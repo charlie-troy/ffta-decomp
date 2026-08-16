@@ -2,15 +2,40 @@
 
 ## Where things stand
 
-**Matched: 45 functions.**
+**Matched: 57 functions, 1,284 bytes.**
 
 | Group | Count | Status |
 |---|---|---|
 | `sub_08005BB0`, `sub_080DBD5C` | 2 | match, hand-written, first try |
 | Cluster A, byte flag getters | 43 | match, template found by permuter |
+| Batch 1, assorted small leaves | 12 | match, hand-written |
 | Cluster A-alt, getters with swapped setup order | 3 | 4 bytes off |
-| Cluster B, byte flag setters | 45 | in progress |
-| Cluster C, halfword flag getters | 9 | in progress |
+| Cluster B, byte flag setters | 45 | stalled at 20 bytes off |
+| Cluster C, halfword flag getters | 9 | stalled, permuter regressed |
+
+## Branch polarity depends on the test, not a house rule
+
+The single most useful rule so far, and it cuts both ways:
+
+- **Masked flag tests** (`x & mask`) want the **negated** form:
+  `if (!(x & m)) return 0; return 1;`
+- **Equality tests** (`x == k`) want the **positive** form:
+  `if (x == k) return 1; return 0;`
+
+Applying the getter's negation lesson blindly to `sub_08010FF0` produced exactly
+the mirror-image layout. Flipping it matched. Do not generalise polarity across
+test kinds; check the `beq`/`bne` in the target and pick to suit.
+
+Second rule from batch 1: **statement order in the source shows up in the
+output.** `sub_0800C614` needed the halfword load written before the zero-init
+of the result variable, because the original emits `ldrh` before `movs r2, #0`.
+Reading the target's instruction order and mirroring it in the source is worth
+doing before reaching for the permuter.
+
+Batch 1 hit 10/12 on the first attempt and 12/12 after applying these two
+rules, which is a far better rate than the permuter managed on the stuck
+clusters. Hand-writing with the target disassembly open is the productive mode;
+the permuter is for when that plateaus.
 
 ## The lesson that unlocked cluster A
 
