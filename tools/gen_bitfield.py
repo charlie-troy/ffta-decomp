@@ -75,6 +75,20 @@ u8 {name}(struct Obj *obj)
 # identical, but removing them makes gcc materialise the mask before copying
 # the cleared value, a 4-byte difference. Every clean spelling tried plateaus
 # at 4 bytes off. Matching wins; see docs/matching-notes.md.
+# Same as GETTER_BYTE with the two declarations swapped. The target sets up the
+# mask before the pointer arithmetic, and declaration order drives that.
+GETTER_BYTE_ALT = """
+u8 {name}(struct Obj *obj)
+{{
+    int mask = {mask:#x};
+    u8 *p = &obj->flags;
+
+    if (!(*p & mask))
+        return 0;
+    return 1;
+}}
+"""
+
 SETTER_BYTE = """
 void {name}(struct Obj *obj, u8 set)
 {{
@@ -118,6 +132,14 @@ def gen(f):
         if off is None or mask is None:
             return None
         body = GETTER_BYTE.format(name=f["name"], mask=mask)
+        field = "    u8 flags;"
+
+    elif shape == GET_BYTE_BIT_ALT:
+        off = imm_of(by_mn(d, "adds")[0])
+        mask = imm_of(by_mn(d, "movs")[0])
+        if off is None or mask is None:
+            return None
+        body = GETTER_BYTE_ALT.format(name=f["name"], mask=mask)
         field = "    u8 flags;"
 
     elif shape in (SET_BYTE_BIT_NEG, SET_BYTE_BIT_POS):

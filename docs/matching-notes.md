@@ -16,6 +16,21 @@ byte-identical; non-matching work lives in `nonmatching/`.
 | Cluster C, halfword flag getters | 9 | 21 bytes off |
 | `sub_080DD580` | 1 | 6 bytes off |
 
+## Some functions are libgcc, not game code
+
+`sub_08142A94` looked like a 64-bit negation, and `return -x;` on a `long long`
+compiled to a `bl` to *itself*. That is the tell: the function **is** libgcc's
+`__negdi2`, linked into the ROM, not something Square wrote.
+
+Compiler runtime routines must come from building agbcc's libgcc, never from
+hand-written C, because no C source can compile to them. Expect more of these,
+`__divsi3`, `__udivsi3`, `__modsi3`, `__ashldi3` and friends, and they will all
+look like plausible arithmetic helpers with no callers in game code.
+
+The cheap check: if a candidate C implementation compiles to a call rather than
+to inline code, stop and consider whether the target is the runtime routine
+that call was headed for.
+
 ## When to permute and when to rewrite
 
 Four functions have now been cracked by the permuter and several have resisted
