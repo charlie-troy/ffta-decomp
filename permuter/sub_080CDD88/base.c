@@ -1,3 +1,5 @@
+/* Best hand-found spelling: 20 bytes off. The complement kept as its own int
+ * variable is worth 3 bytes over writing `& ~mask` inline. */
 typedef unsigned char u8;
 
 struct Obj
@@ -8,9 +10,13 @@ struct Obj
 
 void sub_080CDD88(struct Obj *obj, u8 set)
 {
-    int v = obj->flags & ~0x10;
+    u8 *p = &obj->flags;
+    int notmask = ~0x10;
+    int mask = 0x10;
+    int v;
 
-    obj->flags = v;
+    v = *p & notmask;
+    *p = v;
     if (set)
-        obj->flags = v | 0x10;
+        *p = v | mask;
 }

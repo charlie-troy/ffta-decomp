@@ -28,10 +28,25 @@ command -v arm-none-eabi-objdump >/dev/null || { echo "objdump not on PATH"; exi
 
 cd "$PERM" || exit 1
 echo "permuting $ABS for up to ${SECONDS_LIMIT}s"
-timeout --foreground "$SECONDS_LIMIT" \
-  "$PY" permuter.py "$ABS" --stop-on-zero -j 4 "$@"
+
+# A plain `timeout` does not reliably stop this: with -j the permuter spawns
+# worker processes, and SIGTERM to the parent alone left the whole tree running
+# for an hour. Run it in its own process group and kill the group, escalating
+# to SIGKILL if it does not go quietly.
+setsid "$PY" permuter.py "$ABS" --stop-on-zero -j 4 "$@" &
+pid=$!
+pgid=$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d ' ')
+
+( sleep "$SECONDS_LIMIT"
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "TIMED OUT after ${SECONDS_LIMIT}s with no match"
+    kill -INT -"$pgid" 2>/dev/null
+    sleep 10
+    kill -KILL -"$pgid" 2>/dev/null
+  fi ) &
+watchdog=$!
+
+wait "$pid"
 rc=$?
-if [ $rc -eq 124 ]; then
-  echo "TIMED OUT after ${SECONDS_LIMIT}s with no match"
-fi
+kill "$watchdog" 2>/dev/null
 exit $rc
