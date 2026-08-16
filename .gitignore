@@ -11,3 +11,9 @@ baserom*
 *.map
 *.sym
 *.log
+# permuter scratch output dirs are search artifacts, not source
+permuter/*/output-*/
+permuter/*/target.o
+permuter/*/target.bin
+permuter/*/base.o
+permuter/*/base.bin

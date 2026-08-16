@@ -54,12 +54,19 @@ struct Obj
 }};
 """
 
+# Spelling found by decomp-permuter and verified byte-exact. Three details all
+# matter: the condition must be negated (else the branch layout mirrors), the
+# field must be reached through a pointer temp, and the mask must be an int
+# variable rather than a literal (else the mask and value swap registers).
 GETTER_BYTE = """
 u8 {name}(struct Obj *obj)
 {{
-    if (obj->flags & {mask:#x})
-        return 1;
-    return 0;
+    u8 *p = &obj->flags;
+    int mask = {mask:#x};
+
+    if (!(*p & mask))
+        return 0;
+    return 1;
 }}
 """
 

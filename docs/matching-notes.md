@@ -2,97 +2,88 @@
 
 ## Where things stand
 
-**Matched: 2 functions.** Both are branch-free.
+**Matched: 45 functions.**
 
-| Function | Bytes | Status |
+| Group | Count | Status |
 |---|---|---|
-| `sub_08005BB0` | 18 | match, first try |
-| `sub_080DBD5C` | 20 | match, first try |
+| `sub_08005BB0`, `sub_080DBD5C` | 2 | match, hand-written, first try |
+| Cluster A, byte flag getters | 43 | match, template found by permuter |
+| Cluster A-alt, getters with swapped setup order | 3 | 4 bytes off |
+| Cluster B, byte flag setters | 45 | in progress |
+| Cluster C, halfword flag getters | 9 | in progress |
 
-**Not matched: the three large accessor clusters (~100 functions).** All of them
-contain a conditional branch, and all of them plateau at a small, *constant*
-residual difference no matter how the C is spelled.
+## The lesson that unlocked cluster A
 
-## The open problem
+Three independent details all had to be right at once, and getting two of three
+still leaves a stable non-zero diff. This is why hand-permuting stalled:
 
-agbcc reproduces straight-line code exactly and branchy code almost-but-not-quite.
-That split is the whole story so far, and it is the thing to solve next.
+1. **The condition must be negated.** `if (x & m) return 1; return 0;` produces
+   the mirror-image branch layout. `if (!(x & m)) return 0; return 1;` produces
+   the original. Worth 3 bytes.
+2. **The field must be reached through a pointer temp**, not `obj->flags`
+   directly.
+3. **The mask must be an `int` variable, not a literal.** A literal `0x40` and a
+   variable holding `0x40` allocate registers differently; the literal puts the
+   mask in `r0` and the value in `r1`, the original wants the reverse.
 
-### Cluster A: byte flag getter (43 functions)
+Final matching form:
 
-Original, e.g. `sub_080CD92C` (offset `0xE8`, mask `0x40`):
+```c
+u8 sub_080CD92C(struct Obj *obj)
+{
+    u8 *p = &obj->flags;
+    int mask = 0x40;
 
+    if (!(*p & mask))
+        return 0;
+    return 1;
+}
 ```
-push {lr}
-adds r0, #0xe8
-movs r1, #0x40      <- mask into r1
-ldrb r0, [r0]       <- value into r0, reusing the dead pointer
-ands r0, r1
-cmp  r0, #0
-beq  .L0
-movs r0, #1
-b    .L1
-.L0: movs r0, #0
-.L1: pop {r1}
-     bx r1
-```
 
-Two independent discrepancies were found, one solved and one not:
+Thirteen hand-written spellings all plateaued at exactly 4 bytes off, because
+each one got at most two of the three details right. decomp-permuter found the
+combination at iteration 2496, in under four minutes.
 
-1. **Branch polarity — solved.** Writing the condition positively
-   (`if (x & m) return 1; return 0;`) yields the mirror-image layout. Writing it
-   negated (`if (!(x & m)) return 0; return 1;`) yields the original layout.
-   This took the diff from 7 bytes to 4.
+The generated template in `tools/gen_bitfield.py` applies this to all 43
+functions in the cluster, varying only the struct offset and mask, and every one
+matches.
 
-2. **Operand order — unsolved.** The original puts the mask in `r1` and loads
-   the value into `r0`; agbcc does the reverse, costing exactly 4 bytes (two
-   instructions). Thirteen spellings were tried, all landing on 4:
-   plain if, `!=0`, `==0`, negated, ternary, mask-first (`0x40 & x`), u8 temp,
-   int temp, pointer temp, separate mask variable, bitfield read, bitfield in an
-   if, and an explicit else. Every one produced an identical 4-byte residual.
+**Caveat worth keeping in mind:** matching is not the same as being the original
+source. `int mask = 0x40;` is unlikely to be literally what Square wrote. It
+reproduces the codegen exactly, which is what a matching decomp requires, but
+the shape of the real source may become clearer once neighbouring functions are
+done and a house style emerges.
 
-That invariance across spellings is the important datum: the difference is not
-expressible in the source, so it is coming from the compiler.
+## Setting up the permuter
 
-### Cluster B: byte flag setter (45 functions)
+Non-obvious bits, all handled by the checked-in scripts:
 
-Structurally solved, register allocation not. Using an `int` temporary
-reproduces the distinctive `movs r3, #0x11; rsbs r3, r3, #0` (the mask kept as a
-32-bit `~0x10` = `0xFFFFFFEF` rather than narrowed to `0xEF`), which is the
-tell that the cleared value lives in an int-width temporary and is reused.
+- `prelude.inc` in decomp-permuter is **MIPS-only**. ARM targets must not
+  include it; `permuter/*/target.s` is plain Thumb with its own header.
+- `compile.sh` is invoked as `./compile.sh input.c -o output.o`, so the output
+  path is `$3`, not `$2`.
+- `arm-none-eabi-objdump` must be on `PATH` for the ARM32 scorer.
+- Ubuntu 24.04 is PEP668-managed, so the permuter's `toml` and `pycparser` live
+  in a venv at `~/ffta-toolchain/permuter-venv`.
+- `target.s` is worth verifying: `tools/permuter_setup.sh` assembles it and
+  dumps the bytes so they can be checked against the ROM before any search runs.
+  A wrong target silently searches for the wrong thing.
 
-Remaining: the original allocates `r2`/`r3` the other way round, and its final
-or-in is three instructions (`adds r0, r3, #0; movs r1, #0x10; orrs r0, r1`)
-against agbcc's two (`movs r0, #0x10; orrs r2, r0`), implying the store target
-and the or-ed value are distinct variables in the original source.
-
-### Cluster C: halfword flag getter (9 functions)
-
-The original does the naive thing: `and`, truncate to u16 via `lsl #16; lsr #16`,
-then test `!= 0` via `rsbs r0, r0, #0; lsrs r1, r0, #31`. agbcc instead optimises
-`(x & 0x8000) != 0` into a single shift. Forcing a `u16` temporary gets the
-truncation back but not the rest.
-
-## What was ruled out
+## What was ruled out earlier
 
 - **Compiler revision.** `agbcc` beats `old_agbcc` decisively (4 vs 22 bytes off
-  on the getter), so `agbcc` is the right one of the two.
-- **Optimisation level.** `-O0/-O1/-O2/-O3/-Os` were swept across both compiler
-  revisions. `-O2` and `-O3` tie for best; nothing matches. `-O0` is far worse,
-  confirming the ROM is an optimised build.
+  on the getter). `agbcc` is correct.
+- **Optimisation level.** `-O0/-O1/-O2/-O3/-Os` swept across both revisions.
+  `-O2` is right; `-O0` is far worse, confirming an optimised build.
 
-## Next things to try
+The earlier hypothesis that a different compiler revision was needed turned out
+to be wrong. The residual was a source-spelling problem after all, just a
+three-dimensional one that hand-search was poorly suited to.
 
-1. **A permuter.** This is exactly what `decomp-permuter` exists for: it mutates
-   a source that is already close and searches for the spelling that matches.
-   Hand-permuting has hit its limit at 4 bytes.
-2. **Other agbcc forks.** Several GBA decomp projects maintain their own agbcc
-   patches. A fork whose branch and register-allocation behaviour differs
-   slightly may be the actual answer, given how uniform the residual is.
-3. **A different SDK compiler revision.** agbcc reports itself as
-   `gcc 2.9-arm-000512`. The AGB SDK shipped more than one build, and Square was
-   not Game Freak; pret's agbcc is tuned to reproduce Game Freak's ROMs
-   specifically.
-4. **Confirm on more branch-free functions.** Cheap sanity check: if every
-   branch-free leaf matches first try and every branchy one does not, that
-   sharpens the diagnosis considerably.
+## Next
+
+1. Finish clusters B and C via the permuter, then template them.
+2. Chase the 3-function A-alt shape, where the mask setup precedes the pointer
+   arithmetic.
+3. Move on to the 111 single-member shapes, which will need individual work.
+4. Linker script and full-ROM rebuild with everything else still assembly.
