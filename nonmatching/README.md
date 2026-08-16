@@ -6,6 +6,7 @@ bytes. Kept out of `src/` so that everything under `src/` is known-matching.
 | Function | Off by | What is wrong |
 |---|---|---|
 | `sub_080DD580` | 6 bytes | Register allocation around the result variable. Was 24 off until the mask became an `int` variable, which stopped gcc folding `((v >> 7) & 1) == 1` down to no branch at all. A 5-minute permuter run reached a best score of 60 without matching. |
+| `sub_0801AD1C` | 15 bytes | gcc folds `base + 0x2000` into a second literal-pool constant instead of materialising `0x2000` in a register and adding at runtime, as the original does. Making the offset an `int` variable did not stop the folding. |
 | `sub_08006B9C` | 20 bytes | Register roles are swapped: the original keeps the index in `r0` and the struct pointer in `r1`, agbcc does the reverse. Two hand rewrites, including an explicit pointer temp, did not move it. |
 
 Also unmatched, still assembly rather than C: the 9 halfword flag getters of

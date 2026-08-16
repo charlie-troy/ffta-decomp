@@ -16,6 +16,38 @@ byte-identical; non-matching work lives in `nonmatching/`.
 | Cluster C, halfword flag getters | 9 | 21 bytes off |
 | `sub_080DD580` | 1 | 6 bytes off |
 
+## Referencing globals before a symbol file exists
+
+`sub_08013364` reads a pointer from `0x0200918C`. There is no linker script or
+symbol file yet, so an `extern` would leave a relocation and an empty literal
+pool. Addressing the global through a macro puts the right constant in the pool
+and matches:
+
+```c
+#define gUnk_0200918C (*(struct Obj **)0x0200918C)
+```
+
+This is scaffolding, not the end state. Once a symbol file and linker script
+exist these should become real `extern` declarations with proper names, and the
+macro form is easy to grep for when that day comes.
+
+## Literals versus int variables, again
+
+This keeps recurring and is worth stating as one rule: **gcc reasons about
+literals and refuses to reason about variables.** Three separate consequences
+seen so far, all fixed the same way:
+
+- A literal mask let gcc prove `(v >> 7) & 1` was already 0 or 1, so it folded
+  the comparison and emitted no branch (`sub_080DD580`).
+- A literal mask allocated the mask and value to swapped registers
+  (cluster A).
+- A literal offset let gcc fold `base + 0x2000` into a second literal-pool
+  constant instead of adding at runtime (`sub_0801AD1C`, still unmatched: here
+  the int variable was *not* enough).
+
+When output is shorter than the target, or a constant appears in a pool that
+the original computes, try promoting the constant to an `int` variable first.
+
 ## Some functions are libgcc, not game code
 
 `sub_08142A94` looked like a 64-bit negation, and `return -x;` on a `long long`
