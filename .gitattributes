@@ -1,0 +1,6 @@
+# The toolchain runs under WSL. CRLF line endings break shell scripts there,
+# so keep everything LF regardless of the checkout platform.
+* text=auto eol=lf
+*.sh text eol=lf
+*.gba binary
+*.bin binary
