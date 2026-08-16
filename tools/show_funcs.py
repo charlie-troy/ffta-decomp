@@ -7,6 +7,7 @@ Usage:
     python tools/show_funcs.py <manifest.json> [--max-size N] [--limit M]
                                [--min-callers N] [--include-templated]
 """
+import os
 import sys
 import json
 import argparse
@@ -18,8 +19,20 @@ TEMPLATED = {
     G.GET_HW_BIT_SHIFT, G.GET_HW_BIT,
 }
 
-# already matched by hand
-DONE = {"sub_08005BB0", "sub_080DBD5C"}
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Matched by hand before the src/ naming convention settled.
+EXTRA_DONE = {"sub_08005BB0", "sub_080DBD5C"}
+
+
+def claimed():
+    """Functions that already have a source file, so they are not open work."""
+    done = set(EXTRA_DONE)
+    for root, _dirs, files in os.walk(os.path.join(REPO, "src")):
+        for fn in files:
+            if fn.startswith("sub_") and fn.endswith(".c"):
+                done.add(fn[:-2])
+    return done
 
 
 def parse_args(argv):
@@ -35,6 +48,7 @@ def parse_args(argv):
 def main(argv):
     args = parse_args(argv)
     funcs = json.load(open(args.manifest))
+    done = claimed()
 
     sel = []
     for f in funcs:
@@ -42,7 +56,7 @@ def main(argv):
             continue
         if f["callers"] < args.min_callers:
             continue
-        if f["name"] in DONE:
+        if f["name"] in done:
             continue
         if not args.include_templated and f["shape"] in TEMPLATED:
             continue
