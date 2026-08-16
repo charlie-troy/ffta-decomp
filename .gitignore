@@ -1,0 +1,13 @@
+# NEVER commit the ROM or anything extracted from it.
+*.gba
+*.bin
+*.gbc
+baserom*
+/build/
+/tools/__pycache__/
+/toolchain/
+*.o
+*.elf
+*.map
+*.sym
+*.log
