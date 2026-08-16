@@ -70,12 +70,26 @@ u8 {name}(struct Obj *obj)
 }}
 """
 
+# Found by decomp-permuter. The duplicated branch is load-bearing and not a
+# transcription error: `p || notmask` is always true and both arms are
+# identical, but removing them makes gcc materialise the mask before copying
+# the cleared value, a 4-byte difference. Every clean spelling tried plateaus
+# at 4 bytes off. Matching wins; see docs/matching-notes.md.
 SETTER_BYTE = """
 void {name}(struct Obj *obj, u8 set)
 {{
-    obj->flags &= ~{mask:#x};
+    u8 *p = &obj->flags;
+    int notmask = ~{mask:#x};
+    int mask = {mask:#x};
+
+    *p = *p & notmask;
     if (set)
-        obj->flags |= {mask:#x};
+    {{
+        if (p || notmask)
+            *p = (*p & notmask) | mask;
+        else
+            *p = (*p & notmask) | mask;
+    }}
 }}
 """
 
@@ -94,7 +108,11 @@ def gen(f):
     d = f["disasm"]
     shape = f["shape"]
 
-    if shape in (GET_BYTE_BIT, GET_BYTE_BIT_ALT):
+    # GET_BYTE_BIT_ALT (3 functions, mask setup before the pointer arithmetic)
+    # and the GET_HW_BIT shapes (cluster C) are deliberately not generated:
+    # the templates below get them to 4 and 21 bytes off respectively, and
+    # emitting known-bad C into src/ would make the tree stop being all-matching.
+    if shape == GET_BYTE_BIT:
         off = imm_of(by_mn(d, "adds")[0])
         mask = imm_of(by_mn(d, "movs")[0])
         if off is None or mask is None:
@@ -110,18 +128,6 @@ def gen(f):
             return None
         body = SETTER_BYTE.format(name=f["name"], mask=mask)
         field = "    u8 flags;"
-
-    elif shape in (GET_HW_BIT_SHIFT, GET_HW_BIT):
-        ldrh = by_mn(d, "ldrh")[0]
-        m = LDR_OFF.search(ldrh["op_str"])
-        if not m:
-            return None
-        off = int(m.group(1), 0)
-        mask = imm_of(by_mn(d, "movs")[1])
-        if shape is GET_HW_BIT_SHIFT:
-            mask <<= imm_of(by_mn(d, "lsls")[0])
-        body = GETTER_HW.format(name=f["name"], mask=mask)
-        field = "    u16 flags;"
 
     else:
         return None

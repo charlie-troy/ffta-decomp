@@ -2,16 +2,61 @@
 
 ## Where things stand
 
-**Matched: 57 functions, 1,284 bytes.**
+**Matched: 113 functions, 3,044 bytes.** Everything under `src/` is verified
+byte-identical; non-matching work lives in `nonmatching/`.
 
 | Group | Count | Status |
 |---|---|---|
 | `sub_08005BB0`, `sub_080DBD5C` | 2 | match, hand-written, first try |
 | Cluster A, byte flag getters | 43 | match, template found by permuter |
+| Cluster B, byte flag setters | 45 | match, template found by permuter |
 | Batch 1, assorted small leaves | 12 | match, hand-written |
+| Batch 2, assorted small leaves | 11 | match, 9 by hand + 2 by permuter |
 | Cluster A-alt, getters with swapped setup order | 3 | 4 bytes off |
-| Cluster B, byte flag setters | 45 | stalled at 20 bytes off |
-| Cluster C, halfword flag getters | 9 | stalled, permuter regressed |
+| Cluster C, halfword flag getters | 9 | 21 bytes off |
+| `sub_080DD580` | 1 | 6 bytes off |
+
+## When to permute and when to rewrite
+
+Four functions have now been cracked by the permuter and several have resisted
+it. The split is not about size:
+
+- **Permute when the structure is right and something needs naming or
+  spilling.** Cluster A needed a pointer temp plus an int mask; `sub_08092084`
+  needed an intermediate pointer; cluster B needed a duplicated branch. In each
+  case the fix was *adding a variable or a redundant construct*, which is
+  exactly the mutation space the permuter searches.
+- **Rewrite by hand when register roles are wrong.** If the target puts a value
+  in `r0` and your output puts it in `r1`, that usually traces back to a
+  declaration type or order decision, and reading the target and changing the
+  source deliberately is faster. `sub_08017B50` was solved by the permuter but
+  the actual fix, `int` instead of `s16` for a temp, was a one-line change.
+
+## Matching sometimes requires code that is not clean
+
+`sub_080CDD88` and the 45 setters templated from it only match with this:
+
+```c
+if (set)
+{
+    if (p || notmask)
+        *p = (*p & notmask) | mask;
+    else
+        *p = (*p & notmask) | mask;
+}
+```
+
+`p || notmask` is always true and both arms are identical. Removing the dead
+branch makes gcc materialise the mask before copying the cleared value, a
+4-byte difference, and every clean spelling tried plateaus at exactly 4. The
+duplicated branch is load-bearing, not a transcription error.
+
+This is normal for a matching decomp and worth keeping in perspective: the goal
+is byte-exact reproduction first, readable source second. A later cleanup pass
+can revisit these once the surrounding code exists and the real idiom is
+clearer. Contrast `sub_08017B50`, where the permuter's answer *did* clean up
+without losing the match, which is always worth checking before committing
+something ugly.
 
 ## Branch polarity depends on the test, not a house rule
 

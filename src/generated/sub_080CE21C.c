@@ -14,7 +14,16 @@ struct Obj
 
 void sub_080CE21C(struct Obj *obj, u8 set)
 {
-    obj->flags &= ~0x20;
+    u8 *p = &obj->flags;
+    int notmask = ~0x20;
+    int mask = 0x20;
+
+    *p = *p & notmask;
     if (set)
-        obj->flags |= 0x20;
+    {
+        if (p || notmask)
+            *p = (*p & notmask) | mask;
+        else
+            *p = (*p & notmask) | mask;
+    }
 }

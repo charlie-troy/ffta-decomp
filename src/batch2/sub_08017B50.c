@@ -10,10 +10,13 @@ struct Obj
     s16 unk_18;
 };
 
+/* Both temps must be int. Declaring limit as s16 to match the field type
+ * allocates the two loads to the opposite registers. Found by decomp-permuter,
+ * and it cleaned up without losing the match. */
 u16 sub_08017B50(struct Obj *obj)
 {
+    int limit = obj->unk_18;
     int v = obj->unk_16;
-    s16 limit = obj->unk_18;
 
     if (v > limit)
         v = limit;
