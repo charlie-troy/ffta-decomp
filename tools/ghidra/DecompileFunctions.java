@@ -13,12 +13,18 @@ import ghidra.app.script.GhidraScript;
 import ghidra.app.decompiler.DecompInterface;
 import ghidra.app.decompiler.DecompileResults;
 import ghidra.program.model.address.Address;
+import ghidra.program.model.lang.Register;
+import ghidra.program.model.lang.RegisterValue;
 import ghidra.program.model.listing.Function;
 
 import java.io.FileWriter;
 import java.io.PrintWriter;
+import java.math.BigInteger;
 
 public class DecompileFunctions extends GhidraScript {
+
+    /** Bytes re-decoded as Thumb around each requested address. */
+    private static final int WINDOW = 0x100;
 
     @Override
     public void run() throws Exception {
@@ -37,9 +43,24 @@ public class DecompileFunctions extends GhidraScript {
         for (int i = 1; i < args.length; i++) {
             String addrText = args[i];
             Address addr = toAddr(addrText);
+
+            // The GBA runs almost entirely in Thumb, but a raw binary import
+            // has no way to know that, so auto-analysis decodes ARM and the
+            // decompiler emits halt_baddata(). TMode=1 fixes it, but the
+            // context register cannot be changed where instructions already
+            // exist, so the listing must be cleared FIRST.
+            Address end = addr.add(WINDOW - 1);
+            clearListing(addr, end);
+
+            Register tmode = currentProgram.getRegister("TMode");
+            if (tmode != null) {
+                currentProgram.getProgramContext().setRegisterValue(
+                        addr, end, new RegisterValue(tmode, BigInteger.ONE));
+            }
+            disassemble(addr);
+
             Function f = getFunctionAt(addr);
             if (f == null) {
-                // The address may not have been reached by auto-analysis.
                 f = createFunction(addr, null);
             }
             out.println("/* ===== " + addrText + " ===== */");

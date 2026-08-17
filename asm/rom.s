@@ -2,7 +2,10 @@
 @ Every byte of the ROM that has not been decompiled yet.
 
 	.section .rom_00000000, "ax", %progbits
-	.incbin "baserom.gba", 0x0, 0x23d0
+	.incbin "baserom.gba", 0x0, 0x1cd0
+
+	.section .rom_00001cf0, "ax", %progbits
+	.incbin "baserom.gba", 0x1cf0, 0x6e0
 
 	.section .rom_000023ea, "ax", %progbits
 	.incbin "baserom.gba", 0x23ea, 0x1572

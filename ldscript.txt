@@ -13,7 +13,9 @@
 gUnk_020020D0 = 0x020020D0;
 gUnk_02009000 = 0x02009000;
 gUnk_020091A0 = 0x020091A0;
+gUnk_03000028 = 0x03000028;
 gUnk_03000890 = 0x03000890;
+gUnk_03002F58 = 0x03002F58;
 gUnk_03002710 = 0x03002710;
 gUnk_030034B8 = 0x030034B8;
 
@@ -22,6 +24,11 @@ SECTIONS
     .rom 0x08000000 :
     {
         build/obj/rom.o(.rom_00000000)
+        . = 0x001cd0;
+        build/obj/sub_08001CD0.o(.text)
+        . = 0x001ce0;
+        build/obj/sub_08001CE0.o(.text)
+        build/obj/rom.o(.rom_00001cf0)
         . = 0x0023d0;
         build/obj/sub_080023D0.o(.text)
         build/obj/rom.o(.rom_000023ea)

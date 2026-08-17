@@ -2,6 +2,22 @@
  "rom_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
  "functions": [
   {
+   "name": "sub_08001CD0",
+   "object": "sub_08001CD0",
+   "address": 134225104,
+   "offset": 7376,
+   "size": 16,
+   "sha256": "0e9ec1883da36a70d35618f539b42a58265af17f628ce1f28cf282527273eb86"
+  },
+  {
+   "name": "sub_08001CE0",
+   "object": "sub_08001CE0",
+   "address": 134225120,
+   "offset": 7392,
+   "size": 16,
+   "sha256": "bc24f77095e4959fbde0a77d8b7b69788a140052455ee8f5634d20c5ea0f5fad"
+  },
+  {
    "name": "sub_080023D0",
    "object": "sub_080023D0",
    "address": 134226896,

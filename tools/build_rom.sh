@@ -20,6 +20,12 @@ mkdir -p "$OBJ"
 
 TARGET_SHA1=4ac05441f4de70a4ec3dd932116346c61b8783d9
 
+# Canonical function manifest. functions_all.json merges luvdis's discovery
+# with local scanning and covers functions the local scan cannot see; the older
+# leaf_candidates.json is the fallback if the merge has not been run.
+MANIFEST=build/functions_all.json
+[ -f "$MANIFEST" ] || MANIFEST=build/leaf_candidates.json
+
 # ---- stage the base ROM ----
 SRC_ROM="${1:-/mnt/d/Nintendo - Game Boy Advance/Final Fantasy Tactics Advance.gba}"
 if [ ! -f baserom.gba ]; then
@@ -42,11 +48,11 @@ bash tools/compile_src.sh "$OBJ" || exit 1
 # so padding is tolerated as long as it covers zero bytes in the ROM. A padded
 # section is still worth seeing.
 echo "=== object size check ==="
-python3 tools/check_obj_sizes.py build/leaf_candidates.json "$OBJ" || true
+python3 tools/check_obj_sizes.py "$MANIFEST" "$OBJ" || true
 
 # ---- generate placement from the objects just built ----
 echo "=== generating rom.s and ldscript.txt ==="
-python3 tools/gen_build.py build/leaf_candidates.json \
+python3 tools/gen_build.py "$MANIFEST" \
   --objdir "$OBJ" --rom baserom.gba || exit 1
 
 # ---- assemble the rest of the ROM ----
