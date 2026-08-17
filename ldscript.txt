@@ -147,6 +147,9 @@ SECTIONS
         . = 0x0a8810;
         build/obj/sub_080A8810.o(.text)
         build/obj/rom.o(.rom_000a8830)
+        . = 0x0a946c;
+        build/obj/sub_080A946C.o(.text)
+        build/obj/rom.o(.rom_000a9476)
         . = 0x0ba7fc;
         build/obj/sub_080BA7FC.o(.text)
         build/obj/rom.o(.rom_000ba816)
@@ -427,6 +430,12 @@ SECTIONS
         . = 0x0ce380;
         build/obj/sub_080CE380.o(.text)
         build/obj/rom.o(.rom_000ce3a0)
+        . = 0x0d4768;
+        build/obj/sub_080D4768.o(.text)
+        build/obj/rom.o(.rom_000d4772)
+        . = 0x0dba50;
+        build/obj/sub_080DBA50.o(.text)
+        build/obj/rom.o(.rom_000dba5a)
         . = 0x0dbd5c;
         build/obj/match_test2.o(.text)
         build/obj/rom.o(.rom_000dbd70)
@@ -445,6 +454,12 @@ SECTIONS
         . = 0x12b4e0;
         build/obj/sub_0812B4E0.o(.text)
         build/obj/rom.o(.rom_0012b502)
+        . = 0x12f0cc;
+        build/obj/sub_0812F0CC.o(.text)
+        build/obj/rom.o(.rom_0012f0d6)
+        . = 0x12f0d8;
+        build/obj/sub_0812F0D8.o(.text)
+        build/obj/rom.o(.rom_0012f0e2)
         . = 0x1485d4;
         build/obj/sub_081485D4.o(.text)
         build/obj/rom.o(.rom_001485e6)

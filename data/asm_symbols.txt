@@ -1,0 +1,18 @@
+/* Call targets that are still assembly.
+ *
+ * These must NOT go in symbols.txt. A linker-script assignment creates an
+ * absolute symbol with no type, so ld cannot tell it is Thumb and inserts an
+ * interworking veneer for every BL to it. That both corrupts the branch and
+ * grows the ROM (four of them added 36 bytes).
+ *
+ * Instead tools/gen_build.py emits a real `.thumb_func` label at the address
+ * inside the incbin that already covers it. The label costs no bytes and gives
+ * ld a properly typed Thumb symbol to branch to.
+ *
+ * Address only, no Thumb bit: `.thumb_func` supplies that.
+ */
+
+sub_08005B58 = 0x08005B58;
+sub_080A8DB8 = 0x080A8DB8;
+sub_0812E4F4 = 0x0812E4F4;
+sub_0812E55C = 0x0812E55C;

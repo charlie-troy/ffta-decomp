@@ -30,6 +30,9 @@ def main(argv):
     sympath = os.path.join(REPO, "data", "symbols.txt")
 
     symaddrs = elfutil.load_symbols(sympath) if os.path.isfile(sympath) else {}
+    asmpath = os.path.join(REPO, "data", "asm_symbols.txt")
+    if os.path.isfile(asmpath):
+        symaddrs.update(elfutil.load_symbols(asmpath))
 
     with open(index) as fh:
         data = json.load(fh)
@@ -42,7 +45,8 @@ def main(argv):
         if not os.path.isfile(path):
             missing.append(f["name"])
             continue
-        text, unres = elfutil.Elf(path).text_relocated(symaddrs)
+        text, unres = elfutil.Elf(path).text_relocated(
+            symaddrs, base_addr=f["address"])
         if text is None:
             missing.append(f["name"])
             continue

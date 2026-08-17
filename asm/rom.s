@@ -11,7 +11,11 @@
 	.incbin "baserom.gba", 0x23ea, 0x1572
 
 	.section .rom_0000397c, "ax", %progbits
-	.incbin "baserom.gba", 0x397c, 0x2234
+	.incbin "baserom.gba", 0x397c, 0x21dc
+	.globl sub_08005B58
+	.thumb_func
+sub_08005B58:
+	.incbin "baserom.gba", 0x5b58, 0x58
 
 	.section .rom_00005bc2, "ax", %progbits
 	.incbin "baserom.gba", 0x5bc2, 0xf1a
@@ -119,7 +123,14 @@
 	.incbin "baserom.gba", 0x9a5e0, 0xe230
 
 	.section .rom_000a8830, "ax", %progbits
-	.incbin "baserom.gba", 0xa8830, 0x11fcc
+	.incbin "baserom.gba", 0xa8830, 0x588
+	.globl sub_080A8DB8
+	.thumb_func
+sub_080A8DB8:
+	.incbin "baserom.gba", 0xa8db8, 0x6b4
+
+	.section .rom_000a9476, "ax", %progbits
+	.incbin "baserom.gba", 0xa9476, 0x11386
 
 	.section .rom_000ba816, "ax", %progbits
 	.incbin "baserom.gba", 0xba816, 0xd2f2
@@ -293,7 +304,13 @@
 	.incbin "baserom.gba", 0xce336, 0x4a
 
 	.section .rom_000ce3a0, "ax", %progbits
-	.incbin "baserom.gba", 0xce3a0, 0xd9bc
+	.incbin "baserom.gba", 0xce3a0, 0x63c8
+
+	.section .rom_000d4772, "ax", %progbits
+	.incbin "baserom.gba", 0xd4772, 0x72de
+
+	.section .rom_000dba5a, "ax", %progbits
+	.incbin "baserom.gba", 0xdba5a, 0x302
 
 	.section .rom_000dbd70, "ax", %progbits
 	.incbin "baserom.gba", 0xdbd70, 0x144
@@ -311,7 +328,21 @@
 	.incbin "baserom.gba", 0xe06a4, 0x4ae3c
 
 	.section .rom_0012b502, "ax", %progbits
-	.incbin "baserom.gba", 0x12b502, 0x1d0d2
+	.incbin "baserom.gba", 0x12b502, 0x2ff2
+	.globl sub_0812E4F4
+	.thumb_func
+sub_0812E4F4:
+	.incbin "baserom.gba", 0x12e4f4, 0x68
+	.globl sub_0812E55C
+	.thumb_func
+sub_0812E55C:
+	.incbin "baserom.gba", 0x12e55c, 0xb70
+
+	.section .rom_0012f0d6, "ax", %progbits
+	.incbin "baserom.gba", 0x12f0d6, 0x2
+
+	.section .rom_0012f0e2, "ax", %progbits
+	.incbin "baserom.gba", 0x12f0e2, 0x194f2
 
 	.section .rom_001485e6, "ax", %progbits
 	.incbin "baserom.gba", 0x1485e6, 0xd82

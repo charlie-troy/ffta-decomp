@@ -338,6 +338,14 @@
    "sha256": "88703bd8e8ebd8c7a2ac7812ac9c0477be79b2aec70470d0fb077c49aac7e3b0"
   },
   {
+   "name": "sub_080A946C",
+   "object": "sub_080A946C",
+   "address": 134911084,
+   "offset": 693356,
+   "size": 10,
+   "sha256": "892da3571222e4831934d5b042ee8fc3f448059e2ad9f96ac3b00e4c1be50ec8"
+  },
+  {
    "name": "sub_080BA7FC",
    "object": "sub_080BA7FC",
    "address": 134981628,
@@ -1226,6 +1234,22 @@
    "sha256": "20ec0f365cf457bada4f11b7158eee05d549092c9ea9023bf91ac54ff4b4ebb7"
   },
   {
+   "name": "sub_080D4768",
+   "object": "sub_080D4768",
+   "address": 135087976,
+   "offset": 870248,
+   "size": 10,
+   "sha256": "3f2a4ef8cd9b1ad14a0157fb02562fcc04e003ec558ba01a02201009fb5f6fae"
+  },
+  {
+   "name": "sub_080DBA50",
+   "object": "sub_080DBA50",
+   "address": 135117392,
+   "offset": 899664,
+   "size": 10,
+   "sha256": "a856e3edf0f63e8a2338e244a93e56dfae8ceeb75d8c38d48c7d3e256a2e57a0"
+  },
+  {
    "name": "sub_080DBD5C",
    "object": "match_test2",
    "address": 135118172,
@@ -1272,6 +1296,22 @@
    "offset": 1225952,
    "size": 34,
    "sha256": "42c3b3641999a127e69055dc92a55bfb28ff31e163802cff2cf5ba43ff0cd2e6"
+  },
+  {
+   "name": "sub_0812F0CC",
+   "object": "sub_0812F0CC",
+   "address": 135459020,
+   "offset": 1241292,
+   "size": 10,
+   "sha256": "234924c6f989586162c545f7666af5acdded38cfb4894fd0929beb8edfa01cd1"
+  },
+  {
+   "name": "sub_0812F0D8",
+   "object": "sub_0812F0D8",
+   "address": 135459032,
+   "offset": 1241304,
+   "size": 10,
+   "sha256": "25d905c010abae7cf07c564bee8bbeaf3b04b81d9464c11cbabbf4d228cdf11a"
   },
   {
    "name": "sub_081485D4",
