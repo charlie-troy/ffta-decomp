@@ -53,7 +53,10 @@
 	.incbin "baserom.gba", 0x112e8, 0x207c
 
 	.section .rom_00013380, "ax", %progbits
-	.incbin "baserom.gba", 0x13380, 0x4744
+	.incbin "baserom.gba", 0x13380, 0x72c
+
+	.section .rom_00013acc, "ax", %progbits
+	.incbin "baserom.gba", 0x13acc, 0x3ff8
 
 	.section .rom_00017ad8, "ax", %progbits
 	.incbin "baserom.gba", 0x17ad8, 0x78
@@ -128,7 +131,10 @@
 	.incbin "baserom.gba", 0xc82f4, 0x1c
 
 	.section .rom_000c8382, "ax", %progbits
-	.incbin "baserom.gba", 0xc8382, 0x3122
+	.incbin "baserom.gba", 0xc8382, 0x2
+
+	.section .rom_000c83a4, "ax", %progbits
+	.incbin "baserom.gba", 0xc83a4, 0x3100
 
 	.section .rom_000cb4c0, "ax", %progbits
 	.incbin "baserom.gba", 0xcb4c0, 0x2084
