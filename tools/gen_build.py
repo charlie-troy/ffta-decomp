@@ -1,0 +1,185 @@
+"""Generate asm/rom.s and ldscript.txt for a full-ROM rebuild.
+
+Everything that has been decompiled is compiled from C and placed at its real
+address; everything else is pulled straight out of the base ROM with .incbin.
+As functions move from incbin to C the output must stay byte-identical, so the
+SHA1 check at the end of the build is the whole point.
+
+Layout strategy: one named section per incbin gap, and explicit `. = <addr>`
+assignments in the linker script before each compiled function. If a function
+assembles to the wrong size the location counter collides and ld fails loudly
+rather than silently shifting the rest of the ROM.
+
+Usage:
+    python tools/gen_build.py <manifest.json> [--rom-size 0x1000000]
+"""
+import os
+import re
+import sys
+import json
+import argparse
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE = 0x08000000
+
+# Matched before the src/ naming convention settled; both live in src/ now
+# under names the manifest does not use.
+EXTRA = {
+    "sub_08005BB0": ("match_test", 0x005BB0, 18),
+    "sub_080DBD5C": ("match_test2", 0x0DBD5C, 20),
+}
+
+
+def parse_args(argv):
+    p = argparse.ArgumentParser()
+    p.add_argument("manifest")
+    p.add_argument("--rom-size", type=lambda x: int(x, 0), default=0x1000000)
+    p.add_argument("--objdir", default=None,
+                   help="read real .text sizes from these objects")
+    p.add_argument("--rom", default=None,
+                   help="base ROM, needed to validate any padding")
+    return p.parse_args(argv)
+
+
+def collect_sources():
+    """Map function name -> source path for every sub_*.c under src/."""
+    out = {}
+    for root, _dirs, files in os.walk(os.path.join(REPO, "src")):
+        for fn in sorted(files):
+            m = re.match(r"^(sub_[0-9A-Fa-f]{8})\.c$", fn)
+            if m:
+                out[m.group(1)] = os.path.join(root, fn)
+    return out
+
+
+def main(argv):
+    args = parse_args(argv)
+    manifest = {f["name"]: f for f in json.load(open(args.manifest))}
+    sources = collect_sources()
+
+    placed = []
+    missing = []
+    for name, path in sources.items():
+        f = manifest.get(name)
+        if f is None:
+            missing.append(name)
+            continue
+        placed.append({
+            "name": name,
+            "obj": name,
+            "offset": f["offset"],
+            "size": f["size"],
+        })
+
+    # the two originals, whose sources are named after the match test
+    for name, (obj, off, size) in EXTRA.items():
+        if os.path.isfile(os.path.join(REPO, "src", obj + ".c")):
+            placed.append({"name": name, "obj": obj, "offset": off, "size": size})
+
+    placed.sort(key=lambda f: f["offset"])
+
+    # A section whose alignment directives survive gets padded up to a multiple
+    # of 4, so the object can be larger than the function. That is tolerable
+    # only if the ROM bytes the padding covers are zeros; otherwise the padding
+    # would overwrite real data.
+    if args.objdir:
+        import check_obj_sizes
+        rom = open(args.rom, "rb").read() if args.rom else None
+        for f in placed:
+            obj_path = os.path.join(args.objdir, f["obj"] + ".o")
+            actual = check_obj_sizes.text_size(obj_path)
+            if actual is None or actual == f["size"]:
+                continue
+            if actual < f["size"]:
+                print(f"error: {f['name']} object is {actual} bytes, "
+                      f"function is {f['size']}")
+                return 1
+            tail = rom[f["offset"] + f["size"]:f["offset"] + actual] if rom else None
+            if tail is None or tail.strip(b"\x00"):
+                print(f"error: {f['name']} object is padded to {actual} bytes "
+                      f"but the ROM bytes it would cover are not zero")
+                return 1
+            print(f"note: {f['name']} padded {f['size']} -> {actual}, "
+                  f"padding covers zero bytes in the ROM")
+            f["size"] = actual
+
+    # overlap check: two functions claiming the same bytes would corrupt the ROM
+    for a, b in zip(placed, placed[1:]):
+        if a["offset"] + a["size"] > b["offset"]:
+            print(f"error: {a['name']} overlaps {b['name']}")
+            return 1
+
+    odd = [f for f in placed if f["offset"] % 4]
+    if odd:
+        print(f"note: {len(odd)} function(s) are only 2-byte aligned; "
+              f"agbcc's .align 2 may pad them:")
+        for f in odd[:5]:
+            print(f"    {f['name']} at {f['offset']:#08x}")
+
+    # ---- asm/rom.s: one section per gap ----
+    gaps = []
+    cur = 0
+    for f in placed:
+        if f["offset"] > cur:
+            gaps.append((cur, f["offset"]))
+        cur = f["offset"] + f["size"]
+    if cur < args.rom_size:
+        gaps.append((cur, args.rom_size))
+
+    asm_dir = os.path.join(REPO, "asm")
+    os.makedirs(asm_dir, exist_ok=True)
+    with open(os.path.join(asm_dir, "rom.s"), "w", newline="\n") as fh:
+        fh.write("@ Generated by tools/gen_build.py. Do not edit.\n")
+        fh.write("@ Every byte of the ROM that has not been decompiled yet.\n\n")
+        for start, end in gaps:
+            fh.write(f'\t.section .rom_{start:08x}, "ax", %progbits\n')
+            fh.write(f'\t.incbin "baserom.gba", {start:#x}, {end - start:#x}\n\n')
+
+    # ---- ldscript.txt ----
+    lines = [
+        "/* Generated by tools/gen_build.py. Do not edit. */",
+        "",
+        "SECTIONS",
+        "{",
+        f"    .rom {BASE:#010x} :",
+        "    {",
+    ]
+    gi = 0
+    cur = 0
+    for f in placed:
+        if f["offset"] > cur:
+            start, _end = gaps[gi]
+            assert start == cur, (start, cur)
+            lines.append(f"        build/obj/rom.o(.rom_{start:08x})")
+            gi += 1
+        # Inside an output section ld treats an assignment to `.` as an offset
+        # from the section start, not an absolute address. The section starts at
+        # 0x08000000, so the ROM file offset is exactly the right value.
+        lines.append(f"        . = {f['offset']:#08x};")
+        lines.append(f"        build/obj/{f['obj']}.o(.text)")
+        cur = f["offset"] + f["size"]
+    if gi < len(gaps):
+        start, _end = gaps[gi]
+        lines.append(f"        build/obj/rom.o(.rom_{start:08x})")
+
+    lines += [
+        "    }",
+        "",
+        "    /DISCARD/ : { *(.comment) *(.debug*) *(.ARM.attributes) }",
+        "}",
+        "",
+    ]
+    with open(os.path.join(REPO, "ldscript.txt"), "w", newline="\n") as fh:
+        fh.write("\n".join(lines))
+
+    total = sum(f["size"] for f in placed)
+    print(f"placed {len(placed)} function(s), {total:,} bytes of C")
+    print(f"{len(gaps)} incbin gap(s) covering {args.rom_size - total:,} bytes")
+    if missing:
+        print(f"warning: {len(missing)} source(s) not in manifest: "
+              f"{', '.join(sorted(missing)[:5])}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

@@ -12,8 +12,10 @@ The goal is C source that rebuilds the original ROM byte for byte.
 
 ## Status
 
-Feasibility is **confirmed**. The toolchain question that decides whether a
-matching decomp is tractable has been answered, and two functions already match.
+**The full 16 MB ROM rebuilds byte-identical.** 140 functions are compiled from
+C and placed at their real addresses; everything else is pulled from the base
+ROM with `.incbin`. `make rom` fails unless the SHA1 matches, so no change can
+silently break the build.
 
 | | |
 |---|---|
@@ -21,8 +23,13 @@ matching decomp is tractable has been answered, and two functions already match.
 | SHA1 | `4ac05441f4de70a4ec3dd932116346c61b8783d9` |
 | Compiler | **agbcc** (pret's patched gcc 2.95.3, the AGB SDK compiler) |
 | Flags | `-mthumb-interwork -Wimplicit -Wparentheses -O2` |
-| Functions matched | 2 |
-| Functions discovered | 3,394 call targets, 124 small leaf candidates |
+| Functions matched | **140** (3,780 bytes) |
+| Full ROM rebuild | **matching** |
+| Functions discovered | 3,394 call targets, 212 leaf candidates |
+
+```bash
+make setup && make rom
+```
 
 ### Evidence for agbcc
 
@@ -95,6 +102,40 @@ That preprocesses, compiles with agbcc, assembles, and prints an
 instruction-by-instruction diff against the original ROM bytes.
 
 ---
+
+## How the rebuild works
+
+`tools/build_rom.sh` runs the whole pipeline:
+
+1. Compile every `src/**/sub_*.c` with agbcc, one object each.
+2. Check each object's `.text` size against the function's real ROM size.
+3. Generate `asm/rom.s` and `ldscript.txt` **from the objects just built**, so
+   placement reflects real section sizes rather than assumed ones.
+4. Assemble `asm/rom.s`, which `.incbin`s every stretch of ROM not yet
+   decompiled, one named section per gap.
+5. Link at absolute addresses, extract with objcopy, compare SHA1.
+
+Three things about agbcc's output make this fiddlier than it looks, all handled
+in `build_rom.sh`:
+
+- **`.text` gets padded.** agbcc opens with `.align 2, 0`, which sets the
+  section alignment to 4 and makes GAS round the section size up. A 26-byte
+  function then occupies 28 and overruns the next thing in the ROM. The leading
+  directive is stripped, since the linker script already places each function at
+  its true address.
+- **Literal pools still need their alignment.** Stripping *every* `.align`
+  breaks any function with a pool, so only the first is removed.
+- **Tail padding is a nop, not zeros.** Where a pool forces alignment 4 anyway,
+  GAS fills the section tail with `0xC046` (`mov r8, r8`) and the ROM has zeros
+  there. An explicit zero-filled `.align 2, 0` is appended to exactly those
+  objects.
+
+Placement uses `. = <offset>` assignments in the linker script. Inside an output
+section ld treats those as offsets from the section start, not absolute
+addresses, and since the section begins at `0x08000000` the ROM file offset is
+the right value. If a function ever assembles to the wrong size the location
+counter collides and ld fails loudly rather than silently shifting the rest of
+the ROM.
 
 ## Layout
 
