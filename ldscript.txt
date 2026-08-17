@@ -14,6 +14,7 @@ gUnk_020020D0 = 0x020020D0;
 gUnk_02009000 = 0x02009000;
 gUnk_020091A0 = 0x020091A0;
 gUnk_03000890 = 0x03000890;
+gUnk_030034B8 = 0x030034B8;
 
 SECTIONS
 {
@@ -91,6 +92,9 @@ SECTIONS
         . = 0x01ca78;
         build/obj/sub_0801CA78.o(.text)
         build/obj/rom.o(.rom_0001ca98)
+        . = 0x021c3c;
+        build/obj/sub_08021C3C.o(.text)
+        build/obj/rom.o(.rom_00021c5c)
         . = 0x02202c;
         build/obj/sub_0802202C.o(.text)
         build/obj/rom.o(.rom_00022044)
@@ -100,6 +104,9 @@ SECTIONS
         . = 0x04c788;
         build/obj/sub_0804C788.o(.text)
         build/obj/rom.o(.rom_0004c7a0)
+        . = 0x05cf3c;
+        build/obj/sub_0805CF3C.o(.text)
+        build/obj/rom.o(.rom_0005cf5c)
         . = 0x068810;
         build/obj/sub_08068810.o(.text)
         build/obj/rom.o(.rom_0006881e)
@@ -114,6 +121,9 @@ SECTIONS
         . = 0x09a260;
         build/obj/sub_0809A260.o(.text)
         build/obj/rom.o(.rom_0009a27c)
+        . = 0x09a5c0;
+        build/obj/sub_0809A5C0.o(.text)
+        build/obj/rom.o(.rom_0009a5e0)
         . = 0x0a8810;
         build/obj/sub_080A8810.o(.text)
         build/obj/rom.o(.rom_000a8830)

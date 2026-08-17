@@ -194,6 +194,14 @@
    "sha256": "dbde99fd245e7c42708043685bb3836d3d84a6baa034ba92cb9fdd062ac9a273"
   },
   {
+   "name": "sub_08021C3C",
+   "object": "sub_08021C3C",
+   "address": 134356028,
+   "offset": 138300,
+   "size": 32,
+   "sha256": "b31359551501505ea813a32430029938b186639fd75acb30a3a0bcc2069d9661"
+  },
+  {
    "name": "sub_0802202C",
    "object": "sub_0802202C",
    "address": 134357036,
@@ -216,6 +224,14 @@
    "offset": 313224,
    "size": 24,
    "sha256": "6078396a972d611b614f9ef4dee42a7cbd0b715dd3216c2bebd140055106186e"
+  },
+  {
+   "name": "sub_0805CF3C",
+   "object": "sub_0805CF3C",
+   "address": 134598460,
+   "offset": 380732,
+   "size": 32,
+   "sha256": "d1856bc7a5f186308c8cc4564c5e0ebf7cf4cc6f4c2ccb00571330a03f8e836f"
   },
   {
    "name": "sub_08068810",
@@ -256,6 +272,14 @@
    "offset": 631392,
    "size": 28,
    "sha256": "67d46cc33fe59f5d99b96a228e530df05cd0851124bc41ba87c5e5bc9cab59fe"
+  },
+  {
+   "name": "sub_0809A5C0",
+   "object": "sub_0809A5C0",
+   "address": 134849984,
+   "offset": 632256,
+   "size": 32,
+   "sha256": "97e97ce803628633114bfbbf2474200de493feb08e21f69e478047f961c96404"
   },
   {
    "name": "sub_080A8810",
