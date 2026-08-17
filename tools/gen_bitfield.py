@@ -107,12 +107,22 @@ void {name}(struct Obj *obj, u8 set)
 }}
 """
 
+# Cluster C. The result-variable form plus an int mask and an explicit u16
+# temp; a direct `return (obj->flags & MASK) != 0;` gets optimised into a
+# single shift instead of the original's and / truncate / neg / lsr sequence.
 GETTER_HW = """
 u8 {name}(struct Obj *obj)
 {{
-    if (obj == 0)
-        return 0;
-    return (obj->flags & {mask:#x}) != 0;
+    u8 r = 0;
+    int mask = {mask:#x};
+    u16 v;
+
+    if (obj != 0)
+    {{
+        v = obj->flags & mask;
+        r = v != 0;
+    }}
+    return r;
 }}
 """
 
@@ -150,6 +160,20 @@ def gen(f):
             return None
         body = SETTER_BYTE.format(name=f["name"], mask=mask)
         field = "    u8 flags;"
+
+    elif shape in (GET_HW_BIT_SHIFT, GET_HW_BIT):
+        ldrh = by_mn(d, "ldrh")[0]
+        m = LDR_OFF.search(ldrh["op_str"])
+        if not m:
+            return None
+        off = int(m.group(1), 0)
+        mask = imm_of(by_mn(d, "movs")[1])
+        if mask is None:
+            return None
+        if shape == GET_HW_BIT_SHIFT:
+            mask <<= imm_of(by_mn(d, "lsls")[0])
+        body = GETTER_HW.format(name=f["name"], mask=mask)
+        field = "    u16 flags;"
 
     else:
         return None
