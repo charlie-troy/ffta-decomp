@@ -6,6 +6,7 @@ bytes. Kept out of `src/` so that everything under `src/` is known-matching.
 | Function | Off by | Permuter best | What is wrong |
 |---|---|---|---|
 | `sub_080DD580` | 6 bytes | 60 | Register allocation around the result variable. Was 24 off until the mask became an `int` variable, which stopped gcc folding `((v >> 7) & 1) == 1` down to no branch at all. Has failed the permuter twice, at two different bases. |
+| `sub_080BDC20` | 13 bytes | not run | Index arithmetic matches exactly as a 2D array. The target sums both scaled offsets and adds the base last; agbcc folds the base in earlier, and the ternary routes the result through an extra temp. Structure right, allocation wrong: a permuter case. |
 
 Skipped deliberately: `sub_0800AF8C`, which contains two mask computations whose
 results are discarded. Dead code like that is unlikely to come out of any
