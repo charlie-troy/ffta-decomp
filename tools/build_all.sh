@@ -30,7 +30,10 @@ for src in "$SRCDIR"/*.c; do
      && "$OBJCOPY" -O binary --only-section=.text "$OUT/$name.o" "$OUT/$name.bin" 2>>"$OUT/$name.err"
   then
     ok=$((ok + 1))
-    rm -f "$OUT/$name.err" "$OUT/$name.i" "$OUT/$name.o"
+    # Keep the .o: functions that reference a global need their relocations
+    # applied before their bytes can be compared, and the .bin cannot carry
+    # that information.
+    rm -f "$OUT/$name.err" "$OUT/$name.i"
   else
     fail=$((fail + 1))
     echo "COMPILE FAIL: $name"

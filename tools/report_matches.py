@@ -7,6 +7,41 @@ import os
 import sys
 import json
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import elfutil
+
+_SYMS = None
+
+
+def _symbols():
+    global _SYMS
+    if _SYMS is None:
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "data", "symbols.txt")
+        _SYMS = elfutil.load_symbols(p) if os.path.isfile(p) else {}
+    return _SYMS
+
+
+def built_bytes(bindir, name, size):
+    """Prefer the object, so relocations to globals are applied.
+
+    A raw .bin still holds placeholder literal-pool words for any function that
+    references a global, which shows up as a spurious mismatch.
+    """
+    obj = os.path.join(bindir, name + ".o")
+    if os.path.isfile(obj):
+        try:
+            text, unresolved = elfutil.Elf(obj).text_relocated(_symbols())
+            if text is not None and not unresolved:
+                return text[:size]
+        except Exception:
+            pass
+    path = os.path.join(bindir, name + ".bin")
+    if not os.path.isfile(path):
+        return None
+    with open(path, "rb") as fh:
+        return fh.read()[:size]
+
 
 def main(argv):
     if len(argv) < 3:
@@ -23,11 +58,10 @@ def main(argv):
     matched_bytes = 0
 
     for name, f in sorted(funcs.items()):
-        path = os.path.join(bindir, name + ".bin")
-        if not os.path.isfile(path):
+        built = built_bytes(bindir, name, f["size"])
+        if built is None:
             missing.append(name)
             continue
-        built = open(path, "rb").read()[:f["size"]]
         orig = rom[f["offset"]:f["offset"] + f["size"]]
         if built == orig:
             matched.append(name)

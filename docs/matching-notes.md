@@ -16,6 +16,33 @@ byte-identical; non-matching work lives in `nonmatching/`.
 | Cluster C, halfword flag getters | 9 | 21 bytes off |
 | `sub_080DD580` | 1 | 6 bytes off |
 
+## Ternary versus if/else changes register allocation
+
+A `u32` field or-ed with a bit or and-ed with its complement, chosen by a
+branch and stored once at the join, only matches when written as a **ternary**:
+
+```c
+p->unk_24 = a != 0 ? (p->unk_24 | 0x20) : (p->unk_24 & ~0x20);
+```
+
+Written as an `if`/`else` the same logic puts the loaded value in `r1` and the
+constant in `r0`; the ternary reverses that to match the ROM, and additionally
+emits the pointer temp *before* the parameter truncation, which was a second
+discrepancy in one of the two functions.
+
+Eight spellings were compiled and their assembly compared: plain if/else, `int`
+temp, ternary, constant-first operands, a temp loaded inside each arm, no
+pointer temp, an `int` parameter, and masks promoted to `int` variables. **Only
+the ternary matched.** Seven of eight produced byte-identical wrong output,
+which is why hand-permuting never found it: the mutation space simply does not
+contain "rewrite this if/else as a conditional expression".
+
+This unblocked `sub_0809993C` and `sub_080DBEB4`, which had both been stuck at
+exactly 12 bytes off.
+
+Generalisation worth carrying: when both arms of a branch assign the same
+variable and it is stored once afterwards, try the ternary before anything else.
+
 ## Globals must be extern symbols, never cast literal addresses
 
 This one blocked four functions across three batches before it was investigated
