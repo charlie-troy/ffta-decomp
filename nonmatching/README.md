@@ -15,6 +15,25 @@ natural C.
 **Not for decompilation:** `sub_08142A94` is libgcc's `__negdi2`, not game code.
 See the libgcc section of `docs/matching-notes.md`.
 
+## These two are parked, not open
+
+Everything reasonable has been tried on `sub_080DD580` and `sub_080BDC20`:
+
+- **Hand iteration**: each plateaus at an unchanging diff (6 and 13 bytes).
+- **Compiler flags**: all 22 agbcc optimisation switches, including the
+  register-allocation ones (`regmove`, `optimize-register-move`,
+  `caller-saves`), produce a byte-identical result. Not one moved either
+  function. pret's agbcc has no `-ftst`; that is a different fork.
+- **Upstream decomp-permuter**: failed, best 60 and 35.
+- **decomp-permuter-agbcc**, the ARMv4T fork with its own scorer: failed, best
+  **60 and 35 again**.
+
+Two independent permuters reaching identical local optima is the useful signal:
+the answer is not reachable by mutating these sources, so more search time is
+waste. They need either a fresh structural idea or a look at how a comparable
+function is written in another agbcc project. Do not spend more permuter time
+on them.
+
 ## Solved, and what solved them
 
 Three blocker classes covering eight functions have been cleared. All three fell

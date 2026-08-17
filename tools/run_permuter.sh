@@ -12,7 +12,13 @@ TC="$HOME/ffta-toolchain"
 # targets MIPS and other AArch32. Set PERMUTER_DIR to switch.
 PERM="${PERMUTER_DIR:-$TC/decomp-permuter-agbcc}"
 [ -d "$PERM" ] || PERM="$TC/decomp-permuter"
-PY="$TC/permuter-venv/bin/python3"
+# The fork needs pycparser 2.x (it imports pycparser.plyparser, removed in 3.x)
+# while upstream is happy on 3.x, so each has its own venv.
+case "$PERM" in
+  *agbcc*) PY="$TC/permuter-agbcc-venv/bin/python3" ;;
+  *)       PY="$TC/permuter-venv/bin/python3" ;;
+esac
+[ -x "$PY" ] || PY="$TC/permuter-venv/bin/python3"
 export PATH="$TC/local/usr/bin:$PATH"
 
 DIR="${1:?usage: run_permuter.sh <scratchdir> [--seconds N] [args...]}"
