@@ -58,6 +58,9 @@ SECTIONS
         . = 0x018470;
         build/obj/sub_08018470.o(.text)
         build/obj/rom.o(.rom_00018484)
+        . = 0x01ca78;
+        build/obj/sub_0801CA78.o(.text)
+        build/obj/rom.o(.rom_0001ca98)
         . = 0x02202c;
         build/obj/sub_0802202C.o(.text)
         build/obj/rom.o(.rom_00022044)
@@ -78,6 +81,9 @@ SECTIONS
         . = 0x09a260;
         build/obj/sub_0809A260.o(.text)
         build/obj/rom.o(.rom_0009a27c)
+        . = 0x0a8810;
+        build/obj/sub_080A8810.o(.text)
+        build/obj/rom.o(.rom_000a8830)
         . = 0x0ba7fc;
         build/obj/sub_080BA7FC.o(.text)
         build/obj/rom.o(.rom_000ba816)
