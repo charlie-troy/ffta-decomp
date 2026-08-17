@@ -16,7 +16,7 @@ PY  ?= python3
 
 BUILD := build
 
-.PHONY: all rom setup verify funcs match progress clean
+.PHONY: all rom check index setup verify funcs match progress clean
 
 all: rom
 
@@ -25,6 +25,16 @@ setup:
 
 rom:
 	bash tools/build_rom.sh "$(ROM)"
+
+## What CI runs: compile everything and check each function's bytes against
+## data/functions.json. Needs no ROM.
+check:
+	bash tools/compile_src.sh build/obj
+	$(PY) tools/verify_functions.py data/functions.json build/obj
+
+## Refresh data/functions.json after adding a function to src/. Needs the ROM.
+index:
+	$(PY) tools/gen_function_index.py "$(ROM)" build/leaf_candidates.json
 
 verify:
 	$(PY) tools/verify_rom.py "$(ROM)"

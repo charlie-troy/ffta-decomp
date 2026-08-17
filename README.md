@@ -103,6 +103,31 @@ instruction-by-instruction diff against the original ROM bytes.
 
 ---
 
+## CI, and what it can and cannot check
+
+CI **cannot run the full ROM rebuild**. That needs `baserom.gba`, which is never
+committed and never will be. Any CI setup that did run it would require shipping
+the ROM to a build server.
+
+What CI runs instead is a genuine per-function regression gate. `data/functions.json`
+records each function's address, size, and the **SHA-256 of the bytes it must
+compile to**. Hashes, not bytes, so the file carries no ROM content and is safe
+to commit. CI builds agbcc, compiles every function, and checks each object's
+`.text` against that hash.
+
+That catches the failure that actually matters day to day: a change that makes a
+function stop compiling to the right code. It does **not** prove the ROM links
+or that placement is correct, because nothing without the ROM can.
+
+```bash
+make check    # what CI runs; no ROM needed
+make rom      # the real gate; needs your own dump
+make index    # refresh data/functions.json after adding a function
+```
+
+After adding a function to `src/`, run `make index` locally and commit the
+updated `data/functions.json`, or CI will report it as missing.
+
 ## How the rebuild works
 
 `tools/build_rom.sh` runs the whole pipeline:

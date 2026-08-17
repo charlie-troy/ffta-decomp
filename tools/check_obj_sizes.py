@@ -17,6 +17,40 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXTRA = {"match_test": ("sub_08005BB0", 18), "match_test2": ("sub_080DBD5C", 20)}
 
 
+def text_bytes(path):
+    """Return the contents of the .text section of an ELF object."""
+    with open(path, "rb") as fh:
+        data = fh.read()
+    found = _find_text(data)
+    if found is None:
+        return None
+    offset, size = found
+    return data[offset:offset + size]
+
+
+def _find_text(data):
+    """Return (file_offset, size) of .text, or None."""
+    if data[:4] != b"\x7fELF":
+        return None
+    e_shoff = struct.unpack_from("<I", data, 0x20)[0]
+    e_shentsize = struct.unpack_from("<H", data, 0x2E)[0]
+    e_shnum = struct.unpack_from("<H", data, 0x30)[0]
+    e_shstrndx = struct.unpack_from("<H", data, 0x32)[0]
+
+    def sh(i):
+        off = e_shoff + i * e_shentsize
+        name, _type, _flags, _addr, offset, size = struct.unpack_from("<IIIIII", data, off)
+        return name, offset, size
+
+    _n, stroff, _s = sh(e_shstrndx)
+    for i in range(e_shnum):
+        name, off, size = sh(i)
+        end = data.index(b"\x00", stroff + name)
+        if data[stroff + name:end] == b".text":
+            return off, size
+    return None
+
+
 def text_size(path):
     """Read the ELF section headers and return the size of .text."""
     with open(path, "rb") as fh:
