@@ -7,7 +7,7 @@ struct Entry
     u32 unk_04;
 };
 
-#define gUnk_03000890 ((struct Entry *)0x03000890)
+extern struct Entry gUnk_03000890[];
 
 u8 sub_080099A4(int i)
 {

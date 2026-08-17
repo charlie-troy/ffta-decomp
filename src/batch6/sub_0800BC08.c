@@ -9,7 +9,7 @@ struct Entry
     u8 filler_1C[0xc];
 };
 
-#define gUnk_02009000 ((struct Entry *)0x02009000)
+extern struct Entry gUnk_02009000[];
 
 void sub_0800BC08(u8 i, u16 a, u16 b)
 {

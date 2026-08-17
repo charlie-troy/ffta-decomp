@@ -3,6 +3,10 @@
 Hashes the .text of each object and compares it to the recorded value. This is
 the regression gate that works without the ROM, so CI can run it.
 
+Functions that reference a global carry R_ARM_ABS32 relocations, whose pool
+words are placeholders until link time. Those are relocated here using
+data/symbols.txt so they can be checked like any other function.
+
 It proves every function still compiles to exactly the right bytes. It does not
 prove the ROM links or that placement is correct; only `make rom` with a real
 base ROM does that.
@@ -15,7 +19,7 @@ import sys
 import json
 import hashlib
 
-import check_obj_sizes
+import elfutil
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -23,20 +27,27 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def main(argv):
     index = argv[0] if argv else os.path.join(REPO, "data", "functions.json")
     objdir = argv[1] if len(argv) > 1 else os.path.join(REPO, "build", "obj")
+    sympath = os.path.join(REPO, "data", "symbols.txt")
+
+    symaddrs = elfutil.load_symbols(sympath) if os.path.isfile(sympath) else {}
 
     with open(index) as fh:
         data = json.load(fh)
     funcs = data["functions"]
 
-    ok, bad, missing = [], [], []
+    ok, bad, missing, unresolved = [], [], [], []
+    relocated = 0
     for f in funcs:
         path = os.path.join(objdir, f["object"] + ".o")
         if not os.path.isfile(path):
             missing.append(f["name"])
             continue
-        text = check_obj_sizes.text_bytes(path)
+        text, unres = elfutil.Elf(path).text_relocated(symaddrs)
         if text is None:
             missing.append(f["name"])
+            continue
+        if unres:
+            unresolved.append((f["name"], sorted(set(unres))))
             continue
         # The section can be padded past the function; only the function's own
         # bytes are compared, and the ROM build validates the padding itself.
@@ -46,17 +57,21 @@ def main(argv):
         else:
             bad.append((f["name"], f["size"], len(text)))
 
-    print(f"index    : {len(funcs)} function(s)")
-    print(f"verified : {len(ok)}")
-    print(f"MISMATCH : {len(bad)}")
-    print(f"missing  : {len(missing)}")
+    print(f"index      : {len(funcs)} function(s)")
+    print(f"verified   : {len(ok)}")
+    print(f"MISMATCH   : {len(bad)}")
+    print(f"missing    : {len(missing)}")
+    print(f"unresolved : {len(unresolved)}")
 
     for name, size, actual in bad:
         print(f"  mismatch {name} (expected {size} bytes, object .text {actual})")
     for name in missing[:10]:
         print(f"  missing object for {name}")
+    for name, syms in unresolved[:10]:
+        print(f"  {name} references unknown symbol(s): {', '.join(syms)}")
+        print("    add them to data/symbols.txt")
 
-    if bad or missing:
+    if bad or missing or unresolved:
         return 1
     print("\nall functions compile to the expected bytes")
     return 0

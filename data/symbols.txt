@@ -1,0 +1,14 @@
+/* Addresses of globals referenced from decompiled C.
+ *
+ * These must be real symbols rather than cast literal addresses: agbcc folds
+ * a constant address and a constant offset into a single literal-pool word,
+ * while the original code computes the offset at runtime. Referencing a symbol
+ * is what forces the split. See docs/matching-notes.md.
+ *
+ * This file is included verbatim into ldscript.txt.
+ */
+
+gUnk_020020D0 = 0x020020D0;
+gUnk_02009000 = 0x02009000;
+gUnk_020091A0 = 0x020091A0;
+gUnk_03000890 = 0x03000890;

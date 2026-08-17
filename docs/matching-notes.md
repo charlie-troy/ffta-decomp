@@ -16,6 +16,43 @@ byte-identical; non-matching work lives in `nonmatching/`.
 | Cluster C, halfword flag getters | 9 | 21 bytes off |
 | `sub_080DD580` | 1 | 6 bytes off |
 
+## Globals must be extern symbols, never cast literal addresses
+
+This one blocked four functions across three batches before it was investigated
+properly, and the investigation took one probe file.
+
+Compiling both spellings of the same function and reading agbcc's assembly:
+
+| Source | Emits |
+|---|---|
+| `u8 *p = (u8 *)0x020091A0; if (a) p += 0x2000;` | two literal-pool words, `base` and `base + 0x2000` |
+| `extern u8 gArr[]; u8 *p = gArr; if (a) p += 0x2000;` | one pool word, then `mov r0, #128; lsl r0, r0, #6; add r1, r1, r0` |
+
+The second is exactly what the ROM does. The same split appears for indexed
+struct fields: with a literal address agbcc emits `ldr r0, [r0, #4]`, with a
+symbol it emits `add r1, r1, #4` then a bare `ldr r0, [r0]`, again matching the
+ROM.
+
+**agbcc folds a constant address with a constant offset. It cannot fold a
+symbol, because the address is not known until link time.** That single
+difference decides several instructions.
+
+So the macro-address scaffolding described below was not merely untidy, it was
+actively wrong: it made matching impossible for any function that offsets a
+global. Addresses now live in `data/symbols.txt`, which is included verbatim
+into `ldscript.txt`, and C declares real externs.
+
+Consequence for CI: objects referencing globals carry `R_ARM_ABS32`
+relocations, so their pool words are placeholders until link time.
+`tools/verify_functions.py` applies those relocations using `data/symbols.txt`
+before hashing, so the ROM-free gate still covers them.
+
+Not every pool problem is this one. `sub_0804E014` was tried both ways and sits
+at 18 bytes off either way; its difference is where agbcc places the pool
+(the original puts it mid-function, after an unconditional branch) and its
+collapsing of a two-armed if/else. Worth checking a hypothesis against a
+control before assuming one cause explains everything.
+
 ## Referencing globals before a symbol file exists
 
 `sub_08013364` reads a pointer from `0x0200918C`. There is no linker script or
