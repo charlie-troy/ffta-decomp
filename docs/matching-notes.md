@@ -16,6 +16,38 @@ byte-identical; non-matching work lives in `nonmatching/`.
 | Cluster C, halfword flag getters | 9 | 21 bytes off |
 | `sub_080DD580` | 1 | 6 bytes off |
 
+## Mid-function literal pools are a symptom, not a cause
+
+Two functions placed their literal pool mid-function, right after an
+unconditional branch, where agbcc put it at the end. That looked like a
+separate behaviour to reverse-engineer. It was not.
+
+gcc dumps a pending constant pool at a **barrier**, and an unconditional branch
+is one. So the question was never "how do I move the pool", it was "why did my
+unconditional branch disappear".
+
+Compiling five spellings of the same logic:
+
+| Spelling | Result |
+|---|---|
+| `if (a == 0) v = 7; else v = 0; *p = v;` | collapses to init-then-conditional-set, **no branch**, pool at end |
+| same with an `int` temp | collapses identically |
+| same with the values as `int` variables | collapses identically |
+| `*p = a == 0 ? 7 : 0;` | two arms, `b` survives, **pool mid-function** |
+| `if (a == 0) *p = 7; else *p = 0;` | two arms, `b` survives, **pool mid-function** |
+
+An if/else writing a shared temp collapses; a ternary, or a store in each arm,
+keeps both arms and with them the branch. Once the branch is back the pool lands
+in the right place by itself.
+
+This solved `sub_0804E014` and `sub_0800395C`. Note it is the *same* underlying
+lesson as the u32 flag pair above: an if/else over a shared variable is not a
+neutral way to write a two-way choice, and the ternary is worth trying whenever
+the target's control flow has an unconditional branch that your output lacks.
+
+Generalisation: **when the target has a branch or a pool your output does not,
+look at the control flow, not the constant.**
+
 ## Ternary versus if/else changes register allocation
 
 A `u32` field or-ed with a bit or and-ed with its complement, chosen by a

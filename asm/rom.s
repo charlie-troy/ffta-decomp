@@ -5,7 +5,10 @@
 	.incbin "baserom.gba", 0x0, 0x23d0
 
 	.section .rom_000023ea, "ax", %progbits
-	.incbin "baserom.gba", 0x23ea, 0x37c6
+	.incbin "baserom.gba", 0x23ea, 0x1572
+
+	.section .rom_0000397c, "ax", %progbits
+	.incbin "baserom.gba", 0x397c, 0x2234
 
 	.section .rom_00005bc2, "ax", %progbits
 	.incbin "baserom.gba", 0x5bc2, 0xf1a
@@ -83,7 +86,10 @@
 	.incbin "baserom.gba", 0x24ad6, 0x27cb2
 
 	.section .rom_0004c7a0, "ax", %progbits
-	.incbin "baserom.gba", 0x4c7a0, 0x1079c
+	.incbin "baserom.gba", 0x4c7a0, 0x1874
+
+	.section .rom_0004e030, "ax", %progbits
+	.incbin "baserom.gba", 0x4e030, 0xef0c
 
 	.section .rom_0005cf5c, "ax", %progbits
 	.incbin "baserom.gba", 0x5cf5c, 0xb8b4

@@ -13,7 +13,5 @@ u8 sub_0800395C(void)
 
     if (p == 0)
         return 0;
-    if (p->unk_00 == 0)
-        return 0;
-    return 1;
+    return p->unk_00 == 0 ? 0 : 1;
 }

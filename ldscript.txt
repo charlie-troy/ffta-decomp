@@ -14,6 +14,7 @@ gUnk_020020D0 = 0x020020D0;
 gUnk_02009000 = 0x02009000;
 gUnk_020091A0 = 0x020091A0;
 gUnk_03000890 = 0x03000890;
+gUnk_03002710 = 0x03002710;
 gUnk_030034B8 = 0x030034B8;
 
 SECTIONS
@@ -24,6 +25,9 @@ SECTIONS
         . = 0x0023d0;
         build/obj/sub_080023D0.o(.text)
         build/obj/rom.o(.rom_000023ea)
+        . = 0x00395c;
+        build/obj/sub_0800395C.o(.text)
+        build/obj/rom.o(.rom_0000397c)
         . = 0x005bb0;
         build/obj/match_test.o(.text)
         build/obj/rom.o(.rom_00005bc2)
@@ -104,6 +108,9 @@ SECTIONS
         . = 0x04c788;
         build/obj/sub_0804C788.o(.text)
         build/obj/rom.o(.rom_0004c7a0)
+        . = 0x04e014;
+        build/obj/sub_0804E014.o(.text)
+        build/obj/rom.o(.rom_0004e030)
         . = 0x05cf3c;
         build/obj/sub_0805CF3C.o(.text)
         build/obj/rom.o(.rom_0005cf5c)
