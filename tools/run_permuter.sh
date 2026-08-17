@@ -8,7 +8,10 @@
 set -u
 
 TC="$HOME/ffta-toolchain"
-PERM="$TC/decomp-permuter"
+# WhenGryphonsFly/decomp-permuter-agbcc is the ARMv4T/agbcc fork; upstream
+# targets MIPS and other AArch32. Set PERMUTER_DIR to switch.
+PERM="${PERMUTER_DIR:-$TC/decomp-permuter-agbcc}"
+[ -d "$PERM" ] || PERM="$TC/decomp-permuter"
 PY="$TC/permuter-venv/bin/python3"
 export PATH="$TC/local/usr/bin:$PATH"
 
