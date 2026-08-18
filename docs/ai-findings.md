@@ -126,6 +126,24 @@ Two consequences worth knowing:
 building libgcc rather than being decompiled. It is the same category as
 `sub_08142A94` (`__negdi2`).
 
+## How AI priority is consumed
+
+`sub_0813413C(unit, abilityId)` is the priority getter. For a real ability it
+returns the ability table's `+0x1A`; for ability id 0 it falls back to a
+**second table at `0x08521A14`, stride 0x34, priority byte at `+0x32`**. That
+second table is a separate AI-tunable dataset and is not yet covered by
+`tools/ability_table.py`.
+
+Only two functions call it, `sub_080C1EB4` and `sub_080C2618`, both in the AI
+region. `sub_080C2618` stores the value into a candidate record rather than
+comparing it, so the AI builds a list of candidate actions each tagged with a
+priority and chooses later.
+
+**Not yet verified:** that higher means less likely. That claim comes from
+public documentation, not from this analysis. Confirming it means finding where
+the candidate records are compared, which is one step further than the trace
+currently reaches. Treat the direction as probable, not established.
+
 ## Supporting primitives worth naming
 
 - `sub_080C7EA4(unit, statId)` — stat getter. `0x13` and `0x14` behave as
