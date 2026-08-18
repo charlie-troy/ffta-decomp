@@ -135,14 +135,25 @@ def cmd_apply(rom_path, csv_path, out_path):
     return 0
 
 
+# Every byte of the entry is exposed. Only offsets whose meaning is actually
+# established get a name; the rest keep a bNN label. Naming a byte on a guess
+# is how a modder ends up corrupting unit data.
+UNIT_NAMED = {0x32: "ai_priority"}
+
+
+def unit_cols():
+    return [UNIT_NAMED.get(o, f"b{o:02x}") for o in range(UNIT_STRIDE)]
+
+
 def cmd_dump_units(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["index", "ai_priority"])
+        w.writerow(["index"] + unit_cols())
         for i in range(UNIT_COUNT):
-            w.writerow([i, rom[UNIT_BASE + i * UNIT_STRIDE + UNIT_PRIO]])
-    print(f"wrote {out_path}: {UNIT_COUNT} entries")
+            base = UNIT_BASE + i * UNIT_STRIDE
+            w.writerow([i] + list(rom[base:base + UNIT_STRIDE]))
+    print(f"wrote {out_path}: {UNIT_COUNT} entries, {UNIT_STRIDE} bytes each")
     return 0
 
 
@@ -155,15 +166,18 @@ def cmd_apply_units(rom_path, csv_path, out_path):
             if not 0 <= i < UNIT_COUNT:
                 print(f"  skipping out-of-range index {i}")
                 continue
-            new = int(row["ai_priority"], 0)
-            if not 0 <= new < 256:
-                print(f"  index {i}: {new} does not fit in a byte, skipped")
-                continue
-            o = UNIT_BASE + i * UNIT_STRIDE + UNIT_PRIO
-            if rom[o] != new:
-                print(f"  index {i:>3} ai_priority: {rom[o]} -> {new}")
-                rom[o] = new
-                changes += 1
+            for off, name in enumerate(unit_cols()):
+                if name not in row or row[name] == "":
+                    continue
+                new = int(row[name], 0)
+                if not 0 <= new < 256:
+                    print(f"  index {i} {name}: {new} does not fit in a byte, skipped")
+                    continue
+                o = UNIT_BASE + i * UNIT_STRIDE + off
+                if rom[o] != new:
+                    print(f"  index {i:>3} {name} (+{off:#04x}): {rom[o]} -> {new}")
+                    rom[o] = new
+                    changes += 1
     open(out_path, "wb").write(rom)
     print(f"\n{changes} field(s) changed, wrote {out_path}")
     return 0
