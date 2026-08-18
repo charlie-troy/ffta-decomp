@@ -31,12 +31,25 @@ COLUMNS = [
     ("aoe_h",       0x09, 1),
     ("aoe_v",       0x0A, 1),
     ("power",       0x0B, 1),
-    ("flags",       0x10, 4),
+    ("flags",       0x10, 4),   # expanded into the named bit columns below
     ("anim_id",     0x14, 2),
     ("desc_id",     0x16, 2),
     ("ai_condition", 0x18, 1),
     ("ai_behaviour", 0x19, 1),
     ("ai_priority",  0x1A, 1),
+]
+
+
+# Bit names for the u32 at +0x10. Unnamed bits keep a bitN label so the word
+# round-trips losslessly; bits 1-4 are never set in any entry.
+FLAG_BITS = [
+    (0,  "f_self_target"),   (1,  "f_bit1"),          (2,  "f_bit2"),
+    (3,  "f_bit3"),          (4,  "f_bit4"),          (5,  "f_offensive"),
+    (6,  "f_ignore_reaction"), (7, "f_reflectable"),  (8,  "f_double_cast"),
+    (9,  "f_ignore_silence"), (10, "f_beastmaster"),  (11, "f_trigger_learn"),
+    (12, "f_blocked_by_cover"), (13, "f_bit13"),      (14, "f_stealable"),
+    (15, "f_return_magic"),  (16, "f_throw"),         (17, "f_absorb_mp"),
+    (18, "f_physical"),      (19, "f_morpher"),       (20, "f_bit20"),
 ]
 
 
@@ -49,9 +62,12 @@ def cmd_dump(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["id"] + [c[0] for c in COLUMNS])
+        cols = [c[0] for c in COLUMNS if c[0] != "flags"]
+        w.writerow(["id"] + cols + [n for _, n in FLAG_BITS])
         for i in range(COUNT):
-            w.writerow([i] + [read(rom, i, off, wd) for _, off, wd in COLUMNS])
+            vals = [read(rom, i, off, wd) for n, off, wd in COLUMNS if n != "flags"]
+            f = read(rom, i, 0x10, 4)
+            w.writerow([i] + vals + [(f >> b) & 1 for b, _ in FLAG_BITS])
     print(f"wrote {out_path}: {COUNT} abilities, {len(COLUMNS)} columns")
     return 0
 
@@ -65,8 +81,24 @@ def cmd_apply(rom_path, csv_path, out_path):
             if not 0 <= i < COUNT:
                 print(f"  skipping out-of-range id {i}")
                 continue
+            # Rebuild the flag word from the named bit columns when present.
+            if all(n in row and row[n] != "" for _, n in FLAG_BITS):
+                new = 0
+                for b, n in FLAG_BITS:
+                    if int(row[n], 0):
+                        new |= 1 << b
+                old = read(rom, i, 0x10, 4)
+                if new != old:
+                    o = BASE + i * STRIDE + 0x10
+                    rom[o:o + 4] = new.to_bytes(4, "little")
+                    changed = [n for b, n in FLAG_BITS
+                               if ((old >> b) & 1) != ((new >> b) & 1)]
+                    print(f"  id {i:>3} flags: {old:#010x} -> {new:#010x} "
+                          f"({', '.join(changed)})")
+                    changes += 1
+
             for name, off, width in COLUMNS:
-                if name not in row or row[name] == "":
+                if name == "flags" or name not in row or row[name] == "":
                     continue
                 new = int(row[name], 0)
                 old = read(rom, i, off, width)

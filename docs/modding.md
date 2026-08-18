@@ -19,6 +19,12 @@ python tools/ability_table.py dump  baserom.gba abilities.csv
 python tools/ability_table.py apply baserom.gba abilities.csv ffta-mod.gba
 ```
 
+The flag word at `+0x10` is expanded into named boolean columns
+(`f_offensive`, `f_reflectable`, `f_ignore_silence`, ...) so bits can be
+toggled without hex. Bits with no known meaning keep a `f_bitN` label so the
+word still round-trips exactly. Verified: re-applying an unedited dump produces
+a byte-identical ROM, and flipping one flag changes exactly one byte.
+
 `apply` rewrites only the fields that differ and prints every change, so a
 stray edit is visible rather than silent. It refuses values that do not fit the
 field width and leaves the ROM size untouched.
