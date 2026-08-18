@@ -27,15 +27,18 @@ for AI behaviour changes.**
 
 ## Concrete AI rules already readable
 
-- **Cost check.** `func_0x0812ED98(user, abilityId)` is compared against
+- **Cost check.** `sub_0812ED98(user, abilityId)` is compared against
   `*(u16 *)(user + 0x1C)`, and the ability is rejected when the resource is
-  short. `user + 0x1C` is very likely current MP. *(high confidence on the
-  mechanism, medium on which resource)*
+  short. `user + 0x1C` is **MP**. *(confirmed, see the stat table below)*
 - **Heal-only-when-hurt.** When the ability table's byte `+0x19` equals 2, the
   AI compares `stat(target, 0x13)` against `stat(target, 0x14) >> 1` and rejects
-  unless the first is below half the second. That is the classic "only heal
-  below 50%" rule, which makes `+0x19 == 2` a healing/support class and
-  `0x13`/`0x14` current and max HP. *(high confidence)*
+  unless the first is below half the second. Stat `0x13` is **current HP** and
+  `0x14` is **max HP**, so this is literally "only use when the target is below
+  half health". *(confirmed)*
+- **Cost is class-modified.** `sub_0812ED98` reads ability property 2 as the
+  base cost, then adjusts it by the unit's class from `sub_080CD50C`: class
+  `0x04` doubles-then-halves via a shift, class `0x0A` rounds up and halves.
+  A half-MP-cost class is exactly the sort of thing worth tuning.
 - **Status gating.** Several checks call the matched flag getters
   (`sub_080CDB54`, `sub_080CDB6C`, `sub_080CD8FC`) on user or target and reject
   on certain states.
@@ -59,6 +62,29 @@ Ability entry fields, inferred from the first rows and from AI usage:
 
 The remaining 24 bytes per entry are not yet identified.
 
+## Unit struct: confirmed stat offsets
+
+`sub_080C7EA4(unit, statId)` is a 69-entry jump table on the stat id. Each case
+is a 4-byte stub that loads one field, so the mapping is exact:
+
+| stat id | load | struct offset | meaning |
+|---|---|---|---|
+| `0x10` | `ldrb` | `+0x12` | byte stat |
+| `0x11` | `ldrb` | `+0x13` | byte stat |
+| `0x12` | `ldrb` | `+0x14` | byte stat |
+| `0x13` | `ldrh` | **`+0x18`** | **current HP** |
+| `0x14` | `ldrh` | **`+0x1A`** | **max HP** |
+| `0x15` | `ldrh` | **`+0x1C`** | **current MP** (the field the cost check uses) |
+| `0x16` | `ldrh` | `+0x1E` | max MP *(by symmetry)* |
+| `0x17` | `ldrh` | `+0x20` | u16 stat |
+
+The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
+comparing one against half the other, is what makes current/max HP certain
+rather than guessed. `+0x1C` then follows as MP because it is both the next
+stat in the sequence and the field the ability-cost check reads.
+
+This was established statically. No emulator was needed.
+
 ## Supporting primitives worth naming
 
 - `sub_080C7EA4(unit, statId)` — stat getter. `0x13` and `0x14` behave as
@@ -75,5 +101,7 @@ The remaining 24 bytes per entry are not yet identified.
 1. Decompile `sub_080C32C0` case by case; the switch makes it separable.
 2. Name the ability table fields by cross-referencing entries against known
    in-game ability stats.
-3. Confirm `0x13`/`0x14` and `user + 0x1C` with mGBA watchpoints. This is the
-   one step that needs the game running.
+3. Decompile the remaining stat cases (69 in total) to finish the struct's
+   numeric fields, the same way `0x13`-`0x15` were resolved.
+4. A running game is still useful for sanity-checking behaviour changes, but it
+   is no longer needed to read the struct.
