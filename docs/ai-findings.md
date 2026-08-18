@@ -30,11 +30,19 @@ for AI behaviour changes.**
 - **Cost check.** `sub_0812ED98(user, abilityId)` is compared against
   `*(u16 *)(user + 0x1C)`, and the ability is rejected when the resource is
   short. `user + 0x1C` is **MP**. *(confirmed, see the stat table below)*
-- **Heal-only-when-hurt.** When the ability table's byte `+0x19` equals 2, the
-  AI compares `stat(target, 0x13)` against `stat(target, 0x14) >> 1` and rejects
-  unless the first is below half the second. Stat `0x13` is **current HP** and
-  `0x14` is **max HP**, so this is literally "only use when the target is below
-  half health". *(confirmed)*
+- **Do not waste debuffs on the nearly dead.** When the ability table's byte
+  `+0x19` equals 2, the AI reads the target's current and max HP (stats `0x13`
+  and `0x14`, at `+0x18` and `+0x1A`) and **rejects the ability when current HP
+  is below half of max**.
+
+  Class 2 is the harmful status/debuff group: ability ids 13, 14 and 18 (Judge,
+  Break, Blind) are class 2, while damage and healing abilities are class 1.
+  So the rule reads as "do not bother inflicting a status effect on something
+  already close to death, just kill it". 97 of 347 abilities are class 2.
+
+  **Correction:** an earlier version of this document had this rule backwards,
+  describing it as "only heal below 50%". The branch rejects when HP is *below*
+  half, not above, and class 2 is not healing. Both were wrong.
 - **Cost is class-modified.** `sub_0812ED98` reads ability property 2 as the
   base cost, then adjusts it by the unit's class from `sub_080CD50C`: class
   `0x04` doubles-then-halves via a shift, class `0x0A` rounds up and halves.

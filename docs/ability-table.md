@@ -9,10 +9,12 @@ Regenerate with `python tools/dump_ability_props.py <rom>`.
 
 | column | width | prop | meaning | evidence |
 |---|---|---|---|---|
-| `+0x04` | u8 | `0x02` | **MP cost** | `sub_0812ED98` reads prop 2 as the cost and the AI compares it against unit MP (`+0x1C`) |
+| `+0x03` | u8 | none | **AP cost / 10** | stored value x10 is the in-game AP; verified against 19 published abilities |
+| `+0x04` | u8 | `0x02` | **MP cost** | `sub_0812ED98` reads prop 2 as the cost and the AI compares it against unit MP (`+0x1C`); verified against 19 published abilities |
+| `+0x0B` | u8 | `0x21` | **Power** | verified against 19 published abilities |
 | `+0x10` | u32 | `0x0B`-`0x1F` | **flag word**, 21 bits | prop id `n` tests bit `n - 0x0B` |
 | `+0x0C` | ptr | `0x09` | sub-structure | the property handler returns an address, not a value |
-| `+0x19` | u8 | none | **AI class** | when 2, the AI requires the target below half HP; not reachable through the property API |
+| `+0x19` | u8 | none | **AI class**; 2 = harmful status/debuff | ids 13, 14 and 18 (Judge, Break, Blind) are class 2 while damage and healing are class 1; not reachable through the property API |
 
 ## Candidates, by evidence
 
@@ -77,8 +79,14 @@ Ability id is the entry index, so these can be checked against known abilities.
 | 11 | 441 | 30 | 32 | 50 | 12 | 1 | 30 |
 | 12 | 385 | 30 | 10 | 0 | 13 | 1 | 20 |
 
-## What would settle the candidates
+## How the names were settled
 
-Someone who knows FFTA's abilities can read the table above against the real
-stats for ability ids 1-12 and pin `+0x03`, `+0x0B` and `+0x1A` immediately.
-That is the fastest remaining step and it needs game knowledge, not tooling.
+Cross-referenced against the published ability data on
+[Data Crystal](https://datacrystal.tcrf.net/wiki/Final_Fantasy_Tactics_Advance/Abilities),
+which documents the same table at the same offset with the same 0x1C stride.
+For ability ids 1-19, `+0x03 * 10` matches the published AP cost and `+0x0B`
+matches the published Power on every entry, which settles both columns.
+
+`+0x1A` remains unidentified: Data Crystal does not document a hit-rate field,
+and its value profile (0-100, clustering on 30/60/70/80) is consistent with
+accuracy but not proven.
