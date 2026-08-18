@@ -14,7 +14,17 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef short s16;
 
-struct Unit;      /* HP +0x18, max HP +0x1A, MP +0x1C; see docs/unit-struct.md */
+/* Only the fields this function touches. Offsets from docs/unit-struct.md. */
+struct Unit
+{
+    u8  filler_00[0x18];
+    u16 hp;             /* +0x18, stat id 0x13 */
+    u16 maxHp;          /* +0x1A, stat id 0x14 */
+    u16 mp;             /* +0x1C, stat id 0x15 */
+    u8  filler_1E[0xD8];
+    u8  unk_F6;         /* +0xF6 */
+    u8  unk_F7;         /* +0xF7 */
+};
 struct Ability;   /* 28 bytes; see docs/ability-table.md                       */
 
 /* An in-progress action. u16[] in the original; only some fields are known. */
@@ -55,7 +65,6 @@ extern u8 sub_0812F1DC(s16 v);
 extern u8 sub_0812F0E4(struct Unit *u, int a, int b);
 extern u16 sub_0812E6A4(struct Unit *u);
 extern u8 sub_08133A58(struct Unit *u, u16 effectId);
-extern u8 sub_080CD8FC_get(struct Unit *u);
 extern void sub_080CDD88(struct Unit *u, u8 v);
 
 extern void (*gEffectHandlers[92])(void);   /* 0x080C3624, all internal */
@@ -85,7 +94,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
 
         /* Reject when the user cannot afford it. The subtraction is done in
          * 16 bits and tested for sign, so it is an unsigned MP < cost test. */
-        if ((s16)(user_mp(user) - AbilityMpCost(user, act->abilityId)) < 0)
+        if ((s16)(user->mp - AbilityMpCost(user, act->abilityId)) < 0)
             Reject();
     }
 
@@ -125,7 +134,8 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
             Reject();
 
         mode = sub_0812E6A4(target) & 0xFFFF;
-        if (!sub_0812F0E4(target, target_unk_F6(target), target_unk_F7(target)))
+        if (!sub_0812F0E4(target, (signed char)target->unk_F6,
+                          (signed char)target->unk_F7))
             mode = 0;
         if (act->abilityId != 0 && AbilityProp(act->abilityId, 0x11))
             mode = 0;                                /* flag bit 6 */
@@ -154,7 +164,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
 
     /* A status bit is briefly cleared around the reachability test, then put
      * back, so the test is done as though the unit did not have it. */
-    saved = sub_080CD8FC_get(user);
+    saved = sub_080CD8FC(user);
     sub_080CDD88(user, 0);
     if (!sub_08133A58(target, act->abilityId))
     {

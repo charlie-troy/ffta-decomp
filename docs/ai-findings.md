@@ -93,6 +93,39 @@ stat in the sequence and the field the ability-cost check reads.
 
 This was established statically. No emulator was needed.
 
+## The AI is randomised
+
+`sub_08002804` is the game's random number generator, a textbook linear
+congruential generator:
+
+```c
+u32 Rand(void)
+{
+    gRngState = gRngState * 1103515245 + 12345;
+    return (gRngState & 0x7FFFFFFF) >> 16;
+}
+```
+
+Those are the ANSI C reference constants. The state lives at **`0x030034B0`**
+in IWRAM.
+
+**43 of the 66 case bodies in the evaluator call it**, each pairing it with the
+libgcc division helper at `0x08142950`, which is the `Rand() % n` idiom. So the
+AI's per-effect scoring is deliberately noisy rather than deterministic, and
+roughly two thirds of the effect types are affected.
+
+Two consequences worth knowing:
+
+- **Testing AI changes is awkward** without pinning the state. Freezing
+  `0x030034B0` makes a battle reproducible, which is the fastest way to tell a
+  behaviour change from a dice roll.
+- **Removing the randomness is a mod in itself.** Making the AI play its best
+  option every time is a plausible difficulty mode and needs no new logic.
+
+`0x08142950` is libgcc's signed division, not game code, and should come from
+building libgcc rather than being decompiled. It is the same category as
+`sub_08142A94` (`__negdi2`).
+
 ## Supporting primitives worth naming
 
 - `sub_080C7EA4(unit, statId)` — stat getter. `0x13` and `0x14` behave as
