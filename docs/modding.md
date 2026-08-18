@@ -9,7 +9,7 @@ how the AI treats that ability, for all 347 of them:
 
 | field | effect |
 |---|---|
-| `ai_priority` | how eagerly the AI reaches for it. **Higher means MORE likely**; 0 disables it for the AI, 100 makes it unconditional. Note this is the opposite of the published description; see docs/ability-table.md for the derivation. |
+| `ai_priority` | **a percentage**: roughly the chance the ability survives the AI's filter. 0 disables it entirely, 100 makes it unconditional. This is the opposite of the published description; see docs/ability-table.md for the derivation. |
 | `ai_behaviour` | when it is considered: `1` low HP, `2` healthy target, `3` last resort |
 | `ai_condition` | special-case handling; `0` on 306 of 347 abilities |
 
@@ -46,6 +46,28 @@ offset `0x1A` of the three entries.
 half HP, which is why status and debuff abilities carry it: there is no point
 blinding something about to die. Setting a healing ability to `2` would make the
 AI refuse to heal badly hurt allies.
+
+## 1a. Presets
+
+Three ready-made changes, each defined only from fields whose meaning is
+established, so none rests on a guessed column:
+
+```bash
+python tools/ability_table.py preset always    baserom.gba ffta-always.gba
+python tools/ability_table.py preset no-status baserom.gba ffta-nostatus.gba
+python tools/ability_table.py preset offensive baserom.gba ffta-aggro.gba
+```
+
+| preset | effect | bytes changed |
+|---|---|---|
+| `always` | every usable ability gets priority 100, so the AI stops randomly skipping actions | 279 |
+| `no-status` | the harmful-status class gets priority 0, so the AI never debuffs | 97 |
+| `offensive` | anything flagged Offensive gets priority 100 | 222 |
+
+`always` is the useful one for testing: with priority pinned at 100 the ability
+filter stops rolling dice, which makes a battle far easier to compare against a
+baseline. Note the AI is randomised in other places too (see
+`docs/ai-case-rules.md`), so this does not make it fully deterministic.
 
 ## 1b. The fallback table
 

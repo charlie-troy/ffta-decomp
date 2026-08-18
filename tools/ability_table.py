@@ -183,7 +183,65 @@ def cmd_apply_units(rom_path, csv_path, out_path):
     return 0
 
 
+# Presets are defined only from fields whose meaning is established: the
+# ai_priority percentage, the ai_behaviour class, and the Offensive flag.
+# Nothing here relies on a guessed column.
+def preset_always(rom, i):
+    """Stop the AI randomly declining an action it could take."""
+    o = BASE + i * STRIDE + 0x1A
+    return [(o, 100)] if rom[o] else []
+
+
+def preset_no_status(rom, i):
+    """Stop the AI using the harmful-status class (ai_behaviour 2)."""
+    b = BASE + i * STRIDE
+    return [(b + 0x1A, 0)] if rom[b + 0x19] == 2 else []
+
+
+def preset_offensive(rom, i):
+    """Make the AI reach for anything flagged Offensive (flag bit 5)."""
+    b = BASE + i * STRIDE
+    flags = int.from_bytes(rom[b + 0x10:b + 0x14], "little")
+    return [(b + 0x1A, 100)] if (flags >> 5) & 1 and rom[b + 0x1A] else []
+
+
+PRESETS = {
+    "always": (preset_always,
+               "every usable ability gets priority 100, so the AI stops "
+               "randomly skipping actions"),
+    "no-status": (preset_no_status,
+                  "abilities in the harmful-status class get priority 0, so "
+                  "the AI never debuffs"),
+    "offensive": (preset_offensive,
+                  "anything flagged Offensive gets priority 100"),
+}
+
+
+def cmd_preset(name, rom_path, out_path):
+    if name not in PRESETS:
+        print("presets:")
+        for k, (_, d) in PRESETS.items():
+            print(f"  {k:<10} {d}")
+        return 2
+    fn, desc = PRESETS[name]
+    rom = bytearray(open(rom_path, "rb").read())
+    n = 0
+    for i in range(COUNT):
+        for off, val in fn(rom, i):
+            if rom[off] != val:
+                rom[off] = val
+                n += 1
+    open(out_path, "wb").write(rom)
+    print(f"preset '{name}': {desc}")
+    print(f"{n} byte(s) changed, wrote {out_path}")
+    return 0
+
+
 def main(argv):
+    if len(argv) == 4 and argv[0] == "preset":
+        return cmd_preset(argv[1], argv[2], argv[3])
+    if len(argv) == 2 and argv[0] == "preset":
+        return cmd_preset(argv[1], None, None)
     if len(argv) == 3 and argv[0] == "dump-units":
         return cmd_dump_units(argv[1], argv[2])
     if len(argv) == 4 and argv[0] == "apply-units":
