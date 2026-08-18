@@ -47,6 +47,22 @@ half HP, which is why status and debuff abilities carry it: there is no point
 blinding something about to die. Setting a healing ability to `2` would make the
 AI refuse to heal badly hurt allies.
 
+## 1b. The fallback table
+
+When an action carries no ability id, `sub_0813413C` reads its priority from a
+second table at `0x08521A14` instead: stride `0x34`, **123 entries**, priority
+byte at `+0x32`, indexed by the unit byte at `+0x05`. Its values use the same
+0-100 scale.
+
+```bash
+python tools/ability_table.py dump-units  baserom.gba units.csv
+python tools/ability_table.py apply-units baserom.gba units.csv ffta-mod.gba
+```
+
+Only the priority byte is written back. The rest of each 52-byte entry is left
+untouched because its layout is not established, and guessing at it would risk
+corrupting unit data.
+
 ## 2. Change the evaluator itself
 
 `sub_080C32C0` is the AI's ability evaluator: an eligibility gauntlet followed

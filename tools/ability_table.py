@@ -5,8 +5,16 @@ behaviour, priority), and those are data, not code. Editing them changes AI
 behaviour without recompiling anything, which makes this the cheapest way to
 tune the game.
 
-    python tools/ability_table.py dump  <rom.gba> out.csv
-    python tools/ability_table.py apply <rom.gba> in.csv out.gba
+    python tools/ability_table.py dump   <rom.gba> out.csv
+    python tools/ability_table.py apply  <rom.gba> in.csv out.gba
+    python tools/ability_table.py dump-units  <rom.gba> out.csv
+    python tools/ability_table.py apply-units <rom.gba> in.csv out.gba
+
+The "units" table at 0x08521A14 is the fallback the AI consults when an action
+carries no ability id. sub_0813413C reads its +0x32 on that path, and the byte
+uses the same 0-100 priority scale as the ability table. Only that byte is
+written back; the rest of each 0x34-byte entry is left alone, because its
+layout is not established.
 
 `apply` rewrites only the bytes that differ and reports each change, so an
 accidental edit is visible rather than silent.
@@ -51,6 +59,14 @@ FLAG_BITS = [
     (15, "f_return_magic"),  (16, "f_throw"),         (17, "f_absorb_mp"),
     (18, "f_physical"),      (19, "f_morpher"),       (20, "f_bit20"),
 ]
+
+
+# Fallback AI table: 0x08521A14, stride 0x34, 123 entries before the zero
+# padding at 123-124. Indexed by the unit byte at +0x05 (stat id 0x02).
+UNIT_BASE = 0x08521A14 - 0x08000000
+UNIT_STRIDE = 0x34
+UNIT_COUNT = 123
+UNIT_PRIO = 0x32
 
 
 def read(rom, i, off, width):
@@ -119,7 +135,45 @@ def cmd_apply(rom_path, csv_path, out_path):
     return 0
 
 
+def cmd_dump_units(rom_path, out_path):
+    rom = open(rom_path, "rb").read()
+    with open(out_path, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["index", "ai_priority"])
+        for i in range(UNIT_COUNT):
+            w.writerow([i, rom[UNIT_BASE + i * UNIT_STRIDE + UNIT_PRIO]])
+    print(f"wrote {out_path}: {UNIT_COUNT} entries")
+    return 0
+
+
+def cmd_apply_units(rom_path, csv_path, out_path):
+    rom = bytearray(open(rom_path, "rb").read())
+    changes = 0
+    with open(csv_path, newline="") as fh:
+        for row in csv.DictReader(fh):
+            i = int(row["index"])
+            if not 0 <= i < UNIT_COUNT:
+                print(f"  skipping out-of-range index {i}")
+                continue
+            new = int(row["ai_priority"], 0)
+            if not 0 <= new < 256:
+                print(f"  index {i}: {new} does not fit in a byte, skipped")
+                continue
+            o = UNIT_BASE + i * UNIT_STRIDE + UNIT_PRIO
+            if rom[o] != new:
+                print(f"  index {i:>3} ai_priority: {rom[o]} -> {new}")
+                rom[o] = new
+                changes += 1
+    open(out_path, "wb").write(rom)
+    print(f"\n{changes} field(s) changed, wrote {out_path}")
+    return 0
+
+
 def main(argv):
+    if len(argv) == 3 and argv[0] == "dump-units":
+        return cmd_dump_units(argv[1], argv[2])
+    if len(argv) == 4 and argv[0] == "apply-units":
+        return cmd_apply_units(argv[1], argv[2], argv[3])
     if len(argv) == 3 and argv[0] == "dump":
         return cmd_dump(argv[1], argv[2])
     if len(argv) == 4 and argv[0] == "apply":

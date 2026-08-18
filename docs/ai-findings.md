@@ -139,10 +139,14 @@ region. `sub_080C2618` stores the value into a candidate record rather than
 comparing it, so the AI builds a list of candidate actions each tagged with a
 priority and chooses later.
 
-**Not yet verified:** that higher means less likely. That claim comes from
-public documentation, not from this analysis. Confirming it means finding where
-the candidate records are compared, which is one step further than the trace
-currently reaches. Treat the direction as probable, not established.
+**Direction verified, and it is the reverse of the published description.**
+Both callers pass the byte to `sub_0812F1DC`, whose result decides survival, and
+that predicate keeps an ability more often as the priority rises. Higher means
+**more** likely. The derivation is in `docs/ability-table.md`.
+
+The fallback table is bounded at **123 entries**: index 123 and 124 are all
+zero and 125 onwards is unrelated data. Its priority byte spans the same 0-100
+scale as the ability table, over 14 distinct values.
 
 ## Supporting primitives worth naming
 
