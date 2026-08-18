@@ -127,18 +127,19 @@ The predicate is:
 ```c
 if (prio == 0)   return 0;      /* never */
 if (prio >= 100) return 1;      /* always: the random test is skipped */
-a = helper(Rand(), 100);
-b = helper(Rand(), 10000);
+a = Rand() % 100;      /* 0..99    */
+b = Rand() % 10000;    /* 0..9999  */
 return (u16)(prio * 100 + a) < (u16)(b + 1) ? 0 : 1;
 ```
 
-`prio` appears only on the left, with a positive coefficient, and
-`prio * 100 + a` peaks around 10327, far below the `u16` wrap point. The
-expression is therefore monotonic in `prio`: raising it makes the drop
-condition harder to satisfy, so the ability is kept more often.
+With the helper identified as modulo rather than division, the arithmetic is
+exact rather than merely monotonic:
 
-Reading it as a percentage-like likelihood fits the observed data too, which
-runs 0 to 100 across only 13 distinct values.
+    P(drop) = P(b + 1 > prio*100 + a) ~= (10000 - prio*100) / 10000
+
+so **P(keep) is approximately `prio / 100`**. The field is literally a
+percentage chance that the ability survives the filter, which is why its
+observed values run 0 to 100.
 
 **Practical consequence:** to make the AI favour an ability, raise `ai_priority`
 towards 100. Setting it to 0 disables the ability for the AI entirely. Anyone

@@ -122,7 +122,7 @@ Two consequences worth knowing:
 - **Removing the randomness is a mod in itself.** Making the AI play its best
   option every time is a plausible difficulty mode and needs no new logic.
 
-`0x08142950` is libgcc's signed division, not game code, and should come from
+`0x08142950` is libgcc's signed modulo (`__modsi3`), not game code, and should come from
 building libgcc rather than being decompiled. It is the same category as
 `sub_08142A94` (`__negdi2`).
 
