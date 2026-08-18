@@ -73,9 +73,34 @@ and `0x13`, which are bits 6, 7 and 8.
 | 19 | Enable morpher | 55/347 |
 | 20 | *not publicly documented* | 327/347 |
 
-Bits 13 and 20 are set on most entries but appear in no public flag list, so
-their meaning is open. That is one place this analysis adds something rather
-than reproducing what was already known.
+### Bits 13 and 20, which no public flag list covers
+
+Found by scanning every call to `sub_080CCD50` for the literal property id in
+`r1` (`tools/prop_users.py`), then decompiling the callers.
+
+**Bit 13** is read only by `sub_08133E18`, in this shape:
+
+```c
+status(unit) == 0 || ability_property(ability, 0x18) != 0
+```
+
+That is an exemption: the ability is blocked when the unit has a status, unless
+the ability carries the bit. The same function uses the identical shape one line
+earlier with property `0x14`, which is the documented **Ignore Silence** flag.
+So bit 13 is "ignore" for whatever status `sub_080CDB54` reports, and 38
+abilities lack the exemption.
+
+**Bit 20** is read by `sub_08026B90` and `sub_08026D44`, gated on
+`sub_080C95A8(0x0D)`, a rule/law query. When that rule is active, abilities
+without bit 20 are zeroed out of a list. 19 abilities lack it. This looks like
+the law system suppressing abilities, though which law `0x0D` is remains open.
+
+### Naming status flags from exemption pairs
+
+The `status || ignore-flag` shape is a general lever. Because bit 9 is
+documented as Ignore Silence and pairs with `sub_080CDB3C`, that getter reads
+**Silence**. Any other documented "ignore X" flag paired the same way names its
+status the same way.
 
 ## Corrections
 

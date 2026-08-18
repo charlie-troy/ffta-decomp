@@ -91,6 +91,17 @@ separate, smaller family that is not yet decompiled.
 | `sub_080CDB9C` | 0xeb bit 7 | `sub_080CE478` |
 | `sub_080CDBB4` | 0xec bit 0 | `sub_080CE480` |
 
+## Named status flags
+
+| getter | status | how |
+|---|---|---|
+| `sub_080CDB3C` | **Silence** | `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
+| `sub_080CDB54` | blocked-by-status, unidentified | same shape with property `0x18` (flag bit 13), which no public list names |
+
+The pattern to look for is `status(unit) == 0 || ability_property(a, N) != 0`.
+Wherever `N` is a documented "ignore X" flag, the paired getter reads X. That
+turns the ability flag documentation into names for these accessors.
+
 ## Why this matters for modding
 
 The AI evaluator `sub_080C32C0` branches on several of these bits directly
