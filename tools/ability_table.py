@@ -61,11 +61,14 @@ FLAG_BITS = [
 ]
 
 
-# Fallback AI table: 0x08521A14, stride 0x34, 123 entries before the zero
-# padding at 123-124. Indexed by the unit byte at +0x05 (stat id 0x02).
+# Job table: 0x08521A14, stride 0x34. Valid job data runs through index 115;
+# index 116 onward fails plausibility (movement of 33, name ids in the tens of
+# thousands), so the earlier bound of 123 was wrong and would have let someone
+# edit non-job bytes. Public documentation gives 115 entries; index 115 still
+# looks like a real job here, so 116 is used.
 UNIT_BASE = 0x08521A14 - 0x08000000
 UNIT_STRIDE = 0x34
-UNIT_COUNT = 123
+UNIT_COUNT = 116
 UNIT_PRIO = 0x32
 
 
@@ -138,7 +141,34 @@ def cmd_apply(rom_path, csv_path, out_path):
 # Every byte of the entry is exposed. Only offsets whose meaning is actually
 # established get a name; the rest keep a bNN label. Naming a byte on a guess
 # is how a modder ends up corrupting unit data.
-UNIT_NAMED = {0x32: "ai_priority"}
+# Layout from public documentation of the job table, adopted only where the ROM
+# data supports it. Fields that failed plausibility, or that the documentation
+# marks unknown, keep a bNN label. See docs/unit-ai-table.md.
+UNIT_NAMED = {
+    0x00: "name_id",
+    0x07: "sprite_index",
+    0x0B: "sprite_palette",
+    0x0D: "portrait_palette",
+    0x0E: "portrait_index",
+    0x10: "a_ability_index",
+    0x12: "elem_resist_0", 0x13: "elem_resist_1",
+    0x14: "elem_resist_2", 0x15: "elem_resist_3",
+    0x16: "status_defense",
+    0x17: "base_hp", 0x18: "base_mp", 0x19: "base_speed",
+    0x1A: "base_melee_0", 0x1B: "base_melee_1", 0x1C: "base_melee_2",
+    0x1D: "base_magic_0", 0x1E: "base_magic_1", 0x1F: "base_magic_2",
+    0x20: "growth_hp", 0x21: "growth_mp", 0x22: "growth_speed",
+    0x23: "growth_attack", 0x24: "growth_defense",
+    0x25: "growth_magic_pow", 0x26: "growth_magic_res",
+    0x28: "movement", 0x29: "jump", 0x2A: "evade",
+    0x2B: "movement_style",
+    0x2D: "equip_index",
+    0x2E: "ability_start", 0x2F: "ability_end",
+    0x30: "job_requirement",
+    # Not in the published layout, which marks 0x31-0x33 unknown. Established
+    # here from sub_0813413C, which reads it as the AI priority percentage.
+    0x32: "ai_priority",
+}
 
 
 def unit_cols():
