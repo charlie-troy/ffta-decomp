@@ -26,7 +26,7 @@ which describes the same table at the same offset, and verified against the ROM.
 | `+0x16` | 2 | Description ID |  | 0-400, 346 distinct |
 | `+0x18` | 1 | **AI condition** | 0 normal, 1 judge, 2 mug, 3 sensor, ... | 306 of 347 are 0 |
 | `+0x19` | 1 | **AI behaviour** | 0 unknown, 1 low HP, 2 healthy, 3 last resort | 60/185/97/5 |
-| `+0x1A` | 1 | **AI priority** | higher means less likely to be chosen | 13 distinct, 0-100 |
+| `+0x1A` | 1 | **AI priority** | **higher means MORE likely** to be chosen; 0 never, 100+ always | 13 distinct, 0-100 |
 | `+0x1B` | 1 | padding |  | always 0 |
 
 ## The AI tuning surface
@@ -111,3 +111,35 @@ Two earlier readings in this file were wrong and are worth recording:
   exactly why it should not have been asserted.
 - `+0x16` was measured as two separate `u8` columns. It is a single `u16`
   description id; the apparent boolean at `+0x17` was just its high byte.
+
+## AI priority: direction verified, and it is the opposite of the public docs
+
+Data Crystal describes `+0x1A` as "higher = less likely". Reading the code that
+consumes it shows the reverse.
+
+`sub_0813413C` fetches the byte and both callers pass it to the predicate
+`sub_0812F1DC`, whose result decides whether the ability survives. In
+`sub_080C1EB4` a zero result zeroes the candidate out of the list; in
+`sub_080C32C0` a zero result rejects outright. So **1 means keep**.
+
+The predicate is:
+
+```c
+if (prio == 0)   return 0;      /* never */
+if (prio >= 100) return 1;      /* always: the random test is skipped */
+a = helper(Rand(), 100);
+b = helper(Rand(), 10000);
+return (u16)(prio * 100 + a) < (u16)(b + 1) ? 0 : 1;
+```
+
+`prio` appears only on the left, with a positive coefficient, and
+`prio * 100 + a` peaks around 10327, far below the `u16` wrap point. The
+expression is therefore monotonic in `prio`: raising it makes the drop
+condition harder to satisfy, so the ability is kept more often.
+
+Reading it as a percentage-like likelihood fits the observed data too, which
+runs 0 to 100 across only 13 distinct values.
+
+**Practical consequence:** to make the AI favour an ability, raise `ai_priority`
+towards 100. Setting it to 0 disables the ability for the AI entirely. Anyone
+following the published description would tune it backwards.

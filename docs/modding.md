@@ -9,7 +9,7 @@ how the AI treats that ability, for all 347 of them:
 
 | field | effect |
 |---|---|
-| `ai_priority` | how eagerly the AI reaches for it. **Higher means less likely.** |
+| `ai_priority` | how eagerly the AI reaches for it. **Higher means MORE likely**; 0 disables it for the AI, 100 makes it unconditional. Note this is the opposite of the published description; see docs/ability-table.md for the derivation. |
 | `ai_behaviour` | when it is considered: `1` low HP, `2` healthy target, `3` last resort |
 | `ai_condition` | special-case handling; `0` on 306 of 347 abilities |
 
@@ -29,12 +29,13 @@ a byte-identical ROM, and flipping one flag changes exactly one byte.
 stray edit is visible rather than silent. It refuses values that do not fit the
 field width and leaves the ROM size untouched.
 
-Worked example, making the AI much keener on Cure, Cura and Curaga:
+Worked example, making the AI much keener on Cure, Cura and Curaga by raising
+their priority towards the always-use threshold of 100:
 
 ```
-  id   1 ai_priority: 80 -> 10
-  id   2 ai_priority: 65 -> 10
-  id   3 ai_priority: 50 -> 10
+  id   1 ai_priority: 80 -> 100
+  id   2 ai_priority: 65 -> 100
+  id   3 ai_priority: 50 -> 100
 ```
 
 That produced a ROM differing from the base by exactly three bytes, all at
