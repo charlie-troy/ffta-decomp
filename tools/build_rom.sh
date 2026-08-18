@@ -75,7 +75,18 @@ if [ "$got" = "$TARGET_SHA1" ]; then
   echo "ROM MATCHES"
   exit 0
 fi
+if [ "${MOD_BUILD:-0}" = "1" ]; then
+  # A mod is expected to differ. Report what changed and where, and succeed.
+  ndiff=$(cmp -l baserom.gba build/ffta.gba 2>/dev/null | wc -l)
+  echo "MOD BUILD: $ndiff byte(s) differ from the base ROM"
+  python3 tools/diff_regions.py baserom.gba build/ffta.gba data/functions.json 2>/dev/null
+  cp build/ffta.gba build/ffta-mod.gba
+  echo "wrote build/ffta-mod.gba"
+  exit 0
+fi
 echo "ROM DOES NOT MATCH (expected $TARGET_SHA1)"
 cmp -l baserom.gba build/ffta.gba 2>/dev/null | head -20
 echo "differing bytes: $(cmp -l baserom.gba build/ffta.gba 2>/dev/null | wc -l)"
+echo
+echo "If this change was intentional, build with: make mod"
 exit 1

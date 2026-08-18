@@ -16,7 +16,7 @@ PY  ?= python3
 
 BUILD := build
 
-.PHONY: all rom check index setup verify funcs match progress clean
+.PHONY: all rom mod check index setup verify funcs match progress clean
 
 all: rom
 
@@ -25,6 +25,11 @@ setup:
 
 rom:
 	bash tools/build_rom.sh "$(ROM)"
+
+## Build with deliberate changes. Does not require a SHA1 match; reports which
+## functions differ from the base ROM so unintended changes stand out.
+mod:
+	MOD_BUILD=1 bash tools/build_rom.sh "$(ROM)"
 
 ## What CI runs: compile everything and check each function's bytes against
 ## data/functions.json. Needs no ROM.
