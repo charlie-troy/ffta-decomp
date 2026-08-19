@@ -5,6 +5,7 @@
 ##   make setup                       build agbcc + binutils into $HOME
 ##   make rom                         full ROM rebuild, verifies SHA1
 ##   make verify                      check a ROM's sha1 without building
+##   make verify-mod MOD=out.gba      what a mod changes about the AI
 ##   make funcs                       list leaf-function match candidates
 ##   make match SRC=src/foo.c AT=0x5bb0 LEN=18
 ##   make progress                    how much of the ROM is C
@@ -16,7 +17,7 @@ PY  ?= python3
 
 BUILD := build
 
-.PHONY: all rom mod check index setup verify funcs match progress clean
+.PHONY: all rom mod check index setup verify verify-mod funcs match progress clean
 
 all: rom
 
@@ -43,6 +44,12 @@ index:
 
 verify:
 	$(PY) tools/verify_rom.py "$(ROM)"
+
+## Show what a modded ROM changes about the AI's decisions, measured by
+## running both ROMs' own code. MOD= is the ROM you built.
+verify-mod:
+	@test -n "$(MOD)" || { echo "usage: make verify-mod MOD=build/ffta-mod.gba"; exit 2; }
+	$(PY) tools/verify_mod.py "$(ROM)" "$(MOD)"
 
 funcs:
 	cd tools && $(PY) find_leaf_funcs.py "$(ROM)" --max-bytes 48 --count 20 --min-callers 4

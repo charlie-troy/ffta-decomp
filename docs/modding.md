@@ -137,3 +137,61 @@ Anything reported outside a function you deliberately edited is a bug.
 - `docs/unit-struct.md` — 65 of 69 unit stat fields, including HP at `+0x18` and MP at `+0x1C`
 - `docs/unit-flags.md` — 56 status/capability bits and the accessors for each
 - `docs/ai-findings.md` — the evaluator, its data tables and the rules read so far
+
+---
+
+## Checking that a mod did what you meant
+
+Editing a table is easy to get wrong in a way that looks fine: a value that
+saturates, a byte written to the wrong column, an edit that changes nothing.
+
+`tools/verify_mod.py` diffs your ROM against the base, names every changed
+field, and then measures the consequence by running **both ROMs' own decision
+code**, so the answer comes from the game rather than from a description of it.
+
+```bash
+make verify-mod MOD=build/ffta-mod.gba
+```
+
+Output for a mod that raises three abilities and edits one job:
+
+```
+changed fields
+  ability   1  ai_priority               80 -> 100
+  ability   2  ai_priority               65 -> 100
+  ability   3  ai_priority               50 ->  90
+  job       5  resist_packed_1          146 -> 178
+  job       5  unarmed_attack            10 ->  40
+
+measured effect on the AI's decision, run on both ROMs
+ ability     priority            keep rate    delta
+       1    80 -> 100      82.8% ->  100.0%    +17.2
+       2    65 -> 100      68.8% ->  100.0%    +31.2
+       3    50 -> 90       54.2% ->   92.3%    +38.1
+
+job fields, read back through the game's own getters
+  job   5 unarmed_attack   getter 10 -> 40  [ok]
+
+resistance slots touched
+  job   5: slot 3: 1 -> 3
+```
+
+Bytes that fall outside both tables are reported separately and not measured,
+so a stray write is visible rather than quietly folded in.
+
+## 100 is the ceiling, and it is a real ceiling
+
+Measured across the whole byte range, the filter keeps everything from 100
+upward:
+
+| priority | 0 | 25 | 50 | 75 | 90 | 99 | 100 | 128 | 255 |
+|---|---|---|---|---|---|---|---|---|---|
+| keep rate | 0% | 31% | 54% | 79% | 92% | 99.6% | 100% | 100% | 100% |
+
+So 255 is not "more certain than 100", it is the same as 100. `verify_mod.py`
+marks any value above 100 as saturated.
+
+One caller of the filter, at `0x080a2862`, adds 10 to the priority and clamps
+the result at 100 before filtering. Abilities reached through that path
+therefore hit certainty at 90 rather than 100, which is worth knowing before
+concluding that a change from 90 to 100 did nothing.

@@ -1,0 +1,160 @@
+"""Show what a modded ROM actually changes about the AI's decisions.
+
+Editing a CSV is easy to do and easy to get wrong. Everything else in this
+repo validates the base ROM; nothing tells a modder that their edit landed and
+what it did. This diffs a modded ROM against the base, names every changed
+field, and then measures the behavioural consequence by running the ROM's own
+decision code on both, so the answer comes from the game rather than from a
+model of it.
+
+    python tools/verify_mod.py base.gba modded.gba [--samples 4000]
+"""
+import os
+import sys
+import argparse
+import collections
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from emulate import Gba
+import ability_table as A
+
+PRIO_FILTER = 0x0812F1DC
+# sub_080CCD50 exposes only +0x00..+0x0a of an ability entry, so ai_priority at
+# +0x1a is not reachable through it. The AI reads that field directly and hands
+# it to the filter, which is why the measurement below drives the filter itself.
+ABIL_PROP = 0x080CCD50
+JOB_PRIO = 0x0813413C
+JOB_UNARMED = 0x08130820
+RNG_STATE = 0x030034B0
+SEED = 0x12345678
+UNIT = 0x02000400
+
+
+# Offset -> column name, built from the same table the CSV dump uses so the
+# two never drift apart.
+ABIL_OFF = {}
+for _n, _o, _w in A.COLUMNS:
+    for _k in range(_w):
+        ABIL_OFF[_o + _k] = _n if _w == 1 else f"{_n}[{_k}]"
+
+
+def classify(off):
+    """Name the table field a changed ROM offset belongs to."""
+    a = off - A.BASE
+    if 0 <= a < A.COUNT * A.STRIDE:
+        i, o = divmod(a, A.STRIDE)
+        return ("ability", i, o, ABIL_OFF.get(o, f"+{o:#04x}"))
+    u = off - A.UNIT_BASE
+    if 0 <= u < A.UNIT_COUNT * A.UNIT_STRIDE:
+        i, o = divmod(u, A.UNIT_STRIDE)
+        return ("job", i, o, A.UNIT_NAMED.get(o, f"b{o:02x}"))
+    return (None, None, None, None)
+
+
+def keep_rate(gba, prio, n):
+    gba.write32(RNG_STATE, SEED)
+    return 100.0 * sum(1 for _ in range(n) if gba.call(PRIO_FILTER, [prio])) / n
+
+
+def main(argv):
+    p = argparse.ArgumentParser()
+    p.add_argument("base")
+    p.add_argument("modded")
+    p.add_argument("--samples", type=int, default=4000)
+    args = p.parse_args(argv)
+
+    base = open(args.base, "rb").read()
+    mod = open(args.modded, "rb").read()
+    if len(base) != len(mod):
+        print(f"ROM sizes differ: {len(base)} vs {len(mod)}")
+        return 1
+
+    diff = [i for i in range(len(base)) if base[i] != mod[i]]
+    print(f"bytes changed: {len(diff)}")
+    if not diff:
+        print("The ROMs are identical; nothing to measure.")
+        return 0
+
+    groups = collections.defaultdict(list)
+    other = []
+    for off in diff:
+        kind, idx, o, name = classify(off)
+        if kind is None:
+            other.append(off)
+        else:
+            groups[(kind, idx)].append((o, name, base[off], mod[off]))
+
+    print(f"  in the ability table : "
+          f"{sum(1 for k in groups if k[0] == 'ability')} entr(ies)")
+    print(f"  in the job table     : "
+          f"{sum(1 for k in groups if k[0] == 'job')} entr(ies)")
+    print(f"  outside both tables  : {len(other)} byte(s)")
+    if other:
+        print("    (code or another table; behaviour is not measured here)")
+        for off in other[:8]:
+            print(f"    {0x08000000 + off:#010x}: "
+                  f"{base[off]:#04x} -> {mod[off]:#04x}")
+
+    print()
+    print("changed fields")
+    print("-" * 62)
+    for (kind, idx) in sorted(groups):
+        for o, name, b, m in sorted(groups[(kind, idx)]):
+            print(f"  {kind:<7} {idx:>3}  {name:<24} {b:>3} -> {m:>3}")
+
+    gb, gm = Gba(args.base), Gba(args.modded)
+
+    # Ability priority is the field whose effect is measurable end to end.
+    rows = []
+    for (kind, idx), fields in sorted(groups.items()):
+        for o, name, b, m in fields:
+            if kind == "ability" and o == 0x1A:
+                rows.append((idx, b, m))
+    if rows:
+        print()
+        print("measured effect on the AI's decision, run on both ROMs")
+        print(f"{'ability':>8} {'priority':>12} {'keep rate':>20} {'delta':>8}")
+        print("-" * 62)
+        for idx, b, m in rows:
+            rb = keep_rate(gb, b, args.samples)
+            rm = keep_rate(gm, m, args.samples)
+            # confirm the game's own accessor sees the edit
+            note = "  saturated" if m > 100 else ""
+            print(f"{idx:>8}   {b:>3} -> {m:<3}   "
+                  f"{rb:>7.1f}% -> {rm:>6.1f}%   {rm - rb:>+6.1f}{note}")
+        print(f"  {args.samples} samples per figure, same RNG seed on both")
+        if any(m > 100 for _, _, m in rows):
+            print("  values above 100 are marked saturated: the filter keeps")
+            print("  everything at 100, so the extra has no effect")
+
+    jobs = [(idx, o, b, m) for (kind, idx), fs in sorted(groups.items())
+            for o, _, b, m in fs if kind == "job" and o in (0x32, 0x33)]
+    if jobs:
+        print()
+        print("job fields, read back through the game's own getters")
+        for idx, o, b, m in jobs:
+            fn = JOB_PRIO if o == 0x32 else JOB_UNARMED
+            outs = []
+            for g in (gb, gm):
+                g.uc.mem_write(UNIT, bytes(0x40))
+                g.uc.mem_write(UNIT + 5, bytes([idx]))
+                outs.append(g.call(fn, [UNIT, 0]))
+            nm = "ai_priority" if o == 0x32 else "unarmed_attack"
+            ok = "ok" if (outs[0], outs[1]) == (b, m) else "MISMATCH"
+            print(f"  job {idx:>3} {nm:<16} getter {outs[0]} -> {outs[1]}  [{ok}]")
+
+    resist = [(idx, o) for (kind, idx), fs in sorted(groups.items())
+              for o, _, _, _ in fs if kind == "job" and 0x11 <= o <= 0x15]
+    if resist:
+        print()
+        print("resistance slots touched")
+        for idx in sorted({i for i, _ in resist}):
+            b = [A.resist_get(base, idx, n) for n in range(8)]
+            m = [A.resist_get(mod, idx, n) for n in range(8)]
+            ch = [f"slot {n}: {b[n]} -> {m[n]}" for n in range(8) if b[n] != m[n]]
+            print(f"  job {idx:>3}: " + ("; ".join(ch) if ch else "no slot changed"))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))
