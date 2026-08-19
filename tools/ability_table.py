@@ -146,13 +146,22 @@ def cmd_apply(rom_path, csv_path, out_path):
 # marks unknown, keep a bNN label. See docs/unit-ai-table.md.
 UNIT_NAMED = {
     0x00: "name_id",
+    # Documented as Race. Entries 0-71 run in contiguous ascending
+    # blocks, 1-5 covering the playable races and 6+ the monster
+    # families, which is why the range reaches 23.
+    0x04: "race",
     0x07: "sprite_index",
     0x0B: "sprite_palette",
     0x0D: "portrait_palette",
     0x0E: "portrait_index",
     0x10: "a_ability_index",
-    0x12: "elem_resist_0", 0x13: "elem_resist_1",
-    0x14: "elem_resist_2", 0x15: "elem_resist_3",
+    # +0x12..+0x15 are not four byte-sized resistances. They carry eight
+    # 3-bit slots on a 3-bit stride starting at +0x12 bit 3, each holding
+    # 0-3. See docs/job-table.md and the resist subcommands.
+    0x12: "resist_packed_0", 0x13: "resist_packed_1",
+    0x14: "resist_packed_2", 0x15: "resist_packed_3",
+    # Read by field id 0x0d as the low nibble; values 0-8.
+    0x11: "unit_class",
     0x16: "status_defense",
     0x17: "base_hp", 0x18: "base_mp", 0x19: "base_speed",
     0x1A: "base_melee_0", 0x1B: "base_melee_1", 0x1C: "base_melee_2",
@@ -160,6 +169,9 @@ UNIT_NAMED = {
     0x20: "growth_hp", 0x21: "growth_mp", 0x22: "growth_speed",
     0x23: "growth_attack", 0x24: "growth_defense",
     0x25: "growth_magic_pow", 0x26: "growth_magic_res",
+    # Byte-for-byte equal to +0x26 in all 116 entries. Field ids 0x2a
+    # and 0x2b both reach this pair.
+    0x27: "growth_magic_res_copy",
     0x28: "movement", 0x29: "jump", 0x2A: "evade",
     0x2B: "movement_style",
     0x2D: "equip_index",
@@ -210,6 +222,73 @@ def cmd_apply_units(rom_path, csv_path, out_path):
                     changes += 1
     open(out_path, "wb").write(rom)
     print(f"\n{changes} field(s) changed, wrote {out_path}")
+    return 0
+
+
+# Eight resistance slots live in +0x12..+0x15, on a 3-bit stride starting at
+# +0x12 bit 3. Each holds 0-3 and every entry's third bit is clear, so two bits
+# are used of the three allotted. Value 1 dominates (108-113 of 116 entries per
+# slot), which is what a neutral default looks like.
+RESIST_BASE_BIT = 11          # counted from +0x11 bit 0
+RESIST_STRIDE = 3
+RESIST_SLOTS = 8
+RESIST_REGION = 0x11
+RESIST_LEN = 5
+
+
+def resist_get(rom, i, slot):
+    o = UNIT_BASE + i * UNIT_STRIDE + RESIST_REGION
+    w = int.from_bytes(rom[o:o + RESIST_LEN], "little")
+    return (w >> (RESIST_BASE_BIT + slot * RESIST_STRIDE)) & 3
+
+
+def resist_set(rom, i, slot, val):
+    o = UNIT_BASE + i * UNIT_STRIDE + RESIST_REGION
+    w = int.from_bytes(rom[o:o + RESIST_LEN], "little")
+    sh = RESIST_BASE_BIT + slot * RESIST_STRIDE
+    w = (w & ~(3 << sh)) | ((val & 3) << sh)
+    rom[o:o + RESIST_LEN] = w.to_bytes(RESIST_LEN, "little")
+
+
+def cmd_dump_resist(rom_path, out_path):
+    rom = open(rom_path, "rb").read()
+    cols = [f"resist_{n}" for n in range(RESIST_SLOTS)]
+    with open(out_path, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["index"] + cols)
+        for i in range(UNIT_COUNT):
+            w.writerow([i] + [resist_get(rom, i, n) for n in range(RESIST_SLOTS)])
+    print(f"wrote {out_path}: {UNIT_COUNT} entries x {RESIST_SLOTS} slots")
+    print("slot 2 is not reachable through the job field accessor; see "
+          "docs/job-table.md")
+    return 0
+
+
+def cmd_apply_resist(rom_path, csv_path, out_path):
+    rom = bytearray(open(rom_path, "rb").read())
+    changes = 0
+    with open(csv_path, newline="") as fh:
+        for row in csv.DictReader(fh):
+            i = int(row["index"])
+            if not 0 <= i < UNIT_COUNT:
+                print(f"  skipping out-of-range index {i}")
+                continue
+            for n in range(RESIST_SLOTS):
+                key = f"resist_{n}"
+                if key not in row or row[key] == "":
+                    continue
+                new = int(row[key], 0)
+                if not 0 <= new <= 3:
+                    print(f"  index {i} {key}: {new} is outside 0-3, skipped")
+                    continue
+                if resist_get(rom, i, n) != new:
+                    print(f"  index {i:>3} {key}: "
+                          f"{resist_get(rom, i, n)} -> {new}")
+                    resist_set(rom, i, n, new)
+                    changes += 1
+    open(out_path, "wb").write(rom)
+    print()
+    print(f"{changes} slot(s) changed, wrote {out_path}")
     return 0
 
 
@@ -272,6 +351,10 @@ def main(argv):
         return cmd_preset(argv[1], argv[2], argv[3])
     if len(argv) == 2 and argv[0] == "preset":
         return cmd_preset(argv[1], None, None)
+    if len(argv) == 3 and argv[0] == "dump-resist":
+        return cmd_dump_resist(argv[1], argv[2])
+    if len(argv) == 4 and argv[0] == "apply-resist":
+        return cmd_apply_resist(argv[1], argv[2], argv[3])
     if len(argv) == 3 and argv[0] == "dump-units":
         return cmd_dump_units(argv[1], argv[2])
     if len(argv) == 4 and argv[0] == "apply-units":

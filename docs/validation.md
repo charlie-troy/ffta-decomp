@@ -56,8 +56,15 @@ nothing and 100 keeps everything.
 
 ## What is still unvalidated
 
-- **The 43 unnamed job fields.** Their offsets are known, their meanings are
-  not.
+- **Nine unnamed job fields**: `+0x02`, `+0x06`, `+0x09`, `+0x0a`, `+0x0c`,
+  `+0x0f`, `+0x2c`, `+0x31`, `+0x33`. See [job-table.md](job-table.md).
+- **Most of the job field accessor.** Execution confirms 16 of its 45 in-range
+  offsets as plain byte loads. Seven are the packed resistances, now solved.
+  The remaining 22 match on some entries and not others, so they compute a
+  value rather than fetch one, and what they compute is not established.
+- **Resistance slot 2.** It is a real slot with the same value distribution as
+  the other seven, but no field id in the accessor reaches it, so nothing here
+  shows the game reading it.
 - **Whole-battle behaviour.** The evaluator's decision inputs are confirmed
   individually, but no test here assembles a map, a turn order and a full unit
   to watch the AI actually choose. Calling fragments proves the rules; it does

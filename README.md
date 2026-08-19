@@ -28,13 +28,15 @@ exposed:
 | per-ability likelihood (`ai_priority`, a percentage) | ability table | no |
 | when an ability is considered (`ai_behaviour`) | ability table | no |
 | per-job AI priority | job table | no |
+| per-job elemental resistances | job table | no |
 | the 11%/50% self-versus-other gate on status effects | code | yes |
 | the eligibility rules (MP cost, healthy-target, reflect) | code | yes |
 
 Written up in [docs/ai-findings.md](docs/ai-findings.md),
 [docs/ability-table.md](docs/ability-table.md),
-[docs/ai-case-rules.md](docs/ai-case-rules.md) and
-[docs/unit-ai-table.md](docs/unit-ai-table.md).
+[docs/ai-case-rules.md](docs/ai-case-rules.md),
+[docs/unit-ai-table.md](docs/unit-ai-table.md) and
+[docs/job-table.md](docs/job-table.md).
 
 Two results in there disagree with published documentation, with the derivation
 shown in each case: `ai_priority` runs the opposite direction, and the job
@@ -46,8 +48,11 @@ checks pass: the priority filter, the ability property accessor, flag decoding,
 the stat-id mapping, the healthy-target rule at its exact boundaries, and the
 11%/50% status gate. See [docs/validation.md](docs/validation.md).
 
-What remains unvalidated is whole-battle behaviour and the meaning of the 43
-unnamed job fields.
+What remains unvalidated is whole-battle behaviour and nine job-table fields.
+The job table itself is written up in [docs/job-table.md](docs/job-table.md),
+including two corrections to the published layout: the elemental resistances
+are eight packed 3-bit slots rather than four bytes, and `+0x27` is an exact
+duplicate of `+0x26` in every entry.
 
 ## Decompilation status
 

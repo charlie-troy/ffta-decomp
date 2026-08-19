@@ -189,6 +189,44 @@ def check_gate(gba, n):
     return ok
 
 
+def check_resist_slots(gba, rom):
+    """The eight resistance slots must reproduce the accessor exactly.
+
+    Solved as a 3-bit stride from +0x12 bit 3 over +0x11..+0x15. Slot 2 is
+    excluded because no field id reaches it, so there is nothing to compare
+    against.
+    """
+    print("")
+    print("7. packed resistance slots vs the job field accessor")
+    base = 0x08521A14 - 0x08000000
+    stride, count = 0x34, 116
+    acc = 0x080C8570
+    slot_field = {0: 0x0e, 1: 0x0f, 3: 0x11, 4: 0x12, 5: 0x13, 6: 0x14, 7: 0x15}
+
+    def slot(i, n):
+        o = base + i * stride + 0x11
+        w = int.from_bytes(rom[o:o + 5], "little")
+        return (w >> (11 + n * 3)) & 3
+
+    bad = total = 0
+    wide = 0
+    for i in range(count):
+        for n, fid in slot_field.items():
+            total += 1
+            if gba.call(acc, [i, 0, fid]) != slot(i, n):
+                bad += 1
+        for n in range(8):
+            o = base + i * stride + 0x11
+            w = int.from_bytes(rom[o:o + 5], "little")
+            if (w >> (11 + n * 3 + 2)) & 1:
+                wide += 1
+    ok = bad == 0 and wide == 0
+    print(f"   {total} slot reads, {bad} mismatch(es)")
+    print(f"   third bit set in {wide} slot(s) (expected 0)")
+    print(f"   -> {'PASS' if ok else 'FAIL'}")
+    return ok
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("rom")
@@ -203,7 +241,8 @@ def main(argv):
                check_flags(gba, rom),
                check_stat_ids(gba),
                check_healthy_rule(gba),
-               check_gate(gba, args.samples)]
+               check_gate(gba, args.samples),
+               check_resist_slots(gba, rom)]
     print(f"\n{sum(results)}/{len(results)} checks passed")
     return 0 if all(results) else 1
 
