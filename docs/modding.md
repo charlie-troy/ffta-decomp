@@ -85,6 +85,29 @@ Only the priority byte is written back. The rest of each 52-byte entry is left
 untouched because its layout is not established, and guessing at it would risk
 corrupting unit data.
 
+## 1c. The status-effect gates
+
+Every case in the evaluator rolls `Rand() % 101` and compares against one of two
+thresholds: one when the AI would apply the effect to **itself**, one for **any
+other target**. The retail values are 10 and 49, so roughly 11% and 50%.
+
+These live in code rather than a table, but they are plain immediate operands,
+so they can be patched without a compiler:
+
+```bash
+python tools/patch_ai_gates.py show baserom.gba
+python tools/patch_ai_gates.py set  baserom.gba 50 90 ffta-statusheavy.gba
+```
+
+That example makes the AI far keener on status effects: 50% when self-targeting
+and 90% otherwise. Raising them makes status abilities more common, 0 disables
+them.
+
+The tool refuses to patch unless it finds exactly two distinct thresholds
+across the case bodies, so a mismatched ROM fails loudly rather than being
+corrupted. Verified on the retail ROM: 85 gates, 42 at threshold 10 and 43 at
+49, and a patch changes exactly those 85 bytes with the ROM size untouched.
+
 ## 2. Change the evaluator itself
 
 `sub_080C32C0` is the AI's ability evaluator: an eligibility gauntlet followed
@@ -92,9 +115,15 @@ by a 92-case switch on the ability's effect id. Rules live there rather than in
 the table, for example rejecting an ability whose MP cost exceeds the unit's
 current MP.
 
-That function is not yet decompiled. Doing so means writing C that matches, then
-editing it and building with `make mod`, which does not require a SHA1 match and
-reports which functions changed:
+Everything above reaches the AI's tuning without a compiler. Going further,
+changing the *rules* rather than their constants, does need the evaluator
+decompiled and matching, which it is not: `reference/ai_ability_eval.c` is
+readable but deliberately not byte-matching, and lives outside `src/` so the
+build never sees it.
+
+Doing that means writing C that matches, then editing it and building with
+`make mod`, which does not require a SHA1 match and reports which functions
+changed:
 
 ```bash
 make mod
