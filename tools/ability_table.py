@@ -20,7 +20,11 @@ layout is not established.
 accidental edit is visible rather than silent.
 """
 import csv
+import os
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ffta_names import Names
 
 BASE = 0x0855187C - 0x08000000
 STRIDE = 0x1C
@@ -82,11 +86,13 @@ def cmd_dump(rom_path, out_path):
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
         cols = [c[0] for c in COLUMNS if c[0] != "flags"]
-        w.writerow(["id"] + cols + [n for _, n in FLAG_BITS])
+        names = Names(rom)
+        w.writerow(["id", "name"] + cols + [n for _, n in FLAG_BITS])
         for i in range(COUNT):
             vals = [read(rom, i, off, wd) for n, off, wd in COLUMNS if n != "flags"]
             f = read(rom, i, 0x10, 4)
-            w.writerow([i] + vals + [(f >> b) & 1 for b, _ in FLAG_BITS])
+            w.writerow([i, names.ability(i)] + vals +
+                       [(f >> b) & 1 for b, _ in FLAG_BITS])
     print(f"wrote {out_path}: {COUNT} abilities, {len(COLUMNS)} columns")
     return 0
 
@@ -204,10 +210,11 @@ def cmd_dump_units(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["index"] + unit_cols())
+        names = Names(rom)
+        w.writerow(["index", "name"] + unit_cols())
         for i in range(UNIT_COUNT):
             base = UNIT_BASE + i * UNIT_STRIDE
-            w.writerow([i] + list(rom[base:base + UNIT_STRIDE]))
+            w.writerow([i, names.job(i)] + list(rom[base:base + UNIT_STRIDE]))
     print(f"wrote {out_path}: {UNIT_COUNT} entries, {UNIT_STRIDE} bytes each")
     return 0
 

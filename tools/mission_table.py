@@ -16,7 +16,11 @@ mission id. Dump it with the `index` command.
     python tools/mission_table.py index baserom.gba mission-index.csv
 """
 import csv
+import os
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ffta_names import Names
 
 BASE = 0x0855AE4C - 0x08000000
 STRIDE = 0x46
@@ -49,10 +53,11 @@ def cmd_dump(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["id"] + [col(o) for o in range(STRIDE)])
+        names = Names(rom)
+        w.writerow(["id", "name"] + [col(o) for o in range(STRIDE)])
         for i in range(COUNT):
             b = BASE + i * STRIDE
-            w.writerow([i] + list(rom[b:b + STRIDE]))
+            w.writerow([i, names.mission(i)] + list(rom[b:b + STRIDE]))
     print(f"wrote {out_path}: {COUNT} entries, {STRIDE} bytes each")
     return 0
 
@@ -89,11 +94,13 @@ def cmd_index(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["record", "b00", "b01", "mission_id", "w04", "w06", "b08"])
+        names = Names(rom)
+        w.writerow(["record", "b00", "b01", "mission_id", "mission_name",
+                    "w04", "w06", "b08"])
         for i in range(IDX_COUNT):
             o = IDX_BASE + i * IDX_STRIDE
-            w.writerow([i, rom[o], rom[o + 1],
-                        int.from_bytes(rom[o + 2:o + 4], "little"),
+            mid = int.from_bytes(rom[o + 2:o + 4], "little")
+            w.writerow([i, rom[o], rom[o + 1], mid, names.mission(mid),
                         int.from_bytes(rom[o + 4:o + 6], "little"),
                         int.from_bytes(rom[o + 6:o + 8], "little"),
                         rom[o + 8]])

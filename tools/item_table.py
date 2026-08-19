@@ -13,7 +13,11 @@ disagreed; those are marked in COLUMNS.
     python tools/item_table.py apply baserom.gba items.csv out.gba
 """
 import csv
+import os
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from ffta_names import Names
 
 BASE = 0x0851D180 - 0x08000000
 STRIDE = 0x20
@@ -68,12 +72,14 @@ def cmd_dump(rom_path, out_path):
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
         cols = [c[0] for c in COLUMNS if c[0] != "flags_0c"]
-        w.writerow(["id"] + cols + [n for _, n in FLAG_BITS])
+        names = Names(rom)
+        w.writerow(["id", "name"] + cols + [n for _, n in FLAG_BITS])
         for i in range(COUNT):
             vals = [read(rom, i, o, wd) for n, o, wd in COLUMNS
                     if n != "flags_0c"]
             f = read(rom, i, 0x0C, 1)
-            w.writerow([i] + vals + [(f >> b) & 1 for b, _ in FLAG_BITS])
+            w.writerow([i, names.item(i)] + vals +
+                       [(f >> b) & 1 for b, _ in FLAG_BITS])
     print(f"wrote {out_path}: {COUNT} items, {len(COLUMNS)} fields")
     return 0
 

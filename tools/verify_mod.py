@@ -16,6 +16,7 @@ import collections
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from emulate import Gba
+from ffta_names import Names
 import ability_table as A
 
 PRIO_FILTER = 0x0812F1DC
@@ -69,6 +70,7 @@ def main(argv):
         print(f"ROM sizes differ: {len(base)} vs {len(mod)}")
         return 1
 
+    nm = Names(base)
     diff = [i for i in range(len(base)) if base[i] != mod[i]]
     print(f"bytes changed: {len(diff)}")
     if not diff:
@@ -99,8 +101,10 @@ def main(argv):
     print("changed fields")
     print("-" * 62)
     for (kind, idx) in sorted(groups):
+        who = nm.ability(idx) if kind == "ability" else nm.job(idx)
         for o, name, b, m in sorted(groups[(kind, idx)]):
-            print(f"  {kind:<7} {idx:>3}  {name:<24} {b:>3} -> {m:>3}")
+            print(f"  {kind:<7} {idx:>3} {who[:16]:<17} {name:<22} "
+                  f"{b:>3} -> {m:>3}")
 
     gb, gm = Gba(args.base), Gba(args.modded)
 
@@ -113,14 +117,15 @@ def main(argv):
     if rows:
         print()
         print("measured effect on the AI's decision, run on both ROMs")
-        print(f"{'ability':>8} {'priority':>12} {'keep rate':>20} {'delta':>8}")
+        print(f"{'ability':>15} {'id':>4} {'priority':>12} "
+              f"{'keep rate':>20} {'delta':>8}")
         print("-" * 62)
         for idx, b, m in rows:
             rb = keep_rate(gb, b, args.samples)
             rm = keep_rate(gm, m, args.samples)
             # confirm the game's own accessor sees the edit
             note = "  saturated" if m > 100 else ""
-            print(f"{idx:>8}   {b:>3} -> {m:<3}   "
+            print(f"{nm.ability(idx)[:14]:>15} {idx:>4}   {b:>3} -> {m:<3}   "
                   f"{rb:>7.1f}% -> {rm:>6.1f}%   {rm - rb:>+6.1f}{note}")
         print(f"  {args.samples} samples per figure, same RNG seed on both")
         if any(m > 100 for _, _, m in rows):

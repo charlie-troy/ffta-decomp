@@ -32,6 +32,11 @@ exposed:
 | the 11%/50% self-versus-other gate on status effects | code | yes |
 | the eligibility rules (MP cost, healthy-target, reflect) | code | yes |
 
+**The text is decoded**, so every dump carries real names rather than ids:
+abilities read as `Cure` and `Curaga`, items as `Shortsword`, jobs as
+`Soldier`, missions as `Snowball Fight`. 99.7% of the game's strings decode
+with no unknown codes. See [docs/text.md](docs/text.md).
+
 Mission data is mapped in [docs/mission-data.md](docs/mission-data.md), which
 was undocumented anywhere and had to be found by scanning the ROM for table
 accessors. That scan also settles a negative: there is no formation table,
@@ -281,8 +286,5 @@ What remains needs something this repo cannot supply on its own.
    nothing here assembles a map, a turn order and a real unit to watch a full
    turn play out. Calling fragments proves the rules; it cannot prove there is
    no further rule that dominates them.
-2. **Naming the mission fields.** The table is mapped and editable, but most
-   of its 65 properties have no established meaning. Decoding the string table
-   would name several at once, since the text ids are already isolated.
-3. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
+2. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
    `+0x08` block and the Huffman-compressed graphics do not yet.
