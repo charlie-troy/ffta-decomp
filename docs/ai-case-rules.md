@@ -13,19 +13,25 @@ Most status-inflicting effects share exactly the same gate: divisor **101**,
 thresholds **10** and **49**. From the disassembly of case 17:
 
 ```
-cmp  sl, r8            ; some condition on the target
+cmp  sl, r8            ; user == target ?
 bne  .other
   r = Rand() % 101
-  if (r > 10)  -> fail        ~11% pass
+  if (r > 10)  -> fail        ~11% pass   (self)
   -> pass
 .other:
   r = Rand() % 101
-  if (r <= 49) -> pass        ~50% pass
+  if (r <= 49) -> pass        ~50% pass   (someone else)
   -> fail
 ```
 
-So the AI applies a status effect roughly **11%** of the time in one case and
-**50%** in the other. Which condition selects which is not yet identified.
+The prologue settles what the comparison is: `sl` is loaded from `r0` and `r8`
+from `r1`, which are the user and the target. So `cmp sl, r8` is **user ==
+target**.
+
+The rule is therefore: the AI applies a status effect to **itself** about
+**11%** of the time, and to **anyone else** about **50%**. Self-targeting is
+strongly discouraged but not forbidden, which is what you want when the same
+machinery handles both debuffs aimed at enemies and buffs aimed at allies.
 
 Because the pair is shared across around twenty effects, changing those two
 constants shifts the AI's willingness to use status effects as a whole.
