@@ -70,6 +70,18 @@ buy value of 0 and a nonzero sell value -- so the two are independent fields.
 nonzero in 294 of 375 items across 31 distinct values, so it is real data that
 nothing reads through the accessor.
 
+## Item ids run past the stat table
+
+The stat table holds 376 entries, but item **ids** keep going to about 629.
+Loot and quest items — Wyrmstone, Rabbit Tail, Flower Vase — have names and can
+be required by missions without carrying combat stats, so they have no entry
+here.
+
+Their names continue in the main string table at the offset this table implies,
+`name index = id + 123`, which holds from Shortsword at id 1 through to the end
+of the table. `Names.item_by_id` resolves the whole range; `item_table.py`
+covers only the 376 that have stats to edit.
+
 ## Editing
 
 ```bash

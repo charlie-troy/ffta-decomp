@@ -109,11 +109,43 @@ def cmd_index(rom_path, out_path):
     return 0
 
 
+def cmd_requires(rom_path, out_path):
+    """What each mission requires you to hold.
+
+    Properties 42 and 44 are item ids and 46/47 a count check; sub_080CEECC
+    reads them and scans your inventory, refusing the mission when an item is
+    absent. Needs the emulator, since neither property is a plain load.
+    """
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from emulate import Gba
+    rom = open(rom_path, "rb").read()
+    gba = Gba(rom_path)
+    names = Names(rom)
+    acc = 0x080CE4DC
+    rows = 0
+    with open(out_path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["mission", "mission_name", "item_1_id", "item_1",
+                    "item_2_id", "item_2"])
+        for i in range(COUNT):
+            a = gba.call(acc, [i, 42])
+            b = gba.call(acc, [i, 44])
+            if not (a or b):
+                continue
+            w.writerow([i, names.mission(i), a, names.item_by_id(a),
+                        b, names.item_by_id(b)])
+            rows += 1
+    print(f"wrote {out_path}: {rows} missions with a requirement")
+    return 0
+
+
 def main(argv):
     if len(argv) == 3 and argv[0] == "dump":
         return cmd_dump(argv[1], argv[2])
     if len(argv) == 4 and argv[0] == "apply":
         return cmd_apply(argv[1], argv[2], argv[3])
+    if len(argv) == 3 and argv[0] == "requires":
+        return cmd_requires(argv[1], argv[2])
     if len(argv) == 3 and argv[0] == "index":
         return cmd_index(argv[1], argv[2])
     print(__doc__)

@@ -50,6 +50,25 @@ and this one, and at least N of that one" — which is how a mission decides
 whether it can be taken. Properties 42 and 44 range over 0–487 and 0–496,
 consistent with item ids.
 
+With the text decoded, this is now checkable end to end, and it holds:
+
+| mission | requires |
+|---|---|
+| Staring Eyes | Ahriman Eye |
+| Desert Rose | Flower Vase |
+| Den of Evil | Helje Key |
+| A Dragon's Aid | Wyrmstone |
+| Missing Meow | Rabbit Tail |
+| The Hero Blade | Rusty Sword |
+| The Fey Blade | Zodiac Ore |
+
+Those are the actual requirements in the game. 92 missions set at least one.
+`python tools/mission_table.py requires baserom.gba out.csv` dumps them all.
+
+The check is worth more than its own result: producing it correctly requires
+the mission table, the two properties, the item id space and the text decoder
+to all be right at once, so it validates the lot.
+
 Properties 33–41 read nine consecutive bytes at `+0x2a`–`+0x32`, all round
 multiples of 5 and 10 capped at 100, which look like weights or percentages but
 are not pinned to a meaning here.
