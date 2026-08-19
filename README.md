@@ -254,19 +254,19 @@ No FFTA decompilation exists. These are worth reading before duplicating work:
 ## Next steps
 
 All four of the original goals are done: the leaf batch, the linker script and
-full rebuild, the CI gate, and progress reporting. What is left needs something
-this repo cannot supply on its own.
+full rebuild, the CI gate, and progress reporting.
 
-1. **A running game.** Four job fields (`+0x02`, `+0x0c`, `+0x2c`, `+0x31`) have
-   no reader anywhere in the ROM, by either the accessor or direct indexing.
-   Static analysis is finished with them; naming them means watching a live
-   game read them. `tools/trace_mgba.py` samples a running mGBA over its GDB
-   stub and needs a save state to attach to.
-2. **Whole-battle behaviour.** Every decision input is confirmed individually
+The job table is finished, in the sense that the four still-unnamed offsets are
+provably dead: no code in the ROM reads them, so there is nothing left to
+discover about them. See [docs/job-table.md](docs/job-table.md).
+
+What remains needs something this repo cannot supply on its own.
+
+1. **Whole-battle behaviour.** Every decision input is confirmed individually
    and `make verify-mod` measures what an edit does to the AI's choices, but
    nothing here assembles a map, a turn order and a real unit to watch a full
    turn play out. Calling fragments proves the rules; it cannot prove there is
    no further rule that dominates them.
-3. **Wider coverage.** The ability and job tables are mapped; items, formations
+2. **Wider coverage.** The ability and job tables are mapped; items, formations
    and map data are not, and the same two-scan method
    (`tools/field_callers.py`, `tools/job_getters.py`) applies directly.

@@ -56,9 +56,11 @@ nothing and 100 keeps everything.
 
 ## What is still unvalidated
 
-- **Four unnamed job fields**: `+0x02`, `+0x0c`, `+0x2c`, `+0x31`. No code
-  reads any of them, by either the accessor or direct indexing, so there is
-  nothing to derive a meaning from. See [job-table.md](job-table.md).
+- **Four job fields are dead data**, not merely unnamed: `+0x02`, `+0x0c`,
+  `+0x2c` and `+0x31`. No code in the ROM reads them, and that is established
+  by enumeration rather than by failing to find a reader -- see
+  [job-table.md](job-table.md). Nothing further is knowable about them from
+  this ROM, dynamically or statically.
 - **Most of the job field accessor.** Execution confirms 16 of its 45 in-range
   offsets as plain byte loads. Seven are the packed resistances, now solved.
   The remaining 22 match on some entries and not others, so they compute a

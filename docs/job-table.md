@@ -211,9 +211,41 @@ what they look like instead:
 | `+0x31` | 0, 1, 2 or 4 — never two bits at once, in three disjoint groups of 20, 5 and 7 entries |
 
 `+0x31` being single-bit throughout suggests a flag byte with three flags
-defined, but with no code reading it that is a shape, not a meaning. `+0x0c` is
-a real field the accessor supports that nothing varies and nothing calls, which
-is what a feature cut before release looks like.
+defined, but with no code reading it that is a shape, not a meaning.
+
+### These four are dead data, and that is a result rather than a gap
+
+The search for a reader can be closed rather than abandoned. Thumb cannot
+materialise a 32-bit address inline, so any code reaching this table must load
+the base, or a pointer into it, from a literal pool. Scanning every aligned
+word in the ROM for a value inside the table's range finds **eight** in the
+code region, and all eight have been disassembled. Four further hits sit above
+`0x08980000`, far past the end of code, and are graphics data that happens to
+contain the byte pattern.
+
+So the reachability of each field is decidable:
+
+| offset | accessor field id | called by anything | direct getter | verdict |
+|---|---|---|---|---|
+| `+0x02` | none | — | none | unreachable |
+| `+0x2c` | none | — | none | unreachable |
+| `+0x0c` | `0x08` | no | none | reachable, never called |
+| `+0x31` | `0x21` | no | none | reachable, never called |
+
+**No code in the retail ROM reads any of the four.** Two are not addressable
+at all; two are addressable through the accessor but nothing ever passes their
+field id.
+
+This matters for how to spend effort on them: a dynamic trace cannot help. An
+emulator watching a live game would observe no read of these offsets, because
+there is no code path that performs one. They are leftovers, and editing them
+in a mod will do nothing.
+
+Reproduce the reachability argument with:
+
+```bash
+python tools/table_reachability.py
+```
 
 ## Reproducing
 
