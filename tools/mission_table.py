@@ -35,10 +35,11 @@ IDX_COUNT = 259
 # everything else keeps a positional name so the CSV still round-trips.
 NAMED = {
     0x00: "mission_id",      # equals the entry index on all 512
-    0x35: "prop29",
-    0x34: "prop31",
-    0x45: "id_echo",
+    0x45: "id_echo",         # mirrors the low byte of the id
 }
+# Deliberately not named: +0x34 looked like AP/10 because Herb Picking has 4
+# and awards 40 AP, but Thesis Hunt also has 4 and awards 80. Gil and AP are
+# not in this table at any offset, width or scale -- see docs/mission-data.md.
 # +0x12, +0x16, +0x1a, +0x1e, +0x22 and +0x2a are handed out as addresses by
 # properties 19-24 and 32, so each is the start of a four-byte slot the caller
 # reads itself rather than a value the accessor returns.

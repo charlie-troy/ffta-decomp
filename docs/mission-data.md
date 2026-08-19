@@ -73,6 +73,55 @@ Properties 33–41 read nine consecutive bytes at `+0x2a`–`+0x32`, all round
 multiples of 5 and 10 capped at 100, which look like weights or percentages but
 are not pinned to a meaning here.
 
+## Gil and AP are not in this table
+
+This is established rather than assumed, and it is the most useful thing to
+know before hunting for them.
+
+Two missions have published rewards: Herb Picking gives 600 gil and 40 AP,
+Thesis Hunt gives 28,600 gil and 80 AP. Searching every offset of the entry at
+widths 1, 2 and 4, against scale factors of 1, 10, 100 and 1000, finds **no
+field that holds both values**. Neither number appears literally anywhere in
+either entry.
+
+One hypothesis got far enough to be worth recording as dead: `+0x34` is 4 for
+Herb Picking, and 40 AP divided by 10 is 4, which looks convincing on its own.
+Thesis Hunt has `+0x34 = 4` as well but awards 80 AP, so the field is not AP at
+any scale. A second mission killed it; a single one would have enshrined it.
+
+So the reward figures are computed elsewhere — from mission type and rank, or
+from a table this one does not contain.
+
+## What the field-naming attempts did and did not establish
+
+Named, with the code or the game as evidence:
+
+| field | meaning | basis |
+|---|---|---|
+| `+0x00` | mission id | equals the entry index on all 512 |
+| `+0x45` | id echo | mirrors the low byte of the id |
+| property 42 | first required item | verified against 7 real missions |
+| property 44 | second required item | same check |
+| properties 46, 47 | a count requirement | the same function compares them |
+
+Two approaches were tried and are recorded here because they look productive
+and are not:
+
+**Resolving bytes as ids proves nothing on its own.** Reading a field as a job
+id gave hit rates like 368 of 368, which is meaningless: every byte below 116
+resolves to some job name. The same trap applies to item ids, where the id
+space runs to 629 and so swallows any byte-sized field whole. A coverage test
+only discriminates when the field's range can *exceed* the candidate space.
+
+**Sparse entries are not evidence of a small mission.** Herb Picking sets only
+16 of its 70 bytes despite being a full mission with rewards, requirements and
+a map, which is consistent with most of its definition living outside this
+table.
+
+The remaining fields keep positional names. Naming them needs the same thing
+that worked for the required items: a function that reads the property and does
+something identifiable with the value.
+
 ## The mission index at `0x08563A7C`
 
 259 records of 12 bytes. `+0x02` is a halfword mission id: all 259 fall inside
