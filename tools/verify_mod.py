@@ -127,6 +127,31 @@ def main(argv):
             print("  values above 100 are marked saturated: the filter keeps")
             print("  everything at 100, so the extra has no effect")
 
+    # ai_behaviour and ai_condition select which rule the evaluator applies.
+    # Driving that end to end needs the whole evaluator and a real battle
+    # state, so these are described from the established semantics and marked
+    # as not measured, rather than given a number this harness cannot earn.
+    BEHAVIOUR = {
+        0: "no special handling",
+        1: "considered when the target is at low HP",
+        2: "rejected when the target is below half HP (harmful status)",
+        3: "last resort",
+    }
+    beh = [(idx, o, b, m) for (kind, idx), fs in sorted(groups.items())
+           for o, _, b, m in fs if kind == "ability" and o in (0x18, 0x19)]
+    if beh:
+        print()
+        print("ability rule selectors (described, not measured)")
+        for idx, o, b, m in beh:
+            if o == 0x19:
+                print(f"  ability {idx:>3} ai_behaviour {b} -> {m}")
+                print(f"      was: {BEHAVIOUR.get(b, 'undocumented value')}")
+                print(f"      now: {BEHAVIOUR.get(m, 'undocumented value')}")
+            else:
+                print(f"  ability {idx:>3} ai_condition {b} -> {m}"
+                      f"  (0 on 306 of 347 abilities; special-case handling)")
+        print("  these pick a rule rather than a rate, so no keep rate applies")
+
     jobs = [(idx, o, b, m) for (kind, idx), fs in sorted(groups.items())
             for o, _, b, m in fs if kind == "job" and o in (0x32, 0x33)]
     if jobs:
