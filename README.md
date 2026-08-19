@@ -32,6 +32,11 @@ exposed:
 | the 11%/50% self-versus-other gate on status effects | code | yes |
 | the eligibility rules (MP cost, healthy-target, reflect) | code | yes |
 
+Map data is mapped as well, in [docs/map-data.md](docs/map-data.md). The
+blocks are compressed, the codec is implemented in both directions, and
+terrain is editable tile by tile with a guard that refuses any block that
+would no longer fit.
+
 The item table is mapped too, in [docs/item-table.md](docs/item-table.md):
 all 19 of its accessor properties are plain loads, and weapon attack power
 feeds the same damage term as the job table's unarmed attack.
@@ -271,6 +276,9 @@ What remains needs something this repo cannot supply on its own.
    nothing here assembles a map, a turn order and a real unit to watch a full
    turn play out. Calling fragments proves the rules; it cannot prove there is
    no further rule that dominates them.
-2. **Wider coverage.** The ability and job tables are mapped; items, formations
-   and map data are not, and the same two-scan method
-   (`tools/field_callers.py`, `tools/job_getters.py`) applies directly.
+2. **Wider coverage.** Abilities, jobs, items and map terrain are mapped.
+   Formations and mission data are not, and the same methods apply:
+   `tools/accessor_callers.py` and `tools/map_table.py` for a table with an
+   accessor, `tools/job_getters.py` for direct indexing.
+3. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
+   `+0x08` block and the Huffman-compressed graphics do not yet.
