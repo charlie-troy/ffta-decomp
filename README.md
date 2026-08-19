@@ -32,6 +32,10 @@ exposed:
 | the 11%/50% self-versus-other gate on status effects | code | yes |
 | the eligibility rules (MP cost, healthy-target, reflect) | code | yes |
 
+The item table is mapped too, in [docs/item-table.md](docs/item-table.md):
+all 19 of its accessor properties are plain loads, and weapon attack power
+feeds the same damage term as the job table's unarmed attack.
+
 Written up in [docs/ai-findings.md](docs/ai-findings.md),
 [docs/ability-table.md](docs/ability-table.md),
 [docs/ai-case-rules.md](docs/ai-case-rules.md),
