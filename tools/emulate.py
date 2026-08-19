@@ -17,8 +17,17 @@ import struct
 from unicorn import (Uc, UC_ARCH_ARM, UC_MODE_THUMB, UC_PROT_ALL,
                      UcError)
 from unicorn.arm_const import (UC_ARM_REG_R0, UC_ARM_REG_R1, UC_ARM_REG_R2,
-                               UC_ARM_REG_R3, UC_ARM_REG_SP, UC_ARM_REG_LR,
+                               UC_ARM_REG_R3, UC_ARM_REG_R4, UC_ARM_REG_R5,
+                               UC_ARM_REG_R6, UC_ARM_REG_R7, UC_ARM_REG_R8,
+                               UC_ARM_REG_R9, UC_ARM_REG_R10, UC_ARM_REG_R11,
+                               UC_ARM_REG_R12, UC_ARM_REG_SP, UC_ARM_REG_LR,
                                UC_ARM_REG_PC, UC_ARM_REG_CPSR)
+
+REGS = {"r0": UC_ARM_REG_R0, "r1": UC_ARM_REG_R1, "r2": UC_ARM_REG_R2,
+        "r3": UC_ARM_REG_R3, "r4": UC_ARM_REG_R4, "r5": UC_ARM_REG_R5,
+        "r6": UC_ARM_REG_R6, "r7": UC_ARM_REG_R7, "r8": UC_ARM_REG_R8,
+        "sb": UC_ARM_REG_R9, "sl": UC_ARM_REG_R10, "fp": UC_ARM_REG_R11,
+        "ip": UC_ARM_REG_R12}
 
 ROM = 0x08000000
 EWRAM = 0x02000000
@@ -65,6 +74,20 @@ class Gba:
         self.uc.reg_write(UC_ARM_REG_LR, STOP | 1)
         self.uc.reg_write(UC_ARM_REG_CPSR, 0x33)      # Thumb, system mode
         self.uc.emu_start(addr | 1, STOP, count=timeout_insns)
+        return self.uc.reg_read(UC_ARM_REG_R0)
+
+    def run_range(self, start, stop, regs=None, timeout_insns=200000):
+        """Execute a stretch of code with chosen registers, return r0.
+
+        Used to exercise a fragment such as one arm of a switch, where calling
+        the whole function would need game state that does not exist here.
+        """
+        self.uc.reg_write(UC_ARM_REG_SP, IWRAM + 0x7F00)
+        self.uc.reg_write(UC_ARM_REG_LR, STOP | 1)
+        self.uc.reg_write(UC_ARM_REG_CPSR, 0x33)
+        for name, val in (regs or {}).items():
+            self.uc.reg_write(REGS[name], val)
+        self.uc.emu_start(start | 1, stop, count=timeout_insns)
         return self.uc.reg_read(UC_ARM_REG_R0)
 
 
