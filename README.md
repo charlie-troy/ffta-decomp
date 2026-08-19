@@ -32,6 +32,11 @@ exposed:
 | the 11%/50% self-versus-other gate on status effects | code | yes |
 | the eligibility rules (MP cost, healthy-target, reflect) | code | yes |
 
+Mission data is mapped in [docs/mission-data.md](docs/mission-data.md), which
+was undocumented anywhere and had to be found by scanning the ROM for table
+accessors. That scan also settles a negative: there is no formation table,
+because battle setups are scripted one unit at a time.
+
 Map data is mapped as well, in [docs/map-data.md](docs/map-data.md). The
 blocks are compressed, the codec is implemented in both directions, and
 terrain is editable tile by tile with a guard that refuses any block that
@@ -276,9 +281,8 @@ What remains needs something this repo cannot supply on its own.
    nothing here assembles a map, a turn order and a real unit to watch a full
    turn play out. Calling fragments proves the rules; it cannot prove there is
    no further rule that dominates them.
-2. **Wider coverage.** Abilities, jobs, items and map terrain are mapped.
-   Formations and mission data are not, and the same methods apply:
-   `tools/accessor_callers.py` and `tools/map_table.py` for a table with an
-   accessor, `tools/job_getters.py` for direct indexing.
+2. **Naming the mission fields.** The table is mapped and editable, but most
+   of its 65 properties have no established meaning. Decoding the string table
+   would name several at once, since the text ids are already isolated.
 3. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
    `+0x08` block and the Huffman-compressed graphics do not yet.
