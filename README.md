@@ -1,8 +1,15 @@
 # ffta-decomp
 
-A matching decompilation of **Final Fantasy Tactics Advance** (GBA, USA).
+Reverse engineering **Final Fantasy Tactics Advance** (GBA, USA), aimed at
+making the battle AI understandable and modifiable.
 
-The goal is C source that rebuilds the original ROM byte for byte.
+Two things live here:
+
+1. **A modding path that needs no compiler.** The AI's per-ability tuning is
+   data, so changing how the AI behaves is a CSV edit. Start at
+   [docs/modding.md](docs/modding.md).
+2. **A matching decompilation** underneath it, so the parts that are code and
+   not data can be changed too. The full 16 MB ROM rebuilds byte-identical.
 
 > **No ROM data lives in this repository.** You supply your own dump. The build
 > verifies its SHA1 and extracts what it needs at build time. `.gitignore`
@@ -10,12 +17,38 @@ The goal is C source that rebuilds the original ROM byte for byte.
 
 ---
 
-## Status
+## What is known about the AI
 
-**The full 16 MB ROM rebuilds byte-identical.** 140 functions are compiled from
+The evaluator `sub_080C32C0` decides whether the AI wants a given ability
+against a given target. Its rules are readable, and two layers of tuning are
+exposed:
+
+| lever | where | needs a compiler? |
+|---|---|---|
+| per-ability likelihood (`ai_priority`, a percentage) | ability table | no |
+| when an ability is considered (`ai_behaviour`) | ability table | no |
+| per-job AI priority | job table | no |
+| the 11%/50% self-versus-other gate on status effects | code | yes |
+| the eligibility rules (MP cost, healthy-target, reflect) | code | yes |
+
+Written up in [docs/ai-findings.md](docs/ai-findings.md),
+[docs/ability-table.md](docs/ability-table.md),
+[docs/ai-case-rules.md](docs/ai-case-rules.md) and
+[docs/unit-ai-table.md](docs/unit-ai-table.md).
+
+Two results in there disagree with published documentation, with the derivation
+shown in each case: `ai_priority` runs the opposite direction, and the job
+table's `+0x32` is not unknown.
+
+**Everything is static analysis. None of it has been observed running.**
+
+## Decompilation status
+
+**The full 16 MB ROM rebuilds byte-identical.** 172 functions are compiled from
 C and placed at their real addresses; everything else is pulled from the base
 ROM with `.incbin`. `make rom` fails unless the SHA1 matches, so no change can
-silently break the build.
+silently break the build. `make mod` is the same build with the SHA1 gate
+relaxed, for deliberate changes.
 
 | | |
 |---|---|
@@ -23,12 +56,19 @@ silently break the build.
 | SHA1 | `4ac05441f4de70a4ec3dd932116346c61b8783d9` |
 | Compiler | **agbcc** (pret's patched gcc 2.95.3, the AGB SDK compiler) |
 | Flags | `-mthumb-interwork -Wimplicit -Wparentheses -O2` |
-| Functions matched | **140** (3,780 bytes) |
+| Functions matched | **172** (4,536 bytes) |
 | Full ROM rebuild | **matching** |
-| Functions discovered | 3,394 call targets, 212 leaf candidates |
+| Functions discovered | 3,594 (via luvdis + local analysis) |
 
 ```bash
-make setup && make rom
+make setup && make rom     # verify the decomp still reproduces the ROM
+make mod                   # build with deliberate changes
+```
+
+Modding the AI needs none of that:
+
+```bash
+python tools/ability_table.py preset always baserom.gba ffta-always.gba
 ```
 
 ### Evidence for agbcc
