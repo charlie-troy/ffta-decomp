@@ -227,6 +227,38 @@ def check_resist_slots(gba, rom):
     return ok
 
 
+def check_unarmed(gba, rom):
+    """+0x33 must be what the damage path reads when no weapon is equipped.
+
+    sub_08130820 takes a unit pointer and reads the job index from unit+5.
+    Patching the field has to move the return value, or the link is only a
+    correlation.
+    """
+    print("")
+    print("8. unarmed attack power at +0x33")
+    base, stride, count = 0x08521A14 - 0x08000000, 0x34, 116
+    getter, unit = 0x08130820, 0x02000400
+    bad = 0
+    for job in range(count):
+        gba.uc.mem_write(unit, bytes(0x40))
+        gba.uc.mem_write(unit + 5, bytes([job]))
+        if gba.call(getter, [unit]) != rom[base + job * stride + 0x33]:
+            bad += 1
+    moved = True
+    addr = 0x08000000 + base + 5 * stride + 0x33
+    for probe in (0, 7, 99, 255):
+        gba.uc.mem_write(addr, bytes([probe]))
+        gba.uc.mem_write(unit + 5, bytes([5]))
+        if gba.call(getter, [unit]) != probe:
+            moved = False
+    gba.uc.mem_write(addr, bytes([rom[base + 5 * stride + 0x33]]))
+    ok = bad == 0 and moved
+    print(f"   getter matches the table for {count - bad}/{count} jobs")
+    print(f"   patching the field moves the result: {moved}")
+    print(f"   -> {'PASS' if ok else 'FAIL'}")
+    return ok
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("rom")
@@ -242,7 +274,8 @@ def main(argv):
                check_stat_ids(gba),
                check_healthy_rule(gba),
                check_gate(gba, args.samples),
-               check_resist_slots(gba, rom)]
+               check_resist_slots(gba, rom),
+               check_unarmed(gba, rom)]
     print(f"\n{sum(results)}/{len(results)} checks passed")
     return 0 if all(results) else 1
 

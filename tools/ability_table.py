@@ -150,10 +150,19 @@ UNIT_NAMED = {
     # blocks, 1-5 covering the playable races and 6+ the monster
     # families, which is why the range reaches 23.
     0x04: "race",
+    # 0 on the seven race-0 entries, 1 on the playable races and 2 on
+    # the monster families. Tracks +0x04 almost exactly.
+    0x06: "unit_kind",
+    # One u16, not two bytes: the same 12 entries hold 0xFF in both,
+    # so 0xFFFF reads as "none". Other values run 0x00bc..0x00f7.
+    0x09: "pair09_lo", 0x0A: "pair09_hi",
     0x07: "sprite_index",
     0x0B: "sprite_palette",
     0x0D: "portrait_palette",
     0x0E: "portrait_index",
+    # Packed with portrait_palette as (pal << 8) | this and handed to
+    # sub_08013108. Only read from 0x08035540.
+    0x0F: "portrait_graphic",
     0x10: "a_ability_index",
     # +0x12..+0x15 are not four byte-sized resistances. They carry eight
     # 3-bit slots on a 3-bit stride starting at +0x12 bit 3, each holding
@@ -180,6 +189,10 @@ UNIT_NAMED = {
     # Not in the published layout, which marks 0x31-0x33 unknown. Established
     # here from sub_0813413C, which reads it as the AI priority percentage.
     0x32: "ai_priority",
+    # The attack power used when nothing is equipped. The damage path
+    # substitutes it for sub_080CA7A4(weapon, 10) when the weapon
+    # register is null; both feed the same term.
+    0x33: "unarmed_attack",
 }
 
 

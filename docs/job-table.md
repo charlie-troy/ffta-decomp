@@ -122,18 +122,98 @@ from the conditional fields described above rather than from this guard. What
 `+0x05` selects is still open, but a checksum it is not: a checksum over a
 0x34-byte entry would vary per entry, and this takes two values.
 
-## Fields still unnamed
+## Finding a field's meaning
 
-`+0x02`, `+0x06`, `+0x09`, `+0x0a`, `+0x0c`, `+0x0f`, `+0x2c`, `+0x31`, `+0x33`.
+Two things read this table, and both had to be swept to cover the last
+offsets:
 
-Of these, `+0x0c` and `+0x0f` are confirmed readable through field ids `0x08`
-and `0x0b`, so they are real fields rather than padding. `+0x0c` is zero in
-every entry, which makes it a real field that nothing varies — most likely
-something switched off before release.
+1. **The accessor**, `sub_080C8570(index, ?, fieldId)`. `tools/field_callers.py`
+   decodes every `BL` to it and recovers the constant field id from the
+   preceding `movs r2, #imm`, giving 73 of 74 call sites.
+2. **Direct indexing.** Code that reaches the table itself is recognisable as
+   an idiom — multiply by the 0x34 stride, add the base from a literal pool,
+   add a constant offset, load a byte. `tools/job_getters.py` scans for it
+   ROM-wide.
 
-`+0x01` and `+0x08` are not fields at all. They are the high bytes of the u16
-at `+0x00` (`name_id`) and `+0x07` (`sprite_index`), and are zero only because
-those values stay below 256.
+The second matters because the interesting fields are not reached through the
+accessor at all. `+0x33` has three direct readers and no accessor call site.
+
+Both scans also settled a detail worth stating plainly: the direct getters take
+a **unit pointer** and read `[unit + 5]` to get the job index. Unit struct
+`+0x05` is the job index, and the job table's own `+0x05` is unrelated to it.
+
+## `+0x33` is the unarmed attack power
+
+`sub_08130820(unit)` returns `job_table[unit->job].b33` and nothing else. Its
+meaning comes from the two other readers, at `0x0812fee2` and `0x0812ff16`,
+which sit in the damage path and share one shape:
+
+```
+if (weapon == NULL)  power = job_table[unit->job].b33;
+else                 power = item_property(weapon, 10);
+...
+power = power * 3 / 2;
+result = power * base;
+```
+
+`sub_080CA7A4(item, prop)` is the item property getter — it multiplies by the
+item table's 0x20 stride and bounds-checks the property id against 19. So the
+field stands in for a weapon's attack power when no weapon is equipped, and
+both paths feed the same term.
+
+The values agree: 53 entries hold 10, and the range runs to 48, which is what
+innate attack power looks like across jobs and monsters.
+
+Verified by execution. `tools/probe_unarmed.py` runs the getter against
+synthetic units for all 116 jobs and matches every one, and patching the field
+moves the return value with it, so the link is causal rather than a
+correlation.
+
+## `+0x06` is a unit kind
+
+Values are 0, 1 and 2, and they track `race` at `+0x04` almost exactly:
+
+| `+0x06` | entries | which races |
+|---|---|---|
+| 0 | 7 | exactly the race-0 entries (0, 1, 72–76) |
+| 1 | 63 | the five playable races |
+| 2 | 46 | the monster families |
+
+Read as 0 = placeholder, 1 = character, 2 = monster.
+
+## `+0x09` is one u16, so `+0x0a` is not a field
+
+The same twelve entries hold `0xFF` at `+0x09` and at `+0x0a`, which is
+`0xFFFF` read as a halfword and is the "none" sentinel. Of the rest, 43 are
+zero and the others fall in `0x00bc`–`0x00f7`. `+0x0a` is the high byte.
+
+That leaves eight unnamed offsets rather than nine. `+0x01` and `+0x08` are the
+same kind of thing — high bytes of the u16 at `+0x00` (`name_id`) and `+0x07`
+(`sprite_index`), zero only because those values stay below 256.
+
+## `+0x0f` is a portrait graphic
+
+Read once, at `0x08035540`, alongside `portrait_palette`. The two are packed as
+`(palette << 8) | this` and passed to `sub_08013108` with a constant of
+`0x24c0`, which is a graphics request rather than anything gameplay-facing.
+
+## What is left, and why
+
+Four offsets have no reader at all — no accessor call site passes their field
+id, and no direct getter reads them. Nothing here can name them, so this is
+what they look like instead:
+
+| offset | shape |
+|---|---|
+| `+0x02` | zero except the last four entries (112–115), which hold 1, 2, 3, 4 |
+| `+0x0c` | zero in all 116 entries; reachable as field id `0x08`, never called |
+| `+0x2c` | zero except entries 62 and 63, holding 3 and 7 |
+| `+0x31` | 0, 1, 2 or 4 — never two bits at once, in three disjoint groups of 20, 5 and 7 entries |
+
+`+0x31` being single-bit throughout suggests a flag byte with three flags
+defined, but with no code reading it that is a shape, not a meaning. `+0x0c` is
+a real field the accessor supports that nothing varies and nothing calls, which
+is what a feature cut before release looks like.
 
 ## Reproducing
 

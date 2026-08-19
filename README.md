@@ -48,7 +48,7 @@ checks pass: the priority filter, the ability property accessor, flag decoding,
 the stat-id mapping, the healthy-target rule at its exact boundaries, and the
 11%/50% status gate. See [docs/validation.md](docs/validation.md).
 
-What remains unvalidated is whole-battle behaviour and nine job-table fields.
+What remains unvalidated is whole-battle behaviour and four job-table fields.
 The job table itself is written up in [docs/job-table.md](docs/job-table.md),
 including two corrections to the published layout: the elemental resistances
 are eight packed 3-bit slots rather than four bytes, and `+0x27` is an exact

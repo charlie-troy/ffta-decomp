@@ -56,8 +56,9 @@ nothing and 100 keeps everything.
 
 ## What is still unvalidated
 
-- **Nine unnamed job fields**: `+0x02`, `+0x06`, `+0x09`, `+0x0a`, `+0x0c`,
-  `+0x0f`, `+0x2c`, `+0x31`, `+0x33`. See [job-table.md](job-table.md).
+- **Four unnamed job fields**: `+0x02`, `+0x0c`, `+0x2c`, `+0x31`. No code
+  reads any of them, by either the accessor or direct indexing, so there is
+  nothing to derive a meaning from. See [job-table.md](job-table.md).
 - **Most of the job field accessor.** Execution confirms 16 of its 45 in-range
   offsets as plain byte loads. Seven are the packed resistances, now solved.
   The remaining 22 match on some entries and not others, so they compute a
