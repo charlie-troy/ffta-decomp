@@ -95,12 +95,21 @@ separate, smaller family that is not yet decompiled.
 
 | getter | status | how |
 |---|---|---|
-| `sub_080CDB3C` | **Silence** | `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
+| `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
+| `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 | `sub_080CDB54` | blocked-by-status, unidentified | same shape with property `0x18` (flag bit 13), which no public list names |
 
-The pattern to look for is `status(unit) == 0 || ability_property(a, N) != 0`.
-Wherever `N` is a documented "ignore X" flag, the paired getter reads X. That
-turns the ability flag documentation into names for these accessors.
+Two patterns name a status bit, both keyed on a documented ability flag:
+
+1. **Exemption.** `status(unit) == 0 || ability_property(a, N) != 0`. Where `N`
+   is a documented "ignore X" flag, the paired getter reads X. This named
+   Silence via Ignore Silence.
+2. **Avoidance.** The AI checks an ability flag and a unit predicate together
+   and bails. Where the flag is Reflectable, the predicate reads Reflect. This
+   named Reflect via `sub_0812F154`.
+
+Both need a documented ability flag to key on, which is what limits the method:
+the flag list has only a handful that name a status.
 
 ## Why this matters for modding
 
