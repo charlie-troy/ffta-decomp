@@ -40,7 +40,11 @@ Two results in there disagree with published documentation, with the derivation
 shown in each case: `ai_priority` runs the opposite direction, and the job
 table's `+0x32` is not unknown.
 
-**Everything is static analysis. None of it has been observed running.**
+**The decision inputs are validated by execution.** `tools/validate_ai.py` runs
+the ROM's own functions on an emulated CPU and measures them; the priority
+filter, the ability property accessor and the flag decoding all check out. See
+[docs/validation.md](docs/validation.md). What is *not* validated is behaviour
+in a real battle, which needs the game running.
 
 ## Decompilation status
 

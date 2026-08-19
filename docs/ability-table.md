@@ -141,6 +141,11 @@ so **P(keep) is approximately `prio / 100`**. The field is literally a
 percentage chance that the ability survives the filter, which is why its
 observed values run 0 to 100.
 
+**Measured, not just derived.** `tools/validate_ai.py` calls the filter 1500
+times at each setting on an emulated CPU: 0 keeps nothing, 100 keeps
+everything, and the rate in between tracks `prio/100`. See
+`docs/validation.md`.
+
 **Practical consequence:** to make the AI favour an ability, raise `ai_priority`
 towards 100. Setting it to 0 disables the ability for the AI entirely. Anyone
 following the published description would tune it backwards.
