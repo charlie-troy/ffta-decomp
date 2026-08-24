@@ -152,14 +152,20 @@ remaining work is naming the other computed/packed properties.
 9. **Cancellation rule — done 2026-08-24.** Property `0x37` is `+0x41` bit 2.
    The executed mission formatter selects Cancellations Accepted, No
    Cancellations, or the special-group Mission Begins Immediately path.
-10. Expose every newly-named field in `tools/mission_table.py`,
+10. **Reward-preview flags — done 2026-08-24.** Properties `0x3d..0x40` hide
+    two item and two law-card reward slots behind `????`. All four formatter
+    paths execute, including the retail-dormant second-card flag when injected.
+11. Expose every newly-named field in `tools/mission_table.py`,
    round-trip-verified, and add a validation check. **Done for the nine clan
    progression fields, dispatch job rules, dormant dispatch item rule, pub
    fee, mission type, availability/clear fields, and clan-skill
-   requirements, and the cancellation flag**; repeat for later discoveries.
+   requirements, cancellation, and reward-preview flags**.
 
-**Done when:** a known mission's full reward is reproducible from named data,
-and every new field round-trips byte-identically.
+**Done 2026-08-24:** a known mission's full reward is reproducible from named
+data, every new field round-trips byte-identically, and all 50 constant-property
+call sites in the corrected report belong to a named family. Seven variable-id
+calls remain available for future goal-driven research, but no longer block the
+higher-value map phase.
 
 ---
 

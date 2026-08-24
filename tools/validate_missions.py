@@ -15,6 +15,7 @@ from emulate import Gba
 from ffta_names import Names
 from mission_table import (CLAN_SKILLS, JOB_KIND_BASE, JOB_KIND_STRIDE,
                            JOB_COUNT,
+                           REWARD_PREVIEW_FLAGS,
                            availability_days_get, availability_days_set,
                            blocked_item_get, blocked_item_set,
                            blocked_job_get, blocked_job_set,
@@ -29,7 +30,9 @@ from mission_table import (CLAN_SKILLS, JOB_KIND_BASE, JOB_KIND_STRIDE,
                            required_clan_skill_level_get,
                            required_clan_skill_level_set,
                            required_clan_skill_set,
-                           required_job_get, required_job_set)
+                           required_job_get, required_job_set,
+                           reward_preview_hidden_get,
+                           reward_preview_hidden_set)
 
 BASE = 0x0855AE4C
 STRIDE = 0x46
@@ -40,6 +43,8 @@ ADJUST_FEE = 0x080CEC78
 RATE_DISPATCH = 0x080CF310
 CHECK_REQUIREMENTS = 0x080CEECC
 MISSION_TEXT_EXPAND = 0x08013C20
+FORMAT_ITEM_REWARD = 0x080194E4
+FORMAT_LAW_CARD_REWARD = 0x08019574
 INDEX_PLACEMENT = 0x08045400
 INDEX_TRIGGER = 0x08123898
 CLAN_STATE = 0x020021B4
@@ -640,12 +645,103 @@ def main(argv=None):
         f"text widths {text_widths}; packed edit preserves adjacent bits)"
     )
 
+    preview_ok = True
+    preview_checks = 0
+    for i in range(COUNT):
+        entry = BASE - 0x08000000 + i * STRIDE
+        for name, prop, off, bit in REWARD_PREVIEW_FLAGS:
+            got = gba.call(ACCESSOR, [i, prop])
+            want = reward_preview_hidden_get(rom, entry, off, bit)
+            preview_checks += 1
+            if got != want:
+                preview_ok = False
+                failures.append(f"mission {name} {i}: {got} != {want}")
+                break
+        if not preview_ok:
+            break
+
+    preview_anchors = {
+        "item_reward_slot1_hidden": (32, 1),
+        "item_reward_slot2_hidden": (80, 1),
+        "law_card_reward_slot1_hidden": (8, 1),
+        "law_card_reward_slot2_hidden": (8, 0),
+    }
+    got_preview_anchors = {}
+    for name, _prop, off, bit in REWARD_PREVIEW_FLAGS:
+        mission, _expected = preview_anchors[name]
+        entry = BASE - 0x08000000 + mission * STRIDE
+        got_preview_anchors[name] = reward_preview_hidden_get(
+            rom, entry, off, bit)
+    expected_preview_anchors = {
+        name: expected for name, (_mission, expected) in
+        preview_anchors.items()
+    }
+    if got_preview_anchors != expected_preview_anchors:
+        preview_ok = False
+        failures.append(f"reward-preview anchors: {got_preview_anchors}")
+
+    probe = bytearray(rom)
+    preview_entry = BASE - 0x08000000 + 80 * STRIDE
+    for _name, _prop, off, bit in REWARD_PREVIEW_FLAGS:
+        keep = probe[preview_entry + off] & ~(1 << bit)
+        for value in (0, 1):
+            reward_preview_hidden_set(probe, preview_entry, off, bit, value)
+            if (reward_preview_hidden_get(
+                    probe, preview_entry, off, bit) != value or
+                    probe[preview_entry + off] & ~(1 << bit) != keep):
+                preview_ok = False
+                failures.append(
+                    f"reward-preview packing failed for property {_prop:#x}"
+                )
+                break
+
+    record = 0x02001000
+    output = 0x02003000
+    hidden_text = b"\x80\xea" * 4
+
+    def format_reward(mission, function, control, reward_offset):
+        gba.reset_ram()
+        gba.write32(0x020020D0, record)
+        gba.uc.mem_write(record, mission.to_bytes(2, "little") + bytes(30))
+        gba.write8(record + reward_offset, 1)
+        gba.call(function, [output, control])
+        return bytes(gba.uc.mem_read(output, 8))
+
+    visible_item = format_reward(3, FORMAT_ITEM_REWARD, 0x83, 10)
+    hidden_item = format_reward(80, FORMAT_ITEM_REWARD, 0x83, 10)
+    hidden_card = format_reward(8, FORMAT_LAW_CARD_REWARD, 0x84, 12)
+
+    # Property 0x40 is dormant in retail. Inject it for Herb Picking to prove
+    # the second law-card slot reaches the same ???? formatter branch.
+    gba.write8(BASE + 3 * STRIDE + 0x42,
+               rom[BASE - 0x08000000 + 3 * STRIDE + 0x42] | 2)
+    hidden_card2 = format_reward(3, FORMAT_LAW_CARD_REWARD, 0x85, 14)
+    formatter_ok = (
+        visible_item != hidden_text and
+        hidden_item == hidden_text and
+        hidden_card == hidden_text and
+        hidden_card2 == hidden_text
+    )
+    if not formatter_ok:
+        preview_ok = False
+        failures.append(
+            "reward-preview formatter paths did not select expected text"
+        )
+    print(
+        f"13. hidden reward previews: {'OK' if preview_ok else 'FAIL'} "
+        f"({preview_checks} accessor reads; anchors {got_preview_anchors}; "
+        f"item visible={visible_item != hidden_text}/hidden="
+        f"{hidden_item == hidden_text}; law hidden="
+        f"{hidden_card == hidden_text}/injected slot2="
+        f"{hidden_card2 == hidden_text}; packed edits preserve adjacent bits)"
+    )
+
     if failures:
         print("\nFAIL:")
         for failure in failures[:10]:
             print(f"  - {failure}")
         return 1
-    print("\n12/12 mission checks passed")
+    print("\n13/13 mission checks passed")
     return 0
 
 

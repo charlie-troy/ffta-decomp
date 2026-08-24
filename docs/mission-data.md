@@ -147,6 +147,26 @@ mission on each presentation path: Snowball Fight cannot be cancelled, a
 Wanted! mission can, and Pam Le Fey starts immediately. The computed CSV setter
 preserves all seven adjacent flag bits.
 
+## Hidden reward previews
+
+Properties `0x3d..0x40` are four one-bit **reward-preview hidden** flags. The
+first two cover item reward slots (`+0x41` bits 6 and 7); the next two cover law
+card reward slots (`+0x42` bits 0 and 1). Their two UI callbacks normally
+resolve the generated slot value to an item or law-card name. When the matching
+flag is set, the callback displays `????` instead.
+
+The names stay behavioral rather than calling every hidden slot random. A
+published mission listing does independently show the common correlation:
+[Fire Sigil has a fixed sigil plus a random item and random cards](https://www.geocities.ws/gamecc2000/ffta.html),
+and its second item-preview flag is set. But the formatter proves concealment;
+it does not by itself prove how each reward is generated.
+
+All 2,048 accessor reads match the four raw bits. Executed callbacks show a
+visible Shortsword for an unhidden item slot and `????` for hidden item and law
+card slots. Property `0x40` is clear in all 512 retail missions, so validation
+injects it into a ROM map in memory to prove the dormant second-card branch.
+All four computed CSV setters preserve adjacent flags.
+
 ## Mission behavior and public type
 
 Mission `+0x02` is packed. Accessor property 1 returns bits 0–2, the engine's
@@ -284,6 +304,10 @@ Named, with the code or the game as evidence:
 | `+0x38` bits 0–3 | required clan-skill code | property 46; codes 1–8 select the eight named clan skills |
 | `+0x38` bits 4–7, `+0x39` bits 0–2 | required clan-skill level | property 47; acceptance compares the selected clan level against it |
 | `+0x41` bit 2 | cancellation allowed | property 55; selects accepted/no-cancellation text unless the mission starts immediately |
+| `+0x41` bit 6 | item reward slot 1 hidden | property 61; preview displays `????` when set |
+| `+0x41` bit 7 | item reward slot 2 hidden | property 62; preview displays `????` when set |
+| `+0x42` bit 0 | law-card reward slot 1 hidden | property 63; preview displays `????` when set |
+| `+0x42` bit 1 | law-card reward slot 2 hidden | property 64; dormant in retail, but its formatter branch executes when injected |
 | `+0x39` bits 3–7, `+0x3a` bit 0 | required dispatch job | roster filter requires the canonical job code (property 48) |
 | `+0x3c` bits 2–7 | blocked dispatch job | a matching canonical job returns rating 0 in `sub_080CF310` |
 | `+0x3d` | dormant blocked dispatch item, −375 | rating gate is executable, but all retail entries are zero (property 53) |
@@ -311,6 +335,11 @@ general id echo: it matches the low mission id only through entry 122 (with one
 exception) and is zero for most later entries. Naming it, or any other remaining
 field, needs the same thing that worked for the required items: a function that
 reads the property and does something identifiable with the value.
+
+The corrected constant-caller sweep is now exhausted: 57 accessor call sites,
+50 with recoverable constant property ids, and every constant family accounted
+for above or by an already-named plain field. Seven variable-id calls remain;
+they are not evidence for assigning names to the remaining positional bytes.
 
 ## The mission index at `0x08563A70`
 

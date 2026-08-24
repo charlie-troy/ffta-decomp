@@ -30,17 +30,17 @@ status and backlog tables are living sections and should be kept current.
 | Item | State |
 |---|---|
 | Branch | `master`, tracking `origin/master` |
-| Active phase | Phase 2 — finish computed and packed mission properties |
-| Current work package | Resolve remaining mission UI properties `0x3e/0x40` |
-| Last closed package | Mission cancellation rule |
+| Active phase | Phase 3 — map blocks beyond terrain |
+| Current work package | MAP3.1 — decode map tile arrangement `+0x04` |
+| Last closed package | Hidden item/law-card reward previews; constant mission caller sweep |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 12/12; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; matching ROM SHA1 |
 
 ## Prioritized backlog
 
 | ID | Priority | State | Work package | Definition of done |
 |---|---:|---|---|---|
-| M2.1 | P0 | In progress | Name remaining mission computed/packed properties | A reader gives each name behavioral meaning; fields are exposed and execution- or round-trip-validated |
+| M2.1 | P0 | Complete | Name caller-backed mission computed/packed properties | All 50 constant-property call sites are assigned to named, validated families; seven variable-id calls remain numeric |
 | M2.2 | P0 | Complete | Name mission-index `+0x00/+0x01` | Ordering/grouping role is proven by an identified reader; CSV names and a check are added |
 | MAP3.1 | P1 | Pending | Decode map tile arrangement `+0x04` | Dump/apply round-trips and a known map's layout correlates with terrain |
 | MAP3.2 | P1 | Pending | Characterize map block `+0x08` | A reader identifies the block and one safe edit round-trips |
@@ -63,6 +63,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.1d | 2026-08-24 | Named availability days, clear-condition code, and clear count | 1,536 accessor reads; published mission anchors; packed edit checks |
 | M2.1e | 2026-08-24 | Named required clan skill/level and corrected four reward labels | 1,024 accessor reads; executed Combat 9/10 boundary; published anchors |
 | M2.1f | 2026-08-24 | Named the cancellation flag at `+0x41` bit 2 | 512 accessor reads; three executed formatter paths; packed edit check |
+| M2.1g | 2026-08-24 | Named four hidden item/law-card reward-preview flags and closed the constant caller sweep | 2,048 accessor reads; live visible/hidden formatters; dormant branch injection |
 
 ## Decisions and evidence
 
@@ -199,6 +200,20 @@ status and backlog tables are living sections and should be kept current.
   for Wanted!, Snowball Fight, and Pam Le Fey. All 512 accessor reads and the
   packed setter also pass.
 
+### D-014 — Close the constant mission-caller sweep and advance to maps
+
+- Properties `0x3d..0x40` hide two generated item and two law-card reward
+  preview slots behind `????`. The second law-card flag is dormant in retail
+  but its injected formatter path executes.
+- Naming remains behavioral: published examples correlate hidden slots with
+  random rewards, but the formatter proves concealment rather than generation.
+- The repaired report contains 57 call sites: 50 have recoverable constant
+  property ids and every one now belongs to a named family. The remaining seven
+  pass variable ids and do not justify names for positional fields by themselves.
+- Decision: mark M2.1 complete at the high-confidence caller boundary and move
+  to MAP3.1. Reopen variable-id mission research only when a modding goal gives
+  it a concrete payoff.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -210,6 +225,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Hidden reward previews and Phase 2 closure
+
+Objective:
+
+- Resolve the last constant mission UI pair and decide whether the mission
+  sweep still outranks map work.
+
+Completed:
+
+- Expanded properties `0x3e/0x40` into their full four-property family:
+  hidden previews for two item and two law-card reward slots.
+- Added four computed CSV flags with adjacency-preserving setters.
+- Executed 2,048 accessor reads, visible/hidden item and law-card formatters,
+  and the retail-dormant second-card branch via an in-memory injection.
+- Audited the corrected caller report: all 50 constant-property sites are now
+  assigned; only seven variable-id calls remain.
+- Closed M2.1 and promoted MAP3.1 to the active work package.
+
+Evidence recorded during the batch:
+
+- Unhidden item slot renders Shortsword; hidden slots render `????`.
+- Fire Sigil's hidden second-item slot agrees with its published random-item
+  reward listing.
+- Mission validation: 13/13.
+
+Next action:
+
+- Decode the map tile-arrangement block at map-table `+0x04`, correlate one
+  known map against its terrain dimensions, then build guarded dump/apply tools.
 
 ### 2026-08-24 — Cancellation-rule closure
 

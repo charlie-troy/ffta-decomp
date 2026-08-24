@@ -98,11 +98,10 @@ Genuinely open, with the reason:
   frozen-RNG replay enters `sub_080C32C0` once per four distinct targets and
   reproduces exactly; see `docs/whole-battle-trace.md`. Do not generalize that
   one turn to every mission-, law-, or effect-specific path.
-- **Remaining mission fields.** Rewards, clan progression, required/blocked
-  dispatch jobs, pub information fee, dispatch threshold, public type,
-  availability, clear conditions, clan-skill requirements, and cancellation
-  rules are named. Keep using identifiable readers and execution before naming
-  the rest.
+- **Mission fields.** The corrected constant-caller report is exhausted;
+  rewards, progression, dispatch rules, fees, type, deadlines, clear
+  conditions, clan-skill requirements, cancellation, and hidden reward previews
+  are named. Seven variable-id calls remain, but do not block map work.
 - **Map blocks other than terrain.** Arrangement, the `+0x08` block, and the
   Huffman-compressed graphics.
 - **Formations do not exist** — battle setups are scripted, one Place Character
@@ -112,7 +111,7 @@ Genuinely open, with the reason:
 
 ```bash
 python tools/validate_ai.py "<rom>"      # must stay 8/8
-python tools/validate_missions.py "<rom>" # must stay 12/12 when missions change
+python tools/validate_missions.py "<rom>" # must stay 13/13 when missions change
 ```
 
 Every table tool must round-trip: dumping and re-applying an unedited CSV has

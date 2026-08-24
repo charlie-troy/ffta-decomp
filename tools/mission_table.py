@@ -114,6 +114,13 @@ CLAN_SKILLS = {
     8: "Track",
 }
 
+REWARD_PREVIEW_FLAGS = (
+    ("item_reward_slot1_hidden", 0x3D, 0x41, 6),
+    ("item_reward_slot2_hidden", 0x3E, 0x41, 7),
+    ("law_card_reward_slot1_hidden", 0x3F, 0x42, 0),
+    ("law_card_reward_slot2_hidden", 0x40, 0x42, 1),
+)
+
 
 def col(o):
     return NAMED.get(o, f"b{o:02x}")
@@ -226,6 +233,20 @@ def cancellation_allowed_set(data, entry, value):
     data[entry + 0x41] = (data[entry + 0x41] & 0xFB) | (value << 2)
 
 
+def reward_preview_hidden_get(data, entry, offset, bit):
+    """Decode one of accessor properties 0x3d..0x40."""
+    return (data[entry + offset] >> bit) & 1
+
+
+def reward_preview_hidden_set(data, entry, offset, bit, value):
+    """Set a reward-preview hide flag while preserving adjacent flags."""
+    if value not in (0, 1):
+        raise ValueError("reward preview hidden must be 0 or 1")
+    mask = 1 << bit
+    data[entry + offset] = ((data[entry + offset] & ~mask) |
+                            (value << bit))
+
+
 def required_job_get(data, entry):
     """Decode accessor property 0x30 from packed mission bytes."""
     return (data[entry + 0x39] >> 3) | ((data[entry + 0x3A] & 0x01) << 5)
@@ -290,6 +311,8 @@ def cmd_dump(rom_path, out_path):
                     "required_clan_skill_code", "required_clan_skill",
                     "required_clan_skill_level",
                     "cancellation_allowed",
+                    *[name for name, _prop, _off, _bit in
+                      REWARD_PREVIEW_FLAGS],
                     "required_job_code", "required_job",
                     "blocked_dispatch_job_code", "blocked_dispatch_job",
                     "blocked_dispatch_item_id", "blocked_dispatch_item"])
@@ -304,6 +327,10 @@ def cmd_dump(rom_path, out_path):
             required_skill = required_clan_skill_get(rom, b)
             required_skill_level = required_clan_skill_level_get(rom, b)
             cancellation_allowed = cancellation_allowed_get(rom, b)
+            reward_preview_flags = [
+                reward_preview_hidden_get(rom, b, off, bit)
+                for _name, _prop, off, bit in REWARD_PREVIEW_FLAGS
+            ]
             required_job = required_job_get(rom, b)
             blocked_job = blocked_job_get(rom, b)
             blocked_item = blocked_item_get(rom, b)
@@ -315,6 +342,7 @@ def cmd_dump(rom_path, out_path):
                         required_skill, CLAN_SKILLS.get(required_skill, ""),
                         required_skill_level,
                         cancellation_allowed,
+                        *reward_preview_flags,
                         required_job,
                         job_names.get(required_job, ""),
                         blocked_job, job_names.get(blocked_job, ""),
@@ -342,6 +370,10 @@ def cmd_apply(rom_path, csv_path, out_path):
             original_required_skill_level = required_clan_skill_level_get(
                 rom, p)
             original_cancellation_allowed = cancellation_allowed_get(rom, p)
+            original_reward_preview_flags = {
+                name: reward_preview_hidden_get(rom, p, off, bit)
+                for name, _prop, off, bit in REWARD_PREVIEW_FLAGS
+            }
             original_required_job = required_job_get(rom, p)
             original_blocked_job = blocked_job_get(rom, p)
             original_blocked_item = blocked_item_get(rom, p)
@@ -454,6 +486,19 @@ def cmd_apply(rom_path, csv_path, out_path):
                     cancellation_allowed_set(rom, p, requested)
                     print(f"  id {i:>3} cancellation_allowed: "
                           f"{before} -> {requested}")
+                    changes += 1
+            for name, _prop, off, bit in REWARD_PREVIEW_FLAGS:
+                requested = row.get(name, "")
+                if requested == "":
+                    continue
+                requested = int(requested, 0)
+                if requested not in (0, 1):
+                    print(f"  id {i} {name}: {requested} must be 0 or 1, "
+                          "skipped")
+                elif requested != original_reward_preview_flags[name]:
+                    before = reward_preview_hidden_get(rom, p, off, bit)
+                    reward_preview_hidden_set(rom, p, off, bit, requested)
+                    print(f"  id {i:>3} {name}: {before} -> {requested}")
                     changes += 1
             requested = row.get("required_job_code", "")
             if requested != "":
