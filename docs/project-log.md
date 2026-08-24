@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 2 — finish computed and packed mission properties |
-| Current work package | Identify the next mission property with an interpretable reader |
-| Last closed package | Packed mission behavior and public icon type |
+| Current work package | Resolve mission requirement properties `0x2e/0x2f` |
+| Last closed package | Mission availability deadline and clear conditions |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 9/9; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 10/10; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -60,6 +60,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.1b | 2026-08-24 | Named required and blocked dispatch jobs, base pub fee, and the retail-unused item exclusion | `validate_missions.py` 7/7; `mission_table.py job-rules`; byte-identical round-trip |
 | M2.2 | 2026-08-24 | Corrected mission index to 256 records at `0x08563A70`; named map-symbol and script-trigger ids | `mission_table.py index`; executed placement and trigger-selection paths; missions 8/8 |
 | M2.1c | 2026-08-24 | Exposed packed mission behavior and effective public type at `+0x02` | 1,024 accessor reads; packed edit checks; official-manual type anchors |
+| M2.1d | 2026-08-24 | Named availability days, clear-condition code, and clear count | 1,536 accessor reads; published mission anchors; packed edit checks |
 
 ## Decisions and evidence
 
@@ -160,6 +161,18 @@ status and backlog tables are living sections and should be kept current.
 - Product consequence: modders can safely edit both packed values while the
   tool presents reliable public labels and preserves unknown subtype nuance.
 
+### D-011 — Properties 16–18 are deadline and clear-progress fields
+
+- Property 16 packs a six-bit availability deadline across `+0x0f/+0x10`;
+  zero renders as no deadline and nonzero values render as days.
+- Property 17 selects the clear-condition label. Retail and published anchors
+  establish codes 0–2 as Win battle, Days, and Battles; other codes stay
+  numeric rather than receiving speculative names.
+- Property 18 packs the associated six-bit count across `+0x10/+0x11`.
+- Execution evidence: all 1,536 reads agree with the raw packing, and safe
+  setters preserve every adjacent bit. Published Dueling Sub, Watching You,
+  Run For Fun, and Hungry Ghost listings agree with the decoded pairs.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -171,6 +184,32 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Availability and clear-condition closure
+
+Objective:
+
+- Resolve mission accessor properties 16–18 from their isolated UI readers.
+
+Completed:
+
+- Named the six-bit availability deadline, three-bit clear-condition code,
+  and six-bit clear count across their three shared packed bytes.
+- Added computed CSV columns and safe setters that preserve adjacent fields.
+- Added 1,536 executed accessor reads, published mission anchors, and boundary
+  packing probes to the mission gate.
+
+Evidence recorded during the batch:
+
+- Availability anchors span 10, 15, 20, 35, and 40 days.
+- Dueling Sub is 3 Days; Hungry Ghost is 10 Days.
+- Run For Fun is 1 Battle; Watching You is 2 Battles.
+- Mission validation: 10/10.
+
+Next action:
+
+- Resolve the next corrected-caller-report family, prioritizing properties
+  `0x2e/0x2f` because their shared requirement reader is already identified.
 
 ### 2026-08-24 — Caller-analysis repair and mission-type closure
 

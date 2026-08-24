@@ -40,9 +40,10 @@ with no unknown codes. See [docs/text.md](docs/text.md).
 Mission data is mapped in [docs/mission-data.md](docs/mission-data.md), which
 was undocumented anywhere and had to be found by scanning the ROM for table
 accessors. Rewards, clan progression, required and blocked dispatch jobs, pub
-information fees, dispatch difficulty, and the packed behavior/public mission
-type are directly editable. That scan also settles a negative: there is no
-formation table, because battle setups are scripted one unit at a time.
+information fees, dispatch difficulty, availability deadlines, clear
+conditions, and the packed behavior/public mission type are directly editable.
+That scan also settles a negative: there is no formation table, because battle
+setups are scripted one unit at a time.
 
 Map data is mapped as well, in [docs/map-data.md](docs/map-data.md). The
 blocks are compressed, the codec is implemented in both directions, and

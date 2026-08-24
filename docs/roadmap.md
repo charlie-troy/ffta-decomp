@@ -141,10 +141,15 @@ remaining work is naming the other computed/packed properties.
    player-facing types are Non-Battle, Regular, Encounter, Free-Area, plus a
    small internal Special group. All accessor reads and packed edits execute
    in validation.
-7. Expose every newly-named field in `tools/mission_table.py`,
+7. **Availability and clear conditions — done 2026-08-24.** Properties 16–18
+   are the six-bit availability deadline, three-bit clear-condition code, and
+   six-bit clear count. Published mission examples anchor Days and Battles;
+   all 1,536 accessor reads and packed setters execute in validation.
+8. Expose every newly-named field in `tools/mission_table.py`,
    round-trip-verified, and add a validation check. **Done for the nine clan
-   progression fields, dispatch job rules, dormant dispatch item rule, and pub
-   fee**; repeat for later discoveries.
+   progression fields, dispatch job rules, dormant dispatch item rule, pub
+   fee, mission type, and availability/clear fields**; repeat for later
+   discoveries.
 
 **Done when:** a known mission's full reward is reproducible from named data,
 and every new field round-trips byte-identically.

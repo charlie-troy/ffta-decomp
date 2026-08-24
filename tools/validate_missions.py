@@ -14,8 +14,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from emulate import Gba
 from ffta_names import Names
 from mission_table import (JOB_KIND_BASE, JOB_KIND_STRIDE, JOB_COUNT,
+                           availability_days_get, availability_days_set,
                            blocked_item_get, blocked_item_set,
                            blocked_job_get, blocked_job_set,
+                           clear_condition_get, clear_condition_set,
+                           clear_count_get, clear_count_set,
                            mission_behavior_get, mission_behavior_set,
                            mission_icon_group_get, mission_icon_group_set,
                            mission_type_name,
@@ -409,12 +412,101 @@ def main(argv=None):
         "preserve adjacent bits)"
     )
 
+    timing_ok = True
+    timing_checks = 0
+    timing_fields = (
+        (0x10, availability_days_get, "availability"),
+        (0x11, clear_condition_get, "clear condition"),
+        (0x12, clear_count_get, "clear count"),
+    )
+    for i in range(COUNT):
+        entry = BASE - 0x08000000 + i * STRIDE
+        for prop, get, label in timing_fields:
+            got = gba.call(ACCESSOR, [i, prop])
+            want = get(rom, entry)
+            timing_checks += 1
+            if got != want:
+                timing_ok = False
+                failures.append(f"mission {label} {i}: {got} != {want}")
+                break
+        if not timing_ok:
+            break
+
+    availability_anchors = {
+        41: 10,   # Fire! Fire!
+        43: 15,   # Battle Tourney
+        104: 20,  # Fiend Run
+        106: 35,  # Wyrms Awaken
+        113: 40,  # Smuggle Bust
+    }
+    clear_anchors = {
+        128: (2, 2),  # Watching You: win 2 battles
+        130: (1, 3),  # Dueling Sub: 3 days
+        137: (2, 1),  # Run For Fun: win 1 battle
+        138: (1, 10),  # Hungry Ghost: 10 days
+    }
+    got_availability = {
+        i: availability_days_get(
+            rom, BASE - 0x08000000 + i * STRIDE)
+        for i in availability_anchors
+    }
+    got_clear = {
+        i: (
+            clear_condition_get(rom, BASE - 0x08000000 + i * STRIDE),
+            clear_count_get(rom, BASE - 0x08000000 + i * STRIDE),
+        )
+        for i in clear_anchors
+    }
+    if got_availability != availability_anchors:
+        timing_ok = False
+        failures.append(f"availability anchors: {got_availability}")
+    if got_clear != clear_anchors:
+        timing_ok = False
+        failures.append(f"clear-condition anchors: {got_clear}")
+
+    probe = bytearray(rom)
+    timing_entry = BASE - 0x08000000 + 130 * STRIDE
+    for value in (0, 1, 31, 32, 40, 63):
+        keep_0f = probe[timing_entry + 0x0F] & 0x07
+        keep_10 = probe[timing_entry + 0x10] & 0xFE
+        availability_days_set(probe, timing_entry, value)
+        if (availability_days_get(probe, timing_entry) != value or
+                probe[timing_entry + 0x0F] & 0x07 != keep_0f or
+                probe[timing_entry + 0x10] & 0xFE != keep_10):
+            timing_ok = False
+            failures.append(f"availability packing failed for {value}")
+            break
+    for value in range(8):
+        keep_10 = probe[timing_entry + 0x10] & 0xC7
+        clear_condition_set(probe, timing_entry, value)
+        if (clear_condition_get(probe, timing_entry) != value or
+                probe[timing_entry + 0x10] & 0xC7 != keep_10):
+            timing_ok = False
+            failures.append(f"clear-condition packing failed for {value}")
+            break
+    for value in (0, 1, 3, 10, 40, 63):
+        keep_10 = probe[timing_entry + 0x10] & 0x3F
+        keep_11 = probe[timing_entry + 0x11] & 0xF0
+        clear_count_set(probe, timing_entry, value)
+        if (clear_count_get(probe, timing_entry) != value or
+                probe[timing_entry + 0x10] & 0x3F != keep_10 or
+                probe[timing_entry + 0x11] & 0xF0 != keep_11):
+            timing_ok = False
+            failures.append(f"clear-count packing failed for {value}")
+            break
+    print(
+        f"10. mission availability/clear: "
+        f"{'OK' if timing_ok else 'FAIL'} ({timing_checks} accessor reads; "
+        f"availability {got_availability}; clear {got_clear}; packed edits "
+        "preserve adjacent bits)"
+    )
+
     if failures:
         print("\nFAIL:")
         for failure in failures[:10]:
             print(f"  - {failure}")
         return 1
-    print("\n9/9 mission checks passed")
+    print("\n10/10 mission checks passed")
     return 0
 
 

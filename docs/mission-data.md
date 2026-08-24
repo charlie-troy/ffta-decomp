@@ -134,6 +134,29 @@ one-to-one onto the four public icons. Verified anchors are Dueling Sub
 `(2, Special)`. Computed CSV setters preserve both the other packed field and
 the upper two bits of `+0x02`.
 
+## Availability and clear conditions
+
+Three adjacent computed properties drive the deadline and progress text shown
+for accepted missions:
+
+- property `0x10`, **availability days**, is a 6-bit value packed as
+  `(+0x0f >> 3) | ((+0x10 & 1) << 5)`. Zero renders as a dash, meaning no
+  deadline; nonzero values render as a day count. Published anchors include
+  Fire! Fire! 10, Battle Tourney 15, Fiend Run 20, Wyrms Awaken 35, and
+  Smuggle Bust 40.
+- property `0x11`, **clear condition code**, is `(+0x10 >> 3) & 7`. Code 0 is
+  `Win battle`, code 1 is `Days`, and code 2 is `Battles`. Other codes remain
+  numeric until a reader or retail example establishes their presentation.
+- property `0x12`, **clear count**, is
+  `(+0x10 >> 6) | ((+0x11 & 0x0f) << 2)`. Dueling Sub is `(Days, 3)`, Run For
+  Fun is `(Battles, 1)`, Watching You is `(Battles, 2)`, and Hungry Ghost is
+  `(Days, 10)`, matching published mission listings.
+
+The CSV exposes all three as computed columns. Their setters preserve the
+unrelated low bits of `+0x0f`, the neighboring fields in `+0x10`, and the high
+nibble of `+0x11`. Validation executes all 1,536 accessor reads and probes the
+full bit-boundary cases.
+
 ## Gil, AP and item rewards are in this table
 
 An earlier draft of this file concluded the opposite, and was wrong. The
@@ -218,6 +241,9 @@ Named, with the code or the game as evidence:
 | `+0x35` | item reward id | resolves to the Wanted! sword rewards, Kotetsu, etc. |
 | `+0x02` bits 0–2 | mission behavior code | properties 1; dispatch/encounter and internal battle/event paths |
 | `+0x02` bits 3–5 | mission icon group code | property 2; combined with behavior 1 to select the public mission type |
+| `+0x0f` bits 3–7, `+0x10` bit 0 | availability days | property 16; zero displays no deadline, otherwise a day count |
+| `+0x10` bits 3–5 | clear condition code | property 17; known codes are Win battle, Days, and Battles |
+| `+0x10` bits 6–7, `+0x11` bits 0–3 | clear count | property 18; count used by the selected clear condition |
 | `+0x39` bits 3–7, `+0x3a` bit 0 | required dispatch job | roster filter requires the canonical job code (property 48) |
 | `+0x3c` bits 2–7 | blocked dispatch job | a matching canonical job returns rating 0 in `sub_080CF310` |
 | `+0x3d` | dormant blocked dispatch item, −375 | rating gate is executable, but all retail entries are zero (property 53) |

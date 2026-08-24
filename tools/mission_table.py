@@ -97,6 +97,12 @@ MISSION_ICON_GROUPS = {
     3: "Special",
 }
 
+CLEAR_CONDITIONS = {
+    0: "Win battle",
+    1: "Days",
+    2: "Battles",
+}
+
 
 def col(o):
     return NAMED.get(o, f"b{o:02x}")
@@ -131,6 +137,44 @@ def mission_type_name(behavior, icon_group):
     if behavior == 1:
         return "Encounter"
     return MISSION_ICON_GROUPS.get(icon_group, "")
+
+
+def availability_days_get(data, entry):
+    """Decode property 0x10 from +0x0f bits 3..7 and +0x10 bit 0."""
+    return (data[entry + 0x0F] >> 3) | ((data[entry + 0x10] & 1) << 5)
+
+
+def availability_days_set(data, entry, value):
+    """Set the 6-bit deadline while preserving adjacent packed fields."""
+    if not 0 <= value <= 0x3F:
+        raise ValueError("availability days must fit 6 bits")
+    data[entry + 0x0F] = (data[entry + 0x0F] & 0x07) | ((value & 0x1F) << 3)
+    data[entry + 0x10] = (data[entry + 0x10] & 0xFE) | (value >> 5)
+
+
+def clear_condition_get(data, entry):
+    """Decode property 0x11 from +0x10 bits 3..5."""
+    return (data[entry + 0x10] >> 3) & 0x07
+
+
+def clear_condition_set(data, entry, value):
+    """Set the 3-bit clear-condition kind without touching its neighbors."""
+    if not 0 <= value <= 7:
+        raise ValueError("clear condition code must fit 3 bits")
+    data[entry + 0x10] = (data[entry + 0x10] & 0xC7) | (value << 3)
+
+
+def clear_count_get(data, entry):
+    """Decode property 0x12 from +0x10 bits 6..7 and +0x11 bits 0..3."""
+    return (data[entry + 0x10] >> 6) | ((data[entry + 0x11] & 0x0F) << 2)
+
+
+def clear_count_set(data, entry, value):
+    """Set the 6-bit clear count while preserving adjacent packed fields."""
+    if not 0 <= value <= 0x3F:
+        raise ValueError("clear count must fit 6 bits")
+    data[entry + 0x10] = (data[entry + 0x10] & 0x3F) | ((value & 3) << 6)
+    data[entry + 0x11] = (data[entry + 0x11] & 0xF0) | (value >> 2)
 
 
 def required_job_get(data, entry):
@@ -192,7 +236,9 @@ def cmd_dump(rom_path, out_path):
         names = Names(rom)
         w.writerow(["id", "name"] + [col(o) for o in range(STRIDE)] +
                    ["mission_behavior_code", "mission_icon_group_code",
-                    "mission_type", "required_job_code", "required_job",
+                    "mission_type", "availability_days",
+                    "clear_condition_code", "clear_condition", "clear_count",
+                    "required_job_code", "required_job",
                     "blocked_dispatch_job_code", "blocked_dispatch_job",
                     "blocked_dispatch_item_id", "blocked_dispatch_item"])
         job_names = job_code_names(rom, names)
@@ -200,12 +246,18 @@ def cmd_dump(rom_path, out_path):
             b = BASE + i * STRIDE
             behavior = mission_behavior_get(rom, b)
             icon_group = mission_icon_group_get(rom, b)
+            availability = availability_days_get(rom, b)
+            clear_condition = clear_condition_get(rom, b)
+            clear_count = clear_count_get(rom, b)
             required_job = required_job_get(rom, b)
             blocked_job = blocked_job_get(rom, b)
             blocked_item = blocked_item_get(rom, b)
             w.writerow([i, names.mission(i)] + list(rom[b:b + STRIDE]) +
                        [behavior, icon_group,
-                        mission_type_name(behavior, icon_group), required_job,
+                        mission_type_name(behavior, icon_group), availability,
+                        clear_condition,
+                        CLEAR_CONDITIONS.get(clear_condition, ""), clear_count,
+                        required_job,
                         job_names.get(required_job, ""),
                         blocked_job, job_names.get(blocked_job, ""),
                         blocked_item, names.item_by_id(blocked_item)])
@@ -225,6 +277,9 @@ def cmd_apply(rom_path, csv_path, out_path):
             p = BASE + i * STRIDE
             original_behavior = mission_behavior_get(rom, p)
             original_icon_group = mission_icon_group_get(rom, p)
+            original_availability = availability_days_get(rom, p)
+            original_clear_condition = clear_condition_get(rom, p)
+            original_clear_count = clear_count_get(rom, p)
             original_required_job = required_job_get(rom, p)
             original_blocked_job = blocked_job_get(rom, p)
             original_blocked_item = blocked_item_get(rom, p)
@@ -264,6 +319,42 @@ def cmd_apply(rom_path, csv_path, out_path):
                     before = mission_icon_group_get(rom, p)
                     mission_icon_group_set(rom, p, requested)
                     print(f"  id {i:>3} mission_icon_group_code: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("availability_days", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 0x3F:
+                    print(f"  id {i} availability_days: {requested} does not "
+                          "fit 6 bits, skipped")
+                elif requested != original_availability:
+                    before = availability_days_get(rom, p)
+                    availability_days_set(rom, p, requested)
+                    print(f"  id {i:>3} availability_days: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("clear_condition_code", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 7:
+                    print(f"  id {i} clear_condition_code: {requested} does "
+                          "not fit 3 bits, skipped")
+                elif requested != original_clear_condition:
+                    before = clear_condition_get(rom, p)
+                    clear_condition_set(rom, p, requested)
+                    print(f"  id {i:>3} clear_condition_code: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("clear_count", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 0x3F:
+                    print(f"  id {i} clear_count: {requested} does not fit "
+                          "6 bits, skipped")
+                elif requested != original_clear_count:
+                    before = clear_count_get(rom, p)
+                    clear_count_set(rom, p, requested)
+                    print(f"  id {i:>3} clear_count: "
                           f"{before} -> {requested}")
                     changes += 1
             requested = row.get("required_job_code", "")
