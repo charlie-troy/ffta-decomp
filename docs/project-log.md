@@ -30,11 +30,11 @@ status and backlog tables are living sections and should be kept current.
 | Item | State |
 |---|---|
 | Branch | `master`, tracking `origin/master` |
-| Active phase | Phase 3 — map blocks beyond terrain |
-| Current work package | MAP3.4 — animation blocks and map mode bytes |
-| Last closed package | MAP3.3 — custom-LZSS 4bpp graphics decode |
+| Active phase | Phase 4 — item-table stragglers |
+| Current work package | ITEM4.1 — name item `+0x0d/+0x0e` and remaining `+0x0c` bits |
+| Last closed package | MAP3.4 — animations and render modes; Phase 3 closure |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 11/11; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -45,7 +45,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.1 | P1 | Complete | Decode map tile arrangement `+0x04` | Dump/apply round-trips and map 0's two-layer layout is anchored against its 14x14 terrain grid |
 | MAP3.2 | P1 | Complete | Characterize map block `+0x08` | The clipping loader/consumer are identified and a guarded descriptor edit round-trips |
 | MAP3.3 | P1 | Complete | Decode custom-LZSS map graphics | All 50 unique streams match the retail decoder and malformed data is rejected |
-| MAP3.4 | P1 | Pending | Characterize animation blocks and mode bytes | Readers name the controls and reproducible exports cover all present blocks |
+| MAP3.4 | P1 | Complete | Characterize animation blocks and mode bytes | Readers name the controls and reproducible exports cover all present blocks |
 | ITEM4.1 | P2 | Pending | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Each name has an identifiable reader and byte-identical round-trip |
 | AI5.1 | P2 | Pending | Expand unit-status and stat naming | Each new name has a behavioral or execution anchor |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
@@ -68,6 +68,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.1 | 2026-08-24 | Decoded sparse two-layer arrangement runs and corrected the terrain packed-run codec | `validate_maps.py` 6/6; two byte-identical CSV round-trips; compressed/raw edit anchors |
 | MAP3.2 | 2026-08-24 | Identified and exposed the two-layer clipping tilemap at `+0x08` | `validate_maps.py` 8/8; loader/visibility readers; byte-identical and edited round-trips |
 | MAP3.3 | 2026-08-24 | Corrected the Huffman assumption and decoded custom-LZSS 4bpp graphics | 50/50 retail byte matches; malformed-input rejection; 162-row/50-file export |
+| MAP3.4 | 2026-08-24 | Decoded animation metadata/frames, corrected `+0x1c`, and executed render-mode selection | maps 14/14; 83/28 animation coverage; 324 mode selections; 124-frame export |
 
 ## Decisions and evidence
 
@@ -252,6 +253,18 @@ status and backlog tables are living sections and should be kept current.
 - Decision: export decoded graphics now, but do not add an apply command until
   a compatible encoder and original-allocation guard exist.
 
+### D-018 — Separate animation pointers, VRAM destination, and render modes
+
+- `+0x14` metadata supplies byte count, frame count, duration, and source-tile
+  indices; `+0x18` points to raw 4bpp frame tiles.
+- `+0x1c` is the DMA destination `0x06000020` on all 83 animated maps, not a
+  third relative pointer. The table exporter now treats it accordingly.
+- `sub_0801DB98` selects `+0x54` in the primary state and `+0x55` in the
+  alternate state. `+0x56` is consumed as a shared-palette index; `+0x57` is
+  reserved zero.
+- Decision: close Phase 3 with decode/export coverage. Editing compressed
+  graphics remains withheld until a compatible encoder exists.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -263,6 +276,35 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Animations, render modes, and Phase 3 closure
+
+Objective:
+
+- Characterize animation blocks and mode bytes, then decide whether the map
+  phase is complete.
+
+Completed:
+
+- Added animation metadata/frame decoding and indexed raw 4bpp export.
+- Corrected table `+0x1c` from a relative pointer to the absolute VRAM DMA
+  destination `0x06000020`.
+- Named and executed the primary/alternate render mode selector and named the
+  shared-palette index at `+0x56` from its loader.
+- Extended the map gate from 11 to 14 checks and closed Phase 3.
+
+Evidence recorded during the batch:
+
+- 83 animated logical maps share 28 metadata/tile sets and 124 unique frames;
+  every frame size is a whole 32-byte 4bpp tile count.
+- All 324 primary/alternate selections match `+0x54/+0x55`; `+0x57` is zero in
+  all 162 entries.
+- Animation exports contain 162 index rows, 124 metadata rows, and 124 files.
+
+Next action:
+
+- Resume item-table reader work at `+0x0d/+0x0e` and the unnamed `+0x0c`
+  bits, using the same caller/read/round-trip evidence boundary.
 
 ### 2026-08-24 — Custom-LZSS map graphics
 

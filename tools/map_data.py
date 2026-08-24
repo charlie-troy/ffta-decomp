@@ -8,6 +8,7 @@
     python tools/map_data.py clipping          baserom.gba clipping.csv
     python tools/map_data.py apply-clipping    baserom.gba clipping.csv out.gba
     python tools/map_data.py graphics          baserom.gba graphics-dir
+    python tools/map_data.py animations        baserom.gba animations-dir
 """
 import csv
 import os
@@ -20,9 +21,9 @@ TBL = 0x08569104
 STRIDE = 0x58
 COUNT = 162
 B = TBL - 0x08000000
-PTRS = [("graphics", 0x00), ("arrangement", 0x04), ("unknown_08", 0x08),
-        ("palette", 0x0C), ("height", 0x10),
-        ("anim_0", 0x14), ("anim_1", 0x18), ("anim_2", 0x1C)]
+PTRS = [("graphics", 0x00), ("arrangement", 0x04), ("clipping", 0x08),
+        ("palette", 0x0C), ("terrain", 0x10),
+        ("animation_metadata", 0x14), ("animation_tiles", 0x18)]
 PERM = {0: "walkable", 1: "impassable", 2: "water"}
 
 
@@ -195,17 +196,54 @@ def decode_graphics(rom, map_id):
             "tile_count": len(raw) // 32}
 
 
+def decode_animation(rom, map_id):
+    """Decode one map's uncompressed animation metadata and 4bpp frames."""
+    metadata_diff = u32(rom, map_id, 0x14)
+    if metadata_diff == 0:
+        return None
+    metadata_offset = B + metadata_diff
+    tiles_offset = B + u32(rom, map_id, 0x18)
+    destination = u32(rom, map_id, 0x1C)
+    graphics_bytes = _uint(rom, metadata_offset, 2)
+    frame_count = _uint(rom, metadata_offset + 2, 2)
+    expected_tiles = metadata_offset + 4 + frame_count * 4
+    if tiles_offset != expected_tiles:
+        raise ValueError(f"map {map_id} animation tile pointer is not after metadata")
+    if graphics_bytes == 0 or graphics_bytes % 32:
+        raise ValueError(f"map {map_id} animation size is not whole 4bpp tiles")
+    frames = []
+    for frame in range(frame_count):
+        record = metadata_offset + 4 + frame * 4
+        duration = _uint(rom, record, 2)
+        source_tile = _uint(rom, record + 2, 2)
+        start = tiles_offset + source_tile * 32
+        end = start + graphics_bytes
+        if end > len(rom):
+            raise ValueError(f"map {map_id} animation frame exceeds ROM")
+        frames.append({"frame": frame, "duration": duration,
+                       "source_tile": source_tile, "raw": bytes(rom[start:end])})
+    return {"map": map_id, "metadata_offset": metadata_offset,
+            "tiles_offset": tiles_offset, "vram_destination": destination,
+            "graphics_bytes": graphics_bytes, "tile_count": graphics_bytes // 32,
+            "frame_count": frame_count, "frames": frames}
+
+
 def cmd_table(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
-        w.writerow(["map"] + [n for n, _ in PTRS] + ["mode_54", "mode_55"])
+        w.writerow(["map"] + [n for n, _ in PTRS] +
+                   ["animation_vram_destination", "primary_render_mode",
+                    "alternate_render_mode", "shared_palette_index"])
         for i in range(COUNT):
             row = [i]
             for _, k in PTRS:
                 v = u32(rom, i, k)
                 row.append(f"{TBL + v:#010x}" if v else "")
-            row += [rom[B + i * STRIDE + 0x54], rom[B + i * STRIDE + 0x55]]
+            entry = B + i * STRIDE
+            destination = u32(rom, i, 0x1C)
+            row += [f"{destination:#010x}" if destination else "",
+                    rom[entry + 0x54], rom[entry + 0x55], rom[entry + 0x56]]
             w.writerow(row)
     print(f"wrote {out_path}: {COUNT} maps")
     return 0
@@ -292,6 +330,48 @@ def cmd_graphics(rom_path, out_dir):
                         meta["tile_count"], meta["compressed_bytes"],
                         hashlib.sha256(meta["raw"]).hexdigest(), filename])
     print(f"wrote {index_path}: {COUNT} maps, {len(written)} unique 4bpp files")
+    return 0
+
+
+def cmd_animations(rom_path, out_dir):
+    import hashlib
+
+    rom = open(rom_path, "rb").read()
+    os.makedirs(out_dir, exist_ok=True)
+    index_path = os.path.join(out_dir, "index.csv")
+    frames_path = os.path.join(out_dir, "frames.csv")
+    unique = {}
+    decoded = [decode_animation(rom, i) for i in range(COUNT)]
+    with open(index_path, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["map", "animation_metadata", "animation_tiles",
+                    "vram_destination", "graphics_bytes", "tile_count",
+                    "frame_count"])
+        for i, meta in enumerate(decoded):
+            if meta is None:
+                w.writerow([i, "", "", "", 0, 0, 0])
+                continue
+            unique.setdefault(meta["metadata_offset"], meta)
+            w.writerow([i, f"{0x08000000 + meta['metadata_offset']:#010x}",
+                        f"{0x08000000 + meta['tiles_offset']:#010x}",
+                        f"{meta['vram_destination']:#010x}", meta["graphics_bytes"],
+                        meta["tile_count"], meta["frame_count"]])
+    with open(frames_path, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["animation_metadata", "frame", "duration", "source_tile",
+                    "bytes", "sha256", "file"])
+        for metadata_offset, meta in sorted(unique.items()):
+            for frame in meta["frames"]:
+                filename = (f"animation_{0x08000000 + metadata_offset:08x}_"
+                            f"frame_{frame['frame']:02d}.4bpp")
+                with open(os.path.join(out_dir, filename), "wb") as raw_file:
+                    raw_file.write(frame["raw"])
+                w.writerow([f"{0x08000000 + metadata_offset:#010x}",
+                            frame["frame"], frame["duration"],
+                            frame["source_tile"], len(frame["raw"]),
+                            hashlib.sha256(frame["raw"]).hexdigest(), filename])
+    print(f"wrote {index_path} and {frames_path}: {COUNT} maps, "
+          f"{len(unique)} unique animations")
     return 0
 
 
@@ -412,6 +492,8 @@ def main(argv):
             return cmd_clipping(argv[1], argv[2])
         if len(argv) == 3 and argv[0] == "graphics":
             return cmd_graphics(argv[1], argv[2])
+        if len(argv) == 3 and argv[0] == "animations":
+            return cmd_animations(argv[1], argv[2])
         if len(argv) == 4 and argv[0] == "apply-terrain":
             return cmd_apply_terrain(argv[1], argv[2], argv[3])
         if len(argv) == 4 and argv[0] == "apply-arrangement":

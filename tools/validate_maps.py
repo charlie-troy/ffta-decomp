@@ -13,7 +13,7 @@ from map_data import (COUNT, _arrangement_cells, _height_cells,
                       _clipping_cells, cmd_apply_arrangement,
                       cmd_apply_clipping, cmd_apply_terrain, cmd_arrangement,
                       cmd_clipping, cmd_graphics, cmd_terrain, decode_graphics,
-                      resolve_block)
+                      cmd_animations, decode_animation, resolve_block)
 from emulate import Gba
 
 
@@ -216,7 +216,51 @@ def main(argv=None):
     if not ok:
         failures.append("graphics export")
 
-    print(f"\n{11 - len(failures)}/11 map checks passed")
+    animations = [decode_animation(rom, map_id) for map_id in range(COUNT)]
+    present = [meta for meta in animations if meta is not None]
+    unique_animations = {meta["metadata_offset"]: meta for meta in present}
+    unique_frames = sum(meta["frame_count"] for meta in unique_animations.values())
+    ok = (len(present) == 83 and len(unique_animations) == 28 and
+          unique_frames == 124 and
+          all(meta["vram_destination"] == 0x06000020 for meta in present) and
+          all(meta["frame_count"] in (4, 8) for meta in present) and
+          all(frame["duration"] in (8, 10) for meta in present
+              for frame in meta["frames"]))
+    print(f"12. map animations: {'OK' if ok else 'FAIL'} "
+          f"(83 maps/28 unique; {unique_frames} unique frames; VRAM 0x06000020)")
+    if not ok:
+        failures.append("map animations")
+
+    gba.reset_ram()
+    primary_ok = alternate_ok = True
+    for map_id in range(COUNT):
+        entry = 0x569104 + map_id * 0x58
+        gba.write8(0x02002FC2, 0)
+        primary_ok &= gba.call(0x0801DB98, [map_id]) == rom[entry + 0x54]
+        gba.write8(0x02002FC2, 2)
+        alternate_ok &= gba.call(0x0801DB98, [map_id]) == rom[entry + 0x55]
+    ok = primary_ok and alternate_ok and all(
+        rom[0x569104 + map_id * 0x58 + 0x57] == 0 for map_id in range(COUNT))
+    print(f"13. render modes: {'OK' if ok else 'FAIL'} "
+          f"(324 executed selections; +0x57 reserved zero)")
+    if not ok:
+        failures.append("render modes")
+
+    with tempfile.TemporaryDirectory(prefix="ffta-animation-validation-") as temp:
+        cmd_animations(args.rom, temp)
+        with open(os.path.join(temp, "index.csv"), newline="") as fh:
+            animation_rows = list(csv.DictReader(fh))
+        with open(os.path.join(temp, "frames.csv"), newline="") as fh:
+            frame_rows = list(csv.DictReader(fh))
+        frame_files = [name for name in os.listdir(temp) if name.endswith(".4bpp")]
+        ok = (len(animation_rows) == COUNT and len(frame_rows) == 124 and
+              len(frame_files) == 124)
+    print(f"14. animation export: {'OK' if ok else 'FAIL'} "
+          f"({len(animation_rows)} index rows; {len(frame_rows)} frames/files)")
+    if not ok:
+        failures.append("animation export")
+
+    print(f"\n{14 - len(failures)}/14 map checks passed")
     return 1 if failures else 0
 
 

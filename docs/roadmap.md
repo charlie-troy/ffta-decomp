@@ -189,8 +189,10 @@ works both directions, so the pipeline exists and this is pure extension.
 3. **Graphics (`+0x00`) — done 2026-08-24.** The `0x20`/`0x22` bytes are FFTA
    wrappers, not GBA Huffman. The strict custom-LZSS decoder byte-matches the
    retail routine on all 50 unique streams and exports indexed 4bpp tiles.
-4. **Animation blocks** (`+0x14/+0x18/+0x1c`, on 83/162 maps) and the **mode
-   bytes** (`+0x54/+0x55`).
+4. **Animations and modes — done 2026-08-24.** `+0x14/+0x18` describe 28
+   unique uncompressed 4bpp animation sets on 83 maps; `+0x1c` is their VRAM
+   destination, not a pointer. Primary/alternate render modes `+0x54/+0x55`
+   execute through the retail selector, and `+0x56` indexes shared palettes.
 5. ~~Resolve the height >127 flag.~~ **Closed 2026-08-24:** it was a decoder
    error; packed run headers were being read as terrain cells.
 6. ~~Handle the 9 skipped height maps.~~ **Done 2026-08-24:** all nine are
@@ -198,8 +200,9 @@ works both directions, so the pipeline exists and this is pure extension.
 7. Give each newly-decoded block a dump/apply command with the same
    grow-refusal guard `apply-terrain` uses.
 
-**Done when:** arrangement plus one more block are editable with byte-identical
-round-trip and a size guard.
+**Complete 2026-08-24:** arrangement, terrain, and clipping are editable with
+byte-identical round-trips and size guards; graphics and animation frames
+export reproducibly, with graphics matched against the retail decoder.
 
 ---
 

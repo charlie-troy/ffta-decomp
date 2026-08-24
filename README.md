@@ -300,5 +300,5 @@ discover about them. See [docs/job-table.md](docs/job-table.md).
 The former highest-risk live-validation item is now closed.
 
 1. **The rest of the map blocks.** Terrain, arrangement, and clipping decode
-   and round-trip; custom-LZSS graphics decode to indexed 4bpp files. Animation
-   blocks and map mode bytes are next.
+   and round-trip; custom-LZSS graphics and animation sets decode to indexed
+   4bpp files. Map Phase 3 is complete; item-table stragglers are next.

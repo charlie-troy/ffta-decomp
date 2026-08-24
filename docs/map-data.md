@@ -20,14 +20,15 @@ pointer diffs like `0x20380000` that fall outside the cartridge.
 | `+0x08` | clipping tilemap | all 162 |
 | `+0x0c` | palette | all 162 |
 | `+0x10` | height and permissions | all 162 |
-| `+0x14`, `+0x18`, `+0x1c` | animation blocks | 83 of 162 |
-| `+0x54`, `+0x55` | mode bytes | all 162 |
+| `+0x14` | animation metadata pointer | 83 of 162 |
+| `+0x18` | animation 4bpp tile pointer | 83 of 162 |
+| `+0x1c` | animation VRAM destination (`0x06000020`) | 83 of 162 |
+| `+0x54`, `+0x55` | primary/alternate render modes | all 162 |
+| `+0x56` | shared-palette index | all 162 |
+| `+0x57` | reserved zero | all 162 |
 
-`+0x54` runs 0–24 and `+0x55` runs 0–31, which is consistent with the
-published description of a byte at `+0x54` selecting among palette handling
-methods. Note that reading `+0x54` as a halfword is misleading: the high half
-is `+0x55`, and the pair increases across the table in a way that looks like a
-pointer but is not one.
+Reading `+0x54` as a halfword is misleading: `+0x55` is a separate alternate
+mode, not its high byte. Their values happen to correlate strongly.
 
 ## Packed-block wrapper and redirects
 
@@ -138,6 +139,41 @@ containing source addresses, wrapper types, sizes, tile counts, hashes, and
 filenames. It is decode-only: no custom-LZSS encoder is claimed, so graphics
 cannot yet be written back safely.
 
+## Animation and render modes
+
+For 83 logical maps, `+0x14` points to this metadata structure:
+
+```text
+u16 graphics_byte_count
+u16 frame_count
+struct frame[frame_count] {
+    u16 duration
+    u16 source_tile
+}
+```
+
+`+0x18` points immediately after the metadata to uncompressed 4bpp frame
+tiles. Each exported frame is `graphics_byte_count` bytes beginning at
+`animation_tiles + source_tile * 32`. All sizes are whole tiles. The 83 maps
+share 28 unique animation sets: 124 unique frames total, with four or eight
+frames per set and retail duration values 8 or 10.
+
+`+0x1c` was previously listed as a third animation pointer. Retail loader
+`0x0801A2AA` proves it is instead the DMA destination: every animated map uses
+VRAM address `0x06000020`. The first metadata halfword supplies the copy size,
+and `+0x18` supplies the source.
+
+The mode selector at `0x0801DB98` returns `+0x54` under the primary environment
+state and, when available, `+0x55` under the alternate state. All 324
+map/state selections execute and agree with those columns. These are named
+primary/alternate **render modes** because the return feeds map render setup;
+their remaining bit-level submodes are intentionally left numeric. The palette
+loader at `0x0801A3DC` uses `+0x56` to index shared palette streams. `+0x57` is
+zero on every entry.
+
+`animations` exports a 162-row index, one metadata row per unique animation,
+and 124 duration/source-indexed `.4bpp` frames.
+
 ## Editing
 
 ```bash
@@ -149,6 +185,7 @@ python tools/map_data.py apply-arrangement baserom.gba arrangement.csv out.gba
 python tools/map_data.py clipping baserom.gba clipping.csv
 python tools/map_data.py apply-clipping baserom.gba clipping.csv out.gba
 python tools/map_data.py graphics baserom.gba graphics-dir
+python tools/map_data.py animations baserom.gba animations-dir
 python tools/validate_maps.py baserom.gba
 ```
 
