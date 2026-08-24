@@ -9,8 +9,14 @@ That is the cheapest way to turn 3,594 anonymous addresses into a short list of
 candidates for a subsystem, which is the point of it for AI work.
 
 Usage:
-    python tools/trace_mgba.py <manifest.json> [--host H] [--port P]
+    python tools/trace_mgba.py <manifest.json> [--rom rom.gba]
+                               [--host H] [--port P]
                                [--samples N] [--interval S] [--out FILE]
+
+Passing --rom lets the trace resolve samples taken in IWRAM: the game copies
+hot routines there verbatim, so the tool reads the bytes around the sampled PC
+and finds the identical run in the ROM, then maps that ROM address to a
+function the same way as a normal sample.
 """
 import os
 import sys
@@ -21,6 +27,8 @@ import argparse
 import collections
 
 BASE = 0x08000000
+IWRAM_LO, IWRAM_HI = 0x03000000, 0x03008000
+PROBE = 32  # bytes to read around an IWRAM PC and match back into the ROM
 
 
 class Gdb:
@@ -94,6 +102,17 @@ class Gdb:
             pass
         return stop
 
+    def read_mem(self, addr, length):
+        """GDB 'm' packet: read memory as hex bytes, or None on error."""
+        data = self.send(f"m{addr:x},{length:x}")
+        if data and data[:1] not in ("E", "") and \
+                all(c in "0123456789abcdefABCDEF" for c in data):
+            try:
+                return bytes.fromhex(data)
+            except ValueError:
+                return None
+        return None
+
     def read_pc(self):
         """ARM 'g' packet: registers as little-endian hex; r15 is the PC.
 
@@ -148,9 +167,32 @@ def locate(funcs, pc):
     return None
 
 
+def resolve_iwram(gdb, pc, rom):
+    """Map an IWRAM PC back to a ROM address by matching the bytes around it.
+
+    The copy is verbatim (GBA code is position-independent apart from literal
+    pools, which point at absolute ROM addresses that also still work from
+    IWRAM), so the run of bytes at the sampled PC appears unchanged somewhere
+    in the ROM. Reading a short window and locating it recovers the source.
+    """
+    start = pc & ~0xF
+    window = gdb.read_mem(start, PROBE)
+    if not window or len(window) != PROBE:
+        return None
+    # Match the 4-byte prefix first (fast C find), then confirm the full window.
+    head = window[:4]
+    off = rom.find(head)
+    while off != -1:
+        if rom[off:off + PROBE] == window:
+            return BASE + off + (pc - start)
+        off = rom.find(head, off + 1)
+    return None
+
+
 def main(argv):
     p = argparse.ArgumentParser()
     p.add_argument("manifest")
+    p.add_argument("--rom", default=None)
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=2345)
     p.add_argument("--samples", type=int, default=400)
@@ -161,8 +203,26 @@ def main(argv):
     funcs = load_functions(args.manifest)
     print(f"manifest: {len(funcs):,} functions")
 
+    rom = None
+    if args.rom:
+        rom = open(args.rom, "rb").read()
+        print(f"ROM loaded ({len(rom):,} bytes): IWRAM samples will be attributed")
+    else:
+        print("no --rom given: IWRAM samples stay unattributed")
+
     gdb = Gdb(args.host, args.port)
     print(f"connected to mGBA gdb stub at {args.host}:{args.port}")
+
+    # mGBA starts the CPU stopped when its GDB stub is enabled. Interrupting
+    # immediately therefore produces no stop packet and the first sample times
+    # out. Consume the initial status, resume once, and only then enter the
+    # interrupt/read/resume sampling loop.
+    initial = gdb.send("?")
+    if not initial or initial[:1] not in ("S", "T"):
+        gdb.close()
+        raise RuntimeError(f"unexpected initial GDB status: {initial!r}")
+    gdb.cont()
+    time.sleep(max(args.interval, 0.05))
 
     hits = collections.Counter()
     unknown = collections.Counter()
@@ -172,6 +232,14 @@ def main(argv):
         for _ in range(args.samples):
             gdb.interrupt()
             pc = gdb.read_pc()
+            # Memory can only be read while the target is halted. Resolve an
+            # IWRAM sample before resuming; doing this after `cont` makes mGBA
+            # leave the read packet unanswered until the client times out.
+            iwram_name = None
+            if pc is not None and rom and IWRAM_LO <= pc < IWRAM_HI:
+                rom_pc = resolve_iwram(gdb, pc, rom)
+                if rom_pc is not None:
+                    iwram_name = locate(funcs, rom_pc)
             gdb.cont()
             if pc is None:
                 continue
@@ -179,10 +247,14 @@ def main(argv):
             name = locate(funcs, pc)
             if name:
                 hits[name] += 1
-            elif 0x03000000 <= pc < 0x04000000:
-                # The game copies hot routines into IWRAM and runs them there,
-                # so these samples cannot be attributed from a ROM manifest.
-                iwram[pc & ~0xF] += 1
+            elif IWRAM_LO <= pc < IWRAM_HI:
+                # The game copies hot routines into IWRAM and runs them there.
+                # With a ROM we can match the bytes back to their source; keep
+                # the raw 16-byte bucket as the fallback label.
+                if iwram_name:
+                    hits[iwram_name] += 1
+                else:
+                    iwram[pc & ~0xF] += 1
             else:
                 unknown[pc & ~0xFF] += 1
             time.sleep(args.interval)

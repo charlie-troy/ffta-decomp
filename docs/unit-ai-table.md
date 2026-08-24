@@ -1,3 +1,8 @@
+> **Superseded by [`docs/job-table.md`](job-table.md).** That document solves the
+> packed resistance block, closes four dead offsets by enumeration, names the
+> race field, and corrects the entry count to 116. This file is kept for
+> provenance but is not the current source of truth.
+
 # Job table (0x08521A14)
 
 Stride `0x34` (52 bytes). Valid job data runs through index **115**, so 116

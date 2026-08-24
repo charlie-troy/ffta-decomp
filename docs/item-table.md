@@ -66,9 +66,19 @@ sell_value exactly half of buy_value, which is a tempting rule. Across the
 whole table it holds for only 140 of 375 items -- unpurchasable items have a
 buy value of 0 and a nonzero sell value -- so the two are independent fields.
 
-`+0x18` is worth a look by anyone extending this: it has no property id, yet is
-nonzero in 294 of 375 items across 31 distinct values, so it is real data that
-nothing reads through the accessor.
+**`+0x18` is the random-item category, and 0 means "excluded".** It has no
+accessor property id, so it is read by direct indexing. `sub_080CC788` draws
+five random item ids with `id % 376` and keeps only those whose `+0x18` is
+nonzero — the 81 items with `+0x18 = 0` are exactly the unique/quest weapons
+(Victor Sword, Onion Sword, Excalibur 2, Nagrarok, Chirijiraden, the Ayvuir
+pair, and so on), i.e. the ones that must never fall out of the random pool.
+
+The 30 nonzero values classify the rest into coarser slots than `item_type`:
+1–19 are the 19 weapon types (matching `item_type`), then shield (20), helm
+(21), headgear (22, which merges `item_type` 22 hairwear and 23 hats), armor
+(23), clothing (24), robe (25), footwear (26), gloves (27), accessory (28),
+consumable (29), and a Mythril class (30) for the Mythril weapon series. So
+`+0x18` is the category used for random drops/shop generation, not a stat.
 
 ## Item ids run past the stat table
 

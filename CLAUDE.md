@@ -93,8 +93,9 @@ Genuinely open, with the reason:
   and `make verify-mod` measures what an edit does to the AI's choices, but
   nothing assembles a real battle. This needs a save state; `tools/trace_mgba.py`
   attaches to mGBA's GDB stub and mGBA is at `C:\Users\charl\ffta-tools`.
-- **Most mission fields.** Gil and AP are provably not in the table. The rest
-  need a function that reads the property and does something identifiable.
+- **Most mission fields.** Gil (`+0x33`, ×200), AP (`+0x34`, ×10) and the
+  item reward (`+0x35`) are now named. The rest need a function that reads the
+  property and does something identifiable.
 - **Map blocks other than terrain.** Arrangement, the `+0x08` block, and the
   Huffman-compressed graphics.
 - **Formations do not exist** — battle setups are scripted, one Place Character

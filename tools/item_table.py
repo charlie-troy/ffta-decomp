@@ -49,7 +49,10 @@ COLUMNS = [
     ("evade",        0x15, 1),   # prop 15
     ("move",         0x16, 1),   # prop 16
     ("jump",         0x17, 1),   # prop 17
-    ("unk_18",       0x18, 1),   # no property id; nonzero in 294 of 375 items
+    ("category",     0x18, 1),   # no property id; random-item category. 0 =
+                                 # excluded from random generation (the 81
+                                 # unique/quest items); 1-30 classify the rest
+                                 # (sub_080CC788 filters on it being nonzero)
     ("effect_0",     0x1A, 1),
     ("effect_1",     0x1B, 1),
     ("effect_2",     0x1C, 1),

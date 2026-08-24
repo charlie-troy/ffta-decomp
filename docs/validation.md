@@ -12,7 +12,7 @@ No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
 ROM and blank RAM under Unicorn, then calls functions with chosen arguments and
 synthetic units built in RAM.
 
-## The six checks
+## The eight checks
 
 1. **Ability priority filter.** Measured keep-rate against a model of the
    predicate, across the range. See the modulo-bias note below.
@@ -30,6 +30,11 @@ synthetic units built in RAM.
 6. **The status-effect gate.** Running one case body's gate 1200 times per
    branch gives 11.2% when the AI would target itself and 50.8% otherwise,
    against the 10 and 49 thresholds read out of the code.
+7. **Packed resistance slots.** All 812 accessor reads (seven reachable slots
+   across 116 jobs) match the packed 3-bit layout, and the unused third bit of
+   every slot is clear.
+8. **Unarmed attack power.** `sub_08130820` returns job-table `+0x33` for all
+   116 jobs, and changing that byte changes the executed result.
 
 ## The priority field is not exactly a percentage
 

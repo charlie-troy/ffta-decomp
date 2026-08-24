@@ -5,15 +5,16 @@ content. Undocumented before this: found by scanning the ROM for accessors of
 the same shape as the job and item ones, which turned up sub_080CE4DC indexing
 this table with 65 properties.
 
-Entry 0 is blank, and +0x00 holds the entry's own index on all 512 entries,
-which is what fixes the count.
+Entry 0 is blank, and the little-endian halfword at +0x00/+0x01 holds the
+entry's own index on all 512 entries, which is what fixes the count.
 
-A second table at 0x08563A7C holds 259 twelve-byte records whose +0x02 is a
+A second table at 0x08563A7C holds 255 twelve-byte records whose +0x02 is a
 mission id. Dump it with the `index` command.
 
     python tools/mission_table.py dump  baserom.gba missions.csv
     python tools/mission_table.py apply baserom.gba missions.csv out.gba
     python tools/mission_table.py index baserom.gba mission-index.csv
+    python tools/mission_table.py rewards baserom.gba mission-rewards.csv
 """
 import csv
 import os
@@ -28,18 +29,30 @@ COUNT = 512
 
 IDX_BASE = 0x08563A7C - 0x08000000
 IDX_STRIDE = 12
-IDX_COUNT = 259
+IDX_COUNT = 255
+IDX_END = 0x08564670 - 0x08000000  # next table; referenced directly by code
+
+assert IDX_BASE + IDX_COUNT * IDX_STRIDE == IDX_END
 
 # Offsets the accessor reaches with a plain load, confirmed by running it over
 # every entry. Names are given only where the code showed what the field does;
 # everything else keeps a positional name so the CSV still round-trips.
 NAMED = {
-    0x00: "mission_id",      # equals the entry index on all 512
-    0x45: "id_echo",         # mirrors the low byte of the id
+    0x00: "mission_id_lo",          # +0x00/+0x01 little-endian entry index
+    0x01: "mission_id_hi",
+    0x33: "gil_units_200",          # accessor prop 30 multiplies by 200
+    0x34: "ap_units_10",            # displayed reward multiplies by 10
+    0x35: "item_reward_id",         # accessor prop 29
+    0x36: "require_item1_minus_375", # accessor prop 42 adds 375 (0 = none)
+    0x37: "require_item2_minus_375", # accessor prop 44 adds 375 (0 = none)
 }
-# Deliberately not named: +0x34 looked like AP/10 because Herb Picking has 4
-# and awards 40 AP, but Thesis Hunt also has 4 and awards 80. Gil and AP are
-# not in this table at any offset, width or scale -- see docs/mission-data.md.
+# +0x45 equals the low mission id only for entries 0-122 (except 27) and is
+# zero for most later entries. It is not a general id echo, so it stays b45.
+# +0x3e is a second 200-unit field: accessor prop 54 does the same *0xC8
+# multiply. Its meaning is not pinned yet, so it stays positional.
+# +0x43/+0x44 is the dispatch threshold (16-bit, accessor prop 59):
+# sub_080CF310 scores a dispatched unit against it and returns a 1-5 rating.
+# It stays positional because the CSV is one byte per column.
 # +0x12, +0x16, +0x1a, +0x1e, +0x22 and +0x2a are handed out as addresses by
 # properties 19-24 and 32, so each is the start of a four-byte slot the caller
 # reads itself rather than a value the accessor returns.
@@ -91,23 +104,67 @@ def cmd_apply(rom_path, csv_path, out_path):
     return 0
 
 
+def cmd_rewards(rom_path, out_path):
+    """Computed gil/AP/item rewards, no emulator needed.
+
+    The reward bytes are stored scaled: +0x33 is gil/200, +0x34 is AP/10 and
+    +0x35 is an item id. Verified against Herb Picking (600 gil, 40 AP) and
+    Over The Hill (28,600 gil, 80 AP).
+    """
+    rom = open(rom_path, "rb").read()
+    names = Names(rom)
+    rows = 0
+    with open(out_path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["id", "name", "gil", "ap", "item_reward_id",
+                    "item_reward"])
+        for i in range(COUNT):
+            b = BASE + i * STRIDE
+            gil = rom[b + 0x33] * 200
+            ap = rom[b + 0x34] * 10
+            item = rom[b + 0x35]
+            if not (gil or ap or item):
+                continue
+            w.writerow([i, names.mission(i), gil, ap, item,
+                        names.item_by_id(item)])
+            rows += 1
+    print(f"wrote {out_path}: {rows} missions with a reward")
+
+    # Self-check the formula against the two published anchors so the claim
+    # cannot silently rot.
+    def reward(i):
+        b = BASE + i * STRIDE
+        return rom[b + 0x33] * 200, rom[b + 0x34] * 10
+    ok = reward(3) == (600, 40) and reward(25) == (28600, 80)
+    print(f"anchor check: Herb Picking {reward(3)}, Over The Hill {reward(25)}"
+          f" -> {'OK' if ok else 'MISMATCH'}")
+    return 0 if ok else 1
+
+
 def cmd_index(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
         names = Names(rom)
         w.writerow(["record", "b00", "b01", "mission_id", "mission_name",
-                    "w04", "w06", "b08"])
+                    "w04", "w06", "b08", "b09", "b0a", "b0b"])
         for i in range(IDX_COUNT):
             o = IDX_BASE + i * IDX_STRIDE
             mid = int.from_bytes(rom[o + 2:o + 4], "little")
             w.writerow([i, rom[o], rom[o + 1], mid, names.mission(mid),
                         int.from_bytes(rom[o + 4:o + 6], "little"),
-                        int.from_bytes(rom[o + 6:o + 8], "little"),
-                        rom[o + 8]])
+                        int.from_bytes(rom[o + 6:o + 8], "little"), rom[o + 8],
+                        rom[o + 9], rom[o + 10], rom[o + 11]])
     print(f"wrote {out_path}: {IDX_COUNT} records")
-    print("  every mission_id lands inside the 512-entry mission table")
-    return 0
+    bad = []
+    for i in range(IDX_COUNT):
+        o = IDX_BASE + i * IDX_STRIDE
+        mid = int.from_bytes(rom[o + 2:o + 4], "little")
+        if mid >= COUNT:
+            bad.append((i, mid))
+    print(f"  mission ids in range: {IDX_COUNT - len(bad)}/{IDX_COUNT}")
+    print(f"  ends at next table: {IDX_BASE + IDX_COUNT * IDX_STRIDE == IDX_END}")
+    return 1 if bad else 0
 
 
 def cmd_requires(rom_path, out_path):
@@ -147,6 +204,8 @@ def main(argv):
         return cmd_apply(argv[1], argv[2], argv[3])
     if len(argv) == 3 and argv[0] == "requires":
         return cmd_requires(argv[1], argv[2])
+    if len(argv) == 3 and argv[0] == "rewards":
+        return cmd_rewards(argv[1], argv[2])
     if len(argv) == 3 and argv[0] == "index":
         return cmd_index(argv[1], argv[2])
     print(__doc__)

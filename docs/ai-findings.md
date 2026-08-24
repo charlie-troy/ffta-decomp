@@ -66,7 +66,7 @@ Ability entry fields, inferred from the first rows and from AI usage:
 |---|---|---|
 | `+0x0B` | AP cost | values 40, 60, 80, 0, 90 |
 | `+0x19` | ability class | AI treats `2` as heal-like; distribution is almost entirely 0/1/2 |
-| `+0x1A` | accuracy | values 80, 65, 50, 100, 100 |
+| `+0x1A` | AI priority | higher = more likely; corrected from the earlier "accuracy" guess, see [ability-table.md](ability-table.md) |
 
 The remaining 24 bytes per entry are not yet identified.
 
@@ -148,6 +148,32 @@ The fallback table is bounded at **123 entries**: index 123 and 124 are all
 zero and 125 onwards is unrelated data. Its priority byte spans the same 0-100
 scale as the ability table, over 14 distinct values.
 
+## Candidate-list model, confirmed by disassembly
+
+The build-then-filter pipeline is confirmed by reading the two callers' bodies,
+not just their call sites.
+
+`sub_080C2618(record, unit, ..., abilityId, ...)` fills one candidate record:
+
+- `+0x00` is the ability id (it is what gets passed to the priority getter as
+  `abilityId`); `+0x02` is a second `u16` passed in.
+- `sub_080C2314` fills `+0x04`–`+0x0a`, ending in a validity byte at `+0x0a`.
+- when the record is valid (`+0x0a != 0`) the priority getter's byte is stored
+  at **`+0x10`**, and a run of further checks (`sub_08096D7C`, `sub_08099544`,
+  `sub_0812E4A8`, `sub_080CD944`, `sub_080C82B8`) can still invalidate it.
+
+Its only caller (at `0x080C2816`) walks a table of 4-byte ability entries and
+writes one record per entry into a list whose stride is `0x328` bytes
+(`0xCA << 2`); `+0x324` of each record is a running count.
+
+`sub_080C1EB4` is the filter: over a list of `u16` ability ids it fetches the
+priority byte, runs the `sub_0812F1DC` predicate, and stores `0` back over any
+entry that fails — removing it from the list. It skips the predicate for
+entries that first pass a three-way `sub_08133970` check, so that check is an
+exemption from the priority gate. The evaluator `sub_080C32C0` is the later
+chooser: it is the only other caller of the predicate (`0x080C35A0`) and
+re-applies the same gate while scoring.
+
 ## Supporting primitives worth naming
 
 - `sub_080C7EA4(unit, statId)` — stat getter. `0x13` and `0x14` behave as
@@ -160,6 +186,11 @@ scale as the ability table, over 14 distinct values.
 - `sub_08097298` — initialiser; writes 0 to every unit flag.
 
 ## Next steps
+
+> **Most of the original next steps are now done.** See [ability-table.md](ability-table.md)
+> for the full ability layout, [unit-struct.md](unit-struct.md) for 65 of 69 stat
+> fields, and [roadmap.md](roadmap.md) for what remains. The items below are kept
+> as a record of the original plan.
 
 1. Decompile `sub_080C32C0` case by case; the switch makes it separable.
 2. Name the ability table fields by cross-referencing entries against known

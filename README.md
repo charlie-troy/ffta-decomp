@@ -54,24 +54,28 @@ feeds the same damage term as the job table's unarmed attack.
 Written up in [docs/ai-findings.md](docs/ai-findings.md),
 [docs/ability-table.md](docs/ability-table.md),
 [docs/ai-case-rules.md](docs/ai-case-rules.md),
-[docs/unit-ai-table.md](docs/unit-ai-table.md) and
-[docs/job-table.md](docs/job-table.md).
+[docs/unit-ai-table.md](docs/unit-ai-table.md),
+[docs/job-table.md](docs/job-table.md) and
+[docs/turn-order.md](docs/turn-order.md).
 
 Two results in there disagree with published documentation, with the derivation
 shown in each case: `ai_priority` runs the opposite direction, and the job
 table's `+0x32` is not unknown.
 
 **The AI's rules are validated by execution.** `tools/validate_ai.py` runs the
-ROM's own functions on an emulated CPU against synthetic units, and all six
+ROM's own functions on an emulated CPU against synthetic units, and all eight
 checks pass: the priority filter, the ability property accessor, flag decoding,
-the stat-id mapping, the healthy-target rule at its exact boundaries, and the
-11%/50% status gate. See [docs/validation.md](docs/validation.md).
+the stat-id mapping, the healthy-target rule at its exact boundaries, the
+11%/50% status gate, packed resistance decoding, and unarmed attack power. See
+[docs/validation.md](docs/validation.md).
 
-What remains unvalidated is whole-battle behaviour and four job-table fields.
-The job table itself is written up in [docs/job-table.md](docs/job-table.md),
-including two corrections to the published layout: the elemental resistances
-are eight packed 3-bit slots rather than four bytes, and `+0x27` is an exact
-duplicate of `+0x26` in every entry.
+What remains unvalidated is whole-battle behaviour, 22 computed job-accessor
+properties, and resistance slot 2. The four still-unnamed job-table offsets are
+not an open validation task: exhaustive reachability analysis proves the retail
+ROM never reads them. The job table itself is written up in
+[docs/job-table.md](docs/job-table.md), including two corrections to the
+published layout: the elemental resistances are eight packed 3-bit slots rather
+than four bytes, and `+0x27` is an exact duplicate of `+0x26` in every entry.
 
 ## Decompilation status
 
@@ -272,6 +276,9 @@ No FFTA decompilation exists. These are worth reading before duplicating work:
 
 ## Next steps
 
+The remaining work, in order, is written up as a step-by-step roadmap in
+[docs/roadmap.md](docs/roadmap.md).
+
 All four of the original goals are done: the leaf batch, the linker script and
 full rebuild, the CI gate, and progress reporting.
 
@@ -285,6 +292,8 @@ What remains needs something this repo cannot supply on its own.
    and `make verify-mod` measures what an edit does to the AI's choices, but
    nothing here assembles a map, a turn order and a real unit to watch a full
    turn play out. Calling fragments proves the rules; it cannot prove there is
-   no further rule that dominates them.
+   no further rule that dominates them. The turn-order code itself is now
+   identified (see [docs/turn-order.md](docs/turn-order.md)); what remains is a
+   live trace through a real turn.
 2. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
    `+0x08` block and the Huffman-compressed graphics do not yet.

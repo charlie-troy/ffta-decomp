@@ -31,8 +31,8 @@ sub_080CE4DC(id, propId):
 | Entries | 512, of which 418 carry content |
 | Accessor | `sub_080CE4DC`, 65 properties |
 
-`+0x00` holds the entry's own index, and does so on all 512 entries, which is
-what fixes the count. Entry 0 is blank.
+The little-endian halfword at `+0x00`/`+0x01` holds the entry's own index, and
+does so on all 512 entries, which is what fixes the count. Entry 0 is blank.
 
 Running all 65 properties over the whole table: **35 are plain loads, 30 are
 computed or packed.** Six properties (19–24) and property 32 return the
@@ -42,13 +42,22 @@ the slot itself.
 
 ## What identifies it as missions
 
-`sub_080CEECC` reads properties 42 and 44 as halfwords, and for each one scans
-a 64-entry list for a match, returning 0 if it is absent. It then reads
-property 46, indexes a table with it, and compares the count found against
-property 47. That is a requirement check of the form "do you hold this item,
-and this one, and at least N of that one" — which is how a mission decides
-whether it can be taken. Properties 42 and 44 range over 0–487 and 0–496,
-consistent with item ids.
+`sub_080CEECC` reads properties 42 and 44, and for each one scans a 64-entry
+list for a match, returning 0 if it is absent. It then reads property 46,
+indexes a table with it, and compares the count found against property 47.
+That is a requirement check of the form "do you hold this item, and this one,
+and at least N of that one" — which is how a mission decides whether it can be
+taken.
+
+Properties 42 and 44 are byte fields `+0x36` and `+0x37` remapped by
+`sub_080CB4A4`: it returns 0 for 0, and `byte + 375` otherwise. A mission
+stores `item id − 375` in the byte and the accessor returns the real item id.
+The observed range 0–496 is 375 plus a byte of up to 121. Because 0 means
+"none", a mission can only require a quest/loot item (id ≥ 376), never a
+combat item from the 376-entry stat table.
+
+`+0x3d` (property 53) goes through the same `sub_080CB4A4` remap, so it is a
+third quest-item slot — but it is 0 in all 512 missions, i.e. unused data.
 
 With the text decoded, this is now checkable end to end, and it holds:
 
@@ -70,27 +79,72 @@ the mission table, the two properties, the item id space and the text decoder
 to all be right at once, so it validates the lot.
 
 Properties 33–41 read nine consecutive bytes at `+0x2a`–`+0x32`, all round
-multiples of 5 and 10 capped at 100, which look like weights or percentages but
-are not pinned to a meaning here.
+multiples of 5 and 10 capped at 100. They are **player-visible**: the mission
+detail renderer `sub_080461D4` formats `+0x2a` as a 1–3 digit number (the
+value never exceeds 100, but the code handles three digits) and draws the rest
+in a 3×3 grid. They are *not* read by the dispatch calculator
+(`sub_080CF310`, below), so they are display data rather than hidden weights;
+the exact game meaning of the grid is still open.
 
-## Gil and AP are not in this table
+## Gil, AP and item rewards are in this table
 
-This is established rather than assumed, and it is the most useful thing to
-know before hunting for them.
+An earlier draft of this file concluded the opposite, and was wrong. The
+rewards are three plain bytes, missed because of two compounding slips — one
+mislabeled anchor mission and one missing scale factor — that are worth
+recording rather than hiding.
 
-Two missions have published rewards: Herb Picking gives 600 gil and 40 AP,
-Thesis Hunt gives 28,600 gil and 80 AP. Searching every offset of the entry at
-widths 1, 2 and 4, against scale factors of 1, 10, 100 and 1000, finds **no
-field that holds both values**. Neither number appears literally anywhere in
-either entry.
+- **`+0x33` is the gil reward, in units of 200.** Accessor property 30 loads
+  this byte and multiplies by 0xC8 (200) inline, and the mission-info getter
+  `sub_080194A8` fetches exactly that property. Herb Picking has `+0x33 = 3`,
+  so it awards 600 gil — the published value.
+- **`+0x34` is the AP reward, in units of 10.** Herb Picking has `+0x34 = 4`,
+  matching its published 40 AP.
+- **`+0x35` is the item reward id.** Resolving it as an item name gives the
+  actual rewards: the "Wanted!" missions award Buster Sword, Apocalypse,
+  Shadow Blade, Pearl Blade and Blue Saber; Salika Keep awards Kotetsu;
+  Fire! Fire! and The Wanderer award Djinn Flyssa.
 
-One hypothesis got far enough to be worth recording as dead: `+0x34` is 4 for
-Herb Picking, and 40 AP divided by 10 is 4, which looks convincing on its own.
-Thesis Hunt has `+0x34 = 4` as well but awards 80 AP, so the field is not AP at
-any scale. A second mission killed it; a single one would have enshrined it.
+The bad anchor: this file used "Herb Picking = 600 gil / 40 AP" and
+"Thesis Hunt = 28,600 gil / 80 AP". The second pair is real but belongs to
+**Over The Hill** (mission 25): it has `+0x33 = 143` (×200 = 28,600) and
+`+0x34 = 8` (×10 = 80). Thesis Hunt (mission 4) is `+0x33 = 20` (4,000 gil)
+and `+0x34 = 4` (40 AP).
 
-So the reward figures are computed elsewhere — from mission type and rank, or
-from a table this one does not contain.
+The missing scale factor: the dead-end search tried 1, 10, 100 and 1000, and
+gil is scaled by 200 — not in that set. With the right mission and the right
+scale the whole thing locks together, and the rewards turn out to be stored in
+the table, not computed from type/rank.
+
+`+0x3e` is a second 200-unit field: accessor property 54 does the same ×0xC8
+multiply. `sub_080CEC78` reads it as a base amount and returns
+`base ± base × factor/100`, where the factor comes from two per-index tables
+(96-byte and 12-byte records), so it is a gil-valued quantity that receives a
+percentage adjustment. Its exact game meaning is still open, not a reward
+claim.
+
+## Dispatch rating (`sub_080CF310`)
+
+This function scores a unit against a mission and returns a 1–5 rating, which
+is how the game judges a dispatched unit before a non-battle mission resolves.
+
+- It first checks two hard gates and returns 0 (unusable) if either fails:
+  `+0x3c` bits 2–7 are compared against `sub_080C93F0(unit[+7])` — a job/race
+  requirement — and `+0x3d` (the quest-item remap) is checked against two item
+  slots on the dispatch record.
+- The score is a weighted sum read from a 9-entry table at `0x08527E2A`:
+  `2 × level + max HP + MP + attack + defense + magic power + magic resist`
+  (the four combat terms via `sub_080CA400`/`sub_080CA478`), two boolean
+  bonuses, and the **maximum attack power among the unit's four equipped
+  weapons** (`sub_080CA7A4(item, 10)` over slots `+0x2a`/`+0x2c`/`+0x2e`/
+  `+0x30`).
+- The score is compared against the 16-bit threshold at `+0x43`/`+0x44`
+  (accessor property 59, `[+0x44] << 8 | [+0x43]`): score above threshold
+  returns 1, and the gap `threshold − score` returns 2/3/4/5 as it crosses
+  9/29/49.
+
+So `+0x43`/`+0x44` is the **dispatch threshold** — a named field this project
+contributes rather than adopts — and the rating is a coarse difficulty readout,
+not a success percentage.
 
 ## What the field-naming attempts did and did not establish
 
@@ -98,10 +152,14 @@ Named, with the code or the game as evidence:
 
 | field | meaning | basis |
 |---|---|---|
-| `+0x00` | mission id | equals the entry index on all 512 |
-| `+0x45` | id echo | mirrors the low byte of the id |
-| property 42 | first required item | verified against 7 real missions |
-| property 44 | second required item | same check |
+| `+0x00`/`+0x01` | mission id | little-endian; equals the entry index on all 512 |
+| `+0x33` | gil reward, ÷200 | accessor property 30 multiplies by 200; matches Herb Picking's 600 |
+| `+0x34` | AP reward, ÷10 | matches Herb Picking's 40 and Over The Hill's 80 |
+| `+0x35` | item reward id | resolves to the Wanted! sword rewards, Kotetsu, etc. |
+| `+0x3c` bits 2–7 | job/race requirement | `sub_080CF310` compares it against `sub_080C93F0(unit[+7])` |
+| `+0x43`/`+0x44` | dispatch threshold | 16-bit; `sub_080CF310` scores a unit against it (property 59) |
+| property 42 | first required item | byte `+0x36` + 375; verified against 7 real missions |
+| property 44 | second required item | byte `+0x37` + 375; same check |
 | properties 46, 47 | a count requirement | the same function compares them |
 
 Two approaches were tried and are recorded here because they look productive
@@ -118,17 +176,24 @@ only discriminates when the field's range can *exceed* the candidate space.
 a map, which is consistent with most of its definition living outside this
 table.
 
-The remaining fields keep positional names. Naming them needs the same thing
-that worked for the required items: a function that reads the property and does
-something identifiable with the value.
+The remaining fields keep positional names. In particular, `+0x45` is not a
+general id echo: it matches the low mission id only through entry 122 (with one
+exception) and is zero for most later entries. Naming it, or any other remaining
+field, needs the same thing that worked for the required items: a function that
+reads the property and does something identifiable with the value.
 
 ## The mission index at `0x08563A7C`
 
-259 records of 12 bytes. `+0x02` is a halfword mission id: all 259 fall inside
-the 512-entry table and 223 point at an entry that has content. `+0x01` runs
-0–179 and is non-decreasing across 233 of 258 consecutive record pairs, so the
-table is sorted by it; `+0x00` runs 0–30. The sorting field and the small
-leading byte are not named here.
+255 records of 12 bytes. `+0x02` is a halfword mission id: all 255 fall inside
+the 512-entry table and 220 resolve to a decoded mission name. The end is
+fixed by the next table at `0x08564670`, which has 25 direct literal-pool
+references in code. An earlier 259-record count incorrectly consumed four
+records from that next structure.
+
+`+0x01` runs 0–179 and is non-decreasing across most consecutive record pairs;
+`+0x00` runs 0–30. Those shapes suggest ordering/grouping data, but neither is
+named here: no identified reader yet proves what the values mean. The dump
+keeps all remaining bytes positional for the same reason.
 
 ## Formations do not exist as a table
 
@@ -149,6 +214,7 @@ formation table that could be dumped to CSV.
 python tools/mission_table.py dump  baserom.gba missions.csv
 python tools/mission_table.py apply baserom.gba missions.csv out.gba
 python tools/mission_table.py index baserom.gba mission-index.csv
+python tools/mission_props.py baserom.gba          # all 65 property ids -> columns
 ```
 
 Columns are named only where the code showed what a field does; the rest keep
