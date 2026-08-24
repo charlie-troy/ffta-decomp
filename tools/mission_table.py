@@ -8,8 +8,8 @@ this table with 65 properties.
 Entry 0 is blank, and the little-endian halfword at +0x00/+0x01 holds the
 entry's own index on all 512 entries, which is what fixes the count.
 
-A second table at 0x08563A7C holds 255 twelve-byte records whose +0x02 is a
-mission id. Dump it with the `index` command.
+A second table at 0x08563A70 holds 256 twelve-byte records whose +0x02 is a
+mission id. Record 0 is an all-zero sentinel. Dump it with the `index` command.
 
     python tools/mission_table.py dump  baserom.gba missions.csv
     python tools/mission_table.py apply baserom.gba missions.csv out.gba
@@ -29,9 +29,9 @@ BASE = 0x0855AE4C - 0x08000000
 STRIDE = 0x46
 COUNT = 512
 
-IDX_BASE = 0x08563A7C - 0x08000000
+IDX_BASE = 0x08563A70 - 0x08000000
 IDX_STRIDE = 12
-IDX_COUNT = 255
+IDX_COUNT = 256
 IDX_END = 0x08564670 - 0x08000000  # next table; referenced directly by code
 
 # sub_080C93F0(job_id) returns byte 1 of each two-byte record here. The value
@@ -324,8 +324,9 @@ def cmd_index(rom_path, out_path):
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
         names = Names(rom)
-        w.writerow(["record", "b00", "b01", "mission_id", "mission_name",
-                    "w04", "w06", "b08", "b09", "b0a", "b0b"])
+        w.writerow(["record", "map_symbol_id", "script_trigger_id",
+                    "mission_id", "mission_name", "w04", "w06", "b08",
+                    "b09", "b0a", "b0b"])
         for i in range(IDX_COUNT):
             o = IDX_BASE + i * IDX_STRIDE
             mid = int.from_bytes(rom[o + 2:o + 4], "little")

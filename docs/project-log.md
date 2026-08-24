@@ -31,17 +31,17 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 2 — finish computed and packed mission properties |
-| Current work package | Identify the mission-index `+0x00/+0x01` ordering/grouping reader |
-| Last closed package | Dispatch job rules, dormant item exclusion, and base pub fee |
+| Current work package | Identify the next mission property with an interpretable reader |
+| Last closed package | Mission-index boundary, map-symbol id, and script-trigger id |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 7/7; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 8/8; matching ROM SHA1 |
 
 ## Prioritized backlog
 
 | ID | Priority | State | Work package | Definition of done |
 |---|---:|---|---|---|
 | M2.1 | P0 | In progress | Name remaining mission computed/packed properties | A reader gives each name behavioral meaning; fields are exposed and execution- or round-trip-validated |
-| M2.2 | P0 | Pending | Name mission-index `+0x00/+0x01` | Ordering/grouping role is proven by an identified reader; CSV names and a check are added |
+| M2.2 | P0 | Complete | Name mission-index `+0x00/+0x01` | Ordering/grouping role is proven by an identified reader; CSV names and a check are added |
 | MAP3.1 | P1 | Pending | Decode map tile arrangement `+0x04` | Dump/apply round-trips and a known map's layout correlates with terrain |
 | MAP3.2 | P1 | Pending | Characterize map block `+0x08` | A reader identifies the block and one safe edit round-trips |
 | MAP3.3 | P1 | Pending | Implement GBA Huffman graphics decode | Graphics block decodes reproducibly and malformed/growing data is rejected safely |
@@ -58,6 +58,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.0 | 2026-08-24 | Named gil, AP, item, and dispatch-threshold mission fields | `docs/mission-data.md`; reward anchors |
 | M2.1a | 2026-08-24 | Named clan points and all eight clan-skill point rewards at `+0x2a..+0x32` | `tools/validate_missions.py`; `mission_table.py clan-rewards` |
 | M2.1b | 2026-08-24 | Named required and blocked dispatch jobs, base pub fee, and the retail-unused item exclusion | `validate_missions.py` 7/7; `mission_table.py job-rules`; byte-identical round-trip |
+| M2.2 | 2026-08-24 | Corrected mission index to 256 records at `0x08563A70`; named map-symbol and script-trigger ids | `mission_table.py index`; executed placement and trigger-selection paths; missions 8/8 |
 
 ## Decisions and evidence
 
@@ -126,6 +127,17 @@ status and backlog tables are living sections and should be kept current.
 - Product consequence: expose the safe computed item id for modders, but label
   it dormant and do not invent a retail mission meaning.
 
+### D-008 — The mission index starts at its zero sentinel
+
+- Decision: use base `0x08563A70`, stride 12, count 256. The prior
+  `0x08563A7C`/255 model skipped the all-zero record 0.
+- Boundary evidence: dozens of Thumb literal loads point to `0x08563A70`; the
+  next table begins exactly at `0x08564670`. The only interior base,
+  `0x085644FC`, deliberately addresses records 224–255.
+- Field evidence: `+0x00` selects the persistent world-map symbol placement;
+  the script handler at `0x08123898` scans `+0x01` as its trigger key and then
+  selects the record's `+0x02` mission id.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -137,6 +149,40 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Mission-index correction and field closure
+
+Objective:
+
+- Prove the leading mission-index fields without naming them from value
+  distributions.
+
+Completed:
+
+- Corrected the table base from `0x08563A7C` to `0x08563A70` and count from
+  255 to 256, restoring the omitted zero sentinel.
+- Named `+0x00` `map_symbol_id`: availability code uses it to resolve the
+  corresponding persistent world-map placement record.
+- Named `+0x01` `script_trigger_id`: a script handler scans backward for this
+  key, stores the matched index, and selects `+0x02` as the mission id.
+- Updated the focused index CSV and added both executed paths to mission
+  validation.
+
+Evidence recorded during the batch:
+
+- Exact boundary: `0x08563A70 + 256 × 12 = 0x08564670`.
+- Sentinel: record 0 is 12 zero bytes; all 256 mission ids are in range.
+- Map-symbol execution: index record 2 resolves symbol 2's injected placement
+  17 as zero-based placement 16.
+- Trigger execution: script trigger 1 selects index record 1 and mission 30
+  (`Wanted!`).
+- Mission validation: 8/8.
+
+Next action:
+
+- Resume the remaining mission accessor properties using the generic caller
+  report, selecting the smallest multi-caller reader with identifiable state
+  or UI behavior.
 
 ### 2026-08-24 — Dispatch constraints and pub-fee closure
 
@@ -173,7 +219,7 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Trace readers of the 255-record mission index at `0x08563A7C` and prove the
+- Trace readers of the 256-record mission index at `0x08563A70` and prove the
   role of leading fields `+0x00/+0x01`. If no reader supports a semantic name,
   return to the remaining mission accessor properties rather than guessing.
 

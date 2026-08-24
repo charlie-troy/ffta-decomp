@@ -298,7 +298,7 @@ discover about them. See [docs/job-table.md](docs/job-table.md).
 The former highest-risk live-validation item is now closed.
 
 1. **Mission fields.** Rewards, clan progression, dispatch job rules, pub fees,
-   and dispatch difficulty are named; remaining computed/packed properties and
-   mission-index grouping still need identifiable readers.
+   dispatch difficulty, and the mission index's map-symbol/trigger keys are
+   named; remaining computed/packed properties still need identifiable readers.
 2. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
    `+0x08` block and the Huffman-compressed graphics do not yet.

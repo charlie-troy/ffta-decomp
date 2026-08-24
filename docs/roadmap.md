@@ -131,9 +131,11 @@ remaining work is naming the other computed/packed properties.
    `+0x3d` dispatch-item exclusion is validated but clear in every retail
    mission. `validate_missions.py` executes all relevant readers and rating
    branches, and computed CSV edits preserve adjacent packed bits.
-5. Name the mission index fields at `0x08563A7C`: `+0x00` (0–30) and `+0x01`
-   (0–179). The table boundary is now corrected to 255 records; the two leading
-   fields remain positional until a reader proves their ordering/grouping role.
+5. **Mission index leading fields — done 2026-08-24.** The true base is
+   `0x08563A70`, with 256 records including a zero sentinel. `+0x00` selects a
+   world-map symbol's persistent placement record; `+0x01` is the key used by
+   a script handler to select the record's `+0x02` mission. Both paths execute
+   in the standalone validator.
 6. Expose every newly-named field in `tools/mission_table.py`,
    round-trip-verified, and add a validation check. **Done for the nine clan
    progression fields, dispatch job rules, dormant dispatch item rule, and pub

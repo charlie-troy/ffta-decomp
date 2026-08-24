@@ -25,7 +25,17 @@ ACCESSOR = 0x080CE4DC
 APPLY_CLAN_REWARD = 0x08046850
 ADJUST_FEE = 0x080CEC78
 RATE_DISPATCH = 0x080CF310
+INDEX_PLACEMENT = 0x08045400
+INDEX_TRIGGER = 0x08123898
 CLAN_STATE = 0x020021B4
+MAP_SYMBOL_STATE = 0x02002CC3
+SELECTED_MISSION = 0x02002170
+SELECTED_INDEX = 0x02003C2A
+
+INDEX_BASE = 0x08563A70
+INDEX_STRIDE = 12
+INDEX_COUNT = 256
+INDEX_END = 0x08564670
 
 # Accessor properties 0x21..0x29 are direct loads of +0x2a..+0x32.
 TRACKS = (
@@ -287,12 +297,59 @@ def main(argv=None):
     if not anchors_ok:
         failures.append("gil/AP anchors")
 
+    index_off = INDEX_BASE - 0x08000000
+    sentinel_ok = rom[index_off:index_off + INDEX_STRIDE] == bytes(INDEX_STRIDE)
+    index_ids_ok = all(
+        int.from_bytes(
+            rom[index_off + i * INDEX_STRIDE + 2:
+                index_off + i * INDEX_STRIDE + 4], "little"
+        ) < COUNT
+        for i in range(INDEX_COUNT)
+    )
+    boundary_ok = INDEX_BASE + INDEX_COUNT * INDEX_STRIDE == INDEX_END
+
+    # Record 2 carries map symbol id 2. sub_08045400 resolves that id through
+    # the persistent 12-byte-per-symbol placement state and returns placement-1.
+    gba.reset_ram()
+    gba.write8(MAP_SYMBOL_STATE + 1 * 12, 17)
+    gba.write8(MAP_SYMBOL_STATE + 2 * 12, 29)
+    placement = gba.call(INDEX_PLACEMENT, [2])
+
+    # The script handler at 0x08123898 scans records 255..1 for +0x01 and
+    # selects +0x02. Trigger 1 is unique and skips an unrelated sound call,
+    # making it a stable execution anchor: record 1 -> mission 30.
+    trigger_arg = 0x02001200
+    gba.reset_ram()
+    gba.uc.mem_write(trigger_arg, bytes([0, 1, 0]) + bytes(8))
+    gba.call(INDEX_TRIGGER, [0, trigger_arg])
+    selected_index = gba.uc.mem_read(SELECTED_INDEX, 1)[0]
+    selected_mission = int.from_bytes(
+        gba.uc.mem_read(SELECTED_MISSION, 2), "little"
+    )
+    index_ok = (
+        sentinel_ok and index_ids_ok and boundary_ok and placement == 16
+        and selected_index == 1 and selected_mission == 30
+    )
+    if not index_ok:
+        failures.append(
+            "mission index: "
+            f"sentinel={sentinel_ok}, ids={index_ids_ok}, end={boundary_ok}, "
+            f"placement={placement}, selection={selected_index}/"
+            f"{selected_mission}"
+        )
+    print(
+        f"8. mission index: {'OK' if index_ok else 'FAIL'} "
+        f"({INDEX_COUNT} records; zero sentinel; symbol 2 -> placement "
+        f"{placement}; trigger 1 -> record {selected_index}/mission "
+        f"{selected_mission})"
+    )
+
     if failures:
         print("\nFAIL:")
         for failure in failures[:10]:
             print(f"  - {failure}")
         return 1
-    print("\n7/7 mission checks passed")
+    print("\n8/8 mission checks passed")
     return 0
 
 

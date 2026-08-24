@@ -221,18 +221,31 @@ exception) and is zero for most later entries. Naming it, or any other remaining
 field, needs the same thing that worked for the required items: a function that
 reads the property and does something identifiable with the value.
 
-## The mission index at `0x08563A7C`
+## The mission index at `0x08563A70`
 
-255 records of 12 bytes. `+0x02` is a halfword mission id: all 255 fall inside
-the 512-entry table and 220 resolve to a decoded mission name. The end is
-fixed by the next table at `0x08564670`, which has 25 direct literal-pool
-references in code. An earlier 259-record count incorrectly consumed four
-records from that next structure.
+256 records of 12 bytes, beginning with an all-zero sentinel. `+0x02` is a
+halfword mission id: the 255 content records all fall inside the 512-entry
+table and 220 resolve to a decoded mission name. The end is fixed by the next
+table at `0x08564670`. The earlier `0x08563A7C`/255-record model omitted the
+sentinel: retail code has dozens of literal-pool references to the true base,
+while the only pointer inside the table starts at record 224 for a deliberate
+31-record subrange.
 
-`+0x01` runs 0–179 and is non-decreasing across most consecutive record pairs;
-`+0x00` runs 0–30. Those shapes suggest ordering/grouping data, but neither is
-named here: no identified reader yet proves what the values mean. The dump
-keeps all remaining bytes positional for the same reason.
+The two leading bytes now have behavioral names:
+
+- `+0x00` is the **world-map symbol id**. Mission availability paths take the
+  mission's `+0x45` index, read this byte, and resolve that symbol's persistent
+  12-byte placement record through `sub_08036330`. Location filters compare
+  it directly. Executing `sub_08045400` for index record 2 reads symbol 2's
+  injected placement value 17 and returns placement index 16.
+- `+0x01` is the **script trigger id**. The handler at `0x08123898` receives a
+  16-bit script argument, scans content records 255 down to 1 for a matching
+  byte, stores the matched index, and selects its `+0x02` mission id. Executed
+  anchor: trigger 1 selects index record 1 and mission 30 (`Wanted!`). Duplicate
+  trigger ids deliberately resolve to the last matching record.
+
+The focused dump names both columns. Other record fields remain positional
+until their own readers establish semantics.
 
 ## Formations do not exist as a table
 
