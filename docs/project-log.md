@@ -32,9 +32,9 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.2b — named the four base combat stats |
+| Last closed package | AI5.2c — named innate Zombie and its live-status bridge |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 7/7; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 8/8; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -75,6 +75,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.1c | 2026-08-24 | Expanded descriptor-backed names to 15 status bits | 15 named ability/effect/handler joins and bit round-trips; four secondary-effect confirmations |
 | AI5.2a | 2026-08-24 | Named stat `0x16` / unit `+0x1e` as max MP and corrected the direct-load count | Executed four-field stat reads; restoration clamp at `0x0809308A..C4` |
 | AI5.2b | 2026-08-24 | Named stats `0x17..0x1a` as Attack, Defense, Magic Power, and Resistance | Executed stat reads and item-property joins through four combat-total helpers |
+| AI5.2c | 2026-08-24 | Named stat `0x1b` as innate-status flags and bit `0x0800` as persistent Zombie | Zombify descriptor/handler chain; executed live/innate effective predicate; initializer setter join |
 
 ## Decisions and evidence
 
@@ -294,6 +295,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Innate Zombie bridge
+
+Objective:
+
+- Determine the role of stat `0x1b` / unit `+0x28` from its two retail readers.
+
+Completed:
+
+- Named `+0x28` as an innate-status bitfield and bit `0x0800` as Zombie.
+- Added Zombie as the sixteenth behavior-backed live status.
+- Extended the status validator from seven to eight checks.
+- Added behavior-backed names to `dump_stats.py` so regenerated output carries
+  the semantic overlay instead of losing it.
+
+Evidence recorded during the batch:
+
+- Zombify's raw effect 127 selects descriptor case 63; the case-63 handler at
+  `0x081331F8` calls the `+0xe9` bit-3 setter.
+- `sub_081308F4` returns true for either live `+0xe9` bit 3 or stat `0x1b`
+  bit `0x0800`; execution returns 0/1/1 for blank/live/innate samples.
+- The battle-status initializer at `0x08133A58` calls the same Zombie setter
+  when the effective predicate succeeds.
+
+Next action:
+
+- Map the remaining `+0x28` innate bits through their effective-status readers;
+  retain numeric labels for any bit without a unique application/status join.
 
 ### 2026-08-24 — Base combat-stat joins
 

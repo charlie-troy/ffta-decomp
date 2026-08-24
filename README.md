@@ -57,9 +57,9 @@ the same damage term as the job table's unarmed attack, icon graphics/palettes
 are named, and the hand-use, discount, shop-tier, and special-pool flag bits
 are independently editable.
 
-The unit-status map now has 15 behavior-backed names, including Frog, Stop,
+The unit-status map now has 16 behavior-backed names, including Frog, Stop,
 Blind, Confuse, Charm, Addle, Protect, Shell, Silence, Reflect, Speed Down,
-Sleep, Slow, Haste, and Poison. The status validator follows every named
+Sleep, Slow, Haste, Poison, and Zombie. The status validator follows every named
 ability through its raw effect, descriptor, handler, and executed bit pair;
 see
 [docs/unit-flags.md](docs/unit-flags.md) and

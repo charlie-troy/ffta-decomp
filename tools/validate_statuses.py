@@ -16,6 +16,9 @@ ABILITY_TABLE = 0x0855187C
 ABILITY_STRIDE = 0x1C
 SPEED_READER = 0x0812E368
 HIT_READER = 0x0812C8DC
+STAT_GETTER = 0x080C7EA4
+EFFECTIVE_ZOMBIE = 0x081308F4
+STATUS_INITIALIZER = 0x08133A58
 ROM = 0x08000000
 
 
@@ -157,11 +160,33 @@ def main(argv=None):
     if not display_ok:
         failures.append("independent naming anchors")
 
+    # Unit +0x28 bit 0x0800 is the persistent/innate form of Zombie. The
+    # effective predicate accepts either that bit or the live +0xe9 bit 3,
+    # and the battle-status initializer copies the effective state through the
+    # same setter used by Zombify's application case.
+    gba.reset_ram()
+    blank_zombie = gba.call(EFFECTIVE_ZOMBIE, [unit])
+    gba.write8(unit + 0xE9, 0x08)
+    live_zombie = gba.call(EFFECTIVE_ZOMBIE, [unit])
+    gba.reset_ram()
+    gba.uc.mem_write(unit + 0x28, struct.pack("<H", 0x0800))
+    innate_zombie = gba.call(EFFECTIVE_ZOMBIE, [unit])
+    effective_calls = calls_from(rom, EFFECTIVE_ZOMBIE, 0x0813091C)
+    init_calls = calls_from(rom, STATUS_INITIALIZER, 0x08133AC0)
+    innate_ok = ((blank_zombie, live_zombie, innate_zombie) == (0, 1, 1) and
+                 STAT_GETTER in effective_calls and
+                 0x080CD9A4 in effective_calls and
+                 0x080CDE80 in init_calls)
+    print(f"8. innate Zombie bridge: {'OK' if innate_ok else 'FAIL'} "
+          f"(blank/live/innate={blank_zombie}/{live_zombie}/{innate_zombie})")
+    if not innate_ok:
+        failures.append("innate Zombie bridge")
+
     print()
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 7/7 status checks")
+    print("PASS: 8/8 status checks")
     return 0
 
 

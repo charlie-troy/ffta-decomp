@@ -66,6 +66,18 @@ STATUS_FLAGS = [
         "handler": 0x081331A5,
     },
     {
+        "name": "zombie",
+        "ability_name": "Zombify",
+        "ability_id": 307,
+        "raw_effect": 127,
+        "getter": 0x080CD9A4,
+        "setter": 0x080CDE80,
+        "offset": 0xE9,
+        "mask": 0x08,
+        "case": 63,
+        "handler": 0x081331F9,
+    },
+    {
         "name": "frog",
         "ability_name": "Frogsong",
         "ability_id": 232,

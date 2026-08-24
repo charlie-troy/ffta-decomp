@@ -34,13 +34,16 @@ reader anchors, force a live bit-3 price boundary, reproduce an unedited CSV
 byte for byte, and prove a two-field icon edit changes exactly two accessor-
 visible bytes.
 
-`validate_statuses.py` is the behavior-backed status-name gate. Its seven
-checks join 15 named abilities through raw effects and the descriptor table;
+`validate_statuses.py` is the behavior-backed status-name gate. Its eight
+checks join 16 named abilities through raw effects and the descriptor table;
 verify the 92-entry application-handler table; join Speed Down, Sleep, Slow,
-Haste, Poison, and ten other named states to their setters; execute all 15
+Haste, Poison, and eleven other named states to their setters; execute all 16
 getter/setter pairs;
 measure the effective-speed shifts; exercise Sleep's hit-chance branch; and
 preserve the independent Speed Down display and Slow/Haste adjacency anchors.
+The eighth check proves unit `+0x28` bit `0x0800` and live status `+0xe9` bit 3
+both satisfy the effective Zombie predicate, and that initialization calls the
+Zombie setter.
 
 ## The eight checks
 

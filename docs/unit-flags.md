@@ -101,6 +101,7 @@ separate, smaller family that is not yet decompiled.
 | `sub_080CDAC4` | **Slow** | `+0xea` bit 6. Status case 51 calls its setter and `sub_0812E368` halves effective speed |
 | `sub_080CDAAC` | **Haste** | `+0xea` bit 5. Status case 52 calls its setter and `sub_0812E368` doubles effective speed; its handler is adjacent to Slow and the two effects cancel in execution |
 | `sub_080CD974` | **Poison** | `+0xe9` bit 1. Poison ability 64 stores raw effect 125; its descriptor selects internal case 61, whose handler calls this bit's setter. Poison Claw's secondary raw effect 124 selects the same case |
+| `sub_080CD9A4` | **Zombie** | `+0xe9` bit 3. Zombify raw effect 127 selects case 63 and this bit's setter. `sub_081308F4` also returns true for unit `+0x28` bit `0x0800`, making that the persistent/innate Zombie flag |
 | `sub_080CD95C` | **Frog** | `+0xe9` bit 0. Frogsong raw effect 40 and Poison Frog's secondary raw effect 39 both select case 12 and this bit's setter |
 | `sub_080CDADC` | **Stop** | `+0xea` bit 7. Stop raw effect 48 and Stopshot's secondary raw effect 47 both select case 19 and this bit's setter |
 | `sub_080CD98C` | **Blind** | `+0xe9` bit 2. Blind raw effect 87 and Blindshot's secondary raw effect 85 both select case 35 and this bit's setter |
@@ -112,12 +113,13 @@ separate, smaller family that is not yet decompiled.
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 
-`tools/validate_statuses.py` protects all 15 joins independently: it
+`tools/validate_statuses.py` protects all 16 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
-pair, runs the speed arithmetic, exercises Sleep's hit-chance branch, and
-preserves the separate display/adjacency anchors. Raw ability effects and
-internal cases are separate namespaces joined by descriptor byte `+0x01`.
+pair, runs the speed arithmetic, exercises Sleep's hit-chance branch, preserves
+the separate display/adjacency anchors, and executes the innate/live Zombie
+bridge. Raw ability effects and internal cases are separate namespaces joined
+by descriptor byte `+0x01`.
 
 Two patterns name a status bit, both keyed on a documented ability flag:
 
