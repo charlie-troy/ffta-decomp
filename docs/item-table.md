@@ -48,11 +48,13 @@ nothing is equipped, and `0x0812e578` reads property 10 for two item ids and
 the stronger weapon as primary.
 
 **`+0x14` is speed, and it is signed.** `sub_0812E368(unit)` reads property 14,
-then halves it with `asrs` for Speed Down or Sleep, doubles it for Haste, and
-halves it for Slow. The arithmetic shift says the field is treated as signed
-even though no retail item uses a negative value. Execution confirms a base
-speed of 100 becomes 50 for each halving status, 200 for Haste, and 100 when
-Slow and Haste are both set.
+then halves it with `asrs` for Speed Down or a still-unidentified status,
+doubles it for Haste, and halves it for Slow. The arithmetic shift says the
+field is treated as signed even though no retail item uses a negative value.
+Execution confirms a base speed of 100 becomes 50 for each halving status,
+200 for Haste, and 100 when Slow and Haste are both set. The unidentified
+`+0xea` bit 1 is not Sleep: the ability-effect descriptor maps Sleep to
+`+0xeb` bit 2, which does not change this calculation.
 
 ## The two icon fields
 

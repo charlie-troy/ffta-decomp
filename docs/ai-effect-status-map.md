@@ -45,10 +45,12 @@ One anchor is not enough to order 46 bits. The exemption pattern that named
 Silence only works where an "ignore X" ability flag exists, and only two are
 documented.
 
-The tractable route is behavioural: find the code that acts on each bit
-outside the AI, for instance whatever applies damage each turn (Poison) or
-clears a bit when a unit is hit (Sleep). Each such site names one bit, and
-the inflict/cancel pairing then propagates it to a case id.
+The raw ability-effect descriptor table at `0x08553E70` supplies a second,
+stronger route. Each four-byte descriptor's `+0x01` selects this internal case
+space. Named single-effect abilities therefore join directly to cases: Sleep
+raw effect 97 selects case 45, while Poison raw effect 125 selects case 61.
+The corresponding application handlers and executed getter/setter pairs then
+pin the unit bits without relying on list order.
 
 ## Full map
 
@@ -73,11 +75,11 @@ the inflict/cancel pairing then propagates it to a case id.
 | 33 | 10, 49 | `sub_080CD8CC` | `+0xe8` bit 2 |
 | 35 | 10, 49 | `sub_080CD98C` | `+0xe9` bit 2 |
 | 36 | - | `sub_080CD98C` | `+0xe9` bit 2 |
-| 37 | 10, 49 | `sub_080CDA64` | `+0xea` bit 1 |
+| 37 | 10, 49 | `sub_080CDA64` | `+0xea` bit 1 (unidentified; not Sleep) |
 | 41 | 10, 49 | `sub_080CDB54` | `+0xeb` bit 4 |
 | 42 | 10, 49 | `sub_080CDA94` | `+0xea` bit 4 |
 | 43 | 10, 49 | `sub_080CDB24` | `+0xeb` bit 2 |
-| 45 | 10, 49 | `sub_080CDB24` | `+0xeb` bit 2 |
+| 45 | 10, 49 | `sub_080CDB24` | `+0xeb` bit 2 — **Sleep** |
 | 46 | 10, 49 | `sub_080CD92C` | `+0xe8` bit 6 |
 | 47 | - | `sub_080CD92C` | `+0xe8` bit 6 |
 | 48 | 10, 49 | `sub_080CDC8C` | `+0xed` bit 2 |
@@ -86,7 +88,7 @@ the inflict/cancel pairing then propagates it to a case id.
 | 56 | 10, 49 | `sub_080CDB3C` | `+0xeb` bit 3 |
 | 57 | - | `sub_080CDB3C` | `+0xeb` bit 3 |
 | 60 | 10, 49 | `sub_080CD9BC` | `+0xe9` bit 4 |
-| 61 | 10, 49 | `sub_080CD974` | `+0xe9` bit 1 |
+| 61 | 10, 49 | `sub_080CD974` | `+0xe9` bit 1 — **Poison** |
 | 62 | 10, 49 | `sub_080CD974` | `+0xe9` bit 1 |
 | 69 | 10, 49 | `sub_080CDBFC` | `+0xec` bit 4 |
 | 70 | 10, 49 | `sub_080CD9EC` | `+0xe9` bit 6 |

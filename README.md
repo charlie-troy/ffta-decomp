@@ -58,8 +58,9 @@ are named, and the hand-use, discount, shop-tier, and special-pool flag bits
 are independently editable.
 
 The unit-status map now has behavior-backed names for Silence, Reflect, Speed
-Down, Sleep, Slow, and Haste. The status validator executes the four new
-getter/setter joins and their speed, accuracy, and display consequences; see
+Down, Sleep, Slow, Haste, and Poison. The status validator executes the five
+new getter/setter joins and their ability-effect, speed, accuracy, and display
+anchors; see
 [docs/unit-flags.md](docs/unit-flags.md) and
 [docs/validation.md](docs/validation.md).
 

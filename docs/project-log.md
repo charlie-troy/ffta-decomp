@@ -32,9 +32,9 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.1a — Speed Down, Sleep, Slow, and Haste status joins |
+| Last closed package | AI5.1b — corrected Sleep and named Poison through effect descriptors |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 6/6; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 7/7; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -70,7 +70,8 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.3 | 2026-08-24 | Corrected the Huffman assumption and decoded custom-LZSS 4bpp graphics | 50/50 retail byte matches; malformed-input rejection; 162-row/50-file export |
 | MAP3.4 | 2026-08-24 | Decoded animation metadata/frames, corrected `+0x1c`, and executed render-mode selection | maps 14/14; 83/28 animation coverage; 324 mode selections; 124-frame export |
 | ITEM4.1 | 2026-08-24 | Named icon graphics/palette and all eight item flags; closed Phase 4 | `validate_items.py` 8/8; 7,144 accessor loads; 375 icon paths; executed price boundary; byte-identical/edit round-trips |
-| AI5.1a | 2026-08-24 | Joined Speed Down, Sleep, Slow, and Haste to unit bits and application cases | `validate_statuses.py` 6/6; executed getter/setters, speed shifts, Sleep accuracy, and independent naming anchors |
+| AI5.1a | 2026-08-24 | Joined Speed Down, Slow, and Haste to unit bits and application cases | Executed getter/setters, speed shifts, and independent naming anchors |
+| AI5.1b | 2026-08-24 | Added the raw-effect descriptor join, corrected Sleep to case 45, and named Poison case 61 | `validate_statuses.py` 7/7; five named ability/effect/handler/getter chains execute |
 
 ## Decisions and evidence
 
@@ -267,15 +268,17 @@ status and backlog tables are living sections and should be kept current.
 - Decision: close Phase 3 with decode/export coverage. Editing compressed
   graphics remains withheld until a compatible encoder exists.
 
-### D-019 — Keep ability effects and status application cases separate
+### D-019 — Join ability effects to internal cases through descriptors
 
-- The ability table's raw effect id selects effect metadata and is not the
-  status handler table index.
-- The application table at `0x083A87B4` has 92 twelve-byte records; its
-  one-based cases 20, 37, 51, and 52 join to the setters for Speed Down,
-  Sleep, Slow, and Haste respectively.
-- Decision: name a status only from its handler join plus independent runtime
-  behavior. Do not infer equality between the two numeric namespaces.
+- The ability table's raw effect id is not the status-handler index. Each raw
+  id selects a four-byte descriptor at `0x08553E70`; descriptor byte `+0x01`
+  selects one of the 92 internal cases.
+- The application table at `0x083A87B4` has 92 twelve-byte records. Known
+  joins are Speed Down 49→20, Sleep 97→45, Slow 104→51, Haste 105→52, and
+  Poison 125→61.
+- Decision: name a status from the named ability → raw effect → descriptor →
+  handler setter chain, plus execution where practical. Never infer equality
+  between raw effect ids and internal case ids.
 
 ## Risks and controls
 
@@ -289,7 +292,40 @@ status and backlog tables are living sections and should be kept current.
 
 ## Session log
 
-### 2026-08-24 — First behavior-backed status batch
+### 2026-08-24 — Effect-descriptor correction and Poison join
+
+Objective:
+
+- Continue from the first status batch without carrying forward an unverified
+  assumption that raw ability-effect ids and internal cases align directly.
+
+Completed:
+
+- Located the four-byte effect-descriptor table at `0x08553E70` through
+  `sub_0812F230` and `sub_0812F328`.
+- Corrected Sleep from the provisional case-37 hypothesis to internal case 45,
+  getter `sub_080CDB24`, and `+0xeb` bit 2.
+- Named Poison as internal case 61, getter `sub_080CD974`, and `+0xe9` bit 1.
+- Expanded the status gate to assert the named ability, raw effect,
+  descriptor, handler setter, and executed getter/setter chain.
+
+Evidence recorded during the batch:
+
+- Sleep ability 32 stores raw effect 97; descriptor 97 selects case 45; its
+  handler calls `sub_080CE0B8`. The executed bit raises the tested ordinary
+  hit chance from 95 to 100 and does not change effective speed.
+- Poison ability 64 stores raw effect 125; descriptor 125 selects case 61;
+  its handler calls `sub_080CDE38`. Poison Claw raw effect 124 selects the same
+  internal case.
+- The former case-37 bit still halves speed and raises hit chance, but is now
+  deliberately unidentified rather than mislabeled Sleep.
+
+Next action:
+
+- Use the descriptor join to name additional single-effect status abilities,
+  prioritizing action-prevention bits and then unit-stat readers.
+
+### 2026-08-24 — First behavior-backed speed-status batch
 
 Objective:
 
@@ -299,25 +335,25 @@ Objective:
 Completed:
 
 - Added a shared status-name registry consumed by `tools/flag_map.py`.
-- Joined Speed Down, Sleep, Slow, and Haste to their unit bits, setters, and
-  one-based application cases.
-- Added a standalone six-check status validator and corrected the turn-order
-  and item-speed documentation to include all four speed-affecting states.
+- Joined Speed Down, Slow, and Haste to their unit bits, setters, and one-based
+  application cases. A provisional Sleep identification was tested further
+  and corrected in the immediately following batch above.
+- Added a standalone status validator and corrected the turn-order and
+  item-speed documentation.
 
 Evidence recorded during the batch:
 
 - All 92 application-table entries are executable Thumb handlers at a
-  12-byte stride; cases 20/37/51/52 call the expected setters.
-- All four getter/setter pairs clear and set their unit bits in execution.
-- With base speed 100, Speed Down, Sleep, and Slow return 50; Haste returns
-  200; Slow plus Haste returns 100.
-- Sleep raises a synthetic ordinary hit chance from 95 to 100; Speed Down
-  independently selects the red stat-display palette.
+  12-byte stride; cases 20/51/52 call the expected setters.
+- The getter/setter pairs clear and set their unit bits in execution.
+- With base speed 100, Speed Down and Slow return 50; Haste returns 200; Slow
+  plus Haste returns 100. Speed Down independently selects the red stat-display
+  palette.
 
 Next action:
 
-- Continue AI5.1 at the per-turn status processor to identify Poison from HP
-  loss, then propagate that name through the same handler/bit registry.
+- Find and validate the raw-effect-to-internal-case conversion before naming
+  another bit. This is completed by the correction batch above.
 
 ### 2026-08-24 — Item icons, flags, and Phase 4 closure
 
