@@ -57,10 +57,11 @@ the same damage term as the job table's unarmed attack, icon graphics/palettes
 are named, and the hand-use, discount, shop-tier, and special-pool flag bits
 are independently editable.
 
-The unit-status map now has behavior-backed names for Silence, Reflect, Speed
-Down, Sleep, Slow, Haste, and Poison. The status validator executes the five
-new getter/setter joins and their ability-effect, speed, accuracy, and display
-anchors; see
+The unit-status map now has 15 behavior-backed names, including Frog, Stop,
+Blind, Confuse, Charm, Addle, Protect, Shell, Silence, Reflect, Speed Down,
+Sleep, Slow, Haste, and Poison. The status validator follows every named
+ability through its raw effect, descriptor, handler, and executed bit pair;
+see
 [docs/unit-flags.md](docs/unit-flags.md) and
 [docs/validation.md](docs/validation.md).
 

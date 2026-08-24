@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.1b — corrected Sleep and named Poison through effect descriptors |
+| Last closed package | AI5.1c — expanded descriptor-backed status registry to 15 bits |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 7/7; matching ROM SHA1 |
 
@@ -72,6 +72,7 @@ status and backlog tables are living sections and should be kept current.
 | ITEM4.1 | 2026-08-24 | Named icon graphics/palette and all eight item flags; closed Phase 4 | `validate_items.py` 8/8; 7,144 accessor loads; 375 icon paths; executed price boundary; byte-identical/edit round-trips |
 | AI5.1a | 2026-08-24 | Joined Speed Down, Slow, and Haste to unit bits and application cases | Executed getter/setters, speed shifts, and independent naming anchors |
 | AI5.1b | 2026-08-24 | Added the raw-effect descriptor join, corrected Sleep to case 45, and named Poison case 61 | `validate_statuses.py` 7/7; five named ability/effect/handler/getter chains execute |
+| AI5.1c | 2026-08-24 | Expanded descriptor-backed names to 15 status bits | 15 named ability/effect/handler joins and bit round-trips; four secondary-effect confirmations |
 
 ## Decisions and evidence
 
@@ -291,6 +292,37 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Descriptor-backed status expansion
+
+Objective:
+
+- Apply the corrected raw-effect descriptor method to the highest-confidence
+  named status abilities without inferring from effect ordering.
+
+Completed:
+
+- Expanded `tools/status_flags.py` from five descriptor-backed entries to 15.
+- Added Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and Shell; folded
+  the existing Silence and Reflect names into the same executable registry.
+- Kept ambiguous candidates such as Break/Petrify, Aim: Arm/Disable, and
+  Aim: Legs/Immobilize out of the registry pending a direct ROM name anchor.
+
+Evidence recorded during the batch:
+
+- Every named ability resolves to its expected raw effect and internal case;
+  all 15 case handlers call the expected setters and all 15 bit pairs execute.
+- Poison Frog/Frogsong converge on Frog case 12; Stopshot/Stop converge on
+  Stop case 19; Blindshot/Blind converge on Blind case 35; Poison Claw/Poison
+  converge on Poison case 61.
+- Confushot and Charmshot select their named statuses in secondary effect slot
+  1, exercising the validator's slot-aware path.
+
+Next action:
+
+- Resolve the three high-value action-prevention candidates (Petrify,
+  Disable, Immobilize) from ROM-owned labels or behavioral readers, then move
+  to remaining unit-stat fields if those names cannot be pinned cleanly.
 
 ### 2026-08-24 — Effect-descriptor correction and Poison join
 

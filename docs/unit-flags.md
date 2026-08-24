@@ -101,11 +101,18 @@ separate, smaller family that is not yet decompiled.
 | `sub_080CDAC4` | **Slow** | `+0xea` bit 6. Status case 51 calls its setter and `sub_0812E368` halves effective speed |
 | `sub_080CDAAC` | **Haste** | `+0xea` bit 5. Status case 52 calls its setter and `sub_0812E368` doubles effective speed; its handler is adjacent to Slow and the two effects cancel in execution |
 | `sub_080CD974` | **Poison** | `+0xe9` bit 1. Poison ability 64 stores raw effect 125; its descriptor selects internal case 61, whose handler calls this bit's setter. Poison Claw's secondary raw effect 124 selects the same case |
+| `sub_080CD95C` | **Frog** | `+0xe9` bit 0. Frogsong raw effect 40 and Poison Frog's secondary raw effect 39 both select case 12 and this bit's setter |
+| `sub_080CDADC` | **Stop** | `+0xea` bit 7. Stop raw effect 48 and Stopshot's secondary raw effect 47 both select case 19 and this bit's setter |
+| `sub_080CD98C` | **Blind** | `+0xe9` bit 2. Blind raw effect 87 and Blindshot's secondary raw effect 85 both select case 35 and this bit's setter |
+| `sub_080CDB54` | **Confuse** | `+0xeb` bit 4. Confushot's secondary raw effect 93 selects case 41 and this bit's setter |
+| `sub_080CDB6C` | **Charm** | `+0xeb` bit 5. Charmshot's secondary raw effect 140 selects case 80 and this bit's setter |
+| `sub_080CDBB4` | **Addle** | `+0xec` bit 0. Addle raw effect 188 selects case 71 and this bit's setter |
+| `sub_080CDB0C` | **Protect** | `+0xeb` bit 1. Protect raw effect 78 selects case 82 and this bit's setter |
+| `sub_080CDAF4` | **Shell** | `+0xeb` bit 0. Shell raw effect 45 selects case 83 and this bit's setter |
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
-| `sub_080CDB54` | blocked-by-status, unidentified | same shape with property `0x18` (flag bit 13), which no public list names |
 
-`tools/validate_statuses.py` protects the five new joins independently: it
+`tools/validate_statuses.py` protects all 15 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
 pair, runs the speed arithmetic, exercises Sleep's hit-chance branch, and
@@ -121,8 +128,9 @@ Two patterns name a status bit, both keyed on a documented ability flag:
    and bails. Where the flag is Reflectable, the predicate reads Reflect. This
    named Reflect via `sub_0812F154`.
 
-Both need a documented ability flag to key on, which is what limits the method:
-the flag list has only a handful that name a status.
+The effect-descriptor join no longer depends on an exemption flag, so named
+single-effect abilities can identify substantially more of the condition
+space.
 
 ## Why this matters for modding
 

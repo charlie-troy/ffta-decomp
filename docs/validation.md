@@ -35,9 +35,10 @@ byte for byte, and prove a two-field icon edit changes exactly two accessor-
 visible bytes.
 
 `validate_statuses.py` is the behavior-backed status-name gate. Its seven
-checks join five named abilities through raw effects and the descriptor table;
+checks join 15 named abilities through raw effects and the descriptor table;
 verify the 92-entry application-handler table; join Speed Down, Sleep, Slow,
-Haste, and Poison to their setters; execute all five getter/setter pairs;
+Haste, Poison, and ten other named states to their setters; execute all 15
+getter/setter pairs;
 measure the effective-speed shifts; exercise Sleep's hit-chance branch; and
 preserve the independent Speed Down display and Slow/Haste adjacency anchors.
 

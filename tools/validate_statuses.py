@@ -51,21 +51,30 @@ def main(argv=None):
     names = Names(rom)
     for entry in STATUS_FLAGS:
         ability_effect = rom[ABILITY_TABLE - ROM +
-                             entry["ability_id"] * ABILITY_STRIDE + 0x0C]
+                             entry["ability_id"] * ABILITY_STRIDE + 0x0C +
+                             entry.get("effect_slot", 0)]
         descriptor = EFFECT_TABLE - ROM + entry["raw_effect"] * 4
         descriptor_ok &= ability_effect == entry["raw_effect"]
         descriptor_ok &= rom[descriptor + 1] == entry["case"]
         descriptor_ok &= (names.ability(entry["ability_id"]) ==
                           entry["ability_name"])
-    # Poison Claw carries damage first and Poison second; its second raw effect
-    # is a separate proof that raw effects 124 and 125 share case 61.
-    poison_claw = ABILITY_TABLE - ROM + 293 * ABILITY_STRIDE + 0x0C
-    descriptor_ok &= names.ability(293) == "Poison Claw"
-    descriptor_ok &= rom[poison_claw + 1] == 124
-    descriptor_ok &= rom[EFFECT_TABLE - ROM + 124 * 4 + 1] == 61
+    # Secondary-effect abilities independently converge on the same cases as
+    # the pure status abilities, guarding both slot selection and semantics.
+    alternates = [
+        (280, "Poison Frog", 1, 39, 12),
+        (293, "Poison Claw", 1, 124, 61),
+        (240, "Blindshot", 1, 85, 35),
+        (242, "Stopshot", 1, 47, 19),
+    ]
+    for ability_id, name, slot, raw_effect, case in alternates:
+        effect = (ABILITY_TABLE - ROM + ability_id * ABILITY_STRIDE + 0x0C +
+                  slot)
+        descriptor_ok &= names.ability(ability_id) == name
+        descriptor_ok &= rom[effect] == raw_effect
+        descriptor_ok &= rom[EFFECT_TABLE - ROM + raw_effect * 4 + 1] == case
     print(f"2. named ability/effect joins: {'OK' if descriptor_ok else 'FAIL'} "
-          "(Speedbreak 49->20; Sleep 97->45; Slow 104->51; "
-          "Haste 105->52; Poison 125->61)")
+          f"({len(STATUS_FLAGS)} named effects; Frog/Stop/Blind/Poison have "
+          "independent alternate abilities)")
     if not descriptor_ok:
         failures.append("named ability/effect joins")
 
@@ -80,7 +89,7 @@ def main(argv=None):
             handler_ok &= entry["setter"] in calls_from(
                 rom, start, ROM + extent[0])
     print(f"3. named handler joins: {'OK' if handler_ok else 'FAIL'} "
-          "(five internal cases call the expected status setters)")
+          f"({len(STATUS_FLAGS)} internal cases call expected setters)")
     if not handler_ok:
         failures.append("named handler joins")
 
@@ -97,7 +106,7 @@ def main(argv=None):
         gba.call(entry["setter"], [unit, 1])
         getter_ok &= gba.call(entry["getter"], [unit]) == 1
     print(f"4. getter/setter pairs: {'OK' if getter_ok else 'FAIL'} "
-          "(five bits, clear/set round-trips)")
+          f"({len(STATUS_FLAGS)} bits, clear/set round-trips)")
     if not getter_ok:
         failures.append("getter/setter pairs")
 

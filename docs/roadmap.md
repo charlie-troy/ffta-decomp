@@ -264,7 +264,9 @@ behaviour mod needs to reach.
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
    `tools/validate_statuses.py` is the seven-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
-   the four-byte descriptor table at `0x08553E70`.
+   the four-byte descriptor table at `0x08553E70`. The same join now names 15
+   bits total, adding Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and
+   Shell while independently reconfirming Silence and Reflect.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
    (`+0x04`–`+0x14`) and the unnamed `u16`s — by finding code that reads a stat
    and does something identifiable, exactly as the HP pair was pinned.
