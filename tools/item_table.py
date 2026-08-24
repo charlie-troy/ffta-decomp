@@ -35,10 +35,9 @@ COLUMNS = [
     ("element",      0x09, 1),   # prop 4
     ("range",        0x0A, 1),   # prop 5
     ("worn",         0x0B, 1),   # prop 6
-    ("flags_0c",     0x0C, 1),   # prop 7; a bitfield, not a scalar -- the code
-                                 # at 0x080cacf0 tests bit 1 of it
-    ("unk_0d",       0x0D, 1),   # prop 8; 3 distinct values
-    ("unk_0e",       0x0E, 1),   # prop 9; 62 distinct values
+    ("flags_0c",     0x0C, 1),   # prop 7; expanded into named bits below
+    ("icon_palette", 0x0D, 1),   # prop 8; palette-bank offset, values 0-2
+    ("icon_graphics",0x0E, 1),   # prop 9; sprite-resource id
     ("attack",       0x10, 1),   # prop 10; the damage path uses it as weapon
                                  # power, and 0x0812e578 sorts two weapons by it
     ("defense",      0x11, 1),   # prop 11
@@ -62,7 +61,20 @@ COLUMNS = [
 # Offsets that are zero in every real item: +0x0f, +0x19, +0x1e, +0x1f.
 PADDING = (0x0F, 0x19, 0x1E, 0x1F)
 
-FLAG_BITS = [(b, f"f_0c_bit{b}") for b in range(8)]
+# Bits 0-2 describe weapon hand rules. Their populations exactly partition
+# dual-wieldable, one-handed, and two-handed weapon classes; only bit 1 also
+# has a direct accessor reader in the retail equip validator. Bits 3-7 have
+# direct readers described in docs/item-table.md.
+FLAG_BITS = [
+    (0, "dual_wield"),
+    (1, "one_handed"),
+    (2, "two_handed"),
+    (3, "discount_eligible"),
+    (4, "shop_early"),
+    (5, "shop_mid"),
+    (6, "shop_late"),
+    (7, "special_pool"),
+]
 
 
 def read(rom, i, off, width):

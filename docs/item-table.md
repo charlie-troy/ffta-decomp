@@ -32,8 +32,8 @@ python tools/map_table.py --base 0x0851D180 --stride 0x20 \
 | 5 | `+0x0a` | range | 15 | `+0x15` | evade |
 | 6 | `+0x0b` | worn | 16 | `+0x16` | move |
 | 7 | `+0x0c` | flags (see below) | 17 | `+0x17` | jump |
-| 8 | `+0x0d` | unknown | 18 | `+0x1d` | ability |
-| 9 | `+0x0e` | unknown | | | |
+| 8 | `+0x0d` | icon_palette | 18 | `+0x1d` | ability |
+| 9 | `+0x0e` | icon_graphics | | | |
 
 `+0x06` (sell_value) and `+0x18` have no property id. `+0x0f`, `+0x19`, `+0x1e`
 and `+0x1f` are zero in every real item, which supports the published reading
@@ -53,13 +53,52 @@ it if a third does. Slow and Haste, in other words, and the arithmetic shift
 says the field is treated as signed even though no retail item uses a negative
 value.
 
+## The two icon fields
+
+**`+0x0e` is the icon graphics resource id.** The item-window builder at
+`0x080986CA` reads property 9 and passes it to the generic sprite constructor
+at `0x08021618`. That constructor calls `0x08021004`, which uses the value to
+index the sprite-resource pointer table at `0x08390E44`. Executing that path
+for all 375 real items returns the pointer selected by the raw `+0x0e` value.
+There are 62 distinct ids; zero selects the shared generic resource used by
+items such as consumables.
+
+**`+0x0d` is the icon palette-bank offset.** The same builder reads property 8
+at `0x080986D4` and writes it through `0x08021E64` to sprite-object byte
+`+0x1d`. The renderer reads that byte through `0x08021E60`; at `0x08001686`
+it adds the value to the high nibble of OAM attribute 2, which is the GBA OBJ
+palette bank. Retail items use offsets 0, 1, and 2.
+
+`tools/validate_items.py` executes the accessor, resource resolver, and
+palette setter/getter over the entire table, and preserves the final OAM
+packing instructions as a static anchor.
+
 ## Two corrections to the published layout
 
 **`+0x0c` is a bitfield, not a scalar.** It is listed as part of an "Unknown"
-run of three bytes. The code at `0x080cacf0` calls property 7 and immediately
-does `lsrs r0, #1; ands r0, #1`, testing bit 1. It takes 21 distinct values up
-to 248, which is a flag byte rather than a quantity. `tools/item_table.py`
-expands it into eight named bit columns so it can be edited without hex.
+run of three bytes and takes 21 distinct values up to 248. The retail readers
+and exact item populations split it as follows:
+
+| bit | CSV column | retail meaning | evidence |
+|---:|---|---|---|
+| 0 | `dual_wield` | weapon belongs to the dual-wieldable class | Exact 139-item population: one-hand melee classes that can be paired; this name is data-classified, not isolated to a bit reader |
+| 1 | `one_handed` | occupies one equipment hand | Equip validator `0x080CABA8` reads property 7 and tests bit 1; its 215-item population adds spear, instrument, knuckle, soul, gun, and shield classes to bit 0 |
+| 2 | `two_handed` | occupies both hands | Set on exactly all 22 greatsword/broadsword entries and no other type; this name is data-classified, not isolated to a bit reader |
+| 3 | `discount_eligible` | shop price may receive the current discount | `0x080CBC14` returns the full buy price when clear and runs the percentage/clamp path when set |
+| 4 | `shop_early` | offered in the early shop pool | Shop-list builders select mask `0x10` at the first progression stage |
+| 5 | `shop_mid` | offered in the middle shop pool | The same builders select mask `0x20` at the second stage |
+| 6 | `shop_late` | offered in the late shop pool | The same builders select mask `0x40` at the third stage |
+| 7 | `special_pool` | included in the special/random item pool independently of shop tier | `0x080D2114` combines `0x80` with the current tier mask; the 31-item population is Mythril weapons plus consumables |
+
+The shop bits are deliberately cumulative in retail data: early goods usually
+carry bits 4–6, middle goods bits 5–6, and late goods bit 6. The normal shop
+reader at `0x080CBE2E` selects only one of those bits, so an early item remains
+available after the shop advances.
+
+Execution provides a concrete bit-3 boundary: with a forced 2% shop discount,
+the Shortsword costs 294 gil; clearing only bit 3 makes the same function return
+its full 300-gil buy value. `tools/item_table.py` expands all eight bits into
+the named columns above so they can be edited independently.
 
 **`+0x06` is not derived from `+0x04`.** The first several entries have
 sell_value exactly half of buy_value, which is a tempting rule. Across the

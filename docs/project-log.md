@@ -30,11 +30,11 @@ status and backlog tables are living sections and should be kept current.
 | Item | State |
 |---|---|
 | Branch | `master`, tracking `origin/master` |
-| Active phase | Phase 4 — item-table stragglers |
-| Current work package | ITEM4.1 — name item `+0x0d/+0x0e` and remaining `+0x0c` bits |
-| Last closed package | MAP3.4 — animations and render modes; Phase 3 closure |
+| Active phase | Phase 5 — AI condition space |
+| Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
+| Last closed package | ITEM4.1 — item icons, flags, and Phase 4 closure |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -46,8 +46,8 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.2 | P1 | Complete | Characterize map block `+0x08` | The clipping loader/consumer are identified and a guarded descriptor edit round-trips |
 | MAP3.3 | P1 | Complete | Decode custom-LZSS map graphics | All 50 unique streams match the retail decoder and malformed data is rejected |
 | MAP3.4 | P1 | Complete | Characterize animation blocks and mode bytes | Readers name the controls and reproducible exports cover all present blocks |
-| ITEM4.1 | P2 | Pending | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Each name has an identifiable reader and byte-identical round-trip |
-| AI5.1 | P2 | Pending | Expand unit-status and stat naming | Each new name has a behavioral or execution anchor |
+| ITEM4.1 | P2 | Complete | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Icon paths execute end to end; behavioral flags have readers; hand bits have explicit population evidence; CSV round-trips |
+| AI5.1 | P2 | Active | Expand unit-status and stat naming | Each new name has a behavioral or execution anchor |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -69,6 +69,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.2 | 2026-08-24 | Identified and exposed the two-layer clipping tilemap at `+0x08` | `validate_maps.py` 8/8; loader/visibility readers; byte-identical and edited round-trips |
 | MAP3.3 | 2026-08-24 | Corrected the Huffman assumption and decoded custom-LZSS 4bpp graphics | 50/50 retail byte matches; malformed-input rejection; 162-row/50-file export |
 | MAP3.4 | 2026-08-24 | Decoded animation metadata/frames, corrected `+0x1c`, and executed render-mode selection | maps 14/14; 83/28 animation coverage; 324 mode selections; 124-frame export |
+| ITEM4.1 | 2026-08-24 | Named icon graphics/palette and all eight item flags; closed Phase 4 | `validate_items.py` 8/8; 7,144 accessor loads; 375 icon paths; executed price boundary; byte-identical/edit round-trips |
 
 ## Decisions and evidence
 
@@ -276,6 +277,42 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Item icons, flags, and Phase 4 closure
+
+Objective:
+
+- Name item `+0x0d/+0x0e`, resolve the `+0x0c` bitfield, and make the claims
+  executable rather than distribution-only.
+
+Completed:
+
+- Traced `+0x0e` through the sprite constructor to the resource-pointer table
+  and named it `icon_graphics`.
+- Traced `+0x0d` through the object setter/getter to OAM attribute 2 palette
+  bits and named it `icon_palette`.
+- Named bit 3 as discount eligibility, bits 4–6 as cumulative shop tiers, and
+  bit 7 as the Mythril/consumable special pool from direct retail readers.
+- Classified bits 0–2 as dual-wield, one-handed, and two-handed rules. Bit 1
+  has a direct equip-validator reader; bit 0/2 remain explicitly marked as
+  exact population classifications rather than isolated-reader proofs.
+- Added a standalone eight-check item gate and renamed the CSV columns.
+
+Evidence recorded during the batch:
+
+- All 7,144 item-accessor loads match raw fields; all 375 real items resolve
+  their graphics pointers and round-trip their palette selector.
+- The renderer adds object byte `+0x1d` to OAM attr2 bits 12–15.
+- A forced 2% discount returns 294 gil for the Shortsword with bit 3 set and
+  300 gil when only bit 3 is cleared.
+- Unedited CSV application is byte-identical; editing both icon fields changes
+  exactly two bytes and both are returned by the retail accessor.
+
+Next action:
+
+- Start AI5.1 with behavioral unit-status readers: prioritize per-turn damage,
+  clear-on-hit, and action-prevention sites because they can name status bits
+  without relying on data distributions.
 
 ### 2026-08-24 — Animations, render modes, and Phase 3 closure
 

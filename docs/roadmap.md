@@ -221,12 +221,22 @@ are plain loads), so this is cheap and closes the table.
    footwear/gloves/accessory/consumable, plus Mythril). `sub_080CC788` is the
    reader that filters on `+0x18 != 0` when drawing random items. See
    `docs/item-table.md`.
-2. `+0x0d` and `+0x0e` — unnamed accessor properties.
-3. `+0x0c` flag byte — only bit 1 is understood; test the other bits against
-   observable item behaviour.
+2. `+0x0d` and `+0x0e` — **done 2026-08-24.** They select icon palette bank
+   and graphics resource respectively, traced through the sprite constructor
+   to OAM output.
+3. `+0x0c` flag byte — **done 2026-08-24.** Hand-use classes occupy bits 0–2,
+   bit 3 gates shop discounts, bits 4–6 are cumulative shop tiers, and bit 7
+   adds Mythril/consumables to the special random pool. The hand-use bit 0/2
+   names are exact population classifications; the remaining bits have direct
+   retail readers.
 
-**Done when:** each is named from a reader that does something identifiable,
-and round-trips byte-identically.
+**Done when:** each is named from an identifiable reader or an exact exhaustive
+population invariant whose inference boundary is explicit, and round-trips
+byte-identically.
+
+**Complete 2026-08-24:** the eight-check item gate executes 7,144 accessor
+loads, all 375 icon resource/palette paths, the discount boundary, and both
+unedited and two-field edited CSV round-trips.
 
 ---
 

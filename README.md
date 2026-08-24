@@ -52,8 +52,10 @@ across all 162 logical maps. All three are editable with redirects resolved and
 a guard that refuses any compressed block that would no longer fit.
 
 The item table is mapped too, in [docs/item-table.md](docs/item-table.md):
-all 19 of its accessor properties are plain loads, and weapon attack power
-feeds the same damage term as the job table's unarmed attack.
+all 19 of its accessor properties are plain loads, weapon attack power feeds
+the same damage term as the job table's unarmed attack, icon graphics/palettes
+are named, and the hand-use, discount, shop-tier, and special-pool flag bits
+are independently editable.
 
 Written up in [docs/ai-findings.md](docs/ai-findings.md),
 [docs/ability-table.md](docs/ability-table.md),

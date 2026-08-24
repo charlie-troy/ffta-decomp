@@ -7,6 +7,8 @@ measures the result.
 ```bash
 python tools/validate_ai.py baserom.gba
 python tools/validate_missions.py baserom.gba
+python tools/validate_maps.py baserom.gba
+python tools/validate_items.py baserom.gba
 ```
 
 No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
@@ -23,6 +25,13 @@ reads; all 1,024 clan-skill requirement reads plus an executed acceptance
 boundary; all 512 cancellation reads plus three executed formatter paths and
 all 2,048 reward-preview flag reads plus visible, hidden, and injected dormant
 formatter paths; safe setters; and the two known gil/AP reward anchors.
+
+`validate_items.py` is the item-table gate. Its eight checks execute all 7,144
+accessor loads, resolve all 375 real items through the icon graphics and
+palette object paths, preserve the final OAM palette packing and shop-pool
+reader anchors, force a live bit-3 price boundary, reproduce an unedited CSV
+byte for byte, and prove a two-field icon edit changes exactly two accessor-
+visible bytes.
 
 ## The eight checks
 
