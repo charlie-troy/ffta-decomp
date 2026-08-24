@@ -110,6 +110,30 @@ progress counter.
 They are not dispatch-calculator weights. `sub_080CF310` never reads this
 block; it uses the separate dispatch threshold at `+0x43/+0x44`.
 
+## Mission behavior and public type
+
+Mission `+0x02` is packed. Accessor property 1 returns bits 0–2, the engine's
+**behavior code**; property 2 returns bits 3–5, the **icon group code**. The UI
+helper `sub_080CEBF8` maps icon groups 0, 1 and 2 to the Non-Battle, Regular and
+Free-Area presentation assets, while behavior 1 overrides the result with the
+Encounter asset. Those are the four player-facing mission types named by the
+[official manual](https://www.nintendo.com/eu/media/downloads/games_8/emanuals/game_boy_advance_8/Manual_GameBoyAdvance_FinalFantasyTacticsAdvance_EN_DE_FR_ES_IT.pdf).
+Group 3 is used by a small special/postgame set and stays labeled `Special`.
+
+The behavior code is intentionally exposed as a number rather than given six
+overconfident labels. Two values have direct behavioral identities:
+
+- behavior 0 reaches the dispatch-unit rating path;
+- behavior 1 creates/uses an opposing-clan encounter and forces the Encounter
+  icon.
+
+The remaining values separate internal battle/event paths; they do not map
+one-to-one onto the four public icons. Verified anchors are Dueling Sub
+`(behavior 0, Non-Battle)`, The Bounty `(1, Encounter)`, Free Sprohm!
+`(2, Free-Area)`, Herb Picking `(3, Regular)`, and Pam Le Fey
+`(2, Special)`. Computed CSV setters preserve both the other packed field and
+the upper two bits of `+0x02`.
+
 ## Gil, AP and item rewards are in this table
 
 An earlier draft of this file concluded the opposite, and was wrong. The
@@ -192,6 +216,8 @@ Named, with the code or the game as evidence:
 | `+0x33` | gil reward, ÷200 | accessor property 30 multiplies by 200; matches Herb Picking's 600 |
 | `+0x34` | AP reward, ÷10 | matches Herb Picking's 40 and Over The Hill's 80 |
 | `+0x35` | item reward id | resolves to the Wanted! sword rewards, Kotetsu, etc. |
+| `+0x02` bits 0–2 | mission behavior code | properties 1; dispatch/encounter and internal battle/event paths |
+| `+0x02` bits 3–5 | mission icon group code | property 2; combined with behavior 1 to select the public mission type |
 | `+0x39` bits 3–7, `+0x3a` bit 0 | required dispatch job | roster filter requires the canonical job code (property 48) |
 | `+0x3c` bits 2–7 | blocked dispatch job | a matching canonical job returns rating 0 in `sub_080CF310` |
 | `+0x3d` | dormant blocked dispatch item, −375 | rating gate is executable, but all retail entries are zero (property 53) |

@@ -136,7 +136,12 @@ remaining work is naming the other computed/packed properties.
    world-map symbol's persistent placement record; `+0x01` is the key used by
    a script handler to select the record's `+0x02` mission. Both paths execute
    in the standalone validator.
-6. Expose every newly-named field in `tools/mission_table.py`,
+6. **Behavior and public type — done 2026-08-24.** `+0x02` bits 0–2 select the
+   internal behavior path and bits 3–5 select the icon group. The effective
+   player-facing types are Non-Battle, Regular, Encounter, Free-Area, plus a
+   small internal Special group. All accessor reads and packed edits execute
+   in validation.
+7. Expose every newly-named field in `tools/mission_table.py`,
    round-trip-verified, and add a validation check. **Done for the nine clan
    progression fields, dispatch job rules, dormant dispatch item rule, and pub
    fee**; repeat for later discoveries.

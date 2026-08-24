@@ -20,6 +20,40 @@ ROM = "D:/Nintendo - Game Boy Advance/Final Fantasy Tactics Advance.gba"
 CODE_END = 0x360000
 
 
+def recover_constant(instructions, register):
+    """Recover a constant argument with simple backward register tracking.
+
+    Callers commonly materialize the property in another register and copy it
+    into the ABI argument register (`movs r3, #0x3e; adds r1, r3, #0`). Merely
+    searching for the last immediate assignment to r1 misattributes an older,
+    unrelated mask constant. Follow zero-cost aliases and stop at any other
+    write instead.
+    """
+    wanted = register
+    for ins in reversed(instructions):
+        if ins.mnemonic in ("bl", "blx"):
+            break
+        operands = [part.strip() for part in (ins.op_str or "").split(",")]
+        if not operands or operands[0] != wanted:
+            continue
+        if ins.mnemonic in ("movs", "mov") and len(operands) >= 2:
+            immediate = re.fullmatch(r"#(0x[0-9a-fA-F]+|\d+)", operands[1])
+            if immediate:
+                return int(immediate.group(1), 0)
+            if re.fullmatch(r"r(?:1[0-5]|[0-9])", operands[1]):
+                wanted = operands[1]
+                continue
+        if ins.mnemonic in ("adds", "lsls"):
+            if len(operands) == 2 and operands[1] == "#0":
+                continue
+            if (len(operands) == 3 and operands[2] == "#0" and
+                    re.fullmatch(r"r(?:1[0-5]|[0-9])", operands[1])):
+                wanted = operands[1]
+                continue
+        break
+    return None
+
+
 def bl_sites(rom, target):
     out = []
     for off in range(0, CODE_END, 2):
@@ -52,16 +86,9 @@ def main(argv):
     unknown = []
     for site in sites:
         start = max(0, site - 0x08000000 - args.window * 2)
-        pid = None
-        for i in reversed(romlib.disasm(rom, start, site - 0x08000000)):
-            if i.mnemonic in ("movs", "mov") and \
-                    (i.op_str or "").startswith(args.reg + ","):
-                m = re.search(r"#(0x[0-9a-fA-F]+|\d+)", i.op_str)
-                if m:
-                    pid = int(m.group(1), 0)
-                break
-            if i.mnemonic in ("bl", "blx"):
-                break
+        pid = recover_constant(
+            romlib.disasm(rom, start, site - 0x08000000), args.reg
+        )
         (unknown if pid is None else byid[pid]).append(site)
 
     print(f"  constant {args.reg}: {sum(len(v) for v in byid.values())}")

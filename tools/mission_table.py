@@ -90,9 +90,47 @@ CLAN_REWARDS = (
     (0x32, "track_points"),
 )
 
+MISSION_ICON_GROUPS = {
+    0: "Non-Battle",
+    1: "Regular",
+    2: "Free-Area",
+    3: "Special",
+}
+
 
 def col(o):
     return NAMED.get(o, f"b{o:02x}")
+
+
+def mission_behavior_get(data, entry):
+    """Decode accessor property 1 from +0x02 bits 0..2."""
+    return data[entry + 0x02] & 0x07
+
+
+def mission_behavior_set(data, entry, value):
+    """Set property 1 while preserving +0x02 bits 3..7."""
+    if not 0 <= value <= 7:
+        raise ValueError("mission behavior code must fit 3 bits")
+    data[entry + 0x02] = (data[entry + 0x02] & 0xF8) | value
+
+
+def mission_icon_group_get(data, entry):
+    """Decode accessor property 2 from +0x02 bits 3..5."""
+    return (data[entry + 0x02] >> 3) & 0x07
+
+
+def mission_icon_group_set(data, entry, value):
+    """Set property 2 while preserving +0x02 bits 0..2 and 6..7."""
+    if not 0 <= value <= 7:
+        raise ValueError("mission icon group code must fit 3 bits")
+    data[entry + 0x02] = (data[entry + 0x02] & 0xC7) | (value << 3)
+
+
+def mission_type_name(behavior, icon_group):
+    """Public mission type selected by the UI icon path."""
+    if behavior == 1:
+        return "Encounter"
+    return MISSION_ICON_GROUPS.get(icon_group, "")
 
 
 def required_job_get(data, entry):
@@ -153,17 +191,22 @@ def cmd_dump(rom_path, out_path):
         w = csv.writer(fh)
         names = Names(rom)
         w.writerow(["id", "name"] + [col(o) for o in range(STRIDE)] +
-                   ["required_job_code", "required_job",
+                   ["mission_behavior_code", "mission_icon_group_code",
+                    "mission_type", "required_job_code", "required_job",
                     "blocked_dispatch_job_code", "blocked_dispatch_job",
                     "blocked_dispatch_item_id", "blocked_dispatch_item"])
         job_names = job_code_names(rom, names)
         for i in range(COUNT):
             b = BASE + i * STRIDE
+            behavior = mission_behavior_get(rom, b)
+            icon_group = mission_icon_group_get(rom, b)
             required_job = required_job_get(rom, b)
             blocked_job = blocked_job_get(rom, b)
             blocked_item = blocked_item_get(rom, b)
             w.writerow([i, names.mission(i)] + list(rom[b:b + STRIDE]) +
-                       [required_job, job_names.get(required_job, ""),
+                       [behavior, icon_group,
+                        mission_type_name(behavior, icon_group), required_job,
+                        job_names.get(required_job, ""),
                         blocked_job, job_names.get(blocked_job, ""),
                         blocked_item, names.item_by_id(blocked_item)])
     print(f"wrote {out_path}: {COUNT} entries, {STRIDE} bytes each")
@@ -180,6 +223,8 @@ def cmd_apply(rom_path, csv_path, out_path):
                 print(f"  skipping out-of-range id {i}")
                 continue
             p = BASE + i * STRIDE
+            original_behavior = mission_behavior_get(rom, p)
+            original_icon_group = mission_icon_group_get(rom, p)
             original_required_job = required_job_get(rom, p)
             original_blocked_job = blocked_job_get(rom, p)
             original_blocked_item = blocked_item_get(rom, p)
@@ -196,6 +241,30 @@ def cmd_apply(rom_path, csv_path, out_path):
                     print(f"  id {i:>3} {name} (+{o:#04x}): "
                           f"{rom[field]} -> {new}")
                     rom[field] = new
+                    changes += 1
+            requested = row.get("mission_behavior_code", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 7:
+                    print(f"  id {i} mission_behavior_code: {requested} does "
+                          "not fit 3 bits, skipped")
+                elif requested != original_behavior:
+                    before = mission_behavior_get(rom, p)
+                    mission_behavior_set(rom, p, requested)
+                    print(f"  id {i:>3} mission_behavior_code: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("mission_icon_group_code", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 7:
+                    print(f"  id {i} mission_icon_group_code: {requested} "
+                          "does not fit 3 bits, skipped")
+                elif requested != original_icon_group:
+                    before = mission_icon_group_get(rom, p)
+                    mission_icon_group_set(rom, p, requested)
+                    print(f"  id {i:>3} mission_icon_group_code: "
+                          f"{before} -> {requested}")
                     changes += 1
             requested = row.get("required_job_code", "")
             if requested != "":

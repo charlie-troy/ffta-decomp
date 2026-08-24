@@ -110,7 +110,7 @@ Genuinely open, with the reason:
 
 ```bash
 python tools/validate_ai.py "<rom>"      # must stay 8/8
-python tools/validate_missions.py "<rom>" # must stay 8/8 when missions change
+python tools/validate_missions.py "<rom>" # must stay 9/9 when missions change
 ```
 
 Every table tool must round-trip: dumping and re-applying an unedited CSV has

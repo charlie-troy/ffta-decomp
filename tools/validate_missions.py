@@ -16,6 +16,9 @@ from ffta_names import Names
 from mission_table import (JOB_KIND_BASE, JOB_KIND_STRIDE, JOB_COUNT,
                            blocked_item_get, blocked_item_set,
                            blocked_job_get, blocked_job_set,
+                           mission_behavior_get, mission_behavior_set,
+                           mission_icon_group_get, mission_icon_group_set,
+                           mission_type_name,
                            required_job_get, required_job_set)
 
 BASE = 0x0855AE4C
@@ -344,12 +347,74 @@ def main(argv=None):
         f"{selected_mission})"
     )
 
+    type_ok = True
+    type_checks = 0
+    for i in range(COUNT):
+        entry = BASE - 0x08000000 + i * STRIDE
+        for prop, get, label in (
+            (1, mission_behavior_get, "behavior"),
+            (2, mission_icon_group_get, "icon group"),
+        ):
+            got = gba.call(ACCESSOR, [i, prop])
+            want = get(rom, entry)
+            type_checks += 1
+            if got != want:
+                type_ok = False
+                failures.append(f"mission {label} {i}: {got} != {want}")
+                break
+        if not type_ok:
+            break
+    type_anchors = {
+        i: (
+            mission_behavior_get(rom, BASE - 0x08000000 + i * STRIDE),
+            mission_icon_group_get(rom, BASE - 0x08000000 + i * STRIDE),
+        )
+        for i in (3, 15, 73, 130, 365)
+    }
+    expected_type_anchors = {
+        3: (3, 1),       # Herb Picking: Regular
+        15: (1, 1),      # The Bounty: Encounter override
+        73: (2, 2),      # Free Sprohm!: Free-Area
+        130: (0, 0),     # Dueling Sub: Non-Battle
+        365: (2, 3),     # Pam Le Fey: special group
+    }
+    type_names = {
+        i: mission_type_name(*value) for i, value in type_anchors.items()
+    }
+    type_ok = type_ok and type_anchors == expected_type_anchors
+    if type_anchors != expected_type_anchors:
+        failures.append(f"mission type anchors: {type_anchors}")
+    probe = bytearray(rom)
+    type_entry = BASE - 0x08000000 + 3 * STRIDE
+    keep_high = probe[type_entry + 2] & 0xC0
+    for behavior in range(8):
+        mission_behavior_set(probe, type_entry, behavior)
+        if (mission_behavior_get(probe, type_entry) != behavior or
+                probe[type_entry + 2] & 0xC0 != keep_high):
+            type_ok = False
+            failures.append(f"mission behavior packing failed for {behavior}")
+            break
+    for icon_group in range(8):
+        keep_behavior = mission_behavior_get(probe, type_entry)
+        mission_icon_group_set(probe, type_entry, icon_group)
+        if (mission_icon_group_get(probe, type_entry) != icon_group or
+                mission_behavior_get(probe, type_entry) != keep_behavior or
+                probe[type_entry + 2] & 0xC0 != keep_high):
+            type_ok = False
+            failures.append(f"mission icon packing failed for {icon_group}")
+            break
+    print(
+        f"9. mission behavior/type: {'OK' if type_ok else 'FAIL'} "
+        f"({type_checks} accessor reads; anchors {type_names}; packed edits "
+        "preserve adjacent bits)"
+    )
+
     if failures:
         print("\nFAIL:")
         for failure in failures[:10]:
             print(f"  - {failure}")
         return 1
-    print("\n8/8 mission checks passed")
+    print("\n9/9 mission checks passed")
     return 0
 
 

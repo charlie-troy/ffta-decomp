@@ -32,9 +32,9 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 2 — finish computed and packed mission properties |
 | Current work package | Identify the next mission property with an interpretable reader |
-| Last closed package | Mission-index boundary, map-symbol id, and script-trigger id |
+| Last closed package | Packed mission behavior and public icon type |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 8/8; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 9/9; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -59,6 +59,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.1a | 2026-08-24 | Named clan points and all eight clan-skill point rewards at `+0x2a..+0x32` | `tools/validate_missions.py`; `mission_table.py clan-rewards` |
 | M2.1b | 2026-08-24 | Named required and blocked dispatch jobs, base pub fee, and the retail-unused item exclusion | `validate_missions.py` 7/7; `mission_table.py job-rules`; byte-identical round-trip |
 | M2.2 | 2026-08-24 | Corrected mission index to 256 records at `0x08563A70`; named map-symbol and script-trigger ids | `mission_table.py index`; executed placement and trigger-selection paths; missions 8/8 |
+| M2.1c | 2026-08-24 | Exposed packed mission behavior and effective public type at `+0x02` | 1,024 accessor reads; packed edit checks; official-manual type anchors |
 
 ## Decisions and evidence
 
@@ -138,6 +139,27 @@ status and backlog tables are living sections and should be kept current.
   the script handler at `0x08123898` scans `+0x01` as its trigger key and then
   selects the record's `+0x02` mission id.
 
+### D-009 — Track argument-register aliases in caller reports
+
+- Problem: the old backward scan searched for any prior immediate assignment
+  to `r1`. At `0x08019512`, `movs r3, #0x3e; adds r1, r3, #0` caused the tool
+  to skip the real property and misreport an older mask constant `3`.
+- Decision: follow zero-cost `mov`/`adds #0`/`lsls #0` aliases backward and
+  stop at any other write to the live register.
+- Evidence: the regenerated 57-site report now assigns `0x08019512` to `0x3e`
+  and `0x080195A2` to `0x40`, while preserving the known `0x30` and `0x36`
+  readers.
+
+### D-010 — Separate internal behavior from player-facing mission type
+
+- Decision: expose `+0x02` bits 0–2 as a numeric behavior code, not a guessed
+  six-value enum. Expose bits 3–5 plus the behavior-1 override as the effective
+  public type.
+- Evidence: `sub_080CEBF8` selects the icon assets; the official manual defines
+  the corresponding Regular, Non-Battle, Encounter and Free-Area categories.
+- Product consequence: modders can safely edit both packed values while the
+  tool presents reliable public labels and preserves unknown subtype nuance.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -149,6 +171,39 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Caller-analysis repair and mission-type closure
+
+Objective:
+
+- Resume packed mission properties from the multi-caller report without
+  accepting a faulty analysis artifact.
+
+Completed:
+
+- Fixed `accessor_callers.py` to follow register aliases and stop at clobbers;
+  two properties previously reported as `3` are correctly `0x3e` and `0x40`.
+- Identified `+0x02` bits 0–2 as the internal behavior code and bits 3–5 as the
+  public icon group; behavior 1 overrides the icon to Encounter.
+- Added editable computed fields for behavior code, icon group, and effective
+  public mission type while preserving adjacent bits.
+- Added 1,024 executed accessor reads, anchor classification, and setter checks
+  to mission validation.
+
+Evidence recorded during the batch:
+
+- Dueling Sub: behavior 0 / Non-Battle.
+- The Bounty: behavior 1 / Encounter.
+- Free Sprohm!: behavior 2 / Free-Area.
+- Herb Picking: behavior 3 / Regular.
+- Pam Le Fey: behavior 2 / Special.
+- Mission validation: 9/9.
+
+Next action:
+
+- Regenerate and use the corrected caller report to resolve the next packed
+  mission family, preferring properties 16–18 because their UI readers are
+  small and already isolated.
 
 ### 2026-08-24 — Mission-index correction and field closure
 
