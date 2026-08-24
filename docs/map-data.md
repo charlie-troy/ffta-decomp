@@ -17,7 +17,7 @@ pointer diffs like `0x20380000` that fall outside the cartridge.
 |---|---|---|
 | `+0x00` | tile graphics | all 162 |
 | `+0x04` | tile arrangement | all 162 |
-| `+0x08` | unknown block | all 162 |
+| `+0x08` | clipping tilemap | all 162 |
 | `+0x0c` | palette | all 162 |
 | `+0x10` | height and permissions | all 162 |
 | `+0x14`, `+0x18`, `+0x1c` | animation blocks | 83 of 162 |
@@ -97,6 +97,27 @@ The former reported height values above 127 were packed-run destination and
 length bytes misread as cells. They disappear under the correct decoder; no
 height flag is implied by that evidence.
 
+## Clipping tilemap (`+0x08`)
+
+This block uses the same `u16 destination`, `u16 byte count`, halfword-run
+grammar as packed terrain, but its destinations address a two-layer visual
+tilemap. Each layer is 32x64 halfwords (`0x1000` bytes):
+`layer = address / 0x1000`, `x = (address % 0x40) / 2`, and
+`y = (address / 0x40) % 0x40`.
+
+The name is behavior-backed, not inherited blindly from external tooling.
+`sub_0801F2EC` loads map-table `+0x08`, clears the `0x2000`-byte buffer at
+`0x0200D1A0`, and calls `sub_0801EFB0` to expand its sparse runs. Render and
+occlusion paths then read the two `0x1000`-byte halves; the path at
+`0x0801D7A8` performs a direct zero/nonzero visibility test on a selected
+entry. This also agrees with FFTAUtils' independent “clipping data” label.
+
+All 162 logical maps decode: 156 contain local wrapped-LZ77 data and six
+redirect to another map. They expose 120,448 populated logical-map entries.
+Map 0 anchors the format with 112 runs and 771 entries. The CSV deliberately
+calls the payload a raw `tile_descriptor`; its bit-level art meaning is not
+needed to edit the clipping layer safely and is not claimed here.
+
 ## Editing
 
 ```bash
@@ -105,16 +126,20 @@ python tools/map_data.py terrain baserom.gba terrain.csv   # every tile
 python tools/map_data.py apply-terrain baserom.gba terrain.csv out.gba
 python tools/map_data.py arrangement baserom.gba arrangement.csv
 python tools/map_data.py apply-arrangement baserom.gba arrangement.csv out.gba
+python tools/map_data.py clipping baserom.gba clipping.csv
+python tools/map_data.py apply-clipping baserom.gba clipping.csv out.gba
 python tools/validate_maps.py baserom.gba
 ```
 
-Because compressed data must fit its original allocation, both apply commands
+Because compressed data must fit its original allocation, all apply commands
 recompress, measure, and refuse growth. Uncompressed arrangement blocks edit
 only the selected tile-id bytes. Redirected and pointer-aliased maps share
 storage; conflicting edits to the same underlying value are refused.
 
-Verified across all 162 logical maps: both unedited CSVs reproduce the ROM
+Verified across all 162 logical maps: all three unedited CSVs reproduce the ROM
 byte-for-byte. A compressed map-0 arrangement edit fits in 2,510 of 2,511
 bytes, an uncompressed map-24 edit writes its one-byte id in place, and a
 map-0 permission edit fits exactly in its 137-byte terrain allocation. A
 separate map-0 height edit that grew to 139 bytes was refused as designed.
+Changing map 0's first clipping descriptor from `0x0160` to `0x0161` survives
+re-read and recompresses to 1,483 of 1,485 available bytes.

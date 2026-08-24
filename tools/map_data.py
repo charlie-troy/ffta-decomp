@@ -5,6 +5,8 @@
     python tools/map_data.py apply-terrain     baserom.gba terrain.csv out.gba
     python tools/map_data.py arrangement       baserom.gba arrangement.csv
     python tools/map_data.py apply-arrangement baserom.gba arrangement.csv out.gba
+    python tools/map_data.py clipping          baserom.gba clipping.csv
+    python tools/map_data.py apply-clipping    baserom.gba clipping.csv out.gba
 """
 import csv
 import os
@@ -100,8 +102,8 @@ def parse_arrangement(raw):
             "record_end": p, "records": records}
 
 
-def parse_height(raw):
-    """Decode packed (height, permission) runs on the 16-column grid."""
+def parse_halfword_runs(raw):
+    """Decode sparse destination/byte-count records containing halfwords."""
     p = 0
     records = []
     while True:
@@ -119,6 +121,11 @@ def parse_height(raw):
         records.append((destination, byte_count // 2, p))
         p += byte_count
     return {"record_end": p, "records": records}
+
+
+def parse_height(raw):
+    """Decode packed (height, permission) runs on the 16-column grid."""
+    return parse_halfword_runs(raw)
 
 
 def _arrangement_cells(meta):
@@ -151,6 +158,23 @@ def _height_cells(meta):
                 "data_offset": data_offset, "tile": tile, "x": tile % 16,
                 "y": tile // 16, "height": meta["raw"][data_offset],
                 "permission": meta["raw"][data_offset + 1],
+            }
+    return parsed, cells
+
+
+def _clipping_cells(meta):
+    parsed = parse_halfword_runs(meta["raw"])
+    cells = {}
+    for record, (destination, count, values) in enumerate(parsed["records"]):
+        for slot in range(count):
+            data_offset = values + slot * 2
+            address = destination + slot * 2
+            cells[(record, slot)] = {
+                "data_offset": data_offset, "address": address,
+                "layer": address // 0x1000,
+                "x": (address % 0x40) // 2,
+                "y": (address // 0x40) % 0x40,
+                "tile_descriptor": _uint(meta["raw"], data_offset, 2),
             }
     return parsed, cells
 
@@ -207,6 +231,25 @@ def cmd_arrangement(rom_path, out_path):
                             cell["y"], cell["tile_id"], cell["width"]])
                 rows += 1
     print(f"wrote {out_path}: {rows} placements across {COUNT} logical maps")
+    return 0
+
+
+def cmd_clipping(rom_path, out_path):
+    rom = open(rom_path, "rb").read()
+    rows = 0
+    with open(out_path, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["map", "source_map", "record", "slot", "address", "layer",
+                    "x", "y", "tile_descriptor"])
+        for i in range(COUNT):
+            meta = resolve_block(rom, i, 0x08)
+            _, cells = _clipping_cells(meta)
+            for (record, slot), cell in cells.items():
+                w.writerow([i, meta["source_map"], record, slot,
+                            f"{cell['address']:#06x}", cell["layer"], cell["x"],
+                            cell["y"], f"{cell['tile_descriptor']:#06x}"])
+                rows += 1
+    print(f"wrote {out_path}: {rows} clipping tiles across {COUNT} logical maps")
     return 0
 
 
@@ -306,6 +349,15 @@ def cmd_apply_terrain(rom_path, csv_path, out_path):
     return _write_changed_blocks(rom, changes, out_path)
 
 
+def cmd_apply_clipping(rom_path, csv_path, out_path):
+    rom = bytearray(open(rom_path, "rb").read())
+    def requested(row, cell):
+        return (int(row["tile_descriptor"], 0),
+                cell["tile_descriptor"], 2)
+    changes = _collect_changes(rom, csv_path, 0x08, _clipping_cells, requested)
+    return _write_changed_blocks(rom, changes, out_path)
+
+
 def main(argv):
     try:
         if len(argv) == 3 and argv[0] == "table":
@@ -314,10 +366,14 @@ def main(argv):
             return cmd_terrain(argv[1], argv[2])
         if len(argv) == 3 and argv[0] == "arrangement":
             return cmd_arrangement(argv[1], argv[2])
+        if len(argv) == 3 and argv[0] == "clipping":
+            return cmd_clipping(argv[1], argv[2])
         if len(argv) == 4 and argv[0] == "apply-terrain":
             return cmd_apply_terrain(argv[1], argv[2], argv[3])
         if len(argv) == 4 and argv[0] == "apply-arrangement":
             return cmd_apply_arrangement(argv[1], argv[2], argv[3])
+        if len(argv) == 4 and argv[0] == "apply-clipping":
+            return cmd_apply_clipping(argv[1], argv[2], argv[3])
     except (OSError, ValueError, KeyError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

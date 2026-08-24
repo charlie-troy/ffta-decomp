@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 3 — map blocks beyond terrain |
-| Current work package | MAP3.2 — characterize map block `+0x08` |
-| Last closed package | MAP3.1 — tile arrangement and corrected packed terrain codec |
+| Current work package | MAP3.3 — implement GBA Huffman graphics decode |
+| Last closed package | MAP3.2 — clipping tilemap `+0x08` |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 6/6; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 8/8; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -43,7 +43,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.1 | P0 | Complete | Name caller-backed mission computed/packed properties | All 50 constant-property call sites are assigned to named, validated families; seven variable-id calls remain numeric |
 | M2.2 | P0 | Complete | Name mission-index `+0x00/+0x01` | Ordering/grouping role is proven by an identified reader; CSV names and a check are added |
 | MAP3.1 | P1 | Complete | Decode map tile arrangement `+0x04` | Dump/apply round-trips and map 0's two-layer layout is anchored against its 14x14 terrain grid |
-| MAP3.2 | P1 | Pending | Characterize map block `+0x08` | A reader identifies the block and one safe edit round-trips |
+| MAP3.2 | P1 | Complete | Characterize map block `+0x08` | The clipping loader/consumer are identified and a guarded descriptor edit round-trips |
 | MAP3.3 | P1 | Pending | Implement GBA Huffman graphics decode | Graphics block decodes reproducibly and malformed/growing data is rejected safely |
 | ITEM4.1 | P2 | Pending | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Each name has an identifiable reader and byte-identical round-trip |
 | AI5.1 | P2 | Pending | Expand unit-status and stat naming | Each new name has a behavioral or execution anchor |
@@ -65,6 +65,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.1f | 2026-08-24 | Named the cancellation flag at `+0x41` bit 2 | 512 accessor reads; three executed formatter paths; packed edit check |
 | M2.1g | 2026-08-24 | Named four hidden item/law-card reward-preview flags and closed the constant caller sweep | 2,048 accessor reads; live visible/hidden formatters; dormant branch injection |
 | MAP3.1 | 2026-08-24 | Decoded sparse two-layer arrangement runs and corrected the terrain packed-run codec | `validate_maps.py` 6/6; two byte-identical CSV round-trips; compressed/raw edit anchors |
+| MAP3.2 | 2026-08-24 | Identified and exposed the two-layer clipping tilemap at `+0x08` | `validate_maps.py` 8/8; loader/visibility readers; byte-identical and edited round-trips |
 
 ## Decisions and evidence
 
@@ -228,6 +229,17 @@ status and backlog tables are living sections and should be kept current.
 - Decision: one shared resolver handles compressed, uncompressed, and redirect
   forms; both apply paths preserve record topology and refuse growing blocks.
 
+### D-016 — Name `+0x08` from its runtime buffer and consumers
+
+- `sub_0801F2EC` resolves table `+0x08`, decompresses it, clears the
+  `0x2000`-byte destination at `0x0200D1A0`, and invokes the sparse-halfword
+  expander `sub_0801EFB0`.
+- Destinations cover two 32x64 halfword layers. Render/occlusion code reads
+  both halves, and the consumer at `0x0801D7A8` tests entries for visibility.
+- Decision: call it the clipping tilemap, agreeing with the independent editor,
+  while keeping each payload named only `tile_descriptor` until graphics
+  decoding proves more detailed bit semantics.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -239,6 +251,35 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Clipping tilemap
+
+Objective:
+
+- Identify map-table `+0x08` through retail readers and make one safe edit
+  round-trip.
+
+Completed:
+
+- Traced the loader, sparse halfword expander, `0x0200D1A0` destination, and
+  zero/nonzero visibility consumer.
+- Added `clipping` and `apply-clipping` CSV commands using the shared redirect,
+  alias-conflict, and allocation-growth controls.
+- Extended the map gate from 6 to 8 checks, including all-map format coverage,
+  byte-identical CSV application, and an edited re-read.
+
+Evidence recorded during the batch:
+
+- 156 maps store local LZ77 clipping data; six redirect. All 120,448 logical
+  populated entries are halfword-aligned and stay within layers 0/1.
+- Map 0 contains 112 runs and 771 descriptors.
+- Descriptor `0x0160 -> 0x0161` recompresses to 1,483/1,485 bytes and re-reads
+  as `0x0161` through the production parser.
+
+Next action:
+
+- Implement the GBA Huffman graphics decoder for map-table `+0x00`, including
+  malformed-input checks and reproducible decode anchors.
 
 ### 2026-08-24 — Map arrangement and packed-terrain correction
 

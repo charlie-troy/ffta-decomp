@@ -183,7 +183,9 @@ works both directions, so the pipeline exists and this is pure extension.
    runs, 8/16-bit variants, redirects, and raw/compressed storage are decoded
    and editable. Map 0 has 770 visual placements over a separate 14x14 terrain
    grid; the former 228-tile count was packed-stream bytes misread as cells.
-2. **The `+0x08` block**: decompress, characterize, and find its readers.
+2. **Clipping tilemap (`+0x08`) — done 2026-08-24.** Sparse halfword runs
+   expand into two 32x64 layers at `0x0200D1A0`; the loader and visibility
+   consumer are identified, and dump/apply plus a real edit round-trip pass.
 3. **Graphics** (`+0x00`): implement the GBA **Huffman** variant (the
    `0x20`/`0x22` first-byte range) in `tools/ffta_lz.py`, which today only does
    LZ77.

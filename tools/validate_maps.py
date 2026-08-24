@@ -3,14 +3,16 @@
     python tools/validate_maps.py baserom.gba
 """
 import argparse
+import csv
 import hashlib
 import os
 import tempfile
 
 from ffta_lz import block_length, pack
 from map_data import (COUNT, _arrangement_cells, _height_cells,
-                      cmd_apply_arrangement, cmd_apply_terrain,
-                      cmd_arrangement, cmd_terrain, resolve_block)
+                      _clipping_cells, cmd_apply_arrangement,
+                      cmd_apply_clipping, cmd_apply_terrain, cmd_arrangement,
+                      cmd_clipping, cmd_terrain, resolve_block)
 
 
 def main(argv=None):
@@ -78,6 +80,27 @@ def main(argv=None):
     if not ok:
         failures.append("packed terrain")
 
+    clipping = []
+    clipping_redirects = 0
+    aligned = valid_layers = True
+    for map_id in range(COUNT):
+        meta = resolve_block(rom, map_id, 0x08)
+        parsed, cells = _clipping_cells(meta)
+        clipping.append((meta, parsed, cells))
+        clipping_redirects += len(meta["chain"]) > 1
+        aligned &= all(cell["address"] % 2 == 0 for cell in cells.values())
+        valid_layers &= all(cell["layer"] in (0, 1) for cell in cells.values())
+    clipping_cells = sum(len(cells) for _, _, cells in clipping)
+    clip0_meta, clip0_parsed, clip0_cells = clipping[0]
+    ok = (clipping_redirects == 6 and clipping_cells == 120448 and aligned and
+          valid_layers and len(clip0_parsed["records"]) == 112 and
+          len(clip0_cells) == 771)
+    print(f"5. clipping tilemap: {'OK' if ok else 'FAIL'} "
+          f"({clipping_cells} tiles; map 0 has 112 runs/771 tiles; "
+          f"{clipping_redirects} redirects)")
+    if not ok:
+        failures.append("clipping tilemap")
+
     # Known edits prove both codecs can fit an actual retail allocation.
     arrangement_raw = bytearray(meta0["raw"])
     arrangement_raw[cells0[(0, 0)]["data_offset"]:
@@ -87,29 +110,61 @@ def main(argv=None):
     height_raw = bytearray(height_meta["raw"])
     height_raw[height_cells[(0, 1)]["data_offset"] + 1] = 0
     height_fit = len(pack(height_raw)) <= block_length(rom, height_meta["offset"])
-    ok = arrangement_fit and height_fit
-    print(f"5. guarded edit anchors: {'OK' if ok else 'FAIL'} "
-          f"(arrangement {arrangement_fit}; terrain {height_fit})")
+    clipping_raw = bytearray(clip0_meta["raw"])
+    clip_cell = clip0_cells[(0, 0)]
+    clipping_raw[clip_cell["data_offset"]:clip_cell["data_offset"] + 2] = \
+        (0x0161).to_bytes(2, "little")
+    clipping_fit = (len(pack(clipping_raw)) <=
+                    block_length(rom, clip0_meta["offset"]))
+    ok = arrangement_fit and height_fit and clipping_fit
+    print(f"6. guarded edit anchors: {'OK' if ok else 'FAIL'} "
+          f"(arrangement {arrangement_fit}; terrain {height_fit}; "
+          f"clipping {clipping_fit})")
     if not ok:
         failures.append("guarded edit anchors")
 
     with tempfile.TemporaryDirectory(prefix="ffta-map-validation-") as temp:
         arrangement_csv = os.path.join(temp, "arrangement.csv")
         terrain_csv = os.path.join(temp, "terrain.csv")
+        clipping_csv = os.path.join(temp, "clipping.csv")
         arrangement_rom = os.path.join(temp, "arrangement.gba")
         terrain_rom = os.path.join(temp, "terrain.gba")
+        clipping_rom = os.path.join(temp, "clipping.gba")
+        clipping_edit_csv = os.path.join(temp, "clipping-edit.csv")
+        clipping_edit_rom = os.path.join(temp, "clipping-edit.gba")
         cmd_arrangement(args.rom, arrangement_csv)
         cmd_apply_arrangement(args.rom, arrangement_csv, arrangement_rom)
         cmd_terrain(args.rom, terrain_csv)
         cmd_apply_terrain(args.rom, terrain_csv, terrain_rom)
+        cmd_clipping(args.rom, clipping_csv)
+        cmd_apply_clipping(args.rom, clipping_csv, clipping_rom)
         digest = hashlib.sha256(rom).digest()
         ok = (hashlib.sha256(open(arrangement_rom, "rb").read()).digest() == digest and
-              hashlib.sha256(open(terrain_rom, "rb").read()).digest() == digest)
-    print(f"6. unedited CSV round-trips: {'OK' if ok else 'FAIL'} (byte-identical)")
+              hashlib.sha256(open(terrain_rom, "rb").read()).digest() == digest and
+              hashlib.sha256(open(clipping_rom, "rb").read()).digest() == digest)
+
+        # A minimal partial CSV exercises the real apply path, not just pack().
+        with open(clipping_edit_csv, "w", newline="") as fh:
+            writer = csv.writer(fh)
+            writer.writerow(["map", "source_map", "record", "slot",
+                             "tile_descriptor"])
+            writer.writerow([0, 0, 0, 0, "0x0161"])
+        apply_ok = (cmd_apply_clipping(args.rom, clipping_edit_csv,
+                                       clipping_edit_rom) == 0)
+        edited = open(clipping_edit_rom, "rb").read()
+        _, edited_cells = _clipping_cells(resolve_block(edited, 0, 0x08))
+        edit_ok = (apply_ok and
+                   edited_cells[(0, 0)]["tile_descriptor"] == 0x0161)
+    print(f"7. unedited CSV round-trips: {'OK' if ok else 'FAIL'} (byte-identical)")
     if not ok:
         failures.append("unedited CSV round-trips")
 
-    print(f"\n{6 - len(failures)}/6 map checks passed")
+    print(f"8. clipping edit round-trip: {'OK' if edit_ok else 'FAIL'} "
+          f"(map 0 record 0 slot 0 -> 0x0161)")
+    if not edit_ok:
+        failures.append("clipping edit round-trip")
+
+    print(f"\n{8 - len(failures)}/8 map checks passed")
     return 1 if failures else 0
 
 
