@@ -32,9 +32,9 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.2c — named innate Zombie and its live-status bridge |
+| Last closed package | AI5.2d — named Yellow Card and corrected the persistent-field scope |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 8/8; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -75,7 +75,8 @@ status and backlog tables are living sections and should be kept current.
 | AI5.1c | 2026-08-24 | Expanded descriptor-backed names to 15 status bits | 15 named ability/effect/handler joins and bit round-trips; four secondary-effect confirmations |
 | AI5.2a | 2026-08-24 | Named stat `0x16` / unit `+0x1e` as max MP and corrected the direct-load count | Executed four-field stat reads; restoration clamp at `0x0809308A..C4` |
 | AI5.2b | 2026-08-24 | Named stats `0x17..0x1a` as Attack, Defense, Magic Power, and Resistance | Executed stat reads and item-property joins through four combat-total helpers |
-| AI5.2c | 2026-08-24 | Named stat `0x1b` as innate-status flags and bit `0x0800` as persistent Zombie | Zombify descriptor/handler chain; executed live/innate effective predicate; initializer setter join |
+| AI5.2c | 2026-08-24 | Named stat `0x1b` as persistent-status flags and bit `0x0800` as persistent Zombie | Zombify descriptor/handler chain; executed live/persistent effective predicate; initializer setter join |
+| AI5.2d | 2026-08-24 | Named persistent bit `0x0040` as Yellow Card and corrected the field's overly narrow innate label | Yellow Card descriptor/case-92 join; executed handler write to target `+0x28` |
 
 ## Decisions and evidence
 
@@ -296,7 +297,33 @@ status and backlog tables are living sections and should be kept current.
 
 ## Session log
 
-### 2026-08-24 — Innate Zombie bridge
+### 2026-08-24 — Yellow Card and persistent-field correction
+
+Objective:
+
+- Continue mapping the remaining `+0x28` bits and test whether the field is
+  exclusively innate.
+
+Completed:
+
+- Named `+0x28` bit `0x0040` as Yellow Card.
+- Corrected `innate_status_flags` to `persistent_status_flags`; Yellow Card is
+  applied during battle, so “innate” was too narrow for the whole field.
+- Added a ninth status validator check that executes the Yellow Card handler.
+
+Evidence recorded during the batch:
+
+- Yellow Card ability 344 stores raw effect 207; its descriptor selects case
+  92 and handler `0x081337F4`.
+- With a synthetic action context and target, executing that handler through
+  its store changes target `+0x28` from zero to exactly `0x0040`.
+
+Next action:
+
+- Trace the seven other observed `+0x28` masks from their accessor callers;
+  retain numeric names where a unique status or capability anchor is absent.
+
+### 2026-08-24 — Persistent Zombie bridge
 
 Objective:
 
@@ -304,7 +331,7 @@ Objective:
 
 Completed:
 
-- Named `+0x28` as an innate-status bitfield and bit `0x0800` as Zombie.
+- Named `+0x28` as a persistent-status bitfield and bit `0x0800` as Zombie.
 - Added Zombie as the sixteenth behavior-backed live status.
 - Extended the status validator from seven to eight checks.
 - Added behavior-backed names to `dump_stats.py` so regenerated output carries
@@ -315,13 +342,13 @@ Evidence recorded during the batch:
 - Zombify's raw effect 127 selects descriptor case 63; the case-63 handler at
   `0x081331F8` calls the `+0xe9` bit-3 setter.
 - `sub_081308F4` returns true for either live `+0xe9` bit 3 or stat `0x1b`
-  bit `0x0800`; execution returns 0/1/1 for blank/live/innate samples.
+  bit `0x0800`; execution returns 0/1/1 for blank/live/persistent samples.
 - The battle-status initializer at `0x08133A58` calls the same Zombie setter
   when the effective predicate succeeds.
 
 Next action:
 
-- Map the remaining `+0x28` innate bits through their effective-status readers;
+- Map the remaining `+0x28` persistent bits through their effective-status readers;
   retain numeric labels for any bit without a unique application/status join.
 
 ### 2026-08-24 — Base combat-stat joins

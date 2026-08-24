@@ -201,4 +201,24 @@ STATUS_FLAGS = [
     },
 ]
 
+# The compact unit field at +0x28 persists status-like conditions outside the
+# live +0xe8..+0xed flag block. Only entries with a direct ability/handler or
+# effective-status join belong here.
+PERSISTENT_STATUS_FLAGS = [
+    {
+        "name": "yellow_card",
+        "ability_name": "Yellow Card",
+        "ability_id": 344,
+        "raw_effect": 207,
+        "case": 92,
+        "handler": 0x081337F5,
+        "mask": 0x0040,
+    },
+    {
+        "name": "zombie",
+        "mask": 0x0800,
+        "effective_getter": 0x081308F4,
+    },
+]
+
 KNOWN_BY_GETTER = {entry["getter"]: entry["name"] for entry in STATUS_FLAGS}

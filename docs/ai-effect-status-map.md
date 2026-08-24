@@ -50,7 +50,7 @@ stronger route. Each four-byte descriptor's `+0x01` selects this internal case
 space. Named single-effect abilities therefore join directly to cases: Sleep
 raw effect 97 selects case 45, while Poison raw effect 125 selects case 61.
 The corresponding application handlers and executed getter/setter pairs then
-pin the unit bits without relying on list order. This route currently names 15
+pin the unit bits without relying on list order. This route currently names 16
 bits; secondary-effect abilities independently reconfirm Frog, Stop, Blind,
 and Poison.
 
@@ -92,6 +92,7 @@ and Poison.
 | 60 | 10, 49 | `sub_080CD9BC` | `+0xe9` bit 4 |
 | 61 | 10, 49 | `sub_080CD974` | `+0xe9` bit 1 — **Poison** |
 | 62 | 10, 49 | `sub_080CD974` | `+0xe9` bit 1 |
+| 63 | 10, 49 | `sub_08131030` | live `+0xe9` bit 3 or persistent `+0x28` bit 11 — **Zombie** |
 | 69 | 10, 49 | `sub_080CDBFC` | `+0xec` bit 4 |
 | 70 | 10, 49 | `sub_080CD9EC` | `+0xe9` bit 6 |
 | 71 | 10, 49 | `sub_080CDBB4` | `+0xec` bit 0 — **Addle** |
@@ -103,4 +104,4 @@ and Poison.
 | 80 | 10, 49 | `sub_080CDB6C` | `+0xeb` bit 5 — **Charm** |
 | 82 | 10, 49 | `sub_080CDB0C` | `+0xeb` bit 1 — **Protect** |
 | 83 | 10, 49 | `sub_080CDAF4` | `+0xeb` bit 0 — **Shell** |
-| 92 | - | `sub_080C832C` | `+0x28` bit 6 |
+| 92 | - | `sub_080C832C` | `+0x28` bit 6 — **Yellow Card** |

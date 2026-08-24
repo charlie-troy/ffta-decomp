@@ -30,7 +30,7 @@ KNOWN = {
     0x18: "defense",
     0x19: "magic_power",
     0x1A: "resistance",
-    0x1B: "innate_status_flags",
+    0x1B: "persistent_status_flags",
 }
 
 

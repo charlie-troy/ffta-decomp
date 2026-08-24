@@ -7,7 +7,7 @@ import struct
 
 from emulate import Gba
 from ffta_names import Names
-from status_flags import STATUS_FLAGS
+from status_flags import STATUS_FLAGS, PERSISTENT_STATUS_FLAGS
 from thumb import bl_target, find_extent
 
 HANDLER_TABLE = 0x083A87B4
@@ -19,6 +19,7 @@ HIT_READER = 0x0812C8DC
 STAT_GETTER = 0x080C7EA4
 EFFECTIVE_ZOMBIE = 0x081308F4
 STATUS_INITIALIZER = 0x08133A58
+YELLOW_CARD_HANDLER = 0x081337F4
 ROM = 0x08000000
 
 
@@ -170,23 +171,45 @@ def main(argv=None):
     live_zombie = gba.call(EFFECTIVE_ZOMBIE, [unit])
     gba.reset_ram()
     gba.uc.mem_write(unit + 0x28, struct.pack("<H", 0x0800))
-    innate_zombie = gba.call(EFFECTIVE_ZOMBIE, [unit])
+    persistent_zombie = gba.call(EFFECTIVE_ZOMBIE, [unit])
     effective_calls = calls_from(rom, EFFECTIVE_ZOMBIE, 0x0813091C)
     init_calls = calls_from(rom, STATUS_INITIALIZER, 0x08133AC0)
-    innate_ok = ((blank_zombie, live_zombie, innate_zombie) == (0, 1, 1) and
+    persistent_ok = ((blank_zombie, live_zombie,
+                      persistent_zombie) == (0, 1, 1) and
                  STAT_GETTER in effective_calls and
                  0x080CD9A4 in effective_calls and
                  0x080CDE80 in init_calls)
-    print(f"8. innate Zombie bridge: {'OK' if innate_ok else 'FAIL'} "
-          f"(blank/live/innate={blank_zombie}/{live_zombie}/{innate_zombie})")
-    if not innate_ok:
-        failures.append("innate Zombie bridge")
+    print(f"8. persistent Zombie bridge: {'OK' if persistent_ok else 'FAIL'} "
+          f"(blank/live/persistent={blank_zombie}/{live_zombie}/{persistent_zombie})")
+    if not persistent_ok:
+        failures.append("persistent Zombie bridge")
+
+    yellow = next(entry for entry in PERSISTENT_STATUS_FLAGS
+                  if entry["name"] == "yellow_card")
+    raw_effect = rom[ABILITY_TABLE - ROM +
+                     yellow["ability_id"] * ABILITY_STRIDE + 0x0C]
+    descriptor_case = rom[EFFECT_TABLE - ROM + raw_effect * 4 + 1]
+    handler_pointer = pointers[yellow["case"] - 1]
+    context, target = 0x02001400, 0x02001600
+    gba.reset_ram()
+    gba.write32(context + 4, target)
+    gba.write8(0x02003C33, 1)
+    gba.run_range(YELLOW_CARD_HANDLER, 0x0813382E, {"r0": context})
+    persistent = struct.unpack("<H", gba.uc.mem_read(target + 0x28, 2))[0]
+    yellow_ok = (raw_effect == yellow["raw_effect"] and
+                 descriptor_case == yellow["case"] and
+                 handler_pointer == yellow["handler"] and
+                 persistent == yellow["mask"])
+    print(f"9. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
+          f"(unit +0x28={persistent:#06x})")
+    if not yellow_ok:
+        failures.append("Yellow Card persistent flag")
 
     print()
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 8/8 status checks")
+    print("PASS: 9/9 status checks")
     return 0
 
 

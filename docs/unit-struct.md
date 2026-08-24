@@ -21,7 +21,7 @@ counted address-returning cases as direct loads.
 | `0x18` | `+0x22` | u16 | **Defense** | `sub_080CA6B4` adds equipped item property 11 (defense) to this base |
 | `0x19` | `+0x24` | u16 | **Magic Power** | `sub_080CA66C` adds equipped item property 12 (magic power) to this base |
 | `0x1a` | `+0x26` | u16 | **Resistance** | `sub_080CA6FC` adds equipped item property 13 (resistance) to this base |
-| `0x1b` | `+0x28` | u16 | **innate status flags** *(partially decoded)* | bit `0x0800` makes the effective Zombie predicate true and is copied into the live Zombie status during initialization |
+| `0x1b` | `+0x28` | u16 | **persistent status flags** *(partially decoded)* | bit `0x0040` is Yellow Card; bit `0x0800` is persistent Zombie |
 
 ## Full table
 
@@ -67,5 +67,7 @@ the u16 block, with MP immediately after it.
 The executed restoration clamp makes the first four fields two complete pairs:
 current/max HP, then current/max MP. The next four are the unit's base physical
 and magical combat stats in Attack/Defense and Magic Power/Resistance pairs.
-The next field is a persistent-status bitfield; only its Zombie bit is named so
-far, so the remaining bits stay numeric.
+The next field is a persistent-status bitfield. Yellow Card's application
+handler writes bit `0x0040`; bit `0x0800` satisfies the effective Zombie
+predicate and is copied into the live Zombie status during initialization.
+The remaining bits stay numeric.

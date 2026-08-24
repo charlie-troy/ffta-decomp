@@ -262,7 +262,7 @@ behaviour mod needs to reach.
    descriptor and executed behavior name Speed Down (`+0xec` bit 2 / case
    20), Sleep (`+0xeb` bit 2 / case 45), Slow (`+0xea` bit 6 / case 51), Haste
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
-   `tools/validate_statuses.py` is the eight-check regression gate. Raw ability
+   `tools/validate_statuses.py` is the nine-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
    the four-byte descriptor table at `0x08553E70`. The same join now names 16
    bits total, adding Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and
@@ -275,8 +275,8 @@ behaviour mod needs to reach.
    `0x17..0x1a` / unit `+0x20..+0x26` are now Attack, Defense, Magic Power, and
    Resistance; the four total-stat helpers join them to item properties 10–13.
    The AI validator executes both groups. Stat `0x1b` / unit `+0x28` is now an
-   innate-status bitfield with bit `0x0800` proven as persistent Zombie; the
-   other bits remain numeric.
+   persistent-status bitfield with bit `0x0040` proven as Yellow Card and bit
+   `0x0800` proven as persistent Zombie; the other bits remain numeric.
 4. Decompile the **capability setters** `0x080CE420`–`0x080CE480`.
 5. Resolve whether **resistance slot 2** (a real slot no field id reaches) is
    read by any path.
