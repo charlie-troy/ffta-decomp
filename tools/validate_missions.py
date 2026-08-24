@@ -18,6 +18,8 @@ from mission_table import (CLAN_SKILLS, JOB_KIND_BASE, JOB_KIND_STRIDE,
                            availability_days_get, availability_days_set,
                            blocked_item_get, blocked_item_set,
                            blocked_job_get, blocked_job_set,
+                           cancellation_allowed_get,
+                           cancellation_allowed_set,
                            clear_condition_get, clear_condition_set,
                            clear_count_get, clear_count_set,
                            mission_behavior_get, mission_behavior_set,
@@ -37,12 +39,14 @@ APPLY_CLAN_REWARD = 0x08046850
 ADJUST_FEE = 0x080CEC78
 RATE_DISPATCH = 0x080CF310
 CHECK_REQUIREMENTS = 0x080CEECC
+MISSION_TEXT_EXPAND = 0x08013C20
 INDEX_PLACEMENT = 0x08045400
 INDEX_TRIGGER = 0x08123898
 CLAN_STATE = 0x020021B4
 MAP_SYMBOL_STATE = 0x02002CC3
 SELECTED_MISSION = 0x02002170
 SELECTED_INDEX = 0x02003C2A
+UI_SELECTED_MISSION = 0x020020DC
 
 INDEX_BASE = 0x08563A70
 INDEX_STRIDE = 12
@@ -587,12 +591,61 @@ def main(argv=None):
         "packed edits preserve adjacent bits)"
     )
 
+    cancel_ok = True
+    cancel_checks = 0
+    for i in range(COUNT):
+        entry = BASE - 0x08000000 + i * STRIDE
+        got = gba.call(ACCESSOR, [i, 0x37])
+        want = cancellation_allowed_get(rom, entry)
+        cancel_checks += 1
+        if got != want:
+            cancel_ok = False
+            failures.append(f"mission cancellation flag {i}: {got} != {want}")
+            break
+    cancel_anchors = {1: 0, 28: 1, 104: 0, 365: 0}
+    got_cancel_anchors = {
+        i: cancellation_allowed_get(
+            rom, BASE - 0x08000000 + i * STRIDE)
+        for i in cancel_anchors
+    }
+    if got_cancel_anchors != cancel_anchors:
+        cancel_ok = False
+        failures.append(f"cancellation anchors: {got_cancel_anchors}")
+
+    probe = bytearray(rom)
+    cancel_entry = BASE - 0x08000000 + 28 * STRIDE
+    keep_41 = probe[cancel_entry + 0x41] & 0xFB
+    for value in (0, 1):
+        cancellation_allowed_set(probe, cancel_entry, value)
+        if (cancellation_allowed_get(probe, cancel_entry) != value or
+                probe[cancel_entry + 0x41] & 0xFB != keep_41):
+            cancel_ok = False
+            failures.append(f"cancellation packing failed for {value}")
+            break
+
+    # Text control 0x13 selects one of three retail strings: cancellation
+    # accepted, no cancellations, or immediate start for the special group.
+    text_widths = {}
+    for mission in (1, 28, 365):
+        gba.reset_ram()
+        gba.uc.mem_write(UI_SELECTED_MISSION, mission.to_bytes(2, "little"))
+        text_widths[mission] = gba.call(MISSION_TEXT_EXPAND, [0x13])
+    expected_widths = {1: 38, 28: 44, 365: 58}
+    if text_widths != expected_widths:
+        cancel_ok = False
+        failures.append(f"cancellation text paths: {text_widths}")
+    print(
+        f"12. mission cancellation: {'OK' if cancel_ok else 'FAIL'} "
+        f"({cancel_checks} accessor reads; anchors {got_cancel_anchors}; "
+        f"text widths {text_widths}; packed edit preserves adjacent bits)"
+    )
+
     if failures:
         print("\nFAIL:")
         for failure in failures[:10]:
             print(f"  - {failure}")
         return 1
-    print("\n11/11 mission checks passed")
+    print("\n12/12 mission checks passed")
     return 0
 
 

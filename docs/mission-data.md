@@ -134,6 +134,19 @@ the alloy missions require Smithing 15, and the later alloy orders require
 The CSV exposes both packed fields and preserves the other nibble and the upper
 five bits of `+0x39`.
 
+## Cancellation rule
+
+Accessor property `0x37` is **cancellation allowed**, stored at `+0x41` bit 2.
+The mission-information formatter's control code `0x13` selects resource 8
+when the bit is set (`Cancellations Accepted`) and resource 9 when it is clear
+(`No Cancellations`). Icon group 3 overrides both with
+`Mission Begins Immediately`.
+
+The validator executes all 512 flag reads and the formatter itself for one
+mission on each presentation path: Snowball Fight cannot be cancelled, a
+Wanted! mission can, and Pam Le Fey starts immediately. The computed CSV setter
+preserves all seven adjacent flag bits.
+
 ## Mission behavior and public type
 
 Mission `+0x02` is packed. Accessor property 1 returns bits 0–2, the engine's
@@ -270,6 +283,7 @@ Named, with the code or the game as evidence:
 | `+0x10` bits 6–7, `+0x11` bits 0–3 | clear count | property 18; count used by the selected clear condition |
 | `+0x38` bits 0–3 | required clan-skill code | property 46; codes 1–8 select the eight named clan skills |
 | `+0x38` bits 4–7, `+0x39` bits 0–2 | required clan-skill level | property 47; acceptance compares the selected clan level against it |
+| `+0x41` bit 2 | cancellation allowed | property 55; selects accepted/no-cancellation text unless the mission starts immediately |
 | `+0x39` bits 3–7, `+0x3a` bit 0 | required dispatch job | roster filter requires the canonical job code (property 48) |
 | `+0x3c` bits 2–7 | blocked dispatch job | a matching canonical job returns rating 0 in `sub_080CF310` |
 | `+0x3d` | dormant blocked dispatch item, −375 | rating gate is executable, but all retail entries are zero (property 53) |

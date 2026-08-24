@@ -214,6 +214,18 @@ def required_clan_skill_level_set(data, entry, value):
     data[entry + 0x39] = (data[entry + 0x39] & 0xF8) | (value >> 4)
 
 
+def cancellation_allowed_get(data, entry):
+    """Decode accessor property 0x37 from +0x41 bit 2."""
+    return (data[entry + 0x41] >> 2) & 1
+
+
+def cancellation_allowed_set(data, entry, value):
+    """Set the cancellation flag while preserving adjacent mission flags."""
+    if value not in (0, 1):
+        raise ValueError("cancellation allowed must be 0 or 1")
+    data[entry + 0x41] = (data[entry + 0x41] & 0xFB) | (value << 2)
+
+
 def required_job_get(data, entry):
     """Decode accessor property 0x30 from packed mission bytes."""
     return (data[entry + 0x39] >> 3) | ((data[entry + 0x3A] & 0x01) << 5)
@@ -277,6 +289,7 @@ def cmd_dump(rom_path, out_path):
                     "clear_condition_code", "clear_condition", "clear_count",
                     "required_clan_skill_code", "required_clan_skill",
                     "required_clan_skill_level",
+                    "cancellation_allowed",
                     "required_job_code", "required_job",
                     "blocked_dispatch_job_code", "blocked_dispatch_job",
                     "blocked_dispatch_item_id", "blocked_dispatch_item"])
@@ -290,6 +303,7 @@ def cmd_dump(rom_path, out_path):
             clear_count = clear_count_get(rom, b)
             required_skill = required_clan_skill_get(rom, b)
             required_skill_level = required_clan_skill_level_get(rom, b)
+            cancellation_allowed = cancellation_allowed_get(rom, b)
             required_job = required_job_get(rom, b)
             blocked_job = blocked_job_get(rom, b)
             blocked_item = blocked_item_get(rom, b)
@@ -300,6 +314,7 @@ def cmd_dump(rom_path, out_path):
                         CLEAR_CONDITIONS.get(clear_condition, ""), clear_count,
                         required_skill, CLAN_SKILLS.get(required_skill, ""),
                         required_skill_level,
+                        cancellation_allowed,
                         required_job,
                         job_names.get(required_job, ""),
                         blocked_job, job_names.get(blocked_job, ""),
@@ -326,6 +341,7 @@ def cmd_apply(rom_path, csv_path, out_path):
             original_required_skill = required_clan_skill_get(rom, p)
             original_required_skill_level = required_clan_skill_level_get(
                 rom, p)
+            original_cancellation_allowed = cancellation_allowed_get(rom, p)
             original_required_job = required_job_get(rom, p)
             original_blocked_job = blocked_job_get(rom, p)
             original_blocked_item = blocked_item_get(rom, p)
@@ -425,6 +441,18 @@ def cmd_apply(rom_path, csv_path, out_path):
                     before = required_clan_skill_level_get(rom, p)
                     required_clan_skill_level_set(rom, p, requested)
                     print(f"  id {i:>3} required_clan_skill_level: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("cancellation_allowed", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if requested not in (0, 1):
+                    print(f"  id {i} cancellation_allowed: {requested} must "
+                          "be 0 or 1, skipped")
+                elif requested != original_cancellation_allowed:
+                    before = cancellation_allowed_get(rom, p)
+                    cancellation_allowed_set(rom, p, requested)
+                    print(f"  id {i:>3} cancellation_allowed: "
                           f"{before} -> {requested}")
                     changes += 1
             requested = row.get("required_job_code", "")

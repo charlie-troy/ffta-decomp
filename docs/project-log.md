@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 2 — finish computed and packed mission properties |
-| Current work package | Resolve mission property `0x37` from its UI reader |
-| Last closed package | Clan-skill acceptance requirement and reward-label correction |
+| Current work package | Resolve remaining mission UI properties `0x3e/0x40` |
+| Last closed package | Mission cancellation rule |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 11/11; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 12/12; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -62,6 +62,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.1c | 2026-08-24 | Exposed packed mission behavior and effective public type at `+0x02` | 1,024 accessor reads; packed edit checks; official-manual type anchors |
 | M2.1d | 2026-08-24 | Named availability days, clear-condition code, and clear count | 1,536 accessor reads; published mission anchors; packed edit checks |
 | M2.1e | 2026-08-24 | Named required clan skill/level and corrected four reward labels | 1,024 accessor reads; executed Combat 9/10 boundary; published anchors |
+| M2.1f | 2026-08-24 | Named the cancellation flag at `+0x41` bit 2 | 512 accessor reads; three executed formatter paths; packed edit check |
 
 ## Decisions and evidence
 
@@ -188,6 +189,16 @@ status and backlog tables are living sections and should be kept current.
   Smithing/Craft to Smithing/Craft/Appraise/Gather. The bytes and prior
   application tests were sound; only those four semantic labels were wrong.
 
+### D-013 — Property `0x37` controls mission cancellation
+
+- The property is `+0x41` bit 2. Its sole reader is the mission-information
+  text formatter's control code `0x13`.
+- Set selects `Cancellations Accepted`; clear selects `No Cancellations`.
+  Special icon group 3 overrides the flag with `Mission Begins Immediately`.
+- Execution evidence: the formatter returns the three distinct retail outputs
+  for Wanted!, Snowball Fight, and Pam Le Fey. All 512 accessor reads and the
+  packed setter also pass.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -199,6 +210,30 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Cancellation-rule closure
+
+Objective:
+
+- Resolve property `0x37` from its isolated mission-information reader.
+
+Completed:
+
+- Named `+0x41` bit 2 as the cancellation-allowed flag.
+- Added a computed CSV column and a setter preserving the other seven bits.
+- Executed all 512 accessor reads and all three formatter outcomes.
+
+Evidence recorded during the batch:
+
+- Snowball Fight: No Cancellations.
+- Wanted!: Cancellations Accepted.
+- Pam Le Fey: Mission Begins Immediately via the special-group override.
+- Mission validation: 12/12.
+
+Next action:
+
+- Resolve properties `0x3e/0x40` from their remaining mission-information UI
+  readers, then reassess whether Phase 2 has any high-confidence callers left.
 
 ### 2026-08-24 — Clan-skill requirement closure and reward-label correction
 

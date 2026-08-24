@@ -149,11 +149,14 @@ remaining work is naming the other computed/packed properties.
    one of the eight clan-skill levels and its required threshold. The complete
    acceptance predicate rejects Twin Swords at Combat 9 and accepts it at 10.
    This path also corrected four previously swapped reward-column labels.
-9. Expose every newly-named field in `tools/mission_table.py`,
+9. **Cancellation rule — done 2026-08-24.** Property `0x37` is `+0x41` bit 2.
+   The executed mission formatter selects Cancellations Accepted, No
+   Cancellations, or the special-group Mission Begins Immediately path.
+10. Expose every newly-named field in `tools/mission_table.py`,
    round-trip-verified, and add a validation check. **Done for the nine clan
    progression fields, dispatch job rules, dormant dispatch item rule, pub
    fee, mission type, availability/clear fields, and clan-skill
-   requirements**; repeat for later discoveries.
+   requirements, and the cancellation flag**; repeat for later discoveries.
 
 **Done when:** a known mission's full reward is reproducible from named data,
 and every new field round-trips byte-identically.
