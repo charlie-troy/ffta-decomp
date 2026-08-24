@@ -108,15 +108,17 @@ remaining work is naming the other computed/packed properties.
 
 **Steps:**
 
-1. For each of the 30 non-plain-load properties, find a reader using
-   `tools/field_callers.py` and `tools/accessor_callers.py --target 0x080CE4DC`.
-2. Attack properties **33–41** first: nine consecutive bytes at
-   `+0x2a`–`+0x32`, all round multiples of 5/10 ≤ 100. They are player-visible
-   (the mission detail renderer draws them as a prominent number plus a 3×3
-   grid) but not read by the dispatch calculator, so their exact meaning is
-   still open — see `docs/mission-data.md`. The dispatch path instead uses
-   `+0x43`/`+0x44`, which **is** now named as the dispatch threshold
-   (`sub_080CF310` scores a unit against it and returns a 1–5 rating).
+1. For each non-plain-load property, find a reader using
+   `tools/accessor_callers.py --target 0x080CE4DC --reg r1`. Do not use
+   `tools/field_callers.py` here; that older script is hard-coded to the job
+   accessor and its `r2` field-id convention.
+2. **Properties 33–41 — done 2026-08-24.** The nine bytes at
+   `+0x2a`–`+0x32` are clan progression rewards: clan points, then Combat,
+   Magic, Appraise, Gather, Smithing, Craft, Negotiate and Track skill points.
+   `sub_08046850` applies each byte to the matching progress counter, and
+   `tools/validate_missions.py` checks all 4,608 accessor reads plus one
+   executed application per track. The dispatch path instead uses
+   `+0x43`/`+0x44`, the separately named dispatch threshold.
 3. **Reward source — done.** The rewards are stored, not computed: gil is
    `+0x33` ×200, AP is `+0x34` ×10, item reward is `+0x35`. The earlier
    "not in the table" result was wrong on two counts: the gil scale factor
@@ -127,7 +129,8 @@ remaining work is naming the other computed/packed properties.
    (0–179). The table boundary is now corrected to 255 records; the two leading
    fields remain positional until a reader proves their ordering/grouping role.
 5. Expose every newly-named field in `tools/mission_table.py`,
-   round-trip-verified, and add a validation check.
+   round-trip-verified, and add a validation check. **Done for the nine clan
+   progression fields**; repeat for later discoveries.
 
 **Done when:** a known mission's full reward is reproducible from named data,
 and every new field round-trips byte-identically.

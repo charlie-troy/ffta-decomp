@@ -4,6 +4,11 @@ Reverse engineering Final Fantasy Tactics Advance (GBA, USA). Read
 [README.md](README.md) first for what the project is; this file is about how to
 work on it without repeating mistakes already made.
 
+Then read [docs/project-log.md](docs/project-log.md). It is the operational
+source of truth for the active work package, backlog order, risks, decisions,
+and dated evidence. Update it in the same change as any material discovery or
+priority change; do not leave project state only in chat.
+
 ## The goal shapes what is worth doing
 
 The point is **making the game moddable, especially the battle AI**, not
@@ -104,7 +109,8 @@ Genuinely open, with the reason:
 ## Before you commit
 
 ```bash
-python tools/validate_ai.py "<rom>"     # must stay 8/8
+python tools/validate_ai.py "<rom>"      # must stay 8/8
+python tools/validate_missions.py "<rom>" # must stay 4/4 when missions change
 ```
 
 Every table tool must round-trip: dumping and re-applying an unedited CSV has

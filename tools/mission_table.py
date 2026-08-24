@@ -15,6 +15,7 @@ mission id. Dump it with the `index` command.
     python tools/mission_table.py apply baserom.gba missions.csv out.gba
     python tools/mission_table.py index baserom.gba mission-index.csv
     python tools/mission_table.py rewards baserom.gba mission-rewards.csv
+    python tools/mission_table.py clan-rewards baserom.gba clan-rewards.csv
 """
 import csv
 import os
@@ -40,6 +41,15 @@ assert IDX_BASE + IDX_COUNT * IDX_STRIDE == IDX_END
 NAMED = {
     0x00: "mission_id_lo",          # +0x00/+0x01 little-endian entry index
     0x01: "mission_id_hi",
+    0x2A: "clan_points",            # points toward the next clan level
+    0x2B: "combat_points",          # eight clan-skill progress rewards
+    0x2C: "magic_points",
+    0x2D: "appraise_points",
+    0x2E: "gather_points",
+    0x2F: "smithing_points",
+    0x30: "craft_points",
+    0x31: "negotiate_points",
+    0x32: "track_points",
     0x33: "gil_units_200",          # accessor prop 30 multiplies by 200
     0x34: "ap_units_10",            # displayed reward multiplies by 10
     0x35: "item_reward_id",         # accessor prop 29
@@ -57,6 +67,18 @@ NAMED = {
 # properties 19-24 and 32, so each is the start of a four-byte slot the caller
 # reads itself rather than a value the accessor returns.
 SLOTS = (0x12, 0x16, 0x1A, 0x1E, 0x22, 0x2A)
+
+CLAN_REWARDS = (
+    (0x2A, "clan_points"),
+    (0x2B, "combat_points"),
+    (0x2C, "magic_points"),
+    (0x2D, "appraise_points"),
+    (0x2E, "gather_points"),
+    (0x2F, "smithing_points"),
+    (0x30, "craft_points"),
+    (0x31, "negotiate_points"),
+    (0x32, "track_points"),
+)
 
 
 def col(o):
@@ -141,6 +163,25 @@ def cmd_rewards(rom_path, out_path):
     return 0 if ok else 1
 
 
+def cmd_clan_rewards(rom_path, out_path):
+    """Dump the clan and clan-skill progress awarded by each mission."""
+    rom = open(rom_path, "rb").read()
+    names = Names(rom)
+    rows = 0
+    with open(out_path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["id", "name"] + [name for _off, name in CLAN_REWARDS])
+        for i in range(COUNT):
+            b = BASE + i * STRIDE
+            values = [rom[b + off] for off, _name in CLAN_REWARDS]
+            if not any(values):
+                continue
+            w.writerow([i, names.mission(i)] + values)
+            rows += 1
+    print(f"wrote {out_path}: {rows} missions with clan progression rewards")
+    return 0
+
+
 def cmd_index(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
@@ -206,6 +247,8 @@ def main(argv):
         return cmd_requires(argv[1], argv[2])
     if len(argv) == 3 and argv[0] == "rewards":
         return cmd_rewards(argv[1], argv[2])
+    if len(argv) == 3 and argv[0] == "clan-rewards":
+        return cmd_clan_rewards(argv[1], argv[2])
     if len(argv) == 3 and argv[0] == "index":
         return cmd_index(argv[1], argv[2])
     print(__doc__)

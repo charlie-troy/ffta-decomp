@@ -78,13 +78,33 @@ The check is worth more than its own result: producing it correctly requires
 the mission table, the two properties, the item id space and the text decoder
 to all be right at once, so it validates the lot.
 
-Properties 33–41 read nine consecutive bytes at `+0x2a`–`+0x32`, all round
-multiples of 5 and 10 capped at 100. They are **player-visible**: the mission
-detail renderer `sub_080461D4` formats `+0x2a` as a 1–3 digit number (the
-value never exceeds 100, but the code handles three digits) and draws the rest
-in a 3×3 grid. They are *not* read by the dispatch calculator
-(`sub_080CF310`, below), so they are display data rather than hidden weights;
-the exact game meaning of the grid is still open.
+Properties 33–41 read nine consecutive bytes at `+0x2a`–`+0x32`. They are the
+mission's **clan progression rewards**, in points:
+
+| offset | property | reward |
+|---|---:|---|
+| `+0x2a` | 33 | clan points |
+| `+0x2b` | 34 | Combat skill points |
+| `+0x2c` | 35 | Magic skill points |
+| `+0x2d` | 36 | Appraise skill points |
+| `+0x2e` | 37 | Gather skill points |
+| `+0x2f` | 38 | Smithing skill points |
+| `+0x30` | 39 | Craft skill points |
+| `+0x31` | 40 | Negotiate skill points |
+| `+0x32` | 41 | Track skill points |
+
+The code path is direct. `sub_08046850(mission, ..., index, ...)` adds
+`mission[+0x2a + index]` to the matching level-progress byte in the nine-pair
+clan state at `0x020021B4`; reaching 100 advances that level. The completion
+renderer `sub_080461D4` labels `+0x2a` as `Clan Pts:` and draws the eight skill
+levels in the same order used by the
+[official manual](https://www.nintendo.com/eu/media/downloads/games_8/emanuals/game_boy_advance_8/Manual_GameBoyAdvance_FinalFantasyTacticsAdvance_EN_DE_FR_ES_IT.pdf).
+The standalone validator runs 4,608 accessor reads and then executes
+`sub_08046850` once for every track, proving that each byte reaches its matching
+progress counter.
+
+They are not dispatch-calculator weights. `sub_080CF310` never reads this
+block; it uses the separate dispatch threshold at `+0x43/+0x44`.
 
 ## Gil, AP and item rewards are in this table
 
@@ -153,6 +173,8 @@ Named, with the code or the game as evidence:
 | field | meaning | basis |
 |---|---|---|
 | `+0x00`/`+0x01` | mission id | little-endian; equals the entry index on all 512 |
+| `+0x2a` | clan points | applied to clan progress by `sub_08046850`; completion UI says `Clan Pts:` |
+| `+0x2b`–`+0x32` | eight clan-skill point rewards | applied to the eight paired skill counters; order documented above |
 | `+0x33` | gil reward, ÷200 | accessor property 30 multiplies by 200; matches Herb Picking's 600 |
 | `+0x34` | AP reward, ÷10 | matches Herb Picking's 40 and Over The Hill's 80 |
 | `+0x35` | item reward id | resolves to the Wanted! sword rewards, Kotetsu, etc. |
@@ -214,7 +236,9 @@ formation table that could be dumped to CSV.
 python tools/mission_table.py dump  baserom.gba missions.csv
 python tools/mission_table.py apply baserom.gba missions.csv out.gba
 python tools/mission_table.py index baserom.gba mission-index.csv
+python tools/mission_table.py clan-rewards baserom.gba clan-rewards.csv
 python tools/mission_props.py baserom.gba          # all 65 property ids -> columns
+python tools/validate_missions.py baserom.gba      # execution-backed field checks
 ```
 
 Columns are named only where the code showed what a field does; the rest keep

@@ -282,6 +282,10 @@ No FFTA decompilation exists. These are worth reading before duplicating work:
 The remaining work, in order, is written up as a step-by-step roadmap in
 [docs/roadmap.md](docs/roadmap.md).
 
+Current execution state, decisions, risks, and dated evidence are maintained in
+[docs/project-log.md](docs/project-log.md). Start there when resuming work and
+update it with every material batch.
+
 All four of the original goals are done: the leaf batch, the linker script and
 full rebuild, the CI gate, and progress reporting.
 
@@ -291,7 +295,7 @@ discover about them. See [docs/job-table.md](docs/job-table.md).
 
 The former highest-risk live-validation item is now closed.
 
-1. **Mission fields.** Rewards are named; the remaining computed and packed
-   fields need identifiable readers.
+1. **Mission fields.** Gil/AP/item and clan progression rewards are named; the
+   remaining computed and packed fields need identifiable readers.
 2. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
    `+0x08` block and the Huffman-compressed graphics do not yet.
