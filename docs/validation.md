@@ -13,10 +13,11 @@ No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
 ROM and blank RAM under Unicorn, then calls functions with chosen arguments and
 synthetic units built in RAM.
 
-`validate_missions.py` is the equivalent gate for mission data. Its four
-checks cover all 512 mission ids, all 4,608 clan-reward property reads, the
-executed reward-application path for clan points plus all eight clan skills,
-and the two known gil/AP reward anchors.
+`validate_missions.py` is the equivalent gate for mission data. Its seven
+checks cover all 512 mission ids; all 4,608 clan-reward reads and nine executed
+application paths; required/blocked dispatch jobs and safe packed edits; all
+512 base-fee reads plus adjusted-price anchors; the dormant item-exclusion
+path; and the two known gil/AP reward anchors.
 
 ## The eight checks
 

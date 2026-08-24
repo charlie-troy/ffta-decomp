@@ -39,8 +39,10 @@ with no unknown codes. See [docs/text.md](docs/text.md).
 
 Mission data is mapped in [docs/mission-data.md](docs/mission-data.md), which
 was undocumented anywhere and had to be found by scanning the ROM for table
-accessors. That scan also settles a negative: there is no formation table,
-because battle setups are scripted one unit at a time.
+accessors. Rewards, clan progression, required and blocked dispatch jobs, pub
+information fees, and dispatch difficulty are directly editable. That scan
+also settles a negative: there is no formation table, because battle setups
+are scripted one unit at a time.
 
 Map data is mapped as well, in [docs/map-data.md](docs/map-data.md). The
 blocks are compressed, the codec is implemented in both directions, and
@@ -295,7 +297,8 @@ discover about them. See [docs/job-table.md](docs/job-table.md).
 
 The former highest-risk live-validation item is now closed.
 
-1. **Mission fields.** Gil/AP/item and clan progression rewards are named; the
-   remaining computed and packed fields need identifiable readers.
+1. **Mission fields.** Rewards, clan progression, dispatch job rules, pub fees,
+   and dispatch difficulty are named; remaining computed/packed properties and
+   mission-index grouping still need identifiable readers.
 2. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
    `+0x08` block and the Huffman-compressed graphics do not yet.

@@ -16,6 +16,7 @@ mission id. Dump it with the `index` command.
     python tools/mission_table.py index baserom.gba mission-index.csv
     python tools/mission_table.py rewards baserom.gba mission-rewards.csv
     python tools/mission_table.py clan-rewards baserom.gba clan-rewards.csv
+    python tools/mission_table.py job-rules baserom.gba jobs.csv
 """
 import csv
 import os
@@ -32,6 +33,13 @@ IDX_BASE = 0x08563A7C - 0x08000000
 IDX_STRIDE = 12
 IDX_COUNT = 255
 IDX_END = 0x08564670 - 0x08000000  # next table; referenced directly by code
+
+# sub_080C93F0(job_id) returns byte 1 of each two-byte record here. The value
+# normalizes duplicate job ids (for example each race's White Mage) to one
+# canonical job code used by mission requirements.
+JOB_KIND_BASE = 0x085231F4 - 0x08000000
+JOB_KIND_STRIDE = 2
+JOB_COUNT = 116
 
 assert IDX_BASE + IDX_COUNT * IDX_STRIDE == IDX_END
 
@@ -55,11 +63,13 @@ NAMED = {
     0x35: "item_reward_id",         # accessor prop 29
     0x36: "require_item1_minus_375", # accessor prop 42 adds 375 (0 = none)
     0x37: "require_item2_minus_375", # accessor prop 44 adds 375 (0 = none)
+    0x3D: "blocked_dispatch_item_minus_375", # prop 53; unused in retail
+    0x3E: "fee_units_200",          # accessor prop 54; adjusted by pub/turf
 }
 # +0x45 equals the low mission id only for entries 0-122 (except 27) and is
 # zero for most later entries. It is not a general id echo, so it stays b45.
-# +0x3e is a second 200-unit field: accessor prop 54 does the same *0xC8
-# multiply. Its meaning is not pinned yet, so it stays positional.
+# +0x39/+0x3a pack accessor property 0x30, the required dispatch job. It is
+# exposed as a computed CSV field because neither raw byte can be named alone.
 # +0x43/+0x44 is the dispatch threshold (16-bit, accessor prop 59):
 # sub_080CF310 scores a dispatched unit against it and returns a 1-5 rating.
 # It stays positional because the CSV is one byte per column.
@@ -85,15 +95,77 @@ def col(o):
     return NAMED.get(o, f"b{o:02x}")
 
 
+def required_job_get(data, entry):
+    """Decode accessor property 0x30 from packed mission bytes."""
+    return (data[entry + 0x39] >> 3) | ((data[entry + 0x3A] & 0x01) << 5)
+
+
+def required_job_set(data, entry, value):
+    """Set property 0x30 while preserving unrelated bits in both bytes."""
+    if not 0 <= value <= 0x3F:
+        raise ValueError("required job code must fit 6 bits")
+    data[entry + 0x39] = (data[entry + 0x39] & 0x07) | ((value & 0x1F) << 3)
+    data[entry + 0x3A] = (data[entry + 0x3A] & 0xFE) | ((value >> 5) & 0x01)
+
+
+def blocked_job_get(data, entry):
+    """Decode the dispatch-rating job exclusion from +0x3c bits 2..7."""
+    return data[entry + 0x3C] >> 2
+
+
+def blocked_job_set(data, entry, value):
+    """Set the dispatch job exclusion while preserving +0x3c bits 0..1."""
+    if not 0 <= value <= 0x3F:
+        raise ValueError("blocked job code must fit 6 bits")
+    data[entry + 0x3C] = (data[entry + 0x3C] & 0x03) | (value << 2)
+
+
+def blocked_item_get(data, entry):
+    """Decode the dormant dispatch-item exclusion as a public item id."""
+    value = data[entry + 0x3D]
+    return value + 375 if value else 0
+
+
+def blocked_item_set(data, entry, value):
+    """Set the dormant exclusion (0 or item id 376..630)."""
+    if value == 0:
+        data[entry + 0x3D] = 0
+    elif 376 <= value <= 630:
+        data[entry + 0x3D] = value - 375
+    else:
+        raise ValueError("blocked dispatch item must be 0 or item id 376..630")
+
+
+def job_code_names(rom, names):
+    """Return canonical display names keyed by normalized job code."""
+    out = {0: ""}
+    for job in range(JOB_COUNT):
+        code = rom[JOB_KIND_BASE + job * JOB_KIND_STRIDE + 1]
+        name = names.job(job)
+        if code and name and code not in out:
+            out[code] = name
+    return out
+
+
 def cmd_dump(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
         w = csv.writer(fh)
         names = Names(rom)
-        w.writerow(["id", "name"] + [col(o) for o in range(STRIDE)])
+        w.writerow(["id", "name"] + [col(o) for o in range(STRIDE)] +
+                   ["required_job_code", "required_job",
+                    "blocked_dispatch_job_code", "blocked_dispatch_job",
+                    "blocked_dispatch_item_id", "blocked_dispatch_item"])
+        job_names = job_code_names(rom, names)
         for i in range(COUNT):
             b = BASE + i * STRIDE
-            w.writerow([i, names.mission(i)] + list(rom[b:b + STRIDE]))
+            required_job = required_job_get(rom, b)
+            blocked_job = blocked_job_get(rom, b)
+            blocked_item = blocked_item_get(rom, b)
+            w.writerow([i, names.mission(i)] + list(rom[b:b + STRIDE]) +
+                       [required_job, job_names.get(required_job, ""),
+                        blocked_job, job_names.get(blocked_job, ""),
+                        blocked_item, names.item_by_id(blocked_item)])
     print(f"wrote {out_path}: {COUNT} entries, {STRIDE} bytes each")
     return 0
 
@@ -107,6 +179,10 @@ def cmd_apply(rom_path, csv_path, out_path):
             if not 0 <= i < COUNT:
                 print(f"  skipping out-of-range id {i}")
                 continue
+            p = BASE + i * STRIDE
+            original_required_job = required_job_get(rom, p)
+            original_blocked_job = blocked_job_get(rom, p)
+            original_blocked_item = blocked_item_get(rom, p)
             for o in range(STRIDE):
                 name = col(o)
                 if name not in row or row[name] == "":
@@ -115,10 +191,47 @@ def cmd_apply(rom_path, csv_path, out_path):
                 if not 0 <= new < 256:
                     print(f"  id {i} {name}: {new} does not fit a byte, skipped")
                     continue
-                p = BASE + i * STRIDE + o
-                if rom[p] != new:
-                    print(f"  id {i:>3} {name} (+{o:#04x}): {rom[p]} -> {new}")
-                    rom[p] = new
+                field = p + o
+                if rom[field] != new:
+                    print(f"  id {i:>3} {name} (+{o:#04x}): "
+                          f"{rom[field]} -> {new}")
+                    rom[field] = new
+                    changes += 1
+            requested = row.get("required_job_code", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 0x3F:
+                    print(f"  id {i} required_job_code: {requested} does not "
+                          "fit 6 bits, skipped")
+                elif requested != original_required_job:
+                    before = required_job_get(rom, p)
+                    required_job_set(rom, p, requested)
+                    print(f"  id {i:>3} required_job_code: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("blocked_dispatch_job_code", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 0x3F:
+                    print(f"  id {i} blocked_dispatch_job_code: {requested} "
+                          "does not fit 6 bits, skipped")
+                elif requested != original_blocked_job:
+                    before = blocked_job_get(rom, p)
+                    blocked_job_set(rom, p, requested)
+                    print(f"  id {i:>3} blocked_dispatch_job_code: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("blocked_dispatch_item_id", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if requested != 0 and not 376 <= requested <= 630:
+                    print(f"  id {i} blocked_dispatch_item_id: {requested} "
+                          "must be 0 or 376..630, skipped")
+                elif requested != original_blocked_item:
+                    before = blocked_item_get(rom, p)
+                    blocked_item_set(rom, p, requested)
+                    print(f"  id {i:>3} blocked_dispatch_item_id: "
+                          f"{before} -> {requested}")
                     changes += 1
     open(out_path, "wb").write(rom)
     print()
@@ -179,6 +292,30 @@ def cmd_clan_rewards(rom_path, out_path):
             w.writerow([i, names.mission(i)] + values)
             rows += 1
     print(f"wrote {out_path}: {rows} missions with clan progression rewards")
+    return 0
+
+
+def cmd_job_rules(rom_path, out_path):
+    """Dump required and blocked job rules for dispatch missions."""
+    rom = open(rom_path, "rb").read()
+    names = Names(rom)
+    job_names = job_code_names(rom, names)
+    rows = 0
+    with open(out_path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.writer(fh)
+        w.writerow(["id", "name", "required_job_code", "required_job",
+                    "blocked_dispatch_job_code", "blocked_dispatch_job"])
+        for i in range(COUNT):
+            b = BASE + i * STRIDE
+            required = required_job_get(rom, b)
+            blocked = blocked_job_get(rom, b)
+            if not (required or blocked):
+                continue
+            w.writerow([i, names.mission(i), required,
+                        job_names.get(required, ""), blocked,
+                        job_names.get(blocked, "")])
+            rows += 1
+    print(f"wrote {out_path}: {rows} missions with a dispatch job rule")
     return 0
 
 
@@ -249,6 +386,8 @@ def main(argv):
         return cmd_rewards(argv[1], argv[2])
     if len(argv) == 3 and argv[0] == "clan-rewards":
         return cmd_clan_rewards(argv[1], argv[2])
+    if len(argv) == 3 and argv[0] == "job-rules":
+        return cmd_job_rules(argv[1], argv[2])
     if len(argv) == 3 and argv[0] == "index":
         return cmd_index(argv[1], argv[2])
     print(__doc__)

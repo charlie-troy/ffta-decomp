@@ -125,12 +125,19 @@ remaining work is naming the other computed/packed properties.
    (200) was not in the searched set, and the second anchor was mislabeled —
    "Thesis Hunt = 28,600 gil / 80 AP" is actually **Over The Hill** (mission
    25). Thesis Hunt is 4,000 gil / 40 AP. See `docs/mission-data.md`.
-4. Name the mission index fields at `0x08563A7C`: `+0x00` (0–30) and `+0x01`
+4. **Dispatch jobs and pub fee — done 2026-08-24.** Property 48 is the packed
+   required job; `+0x3c` bits 2–7 are the opposite, a blocked job; `+0x3e`
+   ×200 is the base pub information fee before turf pricing. The dormant
+   `+0x3d` dispatch-item exclusion is validated but clear in every retail
+   mission. `validate_missions.py` executes all relevant readers and rating
+   branches, and computed CSV edits preserve adjacent packed bits.
+5. Name the mission index fields at `0x08563A7C`: `+0x00` (0–30) and `+0x01`
    (0–179). The table boundary is now corrected to 255 records; the two leading
    fields remain positional until a reader proves their ordering/grouping role.
-5. Expose every newly-named field in `tools/mission_table.py`,
+6. Expose every newly-named field in `tools/mission_table.py`,
    round-trip-verified, and add a validation check. **Done for the nine clan
-   progression fields**; repeat for later discoveries.
+   progression fields, dispatch job rules, dormant dispatch item rule, and pub
+   fee**; repeat for later discoveries.
 
 **Done when:** a known mission's full reward is reproducible from named data,
 and every new field round-trips byte-identically.

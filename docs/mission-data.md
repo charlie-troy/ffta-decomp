@@ -56,8 +56,12 @@ The observed range 0–496 is 375 plus a byte of up to 121. Because 0 means
 "none", a mission can only require a quest/loot item (id ≥ 376), never a
 combat item from the 376-entry stat table.
 
-`+0x3d` (property 53) goes through the same `sub_080CB4A4` remap, so it is a
-third quest-item slot — but it is 0 in all 512 missions, i.e. unused data.
+`+0x3d` (property 53) goes through the same `sub_080CB4A4` remap. It is a
+dormant **dispatch-item exclusion**, not a third acceptance requirement:
+`sub_080CF310` returns rating 0 when its raw value matches either item slot on
+the dispatch record. All 512 retail missions leave it zero. The validator
+patches the ROM map in memory to prove both the `+375` accessor remap and the
+two rejection branches without claiming that retail content uses them.
 
 With the text decoded, this is now checkable end to end, and it holds:
 
@@ -135,12 +139,13 @@ gil is scaled by 200 — not in that set. With the right mission and the right
 scale the whole thing locks together, and the rewards turn out to be stored in
 the table, not computed from type/rank.
 
-`+0x3e` is a second 200-unit field: accessor property 54 does the same ×0xC8
-multiply. `sub_080CEC78` reads it as a base amount and returns
-`base ± base × factor/100`, where the factor comes from two per-index tables
-(96-byte and 12-byte records), so it is a gil-valued quantity that receives a
-percentage adjustment. Its exact game meaning is still open, not a reward
-claim.
+`+0x3e` is the **base pub information fee**, in units of 200 gil. Accessor
+property 54 performs the ×200 conversion. `sub_080CEC78` applies the active
+town/turf percentage modifier before mission acceptance compares the result
+with clan funds. Executing that path in an unliberated-town state changes Herb
+Picking from 200 to 300 gil and Thesis Hunt from 600 to 900 gil. Clocktower's
+stored base is 1,600 gil; its published 1,280-gil listing is the same value
+after a 20% discount.
 
 ## Dispatch rating (`sub_080CF310`)
 
@@ -148,9 +153,10 @@ This function scores a unit against a mission and returns a 1–5 rating, which
 is how the game judges a dispatched unit before a non-battle mission resolves.
 
 - It first checks two hard gates and returns 0 (unusable) if either fails:
-  `+0x3c` bits 2–7 are compared against `sub_080C93F0(unit[+7])` — a job/race
-  requirement — and `+0x3d` (the quest-item remap) is checked against two item
-  slots on the dispatch record.
+  `+0x3c` bits 2–7 are a **blocked job code**, compared against the canonical
+  job code returned by `sub_080C93F0(unit[+7])`; dormant `+0x3d` is checked
+  against two item slots on the dispatch record when the caller enables that
+  gate.
 - The score is a weighted sum read from a 9-entry table at `0x08527E2A`:
   `2 × level + max HP + MP + attack + defense + magic power + magic resist`
   (the four combat terms via `sub_080CA400`/`sub_080CA478`), two boolean
@@ -166,6 +172,14 @@ So `+0x43`/`+0x44` is the **dispatch threshold** — a named field this project
 contributes rather than adopts — and the rating is a coarse difficulty readout,
 not a success percentage.
 
+The separate **required dispatch job** is accessor property 48, packed across
+`+0x39` bits 3–7 and `+0x3a` bit 0. A roster filter accepts only units whose
+canonical job code matches it. Retail anchors are Dueling Sub → Soldier, Run
+For Fun → Juggler, and Clocktower → Gadgeteer. The Match demonstrates the
+opposite rule at `+0x3c`: it blocks Soldier (rating 0) while an otherwise
+identical Paladin reaches rating 5. `mission_table.py` exposes both packed
+fields as safe computed columns and preserves their adjacent bits on edits.
+
 ## What the field-naming attempts did and did not establish
 
 Named, with the code or the game as evidence:
@@ -178,7 +192,10 @@ Named, with the code or the game as evidence:
 | `+0x33` | gil reward, ÷200 | accessor property 30 multiplies by 200; matches Herb Picking's 600 |
 | `+0x34` | AP reward, ÷10 | matches Herb Picking's 40 and Over The Hill's 80 |
 | `+0x35` | item reward id | resolves to the Wanted! sword rewards, Kotetsu, etc. |
-| `+0x3c` bits 2–7 | job/race requirement | `sub_080CF310` compares it against `sub_080C93F0(unit[+7])` |
+| `+0x39` bits 3–7, `+0x3a` bit 0 | required dispatch job | roster filter requires the canonical job code (property 48) |
+| `+0x3c` bits 2–7 | blocked dispatch job | a matching canonical job returns rating 0 in `sub_080CF310` |
+| `+0x3d` | dormant blocked dispatch item, −375 | rating gate is executable, but all retail entries are zero (property 53) |
+| `+0x3e` | base pub information fee, ÷200 | property 54 multiplies by 200; `sub_080CEC78` applies turf pricing |
 | `+0x43`/`+0x44` | dispatch threshold | 16-bit; `sub_080CF310` scores a unit against it (property 59) |
 | property 42 | first required item | byte `+0x36` + 375; verified against 7 real missions |
 | property 44 | second required item | byte `+0x37` + 375; same check |
