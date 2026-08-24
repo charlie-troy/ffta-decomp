@@ -42,9 +42,9 @@ For every slot, in order:
 
 1. If `sub_080CD92C(unit)` is set (`+0xe8` bit 6), the unit is skipped: CT and
    carry are both zeroed.
-2. Otherwise `speed = sub_0812E368(unit)` — the signed item speed, halved under
-   one status and doubled under another (Slow / Haste, per `docs/item-table.md`).
-   If speed is 0 the unit is also skipped.
+2. Otherwise `speed = sub_0812E368(unit)` — the signed item speed, halved by
+   Speed Down, Sleep, or Slow and doubled by Haste. Slow and Haste both apply,
+   so their shifts cancel. If speed is 0 the unit is also skipped.
 3. If `sub_080CDCEC(unit)` is set (`+0xed` bit 6), skip again.
 4. Otherwise **`CT += speed + carry`**, then `carry = 0`.
 
@@ -94,7 +94,7 @@ role of `+0xd6c` and the `-100` is left open rather than guessed.
 ## What this contributes
 
 - **Turn-order code identified**, the last static piece of Phase 1.
-- **Three status bits acquire behavioural handles**, which is the exact
+- **Seven status/capability bits now have behavioural handles**, which is the exact
   technique Phase 5 (`docs/roadmap.md`) wants extended:
 
 | getter | bit | role in the turn loop |
@@ -102,15 +102,20 @@ role of `+0xd6c` and the `-100` is left open rather than guessed.
 | `sub_080CD8B4` | `+0xe8` bit 1 | must be **set** to be in the active list — the "present/alive" eligibility flag |
 | `sub_080CD92C` | `+0xe8` bit 6 | when **set**, the unit never charges (CT zeroed, never selected) — a turn-suppressing status |
 | `sub_080CDCEC` | `+0xed` bit 6 | when **set**, the unit is skipped by both the tick and the actor scan — a second turn-suppressing status |
+| `sub_080CDA34` | `+0xec` bit 2 | **Speed Down**; halves effective speed |
+| `sub_080CDA64` | `+0xea` bit 1 | **Sleep**; halves effective speed and makes the target easier to hit |
+| `sub_080CDAC4` | `+0xea` bit 6 | **Slow**; halves effective speed |
+| `sub_080CDAAC` | `+0xea` bit 5 | **Haste**; doubles effective speed |
 
-These are recorded as behaviour, not as names: the project rule is to not
-enshrine a meaning without verification, and "this bit removes a unit from the
-turn queue" is the observable behaviour regardless of which debuff it is.
+The first three remain behavior descriptions rather than status names. The
+last four have independent naming anchors and are protected by
+`tools/validate_statuses.py`. This preserves the project rule: do not enshrine
+a semantic name without more than a plausible bit position.
 
 ## Open questions
 
 1. The `0x1000` carry preload and the `-100` secondary-list write — exact
    game meaning (this is what the live mGBA trace in Phase 1 is for).
-2. Which debuffs sit on `+0xe8` bits 1/6 and `+0xed` bit 6 — resolvable by
+2. Which states sit on `+0xe8` bits 1/6 and `+0xed` bit 6 — resolvable by
    freezing each status in the game and watching whether the unit still takes
    turns.

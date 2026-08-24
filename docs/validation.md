@@ -9,6 +9,7 @@ python tools/validate_ai.py baserom.gba
 python tools/validate_missions.py baserom.gba
 python tools/validate_maps.py baserom.gba
 python tools/validate_items.py baserom.gba
+python tools/validate_statuses.py baserom.gba
 ```
 
 No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
@@ -32,6 +33,12 @@ palette object paths, preserve the final OAM palette packing and shop-pool
 reader anchors, force a live bit-3 price boundary, reproduce an unedited CSV
 byte for byte, and prove a two-field icon edit changes exactly two accessor-
 visible bytes.
+
+`validate_statuses.py` is the behavior-backed status-name gate. Its six checks
+verify the 92-entry application-handler table; join Speed Down, Sleep, Slow,
+and Haste to their setters; execute all four getter/setter pairs; measure the
+effective-speed shifts; exercise Sleep's hit-chance branch; and preserve the
+independent Speed Down display and Slow/Haste adjacency anchors.
 
 ## The eight checks
 

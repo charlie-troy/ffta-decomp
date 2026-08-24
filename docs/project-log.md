@@ -32,9 +32,9 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | ITEM4.1 — item icons, flags, and Phase 4 closure |
+| Last closed package | AI5.1a — Speed Down, Sleep, Slow, and Haste status joins |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 6/6; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -70,6 +70,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.3 | 2026-08-24 | Corrected the Huffman assumption and decoded custom-LZSS 4bpp graphics | 50/50 retail byte matches; malformed-input rejection; 162-row/50-file export |
 | MAP3.4 | 2026-08-24 | Decoded animation metadata/frames, corrected `+0x1c`, and executed render-mode selection | maps 14/14; 83/28 animation coverage; 324 mode selections; 124-frame export |
 | ITEM4.1 | 2026-08-24 | Named icon graphics/palette and all eight item flags; closed Phase 4 | `validate_items.py` 8/8; 7,144 accessor loads; 375 icon paths; executed price boundary; byte-identical/edit round-trips |
+| AI5.1a | 2026-08-24 | Joined Speed Down, Sleep, Slow, and Haste to unit bits and application cases | `validate_statuses.py` 6/6; executed getter/setters, speed shifts, Sleep accuracy, and independent naming anchors |
 
 ## Decisions and evidence
 
@@ -266,6 +267,16 @@ status and backlog tables are living sections and should be kept current.
 - Decision: close Phase 3 with decode/export coverage. Editing compressed
   graphics remains withheld until a compatible encoder exists.
 
+### D-019 — Keep ability effects and status application cases separate
+
+- The ability table's raw effect id selects effect metadata and is not the
+  status handler table index.
+- The application table at `0x083A87B4` has 92 twelve-byte records; its
+  one-based cases 20, 37, 51, and 52 join to the setters for Speed Down,
+  Sleep, Slow, and Haste respectively.
+- Decision: name a status only from its handler join plus independent runtime
+  behavior. Do not infer equality between the two numeric namespaces.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -277,6 +288,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — First behavior-backed status batch
+
+Objective:
+
+- Begin AI5.1 by naming status bits from executable consequences and their
+  retail application handlers.
+
+Completed:
+
+- Added a shared status-name registry consumed by `tools/flag_map.py`.
+- Joined Speed Down, Sleep, Slow, and Haste to their unit bits, setters, and
+  one-based application cases.
+- Added a standalone six-check status validator and corrected the turn-order
+  and item-speed documentation to include all four speed-affecting states.
+
+Evidence recorded during the batch:
+
+- All 92 application-table entries are executable Thumb handlers at a
+  12-byte stride; cases 20/37/51/52 call the expected setters.
+- All four getter/setter pairs clear and set their unit bits in execution.
+- With base speed 100, Speed Down, Sleep, and Slow return 50; Haste returns
+  200; Slow plus Haste returns 100.
+- Sleep raises a synthetic ordinary hit chance from 95 to 100; Speed Down
+  independently selects the red stat-display palette.
+
+Next action:
+
+- Continue AI5.1 at the per-turn status processor to identify Poison from HP
+  loss, then propagate that name through the same handler/bit registry.
 
 ### 2026-08-24 — Item icons, flags, and Phase 4 closure
 

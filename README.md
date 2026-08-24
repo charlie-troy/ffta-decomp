@@ -57,6 +57,12 @@ the same damage term as the job table's unarmed attack, icon graphics/palettes
 are named, and the hand-use, discount, shop-tier, and special-pool flag bits
 are independently editable.
 
+The unit-status map now has behavior-backed names for Silence, Reflect, Speed
+Down, Sleep, Slow, and Haste. The status validator executes the four new
+getter/setter joins and their speed, accuracy, and display consequences; see
+[docs/unit-flags.md](docs/unit-flags.md) and
+[docs/validation.md](docs/validation.md).
+
 Written up in [docs/ai-findings.md](docs/ai-findings.md),
 [docs/ability-table.md](docs/ability-table.md),
 [docs/ai-case-rules.md](docs/ai-case-rules.md),

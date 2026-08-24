@@ -82,8 +82,9 @@ rules; it does not prove there is no further rule that dominates them.
    chain is `sub_0809E1E0` -> `sub_0809E05C` (turn manager) -> `sub_0809DF7C`
    (CT tick). CT accumulates by the slow/haste-adjusted speed, a unit acts at
    CT > 1000, and the advance subtracts `min(max_CT - 1000, 500)` from every
-   unit with a fractional carry. Three status bits acquire behavioural handles
-   (`+0xe8` bits 1/6, `+0xed` bit 6). The live turn is captured in
+   unit with a fractional carry. Seven status/capability bits now have
+   behavioural handles: three eligibility/suppression bits plus Speed Down,
+   Sleep, Slow, and Haste. The live turn is captured in
    `docs/whole-battle-trace.md`.
 6. **Freeze the RNG — done.** `tools/mgba_replay_ai_turn.lua` writes
    `0x12345678` at `0x030034B0`; two traces reproduce exactly.
@@ -257,7 +258,11 @@ behaviour mod needs to reach.
 2. Find the **behavioural sites**: per-turn damage = Poison, clear-on-hit =
    Sleep, etc. Each names one bit, and the already-mapped **inflict/cancel
    adjacency** (46 of 60 case bodies ↔ bits) propagates the name to its case
-   ids.
+   ids. **In progress 2026-08-24:** the 92-entry application table and executed
+   behavior name Speed Down (`+0xec` bit 2 / case 20), Sleep (`+0xea` bit 1 /
+   case 37), Slow (`+0xea` bit 6 / case 51), and Haste (`+0xea` bit 5 / case
+   52). `tools/validate_statuses.py` is the six-check regression gate. Ability
+   effect ids remain a separate numeric namespace.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
    (`+0x04`–`+0x14`) and the unnamed `u16`s — by finding code that reads a stat
    and does something identifiable, exactly as the HP pair was pinned.

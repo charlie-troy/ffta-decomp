@@ -1,7 +1,8 @@
 # Unit struct flags
 
-Derived entirely from the 100 matched accessors in `src/generated`, which
-each encode the struct byte and bit they touch. Regenerate with
+The layout is derived from the 100 matched accessors in `src/generated`, which
+each encode the struct byte and bit they touch. Behavior-backed names are kept
+in `tools/status_flags.py`. Regenerate both views with
 `python tools/flag_map.py --md`.
 
 Bit *meanings* are not yet known. What is known is the layout, and which
@@ -95,9 +96,19 @@ separate, smaller family that is not yet decompiled.
 
 | getter | status | how |
 |---|---|---|
+| `sub_080CDA34` | **Speed Down** | `+0xec` bit 2. Status case 20 calls its setter; `sub_0812E368` halves effective speed, and the stat display changes the speed value from its ordinary palette to the red penalty palette |
+| `sub_080CDA64` | **Sleep** | `+0xea` bit 1. Status case 37 calls its setter; it halves effective speed and `sub_0812C8DC` forces an ordinary attack's hit chance from 95 to 100 against a sleeping target |
+| `sub_080CDAC4` | **Slow** | `+0xea` bit 6. Status case 51 calls its setter and `sub_0812E368` halves effective speed |
+| `sub_080CDAAC` | **Haste** | `+0xea` bit 5. Status case 52 calls its setter and `sub_0812E368` doubles effective speed; its handler is adjacent to Slow and the two effects cancel in execution |
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 | `sub_080CDB54` | blocked-by-status, unidentified | same shape with property `0x18` (flag bit 13), which no public list names |
+
+`tools/validate_statuses.py` protects the first four joins independently: it
+checks the 92-entry handler table, executes every getter/setter pair, runs the
+speed arithmetic, exercises Sleep's hit-chance branch, and preserves the
+separate display/adjacency anchors. The status handler case numbers are not
+ability-table effect ids; those are separate namespaces.
 
 Two patterns name a status bit, both keyed on a documented ability flag:
 

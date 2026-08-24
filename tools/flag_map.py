@@ -14,6 +14,8 @@ import sys
 import glob
 import collections
 
+from status_flags import KNOWN_BY_GETTER
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 FILLER = re.compile(r"filler_00\[(0x[0-9a-fA-F]+|\d+)\]")
@@ -75,6 +77,16 @@ def main(argv):
         print(f"\n{len(keys)} distinct flag bits, {paired} with both a getter and a setter")
         offs = collections.Counter(k[0] for k in keys)
         print("bits per struct byte: " + ", ".join(f"{o:#x}:{n}" for o, n in sorted(offs.items())))
+    named = [(f"sub_{getter:08X}", name)
+             for getter, name in sorted(KNOWN_BY_GETTER.items())]
+    if md:
+        print("\n| getter | behavior-backed name |")
+        print("|---|---|")
+        for getter, name in named:
+            print(f"| `{getter}` | {name} |")
+    else:
+        print("behavior-backed names: " +
+              ", ".join(f"{getter}={name}" for getter, name in named))
     return 0
 
 
