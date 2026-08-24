@@ -103,7 +103,9 @@ Genuinely open, with the reason:
   rewards, progression, dispatch rules, fees, type, deadlines, clear
   conditions, clan-skill requirements, cancellation, and hidden reward previews
   are named. Seven variable-id calls remain, but do not block map work.
-- **Remaining map blocks.** Huffman-compressed graphics are the active target.
+- **Remaining map blocks.** Animation blocks and mode bytes are active. The
+  graphics wrapper was proven to be custom LZSS, not Huffman; do not reopen
+  that old assumption.
 - **Formations do not exist** — battle setups are scripted, one Place Character
   opcode per unit. Do not go looking for a formation table.
 
@@ -112,7 +114,7 @@ Genuinely open, with the reason:
 ```bash
 python tools/validate_ai.py "<rom>"      # must stay 8/8
 python tools/validate_missions.py "<rom>" # must stay 13/13 when missions change
-python tools/validate_maps.py "<rom>"     # must stay 8/8 when maps change
+python tools/validate_maps.py "<rom>"     # must stay 11/11 when maps change
 ```
 
 Every table tool must round-trip: dumping and re-applying an unedited CSV has

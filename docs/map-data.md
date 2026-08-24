@@ -15,7 +15,7 @@ pointer diffs like `0x20380000` that fall outside the cartridge.
 
 | offset | meaning | present on |
 |---|---|---|
-| `+0x00` | tile graphics | all 162 |
+| `+0x00` | custom-LZSS 4bpp tile graphics | all 162 |
 | `+0x04` | tile arrangement | all 162 |
 | `+0x08` | clipping tilemap | all 162 |
 | `+0x0c` | palette | all 162 |
@@ -44,9 +44,9 @@ redirects. `tools/map_data.py` resolves every variant rather than skipping the
 non-LZ77 entries.
 
 The first byte of each block type is consistent across the table: palettes
-start `0x10` (plain BIOS LZ77) on 159 of 162 maps, height, arrangement and the
-unknown block start `0x11` on most, and graphics start `0x20` or `0x22`, which
-is the Huffman range.
+start `0x10` (plain BIOS LZ77) on 159 of 162 maps, while height, arrangement
+and clipping usually start `0x11`. Graphics start `0x20` or `0x22`, but those
+values are FFTA wrapper types rather than GBA BIOS compression identifiers.
 
 `tools/ffta_lz.py` implements both directions. Round-tripping decompress ->
 compress -> decompress reproduces the source data exactly.
@@ -118,6 +118,26 @@ Map 0 anchors the format with 112 runs and 771 entries. The CSV deliberately
 calls the payload a raw `tile_descriptor`; its bit-level art meaning is not
 needed to edit the clipping layer safely and is not claimed here.
 
+## Tile graphics (`+0x00`)
+
+The former roadmap called `0x20`/`0x22` GBA Huffman based only on the leading
+byte. Retail code disproves that: the graphics loader calls FFTA's custom
+decoder at `0x0800543C`. Type `0x20` places its inner stream at wrapper `+4`;
+type `0x22` places it at `+8`. The inner stream begins with a big-endian u32
+output size and uses six token families: literal runs, short/long/extended
+back-references, zero runs, and `0xff` runs.
+
+`tools/ffta_lz.py::map_lzss` implements that grammar with strict input, output,
+and back-reference bounds. It produces a flat run of GBA 4bpp 8x8 tiles (32
+bytes per tile). All 162 logical maps decode to whole tiles: 82 use wrapper
+`0x20`, 80 use `0x22`, and shared pointers reduce them to 50 unique graphics
+streams. The Python output byte-matches the retail decoder on all 50.
+
+`graphics` exports those 50 unique `.4bpp` files plus a 162-row `index.csv`
+containing source addresses, wrapper types, sizes, tile counts, hashes, and
+filenames. It is decode-only: no custom-LZSS encoder is claimed, so graphics
+cannot yet be written back safely.
+
 ## Editing
 
 ```bash
@@ -128,6 +148,7 @@ python tools/map_data.py arrangement baserom.gba arrangement.csv
 python tools/map_data.py apply-arrangement baserom.gba arrangement.csv out.gba
 python tools/map_data.py clipping baserom.gba clipping.csv
 python tools/map_data.py apply-clipping baserom.gba clipping.csv out.gba
+python tools/map_data.py graphics baserom.gba graphics-dir
 python tools/validate_maps.py baserom.gba
 ```
 

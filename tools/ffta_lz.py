@@ -1,4 +1,4 @@
-"""Decompress FFTA map blocks.
+"""Decode FFTA's BIOS-LZ77 map blocks and custom-LZSS map graphics.
 
 Each block carries an 8-byte header: the four bytes 11 FF FF FF, then a
 standard GBA LZ77 header (0x10 plus a 24-bit decompressed size). The payload
@@ -132,3 +132,83 @@ def pack(raw):
     """Wrap compressed data in the 8-byte header the map blocks use."""
     body = compress(raw)
     return WRAPPER + bytes((0x10,)) + len(raw).to_bytes(3, "little") + body
+
+
+def map_lzss(data, off=0, with_consumed=False):
+    """Decode FFTA's custom map-graphics LZSS stream.
+
+    This is not the GBA BIOS Huffman format despite the outer map block types
+    0x20/0x22. The inner stream starts with a big-endian u32 output size and
+    uses six token forms for literals, zero/0xff runs, and back-references.
+    Malformed streams raise ValueError instead of reading outside the input or
+    fabricating bytes before the output buffer.
+    """
+    if off < 0 or off + 4 > len(data):
+        raise ValueError("truncated map LZSS header")
+    size = int.from_bytes(data[off:off + 4], "big")
+    p = off + 4
+    out = bytearray()
+
+    def need(count, what):
+        if p + count > len(data):
+            raise ValueError(f"truncated map LZSS {what}")
+
+    def emit_run(value, count):
+        if len(out) + count > size:
+            raise ValueError("map LZSS token exceeds declared output size")
+        out.extend(bytes((value,)) * count)
+
+    def emit_backref(displacement, count):
+        if displacement <= 0 or displacement > len(out):
+            raise ValueError("map LZSS back-reference precedes output")
+        if len(out) + count > size:
+            raise ValueError("map LZSS token exceeds declared output size")
+        for _ in range(count):
+            out.append(out[-displacement])
+
+    while len(out) < size:
+        need(1, "token")
+        token = data[p]
+        p += 1
+        if token & 0x80:
+            need(1, "short back-reference")
+            displacement = ((token & 0x07) << 8) | data[p]
+            p += 1
+            emit_backref(displacement + 1, ((token >> 3) & 0x0F) + 3)
+        elif token & 0x40:
+            count = (token & 0x3F) + 1
+            need(count, "literal run")
+            if len(out) + count > size:
+                raise ValueError("map LZSS literal exceeds declared output size")
+            out.extend(data[p:p + count])
+            p += count
+        elif token & 0x20:
+            emit_run(0, (token & 0x1F) + 2)
+        elif token & 0x10:
+            need(2, "long back-reference")
+            b1, b2 = data[p], data[p + 1]
+            p += 2
+            displacement = ((b1 & 0x3F) << 8) | b2
+            count = (((b1 >> 2) & 0x30) | (token & 0x0F)) + 4
+            emit_backref(displacement + 1, count)
+        elif token == 0x01:
+            need(1, "0xff run")
+            count = data[p] + 3
+            p += 1
+            emit_run(0xFF, count)
+        elif token == 0x02:
+            need(1, "extended zero run")
+            count = data[p] + 3
+            p += 1
+            emit_run(0, count)
+        elif token == 0x00:
+            need(3, "extended back-reference")
+            count = data[p] + 5
+            displacement = (data[p + 1] << 8) | data[p + 2]
+            p += 3
+            emit_backref(displacement + 1, count)
+        else:
+            raise ValueError(f"unknown map LZSS token {token:#04x}")
+
+    result = bytes(out)
+    return (result, p - off) if with_consumed else result

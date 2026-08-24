@@ -7,13 +7,14 @@
     python tools/map_data.py apply-arrangement baserom.gba arrangement.csv out.gba
     python tools/map_data.py clipping          baserom.gba clipping.csv
     python tools/map_data.py apply-clipping    baserom.gba clipping.csv out.gba
+    python tools/map_data.py graphics          baserom.gba graphics-dir
 """
 import csv
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ffta_lz import block_length, compress, lz77, pack
+from ffta_lz import block_length, compress, lz77, map_lzss, pack
 
 TBL = 0x08569104
 STRIDE = 0x58
@@ -179,6 +180,21 @@ def _clipping_cells(meta):
     return parsed, cells
 
 
+def decode_graphics(rom, map_id):
+    """Decode the custom-LZSS 4bpp tiles referenced by one map entry."""
+    off = B + u32(rom, map_id, 0x00)
+    kind = rom[off]
+    if kind not in (0x20, 0x22):
+        raise ValueError(f"map {map_id} graphics at {off:#x} has type {kind:#x}")
+    source = off + (8 if kind == 0x22 else 4)
+    raw, consumed = map_lzss(rom, source, with_consumed=True)
+    if len(raw) % 32:
+        raise ValueError(f"map {map_id} graphics size is not whole 4bpp tiles")
+    return {"map": map_id, "offset": off, "source_offset": source,
+            "wrapper_type": kind, "raw": raw, "compressed_bytes": consumed,
+            "tile_count": len(raw) // 32}
+
+
 def cmd_table(rom_path, out_path):
     rom = open(rom_path, "rb").read()
     with open(out_path, "w", newline="") as fh:
@@ -250,6 +266,32 @@ def cmd_clipping(rom_path, out_path):
                             cell["y"], f"{cell['tile_descriptor']:#06x}"])
                 rows += 1
     print(f"wrote {out_path}: {rows} clipping tiles across {COUNT} logical maps")
+    return 0
+
+
+def cmd_graphics(rom_path, out_dir):
+    import hashlib
+
+    rom = open(rom_path, "rb").read()
+    os.makedirs(out_dir, exist_ok=True)
+    index_path = os.path.join(out_dir, "index.csv")
+    written = set()
+    with open(index_path, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["map", "source_address", "wrapper_type", "decompressed_bytes",
+                    "tile_count", "compressed_bytes", "sha256", "file"])
+        for i in range(COUNT):
+            meta = decode_graphics(rom, i)
+            filename = f"graphics_{0x08000000 + meta['source_offset']:08x}.4bpp"
+            if filename not in written:
+                with open(os.path.join(out_dir, filename), "wb") as raw_file:
+                    raw_file.write(meta["raw"])
+                written.add(filename)
+            w.writerow([i, f"{0x08000000 + meta['source_offset']:#010x}",
+                        f"{meta['wrapper_type']:#04x}", len(meta["raw"]),
+                        meta["tile_count"], meta["compressed_bytes"],
+                        hashlib.sha256(meta["raw"]).hexdigest(), filename])
+    print(f"wrote {index_path}: {COUNT} maps, {len(written)} unique 4bpp files")
     return 0
 
 
@@ -368,6 +410,8 @@ def main(argv):
             return cmd_arrangement(argv[1], argv[2])
         if len(argv) == 3 and argv[0] == "clipping":
             return cmd_clipping(argv[1], argv[2])
+        if len(argv) == 3 and argv[0] == "graphics":
+            return cmd_graphics(argv[1], argv[2])
         if len(argv) == 4 and argv[0] == "apply-terrain":
             return cmd_apply_terrain(argv[1], argv[2], argv[3])
         if len(argv) == 4 and argv[0] == "apply-arrangement":

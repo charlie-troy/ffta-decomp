@@ -300,4 +300,5 @@ discover about them. See [docs/job-table.md](docs/job-table.md).
 The former highest-risk live-validation item is now closed.
 
 1. **The rest of the map blocks.** Terrain, arrangement, and clipping decode
-   and round-trip; Huffman-compressed graphics are next.
+   and round-trip; custom-LZSS graphics decode to indexed 4bpp files. Animation
+   blocks and map mode bytes are next.

@@ -1,4 +1,4 @@
-"""Validate the packed height and tile-arrangement map codecs.
+"""Validate FFTA's terrain, arrangement, clipping, and graphics codecs.
 
     python tools/validate_maps.py baserom.gba
 """
@@ -8,11 +8,13 @@ import hashlib
 import os
 import tempfile
 
-from ffta_lz import block_length, pack
+from ffta_lz import block_length, map_lzss, pack
 from map_data import (COUNT, _arrangement_cells, _height_cells,
                       _clipping_cells, cmd_apply_arrangement,
                       cmd_apply_clipping, cmd_apply_terrain, cmd_arrangement,
-                      cmd_clipping, cmd_terrain, resolve_block)
+                      cmd_clipping, cmd_graphics, cmd_terrain, decode_graphics,
+                      resolve_block)
+from emulate import Gba
 
 
 def main(argv=None):
@@ -164,7 +166,57 @@ def main(argv=None):
     if not edit_ok:
         failures.append("clipping edit round-trip")
 
-    print(f"\n{8 - len(failures)}/8 map checks passed")
+    graphics = [decode_graphics(rom, map_id) for map_id in range(COUNT)]
+    unique_graphics = {meta["offset"] for meta in graphics}
+    types = {kind: sum(meta["wrapper_type"] == kind for meta in graphics)
+             for kind in (0x20, 0x22)}
+    whole_tiles = all(len(meta["raw"]) % 32 == 0 for meta in graphics)
+    ok = len(unique_graphics) == 50 and types == {0x20: 82, 0x22: 80} and whole_tiles
+    print(f"9. graphics streams: {'OK' if ok else 'FAIL'} "
+          f"(162 maps/50 unique; wrappers {types}; whole 4bpp tiles)")
+    if not ok:
+        failures.append("graphics streams")
+
+    gba = Gba(args.rom)
+    retail_matches = []
+    unique_metas = {meta["offset"]: meta for meta in graphics}.values()
+    for meta in unique_metas:
+        destination = 0x02010000
+        gba.reset_ram()
+        gba.call(0x0800543C,
+                 [destination, 0x08000000 + meta["source_offset"]],
+                 timeout_insns=1000000)
+        retail = bytes(gba.uc.mem_read(destination, len(meta["raw"])))
+        retail_matches.append(retail == meta["raw"])
+    malformed = [b"\x00\x00", b"\x00\x00\x00\x01\x03",
+                 b"\x00\x00\x00\x03\x80\x00",
+                 b"\x00\x00\x00\x01\x41\xaa\xbb"]
+    rejected = 0
+    for sample in malformed:
+        try:
+            map_lzss(sample)
+        except ValueError:
+            rejected += 1
+    ok = all(retail_matches) and rejected == len(malformed)
+    print(f"10. graphics decoder: {'OK' if ok else 'FAIL'} "
+          f"({len(retail_matches)} retail streams byte-match; "
+          f"malformed {rejected}/{len(malformed)} rejected)")
+    if not ok:
+        failures.append("graphics decoder")
+
+    with tempfile.TemporaryDirectory(prefix="ffta-graphics-validation-") as temp:
+        cmd_graphics(args.rom, temp)
+        files = os.listdir(temp)
+        raw_files = [name for name in files if name.endswith(".4bpp")]
+        with open(os.path.join(temp, "index.csv"), newline="") as fh:
+            index_rows = list(csv.DictReader(fh))
+        ok = len(raw_files) == 50 and len(index_rows) == COUNT
+    print(f"11. graphics export: {'OK' if ok else 'FAIL'} "
+          f"({len(raw_files)} unique files; {len(index_rows)} index rows)")
+    if not ok:
+        failures.append("graphics export")
+
+    print(f"\n{11 - len(failures)}/11 map checks passed")
     return 1 if failures else 0
 
 

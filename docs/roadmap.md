@@ -186,9 +186,9 @@ works both directions, so the pipeline exists and this is pure extension.
 2. **Clipping tilemap (`+0x08`) — done 2026-08-24.** Sparse halfword runs
    expand into two 32x64 layers at `0x0200D1A0`; the loader and visibility
    consumer are identified, and dump/apply plus a real edit round-trip pass.
-3. **Graphics** (`+0x00`): implement the GBA **Huffman** variant (the
-   `0x20`/`0x22` first-byte range) in `tools/ffta_lz.py`, which today only does
-   LZ77.
+3. **Graphics (`+0x00`) — done 2026-08-24.** The `0x20`/`0x22` bytes are FFTA
+   wrappers, not GBA Huffman. The strict custom-LZSS decoder byte-matches the
+   retail routine on all 50 unique streams and exports indexed 4bpp tiles.
 4. **Animation blocks** (`+0x14/+0x18/+0x1c`, on 83/162 maps) and the **mode
    bytes** (`+0x54/+0x55`).
 5. ~~Resolve the height >127 flag.~~ **Closed 2026-08-24:** it was a decoder
