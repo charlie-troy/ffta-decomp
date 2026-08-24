@@ -10,6 +10,7 @@ Checks:
   2. the ability property accessor agrees with the parsed table and with
      published ability stats
   3. every flag bit read through the property API matches a direct parse
+  4. named unit-stat ids and equipped-item combat totals agree
 """
 import os
 import sys
@@ -89,6 +90,14 @@ def check_flags(gba, rom, count=60):
 
 
 STAT_GET = 0x080C7EA4
+ITEM_TABLE = 0x0851D180 - 0x08000000
+ITEM_STRIDE = 0x20
+COMBAT_TOTALS = (
+    ("Attack", 0x17, 0x20, 0x10, 0x080CA624),
+    ("Defense", 0x18, 0x22, 0x11, 0x080CA6B4),
+    ("Magic Power", 0x19, 0x24, 0x12, 0x080CA66C),
+    ("Resistance", 0x1A, 0x26, 0x13, 0x080CA6FC),
+)
 # The ai_behaviour == 2 fragment of the evaluator, and its bail-out call.
 HEALTHY_START, HEALTHY_END, HEALTHY_REJECT = 0x080C3364, 0x080C3380, 0x080C337C
 # One case body's probability gate, up to the pass/fail test.
@@ -123,8 +132,8 @@ def _put16(gba, addr, val):
     gba.uc.mem_write(addr, struct.pack("<H", val & 0xFFFF))
 
 
-def check_stat_ids(gba):
-    """HP/MP stat ids should read the four adjacent unit fields."""
+def check_stat_ids(gba, rom):
+    """Named stat ids and equipped-item combat totals should agree."""
     print("")
     print("4. stat ids against a synthetic unit")
     UNIT = 0x02001000
@@ -144,6 +153,26 @@ def check_stat_ids(gba):
             print(f"   wrote {hp}/{mx}/{mp}/{max_mp}, read {got}")
     print("   0x13..0x16 == HP/MaxHP/MP/MaxMP at +0x18..+0x1E "
           f"-> {'PASS' if ok else 'FAIL'}")
+
+    bases = (71, 83, 97, 109)
+    items = (1, 3, 7, 10, 0)
+    gba.uc.mem_write(UNIT, BLANK)
+    for (_, _, off, _, _), value in zip(COMBAT_TOTALS, bases):
+        _put16(gba, UNIT + off, value)
+    for n, item in enumerate(items):
+        _put16(gba, UNIT + 0x2A + n * 2, item)
+
+    for (name, stat_id, _, item_off, total_fn), base in zip(COMBAT_TOTALS, bases):
+        direct = gba.call(STAT_GET, [UNIT, stat_id])
+        item_bonus = sum(rom[ITEM_TABLE + item * ITEM_STRIDE + item_off]
+                         for item in items if item)
+        total = gba.call(total_fn, [UNIT, 1])
+        if direct != base or total != base + item_bonus:
+            ok = False
+            print(f"   {name}: stat={direct}, total={total}, "
+                  f"expected {base}+{item_bonus}")
+    print("   0x17..0x1A == Attack/Defense/Magic Power/Resistance and "
+          f"item props 10..13 join correctly -> {'PASS' if ok else 'FAIL'}")
     return ok
 
 
@@ -276,7 +305,7 @@ def main(argv):
     results = [check_priority(gba, args.samples),
                check_properties(gba, rom),
                check_flags(gba, rom),
-               check_stat_ids(gba),
+               check_stat_ids(gba, rom),
                check_healthy_rule(gba),
                check_gate(gba, args.samples),
                check_resist_slots(gba, rom),

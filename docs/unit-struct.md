@@ -17,6 +17,10 @@ counted address-returning cases as direct loads.
 | `0x14` | `+0x1A` | u16 | **max HP** | the other half of that comparison |
 | `0x15` | `+0x1C` | u16 | **current MP** | the field the ability-cost check reads |
 | `0x16` | `+0x1E` | u16 | **max MP** | the MP-restoration path clamps current MP to this field before writing `+0x1C` |
+| `0x17` | `+0x20` | u16 | **Attack** | `sub_080CA624` adds equipped item property 10 (attack) to this base |
+| `0x18` | `+0x22` | u16 | **Defense** | `sub_080CA6B4` adds equipped item property 11 (defense) to this base |
+| `0x19` | `+0x24` | u16 | **Magic Power** | `sub_080CA66C` adds equipped item property 12 (magic power) to this base |
+| `0x1a` | `+0x26` | u16 | **Resistance** | `sub_080CA6FC` adds equipped item property 13 (resistance) to this base |
 
 ## Full table
 
@@ -60,4 +64,5 @@ Bytes `+0x04`-`+0x14` are a run of 17 u8 stats (ids `0x01`-`0x12`), then
 u16 stats run from `+0x18` upward in pairs. The HP pair sits at the start of
 the u16 block, with MP immediately after it.
 The executed restoration clamp makes the first four fields two complete pairs:
-current/max HP, then current/max MP.
+current/max HP, then current/max MP. The next four are the unit's base physical
+and magical combat stats in Attack/Defense and Magic Power/Resistance pairs.

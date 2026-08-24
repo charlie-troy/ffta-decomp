@@ -51,9 +51,12 @@ preserve the independent Speed Down display and Slow/Haste adjacency anchors.
    matches published AP cost.
 3. **Flag decoding.** 1239 bit reads through the property API match a direct
    parse of `+0x10`, confirming the `prop - 0x0B` mapping across the live range.
-4. **Stat ids.** Writing HP, max HP, MP, and max MP into a synthetic unit and
-   reading them back through `sub_080C7EA4` confirms stats `0x13..0x16` are
-   unit `+0x18..+0x1E`.
+4. **Stat ids and combat totals.** Writing HP, max HP, MP, max MP, Attack,
+   Defense, Magic Power, and Resistance into a synthetic unit and reading them
+   back through `sub_080C7EA4` confirms stats `0x13..0x1A` are unit
+   `+0x18..+0x26`. Executing the four total-stat helpers with five synthetic
+   equipment slots also confirms item properties 10–13 add to the matching
+   combat base.
 5. **The healthy-target rule.** Running the `ai_behaviour == 2` fragment against
    synthetic targets shows it rejects exactly when HP < MaxHP/2, including at
    the boundaries (50 of 100 passes, 49 rejects; 30 of 60 passes, 29 rejects).

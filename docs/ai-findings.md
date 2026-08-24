@@ -84,14 +84,22 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x14` | `ldrh` | **`+0x1A`** | **max HP** |
 | `0x15` | `ldrh` | **`+0x1C`** | **current MP** (the field the cost check uses) |
 | `0x16` | `ldrh` | `+0x1E` | **max MP**; restoration clamps current MP to this value before writing `+0x1C` |
-| `0x17` | `ldrh` | `+0x20` | u16 stat |
+| `0x17` | `ldrh` | `+0x20` | **Attack** |
+| `0x18` | `ldrh` | `+0x22` | **Defense** |
+| `0x19` | `ldrh` | `+0x24` | **Magic Power** |
+| `0x1A` | `ldrh` | `+0x26` | **Resistance** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain
 rather than guessed. `+0x1C` then follows as MP because it is both the next
 stat in the sequence and the field the ability-cost check reads.
 
-This was established statically. No emulator was needed.
+The four combat names are joined through the retail total-stat helpers, not
+assigned from ordering alone. `sub_080CA624`, `sub_080CA6B4`, `sub_080CA66C`,
+and `sub_080CA6FC` add item properties 10, 11, 12, and 13 respectively to
+unit `+0x20`, `+0x22`, `+0x24`, and `+0x26`; those item properties are the
+independently mapped Attack, Defense, Magic Power, and Resistance fields.
+The stat reads and all four equipment joins are covered by the emulator gate.
 
 ## The AI is randomised
 

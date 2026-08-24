@@ -134,7 +134,7 @@ Anything reported outside a function you deliberately edited is a bug.
 ## What is known
 
 - `docs/ability-table.md` — all 28 bytes of an ability entry
-- `docs/unit-struct.md` — all 69 unit-stat ids mapped to direct loads or returned addresses, including HP/MaxHP and MP/MaxMP at `+0x18..+0x1e`
+- `docs/unit-struct.md` — all 69 unit-stat ids mapped to direct loads or returned addresses, including HP/MaxHP, MP/MaxMP, Attack/Defense, and Magic Power/Resistance at `+0x18..+0x26`
 - `docs/unit-flags.md` — 56 status/capability bits and the accessors for each
 - `docs/ai-findings.md` — the evaluator, its data tables and the rules read so far
 

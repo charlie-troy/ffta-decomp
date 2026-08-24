@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.2a — named max MP and corrected stat-map coverage |
+| Last closed package | AI5.2b — named the four base combat stats |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 7/7; matching ROM SHA1 |
 
@@ -74,6 +74,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.1b | 2026-08-24 | Added the raw-effect descriptor join, corrected Sleep to case 45, and named Poison case 61 | `validate_statuses.py` 7/7; five named ability/effect/handler/getter chains execute |
 | AI5.1c | 2026-08-24 | Expanded descriptor-backed names to 15 status bits | 15 named ability/effect/handler joins and bit round-trips; four secondary-effect confirmations |
 | AI5.2a | 2026-08-24 | Named stat `0x16` / unit `+0x1e` as max MP and corrected the direct-load count | Executed four-field stat reads; restoration clamp at `0x0809308A..C4` |
+| AI5.2b | 2026-08-24 | Named stats `0x17..0x1a` as Attack, Defense, Magic Power, and Resistance | Executed stat reads and item-property joins through four combat-total helpers |
 
 ## Decisions and evidence
 
@@ -293,6 +294,33 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Base combat-stat joins
+
+Objective:
+
+- Resolve the four packed `u16` fields at unit `+0x20..+0x26` without relying
+  on their order or a published structure alone.
+
+Completed:
+
+- Named stat ids `0x17..0x1a` as Attack, Defense, Magic Power, and Resistance.
+- Extended the AI execution gate across all eight named `u16` stats.
+- Added an equipped-item test that exercises the four total-stat helpers.
+
+Evidence recorded during the batch:
+
+- `sub_080CA624`, `sub_080CA6B4`, `sub_080CA66C`, and `sub_080CA6FC` load unit
+  `+0x20/+0x22/+0x24/+0x26` respectively.
+- With equipment enabled, those functions add item properties 10/11/12/13,
+  already mapped independently as Attack/Defense/Magic Power/Resistance.
+- The same four values are the combat terms used by the dispatch scorer, and
+  the ROM's unit serializer preserves all 16 bits of each field.
+
+Next action:
+
+- Trace stat `0x1b` / unit `+0x28`, whose known reader tests bit `0x800`, then
+  move backward into the 17 one-byte stats at unit `+0x04..+0x14`.
 
 ### 2026-08-24 — Max-MP execution anchor and stat-map correction
 
