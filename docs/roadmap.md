@@ -114,7 +114,7 @@ remaining work is naming the other computed/packed properties.
    accessor and its `r2` field-id convention.
 2. **Properties 33–41 — done 2026-08-24.** The nine bytes at
    `+0x2a`–`+0x32` are clan progression rewards: clan points, then Combat,
-   Magic, Appraise, Gather, Smithing, Craft, Negotiate and Track skill points.
+   Magic, Smithing, Craft, Appraise, Gather, Negotiate and Track skill points.
    `sub_08046850` applies each byte to the matching progress counter, and
    `tools/validate_missions.py` checks all 4,608 accessor reads plus one
    executed application per track. The dispatch path instead uses
@@ -145,11 +145,15 @@ remaining work is naming the other computed/packed properties.
    are the six-bit availability deadline, three-bit clear-condition code, and
    six-bit clear count. Published mission examples anchor Days and Battles;
    all 1,536 accessor reads and packed setters execute in validation.
-8. Expose every newly-named field in `tools/mission_table.py`,
+8. **Clan-skill requirement — done 2026-08-24.** Properties `0x2e/0x2f` select
+   one of the eight clan-skill levels and its required threshold. The complete
+   acceptance predicate rejects Twin Swords at Combat 9 and accepts it at 10.
+   This path also corrected four previously swapped reward-column labels.
+9. Expose every newly-named field in `tools/mission_table.py`,
    round-trip-verified, and add a validation check. **Done for the nine clan
    progression fields, dispatch job rules, dormant dispatch item rule, pub
-   fee, mission type, and availability/clear fields**; repeat for later
-   discoveries.
+   fee, mission type, availability/clear fields, and clan-skill
+   requirements**; repeat for later discoveries.
 
 **Done when:** a known mission's full reward is reproducible from named data,
 and every new field round-trips byte-identically.

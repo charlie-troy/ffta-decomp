@@ -90,10 +90,10 @@ mission's **clan progression rewards**, in points:
 | `+0x2a` | 33 | clan points |
 | `+0x2b` | 34 | Combat skill points |
 | `+0x2c` | 35 | Magic skill points |
-| `+0x2d` | 36 | Appraise skill points |
-| `+0x2e` | 37 | Gather skill points |
-| `+0x2f` | 38 | Smithing skill points |
-| `+0x30` | 39 | Craft skill points |
+| `+0x2d` | 36 | Smithing skill points |
+| `+0x2e` | 37 | Craft skill points |
+| `+0x2f` | 38 | Appraise skill points |
+| `+0x30` | 39 | Gather skill points |
 | `+0x31` | 40 | Negotiate skill points |
 | `+0x32` | 41 | Track skill points |
 
@@ -101,14 +101,38 @@ The code path is direct. `sub_08046850(mission, ..., index, ...)` adds
 `mission[+0x2a + index]` to the matching level-progress byte in the nine-pair
 clan state at `0x020021B4`; reaching 100 advances that level. The completion
 renderer `sub_080461D4` labels `+0x2a` as `Clan Pts:` and draws the eight skill
-levels in the same order used by the
-[official manual](https://www.nintendo.com/eu/media/downloads/games_8/emanuals/game_boy_advance_8/Manual_GameBoyAdvance_FinalFantasyTacticsAdvance_EN_DE_FR_ES_IT.pdf).
+icons. The internal state order is established independently by the mission
+requirement UI's consecutive text entries: Combat, Magic, Smithing, Craft,
+Appraise, Gather, Negotiate, Track. The official manual presents the same eight
+skills in a different visual grid, so it is not a storage-order source.
 The standalone validator runs 4,608 accessor reads and then executes
 `sub_08046850` once for every track, proving that each byte reaches its matching
 progress counter.
 
 They are not dispatch-calculator weights. `sub_080CF310` never reads this
 block; it uses the separate dispatch threshold at `+0x43/+0x44`.
+
+## Clan-skill acceptance requirement
+
+Accessor property `0x2e` is the **required clan-skill code**, stored in
+`+0x38` bits 0–3. Zero means no skill requirement; codes 1–8 select Combat,
+Magic, Smithing, Craft, Appraise, Gather, Negotiate, and Track. The mission
+information UI adds 97 to the nonzero code and indexes those exact consecutive
+labels in the UI string table.
+
+Property `0x2f` is the **required clan-skill level**, packed as
+`(+0x38 >> 4) | ((+0x39 & 7) << 4)`. The acceptance predicate
+`sub_080CEECC` reads the selected level byte at
+`0x020021B4 + 2 × skill_code` and rejects the mission when it is below the
+required value. Executing the complete predicate proves Twin Swords rejects
+Combat 9 and accepts Combat 10.
+
+Published requirements provide independent anchors: Den of Evil requires
+[Combat 25](https://www.supercheats.com/gameboyadvance/walkthroughs/finalfantasytacticsadvance-walkthrough04.txt),
+the alloy missions require Smithing 15, and the later alloy orders require
+[Smithing 35](https://gamefaqs.gamespot.com/gba/560436-final-fantasy-tactics-advance/faqs/25687).
+The CSV exposes both packed fields and preserves the other nibble and the upper
+five bits of `+0x39`.
 
 ## Mission behavior and public type
 
@@ -244,6 +268,8 @@ Named, with the code or the game as evidence:
 | `+0x0f` bits 3–7, `+0x10` bit 0 | availability days | property 16; zero displays no deadline, otherwise a day count |
 | `+0x10` bits 3–5 | clear condition code | property 17; known codes are Win battle, Days, and Battles |
 | `+0x10` bits 6–7, `+0x11` bits 0–3 | clear count | property 18; count used by the selected clear condition |
+| `+0x38` bits 0–3 | required clan-skill code | property 46; codes 1–8 select the eight named clan skills |
+| `+0x38` bits 4–7, `+0x39` bits 0–2 | required clan-skill level | property 47; acceptance compares the selected clan level against it |
 | `+0x39` bits 3–7, `+0x3a` bit 0 | required dispatch job | roster filter requires the canonical job code (property 48) |
 | `+0x3c` bits 2–7 | blocked dispatch job | a matching canonical job returns rating 0 in `sub_080CF310` |
 | `+0x3d` | dormant blocked dispatch item, −375 | rating gate is executable, but all retail entries are zero (property 53) |
@@ -251,7 +277,6 @@ Named, with the code or the game as evidence:
 | `+0x43`/`+0x44` | dispatch threshold | 16-bit; `sub_080CF310` scores a unit against it (property 59) |
 | property 42 | first required item | byte `+0x36` + 375; verified against 7 real missions |
 | property 44 | second required item | byte `+0x37` + 375; same check |
-| properties 46, 47 | a count requirement | the same function compares them |
 
 Two approaches were tried and are recorded here because they look productive
 and are not:

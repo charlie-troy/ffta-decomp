@@ -52,10 +52,10 @@ NAMED = {
     0x2A: "clan_points",            # points toward the next clan level
     0x2B: "combat_points",          # eight clan-skill progress rewards
     0x2C: "magic_points",
-    0x2D: "appraise_points",
-    0x2E: "gather_points",
-    0x2F: "smithing_points",
-    0x30: "craft_points",
+    0x2D: "smithing_points",
+    0x2E: "craft_points",
+    0x2F: "appraise_points",
+    0x30: "gather_points",
     0x31: "negotiate_points",
     0x32: "track_points",
     0x33: "gil_units_200",          # accessor prop 30 multiplies by 200
@@ -82,10 +82,10 @@ CLAN_REWARDS = (
     (0x2A, "clan_points"),
     (0x2B, "combat_points"),
     (0x2C, "magic_points"),
-    (0x2D, "appraise_points"),
-    (0x2E, "gather_points"),
-    (0x2F, "smithing_points"),
-    (0x30, "craft_points"),
+    (0x2D, "smithing_points"),
+    (0x2E, "craft_points"),
+    (0x2F, "appraise_points"),
+    (0x30, "gather_points"),
     (0x31, "negotiate_points"),
     (0x32, "track_points"),
 )
@@ -101,6 +101,17 @@ CLEAR_CONDITIONS = {
     0: "Win battle",
     1: "Days",
     2: "Battles",
+}
+
+CLAN_SKILLS = {
+    1: "Combat",
+    2: "Magic",
+    3: "Smithing",
+    4: "Craft",
+    5: "Appraise",
+    6: "Gather",
+    7: "Negotiate",
+    8: "Track",
 }
 
 
@@ -177,6 +188,32 @@ def clear_count_set(data, entry, value):
     data[entry + 0x11] = (data[entry + 0x11] & 0xF0) | (value >> 2)
 
 
+def required_clan_skill_get(data, entry):
+    """Decode property 0x2e from +0x38 bits 0..3."""
+    return data[entry + 0x38] & 0x0F
+
+
+def required_clan_skill_set(data, entry, value):
+    """Set the required clan-skill code without touching its level."""
+    if not 0 <= value <= 0x0F:
+        raise ValueError("required clan skill code must fit 4 bits")
+    data[entry + 0x38] = (data[entry + 0x38] & 0xF0) | value
+
+
+def required_clan_skill_level_get(data, entry):
+    """Decode property 0x2f from +0x38 high nibble and +0x39 bits 0..2."""
+    return (data[entry + 0x38] >> 4) | ((data[entry + 0x39] & 7) << 4)
+
+
+def required_clan_skill_level_set(data, entry, value):
+    """Set the required clan-skill level without touching its code."""
+    if not 0 <= value <= 0x7F:
+        raise ValueError("required clan skill level must fit 7 bits")
+    data[entry + 0x38] = ((data[entry + 0x38] & 0x0F) |
+                          ((value & 0x0F) << 4))
+    data[entry + 0x39] = (data[entry + 0x39] & 0xF8) | (value >> 4)
+
+
 def required_job_get(data, entry):
     """Decode accessor property 0x30 from packed mission bytes."""
     return (data[entry + 0x39] >> 3) | ((data[entry + 0x3A] & 0x01) << 5)
@@ -238,6 +275,8 @@ def cmd_dump(rom_path, out_path):
                    ["mission_behavior_code", "mission_icon_group_code",
                     "mission_type", "availability_days",
                     "clear_condition_code", "clear_condition", "clear_count",
+                    "required_clan_skill_code", "required_clan_skill",
+                    "required_clan_skill_level",
                     "required_job_code", "required_job",
                     "blocked_dispatch_job_code", "blocked_dispatch_job",
                     "blocked_dispatch_item_id", "blocked_dispatch_item"])
@@ -249,6 +288,8 @@ def cmd_dump(rom_path, out_path):
             availability = availability_days_get(rom, b)
             clear_condition = clear_condition_get(rom, b)
             clear_count = clear_count_get(rom, b)
+            required_skill = required_clan_skill_get(rom, b)
+            required_skill_level = required_clan_skill_level_get(rom, b)
             required_job = required_job_get(rom, b)
             blocked_job = blocked_job_get(rom, b)
             blocked_item = blocked_item_get(rom, b)
@@ -257,6 +298,8 @@ def cmd_dump(rom_path, out_path):
                         mission_type_name(behavior, icon_group), availability,
                         clear_condition,
                         CLEAR_CONDITIONS.get(clear_condition, ""), clear_count,
+                        required_skill, CLAN_SKILLS.get(required_skill, ""),
+                        required_skill_level,
                         required_job,
                         job_names.get(required_job, ""),
                         blocked_job, job_names.get(blocked_job, ""),
@@ -280,6 +323,9 @@ def cmd_apply(rom_path, csv_path, out_path):
             original_availability = availability_days_get(rom, p)
             original_clear_condition = clear_condition_get(rom, p)
             original_clear_count = clear_count_get(rom, p)
+            original_required_skill = required_clan_skill_get(rom, p)
+            original_required_skill_level = required_clan_skill_level_get(
+                rom, p)
             original_required_job = required_job_get(rom, p)
             original_blocked_job = blocked_job_get(rom, p)
             original_blocked_item = blocked_item_get(rom, p)
@@ -355,6 +401,30 @@ def cmd_apply(rom_path, csv_path, out_path):
                     before = clear_count_get(rom, p)
                     clear_count_set(rom, p, requested)
                     print(f"  id {i:>3} clear_count: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("required_clan_skill_code", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 0x0F:
+                    print(f"  id {i} required_clan_skill_code: {requested} "
+                          "does not fit 4 bits, skipped")
+                elif requested != original_required_skill:
+                    before = required_clan_skill_get(rom, p)
+                    required_clan_skill_set(rom, p, requested)
+                    print(f"  id {i:>3} required_clan_skill_code: "
+                          f"{before} -> {requested}")
+                    changes += 1
+            requested = row.get("required_clan_skill_level", "")
+            if requested != "":
+                requested = int(requested, 0)
+                if not 0 <= requested <= 0x7F:
+                    print(f"  id {i} required_clan_skill_level: {requested} "
+                          "does not fit 7 bits, skipped")
+                elif requested != original_required_skill_level:
+                    before = required_clan_skill_level_get(rom, p)
+                    required_clan_skill_level_set(rom, p, requested)
+                    print(f"  id {i:>3} required_clan_skill_level: "
                           f"{before} -> {requested}")
                     changes += 1
             requested = row.get("required_job_code", "")

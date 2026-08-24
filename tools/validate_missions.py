@@ -13,7 +13,8 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from emulate import Gba
 from ffta_names import Names
-from mission_table import (JOB_KIND_BASE, JOB_KIND_STRIDE, JOB_COUNT,
+from mission_table import (CLAN_SKILLS, JOB_KIND_BASE, JOB_KIND_STRIDE,
+                           JOB_COUNT,
                            availability_days_get, availability_days_set,
                            blocked_item_get, blocked_item_set,
                            blocked_job_get, blocked_job_set,
@@ -22,6 +23,10 @@ from mission_table import (JOB_KIND_BASE, JOB_KIND_STRIDE, JOB_COUNT,
                            mission_behavior_get, mission_behavior_set,
                            mission_icon_group_get, mission_icon_group_set,
                            mission_type_name,
+                           required_clan_skill_get,
+                           required_clan_skill_level_get,
+                           required_clan_skill_level_set,
+                           required_clan_skill_set,
                            required_job_get, required_job_set)
 
 BASE = 0x0855AE4C
@@ -31,6 +36,7 @@ ACCESSOR = 0x080CE4DC
 APPLY_CLAN_REWARD = 0x08046850
 ADJUST_FEE = 0x080CEC78
 RATE_DISPATCH = 0x080CF310
+CHECK_REQUIREMENTS = 0x080CEECC
 INDEX_PLACEMENT = 0x08045400
 INDEX_TRIGGER = 0x08123898
 CLAN_STATE = 0x020021B4
@@ -48,10 +54,10 @@ TRACKS = (
     ("clan", 0x2A, 0x21),
     ("combat", 0x2B, 0x22),
     ("magic", 0x2C, 0x23),
-    ("appraise", 0x2D, 0x24),
-    ("gather", 0x2E, 0x25),
-    ("smithing", 0x2F, 0x26),
-    ("craft", 0x30, 0x27),
+    ("smithing", 0x2D, 0x24),
+    ("craft", 0x2E, 0x25),
+    ("appraise", 0x2F, 0x26),
+    ("gather", 0x30, 0x27),
     ("negotiate", 0x31, 0x28),
     ("track", 0x32, 0x29),
 )
@@ -501,12 +507,92 @@ def main(argv=None):
         "preserve adjacent bits)"
     )
 
+    skill_ok = True
+    skill_checks = 0
+    for i in range(COUNT):
+        entry = BASE - 0x08000000 + i * STRIDE
+        for prop, get, label in (
+            (0x2E, required_clan_skill_get, "required clan skill"),
+            (0x2F, required_clan_skill_level_get, "required skill level"),
+        ):
+            got = gba.call(ACCESSOR, [i, prop])
+            want = get(rom, entry)
+            skill_checks += 1
+            if got != want:
+                skill_ok = False
+                failures.append(f"mission {label} {i}: {got} != {want}")
+                break
+        if not skill_ok:
+            break
+
+    skill_anchors = {
+        39: ("Combat", 10),      # Twin Swords
+        67: ("Combat", 25),      # Den of Evil
+        146: ("Smithing", 15),   # Adaman Alloy
+        157: ("Track", 40),      # Ghosts Of War
+        186: ("Magic", 25),      # T.L.C.
+    }
+    got_skill_anchors = {}
+    for i in skill_anchors:
+        entry = BASE - 0x08000000 + i * STRIDE
+        code = required_clan_skill_get(rom, entry)
+        got_skill_anchors[i] = (
+            CLAN_SKILLS.get(code, ""),
+            required_clan_skill_level_get(rom, entry),
+        )
+    if got_skill_anchors != skill_anchors:
+        skill_ok = False
+        failures.append(f"required clan-skill anchors: {got_skill_anchors}")
+
+    probe = bytearray(rom)
+    skill_entry = BASE - 0x08000000 + 146 * STRIDE
+    keep_skill_level = required_clan_skill_level_get(probe, skill_entry)
+    for value in range(16):
+        required_clan_skill_set(probe, skill_entry, value)
+        if (required_clan_skill_get(probe, skill_entry) != value or
+                required_clan_skill_level_get(probe, skill_entry) !=
+                keep_skill_level):
+            skill_ok = False
+            failures.append(f"required clan-skill packing failed for {value}")
+            break
+    keep_skill_code = required_clan_skill_get(probe, skill_entry)
+    keep_39 = probe[skill_entry + 0x39] & 0xF8
+    for value in (0, 1, 15, 16, 40, 63, 127):
+        required_clan_skill_level_set(probe, skill_entry, value)
+        if (required_clan_skill_level_get(probe, skill_entry) != value or
+                required_clan_skill_get(probe, skill_entry) !=
+                keep_skill_code or
+                probe[skill_entry + 0x39] & 0xF8 != keep_39):
+            skill_ok = False
+            failures.append(f"required skill-level packing failed for {value}")
+            break
+
+    # Twin Swords has no item requirements and needs Combat 10. Execute the
+    # complete acceptance predicate at the exact boundary.
+    gba.reset_ram()
+    gba.write8(CLAN_STATE + 2, 9)
+    below_requirement = gba.call(CHECK_REQUIREMENTS, [39])
+    gba.write8(CLAN_STATE + 2, 10)
+    meets_requirement = gba.call(CHECK_REQUIREMENTS, [39])
+    if below_requirement != 0 or meets_requirement != 1:
+        skill_ok = False
+        failures.append(
+            f"clan-skill requirement behavior: Combat 9="
+            f"{below_requirement}, Combat 10={meets_requirement}"
+        )
+    print(
+        f"11. required clan skill: {'OK' if skill_ok else 'FAIL'} "
+        f"({skill_checks} accessor reads; anchors {got_skill_anchors}; "
+        f"Twin Swords Combat 9={below_requirement}/10={meets_requirement}; "
+        "packed edits preserve adjacent bits)"
+    )
+
     if failures:
         print("\nFAIL:")
         for failure in failures[:10]:
             print(f"  - {failure}")
         return 1
-    print("\n10/10 mission checks passed")
+    print("\n11/11 mission checks passed")
     return 0
 
 

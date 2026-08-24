@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 2 — finish computed and packed mission properties |
-| Current work package | Resolve mission requirement properties `0x2e/0x2f` |
-| Last closed package | Mission availability deadline and clear conditions |
+| Current work package | Resolve mission property `0x37` from its UI reader |
+| Last closed package | Clan-skill acceptance requirement and reward-label correction |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 10/10; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 11/11; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -61,6 +61,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.2 | 2026-08-24 | Corrected mission index to 256 records at `0x08563A70`; named map-symbol and script-trigger ids | `mission_table.py index`; executed placement and trigger-selection paths; missions 8/8 |
 | M2.1c | 2026-08-24 | Exposed packed mission behavior and effective public type at `+0x02` | 1,024 accessor reads; packed edit checks; official-manual type anchors |
 | M2.1d | 2026-08-24 | Named availability days, clear-condition code, and clear count | 1,536 accessor reads; published mission anchors; packed edit checks |
+| M2.1e | 2026-08-24 | Named required clan skill/level and corrected four reward labels | 1,024 accessor reads; executed Combat 9/10 boundary; published anchors |
 
 ## Decisions and evidence
 
@@ -88,8 +89,9 @@ status and backlog tables are living sections and should be kept current.
   paired level/progress counters starting at `0x020021B4`; 100 points advances
   the corresponding level.
 - UI evidence: `sub_080461D4` labels the first value `Clan Pts:` and renders the
-  eight skill levels. The official manual names the displayed order Combat,
-  Magic, Appraise, Gather, Smithing, Craft, Negotiate, Track.
+  eight skill levels. The requirement UI's consecutive string entries establish
+  the internal order as Combat, Magic, Smithing, Craft, Appraise, Gather,
+  Negotiate, Track. The official manual's visual grid is not storage order.
 - Execution evidence: `tools/validate_missions.py` performs 4,608 mission
   accessor reads and calls `sub_08046850` for all nine tracks.
 - Product consequence: the mission CSV now exposes nine named, directly
@@ -173,6 +175,19 @@ status and backlog tables are living sections and should be kept current.
   setters preserve every adjacent bit. Published Dueling Sub, Watching You,
   Run For Fun, and Hungry Ghost listings agree with the decoded pairs.
 
+### D-012 — Properties `0x2e/0x2f` are the clan-skill acceptance gate
+
+- Property `0x2e` is `+0x38` bits 0–3. Nonzero values index consecutive UI
+  labels Combat through Track and select the corresponding clan-state pair.
+- Property `0x2f` is a seven-bit level packed across `+0x38/+0x39`.
+  `sub_080CEECC` rejects when the selected clan-skill level is lower.
+- Execution evidence: Twin Swords rejects Combat 9 and accepts Combat 10.
+  All 1,024 accessor reads and boundary setter probes also pass.
+- Correction: this independently proves the internal clan-state order, so the
+  old `+0x2d..+0x30` reward labels were corrected from Appraise/Gather/
+  Smithing/Craft to Smithing/Craft/Appraise/Gather. The bytes and prior
+  application tests were sound; only those four semantic labels were wrong.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -184,6 +199,32 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Clan-skill requirement closure and reward-label correction
+
+Objective:
+
+- Resolve properties `0x2e/0x2f` through their shared acceptance reader.
+
+Completed:
+
+- Named the required clan-skill code and seven-bit required level.
+- Added computed CSV columns and safe setters across `+0x38/+0x39`.
+- Executed all 1,024 accessor reads and the full Twin Swords acceptance gate.
+- Corrected the four middle clan-reward column labels after the requirement UI
+  proved the internal state order.
+
+Evidence recorded during the batch:
+
+- Twin Swords: Combat 10; Den of Evil: Combat 25.
+- Adaman Alloy: Smithing 15; Ghosts Of War: Track 40; T.L.C.: Magic 25.
+- Twin Swords returns false at Combat 9 and true at Combat 10.
+- Mission validation: 11/11.
+
+Next action:
+
+- Trace property `0x37` from its isolated UI reader and leave it numeric if the
+  presentation path does not establish a concrete player-facing meaning.
 
 ### 2026-08-24 — Availability and clear-condition closure
 
