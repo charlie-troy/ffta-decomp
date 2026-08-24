@@ -29,12 +29,19 @@ methods. Note that reading `+0x54` as a halfword is misleading: the high half
 is `+0x55`, and the pair increases across the table in a way that looks like a
 pointer but is not one.
 
-## The blocks are compressed, and the format is decodable
+## Packed-block wrapper and redirects
 
-Each block opens with the four bytes `11 FF FF FF`, then a **standard GBA LZ77
-header** — `0x10` followed by a 24-bit decompressed size — and then ordinary
-BIOS LZ77 data. The leading `0x11` is the BIOS call number the game uses to
-unpack it, which is why it appears where a compression type byte would.
+Packed blocks use a four-byte dispatch header. Type `0x11` means packed and
+LZ77-compressed; type `0x01` means packed and uncompressed. The following
+24-bit value is either `0xffffff` for local data or another map id to reuse.
+Nine logical maps redirect for both arrangement and terrain.
+
+For local type-`0x11` data, the dispatch header is `11 FF FF FF`, followed by
+a standard GBA LZ77 header (`0x10` plus a 24-bit decompressed size) and BIOS
+LZ77 data. Arrangement has 113 direct compressed maps, 40 direct uncompressed
+maps, and nine redirects. Terrain has 153 direct compressed maps and nine
+redirects. `tools/map_data.py` resolves every variant rather than skipping the
+non-LZ77 entries.
 
 The first byte of each block type is consistent across the table: palettes
 start `0x10` (plain BIOS LZ77) on 159 of 162 maps, height, arrangement and the
@@ -42,28 +49,53 @@ unknown block start `0x11` on most, and graphics start `0x20` or `0x22`, which
 is the Huffman range.
 
 `tools/ffta_lz.py` implements both directions. Round-tripping decompress ->
-compress -> decompress reproduces the data exactly on every map sampled.
+compress -> decompress reproduces the source data exactly.
 
-## Terrain is two bytes a tile
+## Tile arrangement (`+0x04`)
 
-Decompressed, the height block is a flat run of `(height, permission)` pairs.
-Map 0 declares 456 bytes and produces exactly 456, giving 228 tiles.
+The decompressed block begins with a four-byte header. Its first halfword is
+the offset of the 16x8 metatile-definition list; bit 6 of header byte 3 selects
+16-bit rather than 8-bit placement ids. Placement records begin at byte 4:
 
-The permission byte matches the published reading on all 28,222 tiles across
-the 153 decodable maps: 0 walkable, 1 impassable, 2 water, anything else not
-selectable. Values 0, 1 and 2 account for 95.8%, and the remainder are 3, 4, 8
-and 9, which the published "other values" case covers.
+```text
+u16 destination
+u8  count
+u8/u16 tile_id[count]
+```
 
-Heights fall in the documented 0–99 range for 96.7% of tiles. The exceptions
-are worth knowing about before trusting the field blindly: in map 0 they sit at
-tile indices 64, 80, 96, 112, 192 and 208 — every sixteenth tile — and hold
-128, 160, 192 and 224, all of which have bit 7 set. That regular spacing and
-the set high bit suggest the byte carries a flag rather than a height in those
-positions. This is not established, so treat a height above 127 as unexplained
-rather than as elevation.
+A zero destination terminates the placement stream. Each tile advances the
+destination by four. The destination describes a sparse 32x64 grid on each of
+two layers: `x = (address % 0x80) / 4`, `y = (address / 0x80) % 0x40`, and
+`layer = address / 0x2000`. All 119,749 logical-map placements are four-byte
+aligned and land on layer 0 or 1.
 
-Nine of the 162 maps do not carry the `11 FF FF FF` header on their height
-block and are skipped by the tooling rather than guessed at.
+Map 0 is the concrete anchor: 107 runs produce 770 placements (157 on layer 0,
+613 on layer 1), and its metatile definitions start at `0x750`. The separate
+terrain grid for the same map is 14x14. These are intentionally different
+coordinate systems: arrangement stores the two-layer isometric pixels, while
+terrain stores gameplay cells overlaid by the renderer. This structure agrees
+with the independent [FFTAUtils map editor](https://github.com/spiiin/FFTAUtils);
+our implementation is a native, guarded Python decoder rather than a port of
+its C# code.
+
+## Terrain is packed runs of two-byte cells
+
+The old exporter incorrectly treated the decompressed height block as a flat
+array. It is a sparse run stream. Each record is `u16 destination`, `u16 byte
+count`, then that many bytes of `(height, permission)` cells; four zero bytes
+terminate it. Destinations address a 16-column gameplay grid in bytes.
+
+After unpacking, map 0 contains 196 explicit cells covering x/y 0–13: a 14x14
+terrain grid. Its 456 decompressed bytes are encoded records and padding, not
+228 terrain cells.
+
+The permission byte uses 0 walkable, 1 impassable, 2 water, and other values
+for not-selectable cells. The corrected exporter resolves and decodes all 162
+logical maps, including nine redirects.
+
+The former reported height values above 127 were packed-run destination and
+length bytes misread as cells. They disappear under the correct decoder; no
+height flag is implied by that evidence.
 
 ## Editing
 
@@ -71,13 +103,18 @@ block and are skipped by the tooling rather than guessed at.
 python tools/map_data.py table   baserom.gba maps.csv      # resolved pointers
 python tools/map_data.py terrain baserom.gba terrain.csv   # every tile
 python tools/map_data.py apply-terrain baserom.gba terrain.csv out.gba
+python tools/map_data.py arrangement baserom.gba arrangement.csv
+python tools/map_data.py apply-arrangement baserom.gba arrangement.csv out.gba
+python tools/validate_maps.py baserom.gba
 ```
 
-Because the data is compressed, a rewritten block has to fit the space the
-original used. `apply-terrain` recompresses, measures the original block's true
-length, and **refuses any map that grew** rather than overrunning into the next
-block. Nothing outside the edited block is touched.
+Because compressed data must fit its original allocation, both apply commands
+recompress, measure, and refuse growth. Uncompressed arrangement blocks edit
+only the selected tile-id bytes. Redirected and pointer-aliased maps share
+storage; conflicting edits to the same underlying value are refused.
 
-Verified: applying an unedited dump produces a byte-identical ROM. Editing ten
-tiles of map 0 recompressed to 133 bytes against 137 available, changed 108
-bytes, and every one of them fell inside that map's height block.
+Verified across all 162 logical maps: both unedited CSVs reproduce the ROM
+byte-for-byte. A compressed map-0 arrangement edit fits in 2,510 of 2,511
+bytes, an uncompressed map-24 edit writes its one-byte id in place, and a
+map-0 permission edit fits exactly in its 137-byte terrain allocation. A
+separate map-0 height edit that grew to 139 bytes was refused as designed.

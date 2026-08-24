@@ -47,9 +47,9 @@ preview concealment is editable too. That scan also settles a negative: there
 is no formation table, because battle setups are scripted one unit at a time.
 
 Map data is mapped as well, in [docs/map-data.md](docs/map-data.md). The
-blocks are compressed, the codec is implemented in both directions, and
-terrain is editable tile by tile with a guard that refuses any block that
-would no longer fit.
+arrangement and terrain packed-run formats are decoded across all 162 logical
+maps. Both are editable with redirects resolved and a guard that refuses any
+compressed block that would no longer fit.
 
 The item table is mapped too, in [docs/item-table.md](docs/item-table.md):
 all 19 of its accessor properties are plain loads, and weapon attack power
@@ -299,8 +299,5 @@ discover about them. See [docs/job-table.md](docs/job-table.md).
 
 The former highest-risk live-validation item is now closed.
 
-1. **Mission fields.** Rewards, clan progression, dispatch job rules, pub fees,
-   dispatch difficulty, public type, and the mission index's map-symbol/trigger
-   keys are named; remaining computed/packed properties still need readers.
-2. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
-   `+0x08` block and the Huffman-compressed graphics do not yet.
+1. **The rest of the map blocks.** Terrain and tile arrangement decode and
+   round-trip; the `+0x08` block and Huffman-compressed graphics are next.

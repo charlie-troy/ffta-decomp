@@ -179,18 +179,20 @@ works both directions, so the pipeline exists and this is pure extension.
 
 **Steps:**
 
-1. **Tile arrangement** (`+0x04`): decompress and infer the layout — map 0's
-   228 tiles should correlate with the terrain `(height, permission)` pairs.
+1. **Tile arrangement — done 2026-08-24.** The sparse two-layer placement
+   runs, 8/16-bit variants, redirects, and raw/compressed storage are decoded
+   and editable. Map 0 has 770 visual placements over a separate 14x14 terrain
+   grid; the former 228-tile count was packed-stream bytes misread as cells.
 2. **The `+0x08` block**: decompress, characterize, and find its readers.
 3. **Graphics** (`+0x00`): implement the GBA **Huffman** variant (the
    `0x20`/`0x22` first-byte range) in `tools/ffta_lz.py`, which today only does
    LZ77.
 4. **Animation blocks** (`+0x14/+0x18/+0x1c`, on 83/162 maps) and the **mode
    bytes** (`+0x54/+0x55`).
-5. Resolve the **height >127 flag** (every 16th tile in map 0, bit 7 set — a
-   flag, not elevation).
-6. Handle the **9 maps** whose height block lacks the `11 FF FF FF` header,
-   currently skipped.
+5. ~~Resolve the height >127 flag.~~ **Closed 2026-08-24:** it was a decoder
+   error; packed run headers were being read as terrain cells.
+6. ~~Handle the 9 skipped height maps.~~ **Done 2026-08-24:** all nine are
+   ordinary redirects and now resolve through the shared packed-block loader.
 7. Give each newly-decoded block a dump/apply command with the same
    grow-refusal guard `apply-terrain` uses.
 

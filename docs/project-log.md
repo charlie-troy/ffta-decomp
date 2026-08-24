@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 3 — map blocks beyond terrain |
-| Current work package | MAP3.1 — decode map tile arrangement `+0x04` |
-| Last closed package | Hidden item/law-card reward previews; constant mission caller sweep |
+| Current work package | MAP3.2 — characterize map block `+0x08` |
+| Last closed package | MAP3.1 — tile arrangement and corrected packed terrain codec |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 6/6; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -42,7 +42,7 @@ status and backlog tables are living sections and should be kept current.
 |---|---:|---|---|---|
 | M2.1 | P0 | Complete | Name caller-backed mission computed/packed properties | All 50 constant-property call sites are assigned to named, validated families; seven variable-id calls remain numeric |
 | M2.2 | P0 | Complete | Name mission-index `+0x00/+0x01` | Ordering/grouping role is proven by an identified reader; CSV names and a check are added |
-| MAP3.1 | P1 | Pending | Decode map tile arrangement `+0x04` | Dump/apply round-trips and a known map's layout correlates with terrain |
+| MAP3.1 | P1 | Complete | Decode map tile arrangement `+0x04` | Dump/apply round-trips and map 0's two-layer layout is anchored against its 14x14 terrain grid |
 | MAP3.2 | P1 | Pending | Characterize map block `+0x08` | A reader identifies the block and one safe edit round-trips |
 | MAP3.3 | P1 | Pending | Implement GBA Huffman graphics decode | Graphics block decodes reproducibly and malformed/growing data is rejected safely |
 | ITEM4.1 | P2 | Pending | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Each name has an identifiable reader and byte-identical round-trip |
@@ -64,6 +64,7 @@ status and backlog tables are living sections and should be kept current.
 | M2.1e | 2026-08-24 | Named required clan skill/level and corrected four reward labels | 1,024 accessor reads; executed Combat 9/10 boundary; published anchors |
 | M2.1f | 2026-08-24 | Named the cancellation flag at `+0x41` bit 2 | 512 accessor reads; three executed formatter paths; packed edit check |
 | M2.1g | 2026-08-24 | Named four hidden item/law-card reward-preview flags and closed the constant caller sweep | 2,048 accessor reads; live visible/hidden formatters; dormant branch injection |
+| MAP3.1 | 2026-08-24 | Decoded sparse two-layer arrangement runs and corrected the terrain packed-run codec | `validate_maps.py` 6/6; two byte-identical CSV round-trips; compressed/raw edit anchors |
 
 ## Decisions and evidence
 
@@ -214,6 +215,19 @@ status and backlog tables are living sections and should be kept current.
   to MAP3.1. Reopen variable-id mission research only when a modding goal gives
   it a concrete payoff.
 
+### D-015 — Treat arrangement and terrain as separate packed coordinate systems
+
+- Arrangement begins with a metatile-definition pointer and then sparse
+  destination/count runs. Destinations place 16x8 visual metatiles on two
+  32x64 layers; ids are 16-bit on 121 logical maps and 8-bit on 41.
+- Terrain is also a sparse run stream, not the flat pair array the first tool
+  assumed. Its destinations address two-byte gameplay cells on a 16-column
+  grid. Map 0 is 14x14 with 196 explicit cells, not 228.
+- The earlier height values above 127 and nine "undecodable" maps were decoder
+  artifacts: packed headers were read as cells and redirects were skipped.
+- Decision: one shared resolver handles compressed, uncompressed, and redirect
+  forms; both apply paths preserve record topology and refuse growing blocks.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -225,6 +239,41 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Map arrangement and packed-terrain correction
+
+Objective:
+
+- Decode map-table `+0x04`, correlate a retail map with gameplay terrain, and
+  expose a guarded editing surface.
+
+Completed:
+
+- Recovered the arrangement grammar from retail blocks and independently
+  checked it against FFTAUtils: four-byte header, sparse placement runs,
+  8/16-bit ids, two layers, and a zero destination terminator.
+- Added `arrangement` and `apply-arrangement` commands with shared-storage
+  conflict detection, raw in-place writes, LZ77 allocation checks, and redirect
+  resolution.
+- Found and corrected the pre-existing terrain decoder: its decompressed bytes
+  are packed runs, not flat cells. The new exporter resolves all 162 maps.
+- Added `tools/validate_maps.py` with six independent format, anchor, fit, and
+  byte-identical round-trip checks.
+
+Evidence recorded during the batch:
+
+- All 119,749 logical placements are four-byte aligned and occupy layers 0/1.
+- Map 0 has 107 arrangement runs and 770 visual placements over a separate
+  14x14/196-cell terrain grid.
+- Unedited arrangement and terrain CSVs reproduce SHA-256
+  `43FC8204C6DCEEE58828AEBC7AF0C72EB807E99F35AD641C8BB0A4FA8B6EDC19`.
+- A compressed arrangement edit fits at 2,510/2,511 bytes; a raw 8-bit edit is
+  written in place; a 139/137-byte terrain edit is refused.
+
+Next action:
+
+- Characterize map-table `+0x08`, identify its reader and record grammar, then
+  give it the same dump/apply/size-guard treatment.
 
 ### 2026-08-24 — Hidden reward previews and Phase 2 closure
 

@@ -89,7 +89,7 @@ shown to be dead data rather than merely unexplained.
 
 ## Where things stand
 
-Mapped and editable with no compiler: abilities, jobs, items, map terrain,
+Mapped and editable with no compiler: abilities, jobs, items, map terrain and arrangement,
 missions. Text decodes at 99.7%, so every CSV carries real names.
 
 Genuinely open, with the reason:
@@ -102,8 +102,7 @@ Genuinely open, with the reason:
   rewards, progression, dispatch rules, fees, type, deadlines, clear
   conditions, clan-skill requirements, cancellation, and hidden reward previews
   are named. Seven variable-id calls remain, but do not block map work.
-- **Map blocks other than terrain.** Arrangement, the `+0x08` block, and the
-  Huffman-compressed graphics.
+- **Remaining map blocks.** The `+0x08` block and Huffman-compressed graphics.
 - **Formations do not exist** — battle setups are scripted, one Place Character
   opcode per unit. Do not go looking for a formation table.
 
@@ -112,6 +111,7 @@ Genuinely open, with the reason:
 ```bash
 python tools/validate_ai.py "<rom>"      # must stay 8/8
 python tools/validate_missions.py "<rom>" # must stay 13/13 when missions change
+python tools/validate_maps.py "<rom>"     # must stay 6/6 when maps change
 ```
 
 Every table tool must round-trip: dumping and re-applying an unedited CSV has
