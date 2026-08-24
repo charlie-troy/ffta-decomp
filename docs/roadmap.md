@@ -50,7 +50,7 @@ turns.
 
 ---
 
-## Phase 1 — Whole-battle behavioural validation (the highest-stated risk)
+## Phase 1 — Whole-battle behavioural validation (completed 2026-08-24)
 
 **Objective:** watch a real AI turn run end to end, and prove (or refute) that
 no unmodeled rule dominates the individually-verified decision inputs.
@@ -62,17 +62,17 @@ rules; it does not prove there is no further rule that dominates them.
 
 **Steps:**
 
-1. **Get a battle-positioned save state.** `baserom.sav` sits in the working
-   tree. mGBA lives at `C:\Users\charl\ffta-tools` (Windows) and in WSL via
-   `tools/setup_mgba.sh` + `tools/run_mgba.sh`. Save a state on an enemy or
-   auto-battle turn.
-2. **Trace it.** `python tools/trace_mgba.py <manifest> --samples 400` profiles
-   the program counter statistically (interrupt / read-PC / resume) instead of
-   single-stepping.
+1. **Get a battle-positioned save state — done.** The working save was blank,
+   so `tools/mgba_reach_snowball.lua` drives New Game to the opening engagement.
+   The canonical local replay artifact is `outputs/mgba-snowball/state-facing.ss0`.
+2. **Trace it — done.** Exact breakpoint mode records registers, RNG and stack
+   context at `0x080C32C0`, checkpointing each hit. Statistical sampling remains
+   available for subsystem discovery.
 3. **Attribute the IWRAM samples.** Done in tooling: `trace_mgba.py --rom` now
    reads the bytes around an IWRAM PC and matches them back into the ROM (the
-   copy is verbatim), then resolves that ROM address against the manifest. It
-   still needs a live trace to exercise, but the missing tooling is written.
+   copy is verbatim), then resolves that ROM address against the manifest. The
+   completed evaluator trace uses an exact ROM breakpoint and does not need the
+   statistical IWRAM fallback.
 4. **Confirm the candidate-list model.** Static confirmation is done (see
    `docs/ai-findings.md`): `sub_080C2618` builds one record per ability with
    the priority byte at `+0x10`, `sub_080C1EB4` filters a list by zeroing out
@@ -83,20 +83,20 @@ rules; it does not prove there is no further rule that dominates them.
    (CT tick). CT accumulates by the slow/haste-adjusted speed, a unit acts at
    CT > 1000, and the advance subtracts `min(max_CT - 1000, 500)` from every
    unit with a fractional carry. Three status bits acquire behavioural handles
-   (`+0xe8` bits 1/6, `+0xed` bit 6). What remains is the live trace through
-   a real turn.
-6. **Freeze the RNG** at `0x030034B0` so a turn is reproducible and a behaviour
-   change can be told apart from a dice roll.
-7. **Write it up** as a new `docs/` page and add a `validate_ai.py` check (or a
-   trace-based check) for whatever new invariant falls out.
+   (`+0xe8` bits 1/6, `+0xed` bit 6). The live turn is captured in
+   `docs/whole-battle-trace.md`.
+6. **Freeze the RNG — done.** `tools/mgba_replay_ai_turn.lua` writes
+   `0x12345678` at `0x030034B0`; two traces reproduce exactly.
+7. **Write it up — done.** See `docs/whole-battle-trace.md` and the repeat-pair
+   validator `tools/validate_ai_trace.py`.
 
-**Done when:** there is a reproducible trace showing a full AI turn resolving
-through `sub_080C32C0`, and a documented statement of whether any dominant
-unmodeled rule exists.
+**Done:** a reproducible trace shows a full enemy turn resolving through
+`sub_080C32C0`. No upstream rule bypasses the evaluator in this turn; broader
+mission-, law-, and effect-specific paths remain outside that scoped verdict.
 
 ---
 
-## Phase 2 — Mission fields: name the unnamed properties and find gil/AP
+## Phase 2 — Mission fields: finish the computed and packed properties
 
 **Objective:** finish the mission table — the newest and least-labeled of the
 mapped tables.

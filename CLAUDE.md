@@ -89,10 +89,10 @@ missions. Text decodes at 99.7%, so every CSV carries real names.
 
 Genuinely open, with the reason:
 
-- **Whole-battle behaviour.** Every AI decision input is verified individually
-  and `make verify-mod` measures what an edit does to the AI's choices, but
-  nothing assembles a real battle. This needs a save state; `tools/trace_mgba.py`
-  attaches to mGBA's GDB stub and mGBA is at `C:\Users\charl\ffta-tools`.
+- **Whole-battle behaviour is closed for the traced snowball turn.** The
+  frozen-RNG replay enters `sub_080C32C0` once per four distinct targets and
+  reproduces exactly; see `docs/whole-battle-trace.md`. Do not generalize that
+  one turn to every mission-, law-, or effect-specific path.
 - **Most mission fields.** Gil (`+0x33`, ×200), AP (`+0x34`, ×10) and the
   item reward (`+0x35`) are now named. The rest need a function that reads the
   property and does something identifiable.

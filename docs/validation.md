@@ -73,10 +73,12 @@ nothing and 100 keeps everything.
 - **Resistance slot 2.** It is a real slot with the same value distribution as
   the other seven, but no field id in the accessor reaches it, so nothing here
   shows the game reading it.
-- **Whole-battle behaviour.** The evaluator's decision inputs are confirmed
-  individually, but no test here assembles a map, a turn order and a full unit
-  to watch the AI actually choose. Calling fragments proves the rules; it does
-  not prove there is no seventh rule elsewhere that dominates them.
+- **Whole-battle behaviour beyond the traced case.** The opening snowball
+  engagement is now execution-traced: one enemy actor evaluates four distinct
+  targets through `sub_080C32C0`, and two frozen-RNG replays match exactly (see
+  [whole-battle-trace.md](whole-battle-trace.md)). That closes the live-path
+  question for this turn, but does not prove every later mission-, law-, or
+  effect-specific path is free of an additional dominating rule.
 
 ## Why this beats a playtest for these claims
 

@@ -69,8 +69,11 @@ the stat-id mapping, the healthy-target rule at its exact boundaries, the
 11%/50% status gate, packed resistance decoding, and unarmed attack power. See
 [docs/validation.md](docs/validation.md).
 
-What remains unvalidated is whole-battle behaviour, 22 computed job-accessor
-properties, and resistance slot 2. The four still-unnamed job-table offsets are
+Whole-battle behaviour is now traced through a real enemy turn: one actor calls
+`sub_080C32C0` for four distinct targets, and a frozen-RNG replay reproduces the
+registers and stack exactly. See [docs/whole-battle-trace.md](docs/whole-battle-trace.md).
+What remains unvalidated is 22 computed job-accessor properties and resistance
+slot 2. The four still-unnamed job-table offsets are
 not an open validation task: exhaustive reachability analysis proves the retail
 ROM never reads them. The job table itself is written up in
 [docs/job-table.md](docs/job-table.md), including two corrections to the
@@ -286,14 +289,9 @@ The job table is finished, in the sense that the four still-unnamed offsets are
 provably dead: no code in the ROM reads them, so there is nothing left to
 discover about them. See [docs/job-table.md](docs/job-table.md).
 
-What remains needs something this repo cannot supply on its own.
+The former highest-risk live-validation item is now closed.
 
-1. **Whole-battle behaviour.** Every decision input is confirmed individually
-   and `make verify-mod` measures what an edit does to the AI's choices, but
-   nothing here assembles a map, a turn order and a real unit to watch a full
-   turn play out. Calling fragments proves the rules; it cannot prove there is
-   no further rule that dominates them. The turn-order code itself is now
-   identified (see [docs/turn-order.md](docs/turn-order.md)); what remains is a
-   live trace through a real turn.
+1. **Mission fields.** Rewards are named; the remaining computed and packed
+   fields need identifiable readers.
 2. **The rest of the map blocks.** Terrain decodes; tile arrangement, the
    `+0x08` block and the Huffman-compressed graphics do not yet.

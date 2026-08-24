@@ -6,6 +6,7 @@ baserom*
 /build/
 /tools/__pycache__/
 /toolchain/
+/outputs/
 *.o
 *.elf
 *.map

@@ -12,6 +12,7 @@ Usage:
     python tools/trace_mgba.py <manifest.json> [--rom rom.gba]
                                [--host H] [--port P]
                                [--samples N] [--interval S] [--out FILE]
+                               [--break-at ADDR] [--break-hits N]
 
 Passing --rom lets the trace resolve samples taken in IWRAM: the game copies
 hot routines there verbatim, so the tool reads the bytes around the sampled PC
@@ -136,6 +137,26 @@ class Gdb:
         except ValueError:
             return None
 
+    def read_registers(self):
+        """Return r0-r15 plus any trailing ARM registers from a `g` packet."""
+        data = self.send("g")
+        for _ in range(4):
+            if data and len(data) >= 16 * 8 and all(
+                    c in "0123456789abcdefABCDEF" for c in data):
+                break
+            try:
+                data = self._read_packet()
+            except (socket.timeout, EOFError):
+                return None
+        else:
+            return None
+        try:
+            raw = bytes.fromhex(data)
+        except ValueError:
+            return None
+        return [int.from_bytes(raw[i:i + 4], "little")
+                for i in range(0, len(raw) - 3, 4)]
+
     def cont(self):
         self.sock.sendall(self._frame("c"))
 
@@ -189,6 +210,56 @@ def resolve_iwram(gdb, pc, rom):
     return None
 
 
+def parse_address(value):
+    return int(value, 0)
+
+
+def trace_breakpoint(gdb, address, count, timeout, checkpoint=None):
+    """Record register/RNG/stack snapshots each time a ROM address executes."""
+    reply = gdb.send(f"Z0,{address:x},2")
+    if reply != "OK":
+        raise RuntimeError(f"mGBA rejected breakpoint at {address:#010x}: {reply!r}")
+
+    gdb.sock.settimeout(timeout)
+    hits = []
+    try:
+        while len(hits) < count:
+            gdb.cont()
+            stop = gdb._read_packet()
+            if not stop or stop[:1] not in ("S", "T"):
+                raise RuntimeError(f"unexpected breakpoint stop reply: {stop!r}")
+            regs = gdb.read_registers()
+            if not regs or len(regs) < 16:
+                raise RuntimeError("could not read ARM registers at breakpoint")
+            stack = gdb.read_mem(regs[13], 64)
+            rng = gdb.read_mem(0x030034B0, 4)
+            hits.append({
+                "index": len(hits) + 1,
+                "stop": stop,
+                "pc": regs[15],
+                "registers": {f"r{i}": value for i, value in enumerate(regs[:16])},
+                "cpsr": regs[16] if len(regs) > 16 else None,
+                "rng_seed": int.from_bytes(rng, "little") if rng else None,
+                "stack": stack.hex() if stack else None,
+            })
+            print(f"hit {len(hits):>3}/{count}: pc={regs[15]:#010x} "
+                  f"r0={regs[0]:#010x} r1={regs[1]:#010x} "
+                  f"rng={hits[-1]['rng_seed']!r}")
+            if checkpoint:
+                with open(checkpoint, "w", newline="\n") as fh:
+                    json.dump({"mode": "breakpoint", "address": address,
+                               "hits": hits}, fh, indent=1)
+    except (EOFError, socket.timeout, ConnectionError, OSError) as exc:
+        print(f"stopped after {len(hits)} breakpoint hits: {exc}")
+    finally:
+        try:
+            gdb.send(f"z0,{address:x},2")
+            gdb.cont()
+        except (EOFError, socket.timeout, OSError):
+            pass
+    return hits
+
+
 def main(argv):
     p = argparse.ArgumentParser()
     p.add_argument("manifest")
@@ -198,6 +269,11 @@ def main(argv):
     p.add_argument("--samples", type=int, default=400)
     p.add_argument("--interval", type=float, default=0.01)
     p.add_argument("--out", default=None)
+    p.add_argument("--break-at", type=parse_address, default=None,
+                   help="record exact execution hits at ADDR instead of sampling")
+    p.add_argument("--break-hits", type=int, default=1)
+    p.add_argument("--break-timeout", type=float, default=300.0,
+                   help="seconds to wait for each breakpoint hit")
     args = p.parse_args(argv)
 
     funcs = load_functions(args.manifest)
@@ -221,6 +297,23 @@ def main(argv):
     if not initial or initial[:1] not in ("S", "T"):
         gdb.close()
         raise RuntimeError(f"unexpected initial GDB status: {initial!r}")
+    if args.break_at is not None:
+        try:
+            hits = trace_breakpoint(gdb, args.break_at, args.break_hits,
+                                    args.break_timeout, args.out)
+        finally:
+            gdb.close()
+        result = {"mode": "breakpoint", "address": args.break_at,
+                  "hits": hits}
+        if args.out:
+            with open(args.out, "w", newline="\n") as fh:
+                json.dump(result, fh, indent=1)
+            print(f"\nwrote {args.out}")
+        if len(hits) != args.break_hits:
+            print(f"incomplete trace: expected {args.break_hits} hits, got {len(hits)}")
+            return 1
+        return 0
+
     gdb.cont()
     time.sleep(max(args.interval, 0.05))
 
