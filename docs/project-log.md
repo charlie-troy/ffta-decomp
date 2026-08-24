@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.1c — expanded descriptor-backed status registry to 15 bits |
+| Last closed package | AI5.2a — named max MP and corrected stat-map coverage |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 7/7; matching ROM SHA1 |
 
@@ -73,6 +73,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.1a | 2026-08-24 | Joined Speed Down, Slow, and Haste to unit bits and application cases | Executed getter/setters, speed shifts, and independent naming anchors |
 | AI5.1b | 2026-08-24 | Added the raw-effect descriptor join, corrected Sleep to case 45, and named Poison case 61 | `validate_statuses.py` 7/7; five named ability/effect/handler/getter chains execute |
 | AI5.1c | 2026-08-24 | Expanded descriptor-backed names to 15 status bits | 15 named ability/effect/handler joins and bit round-trips; four secondary-effect confirmations |
+| AI5.2a | 2026-08-24 | Named stat `0x16` / unit `+0x1e` as max MP and corrected the direct-load count | Executed four-field stat reads; restoration clamp at `0x0809308A..C4` |
 
 ## Decisions and evidence
 
@@ -292,6 +293,33 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-24 — Max-MP execution anchor and stat-map correction
+
+Objective:
+
+- Start the unit-stat half of AI5.1 with the smallest unnamed `u16` whose
+  consumer has an identifiable boundary behavior.
+
+Completed:
+
+- Named stat id `0x16` / unit `+0x1e` as max MP.
+- Extended the AI execution gate to cover HP, max HP, MP, and max MP together.
+- Corrected stale documentation: the 69-entry accessor has 31 direct loads and
+  38 address-returning cases, not 65 direct loads and four pointers.
+
+Evidence recorded during the batch:
+
+- At `0x0809308A..0x080930C4`, the retail restoration path reads current MP
+  (`0x15`), adds recovery, reads `0x16`, clamps to it, and writes the result to
+  unit `+0x1c`.
+- Four synthetic boundary samples return the exact values written to
+  `+0x18/+0x1a/+0x1c/+0x1e` through stat ids `0x13..0x16`.
+
+Next action:
+
+- Trace stat ids `0x17..0x1a` through their packing and combat consumers; keep
+  them numeric if the bitfields do not expose a unique game-facing meaning.
 
 ### 2026-08-24 — Descriptor-backed status expansion
 

@@ -124,21 +124,26 @@ def _put16(gba, addr, val):
 
 
 def check_stat_ids(gba):
-    """Stat ids 0x13/0x14/0x15 should read unit +0x18/+0x1A/+0x1C."""
+    """HP/MP stat ids should read the four adjacent unit fields."""
     print("")
     print("4. stat ids against a synthetic unit")
     UNIT = 0x02001000
     ok = True
-    for hp, mx, mp in [(1, 1, 1), (37, 80, 12), (250, 999, 64), (0, 50, 0)]:
+    samples = [(1, 1, 1, 2), (37, 80, 12, 40),
+               (250, 999, 64, 123), (0, 50, 0, 0)]
+    for hp, mx, mp, max_mp in samples:
         gba.uc.mem_write(UNIT, BLANK)
         _put16(gba, UNIT + 0x18, hp)
         _put16(gba, UNIT + 0x1A, mx)
         _put16(gba, UNIT + 0x1C, mp)
-        got = tuple(gba.call(STAT_GET, [UNIT, s]) for s in (0x13, 0x14, 0x15))
-        if got != (hp, mx, mp):
+        _put16(gba, UNIT + 0x1E, max_mp)
+        got = tuple(gba.call(STAT_GET, [UNIT, s])
+                    for s in (0x13, 0x14, 0x15, 0x16))
+        if got != (hp, mx, mp, max_mp):
             ok = False
-            print(f"   wrote {hp}/{mx}/{mp}, read {got}")
-    print(f"   0x13/0x14/0x15 == +0x18/+0x1A/+0x1C -> {'PASS' if ok else 'FAIL'}")
+            print(f"   wrote {hp}/{mx}/{mp}/{max_mp}, read {got}")
+    print("   0x13..0x16 == HP/MaxHP/MP/MaxMP at +0x18..+0x1E "
+          f"-> {'PASS' if ok else 'FAIL'}")
     return ok
 
 

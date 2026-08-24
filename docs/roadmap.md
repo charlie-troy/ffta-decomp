@@ -269,7 +269,10 @@ behaviour mod needs to reach.
    Shell while independently reconfirming Silence and Reflect.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
    (`+0x04`–`+0x14`) and the unnamed `u16`s — by finding code that reads a stat
-   and does something identifiable, exactly as the HP pair was pinned.
+   and does something identifiable, exactly as the HP pair was pinned. **In
+   progress 2026-08-24:** stat `0x16` / unit `+0x1e` is now max MP; the executed
+   restoration path clamps current MP to it before writing `+0x1c`, and the AI
+   validator covers all four HP/MP fields.
 4. Decompile the **capability setters** `0x080CE420`–`0x080CE480`.
 5. Resolve whether **resistance slot 2** (a real slot no field id reaches) is
    read by any path.

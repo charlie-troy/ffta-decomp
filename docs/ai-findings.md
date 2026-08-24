@@ -83,7 +83,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x13` | `ldrh` | **`+0x18`** | **current HP** |
 | `0x14` | `ldrh` | **`+0x1A`** | **max HP** |
 | `0x15` | `ldrh` | **`+0x1C`** | **current MP** (the field the cost check uses) |
-| `0x16` | `ldrh` | `+0x1E` | max MP *(by symmetry)* |
+| `0x16` | `ldrh` | `+0x1E` | **max MP**; restoration clamps current MP to this value before writing `+0x1C` |
 | `0x17` | `ldrh` | `+0x20` | u16 stat |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
@@ -188,7 +188,7 @@ re-applies the same gate while scoring.
 ## Next steps
 
 > **Most of the original next steps are now done.** See [ability-table.md](ability-table.md)
-> for the full ability layout, [unit-struct.md](unit-struct.md) for 65 of 69 stat
+> for the full ability layout, [unit-struct.md](unit-struct.md) for all 69 stat
 > fields, and [roadmap.md](roadmap.md) for what remains. The items below are kept
 > as a record of the original plan.
 
