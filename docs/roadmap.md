@@ -333,6 +333,11 @@ behaviour mod needs to reach.
    count KOs inflicted by the actor and suffered by the target. A forced-KO
    path executes target HP `123 -> 0` and counters `9/11 -> 10/12`; both
    increments saturate. Nine bytes at `+0xf3..+0xfb` remain numeric.
+16. **Battle position/index closed 2026-08-25:** stats `0x3e..0x40` /
+   `+0xf6..+0xf8` are tile X, Y, and height; stat `0x43` / `+0xfb` is the
+   zero-based battle-list index assigned at battle-object insertion. Executed
+   movement-origin and list-length paths cover both families. Five bytes in
+   this late block remain numeric.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

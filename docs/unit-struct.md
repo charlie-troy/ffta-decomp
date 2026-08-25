@@ -56,6 +56,10 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x37` | `+0xE7` | u8 | **recent target ids** | two packed 4-bit unit ids; action resolution records the two most recent distinct targets and AI tests membership |
 | `0x39` | `+0xF1` | u8 | **KOs inflicted** | forced-KO result zeroes target HP, then saturating-increments this field on the acting unit |
 | `0x3a` | `+0xF2` | u8 | **KOs suffered** | the same result path saturating-increments this field on the zero-HP target |
+| `0x3e` | `+0xF6` | u8 | **tile X** | copied into movement-search origin X and consumed with Y by spatial distance checks |
+| `0x3f` | `+0xF7` | u8 | **tile Y** | copied into movement-search origin Y and consumed with X by spatial distance checks |
+| `0x40` | `+0xF8` | u8 | **tile height** | vertical component paired with unit X/Y in range formulas and battle-object state |
+| `0x43` | `+0xFB` | u8 | **battle list index** | battle-object creation stores the current unit-list length here before inserting the new object |
 
 ## Complete numeric layout
 
@@ -74,7 +78,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x27` | `+0xd8` | address of status-state array |
 | `0x28..0x37` | `+0xd8..+0xe7` | sixteen named u8 loads: fourteen countdowns/durations, one link id, and packed recent-target ids |
 | `0x38` | `+0xe8` | address of live-status flags |
-| `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads; KO-inflicted/suffered pair named at `+0xf1/+0xf2` |
+| `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads; KO pair, tile X/Y/height, and battle-list index named |
 | `0x44` | `+0xfc` | address |
 
 ## Shape
@@ -136,8 +140,8 @@ target `+0x104` into the actor's `+0xe6`; both its dedicated getter and stat
 `0x36` return 42. Other consumers compare this byte to unit ids when resolving
 linked states, so the encompassing pointer is a status-state array.
 
-This names 53 of 63 scalar loads. Ten remain numeric: stat `0x00` and the nine
-fields at `+0xf3..+0xfb`. The two remaining unnamed address regions are
+This names 57 of 63 scalar loads. Six remain numeric: stat `0x00` and
+`+0xf3/+0xf4/+0xf5/+0xf9/+0xfa`. The two remaining unnamed address regions are
 `+0x34` and `+0xfc`; `+0xd8` is the status-state array and `+0xe8` the
 live-status array.
 
@@ -153,3 +157,11 @@ HP is first set to zero, the acting unit's `+0xf1` is saturating-incremented,
 and the target's `+0xf2` is saturating-incremented. Executing this path from
 starting values 9/11 produces target HP 0 and generic stats `0x39/0x3a` equal
 to 10/12. `+0xf1` also has two independent formula consumers.
+
+The spatial triplet at `+0xf6..+0xf8` is tile X, tile Y, and height. An
+executed movement-search fragment copies synthetic X/Y `12/9` into its origin,
+the generic stats return `12/9/4`, and combat range formulas pass the same
+signed triplet together. `+0xfb` is the zero-based battle-list index: the
+battle-object builder counts the existing list, stores that value as its
+insertion key and in the unit, then inserts the object. A synthetic two-node
+list returns and stores index 2.

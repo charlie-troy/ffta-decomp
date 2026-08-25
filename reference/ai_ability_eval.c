@@ -27,8 +27,11 @@ struct Unit
     u8  koInflictedCount; /* +0xF1 */
     u8  koSufferedCount;  /* +0xF2 */
     u8  filler_F3[3];
-    u8  unk_F6;         /* +0xF6 */
-    u8  unk_F7;         /* +0xF7 */
+    u8  tileX;           /* +0xF6 */
+    u8  tileY;           /* +0xF7 */
+    u8  tileHeight;      /* +0xF8 */
+    u8  filler_F9[2];
+    u8  battleListIndex; /* +0xFB */
 };
 struct Ability;   /* 28 bytes; see docs/ability-table.md                       */
 
@@ -139,8 +142,8 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
             Reject();
 
         mode = sub_0812E6A4(target) & 0xFFFF;
-        if (!sub_0812F0E4(target, (signed char)target->unk_F6,
-                          (signed char)target->unk_F7))
+        if (!sub_0812F0E4(target, (signed char)target->tileX,
+                          (signed char)target->tileY))
             mode = 0;
         if (act->abilityId != 0 && AbilityProp(act->abilityId, 0x11))
             mode = 0;                                /* flag bit 6 */

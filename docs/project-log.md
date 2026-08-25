@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.5b — resolve the remaining `+0xf3..+0xfb` battle state |
-| Last closed package | AI5.5a — named the paired KO counters at `+0xf1/+0xf2` |
+| Current work package | AI5.5c — resolve or classify `+0xf3/+0xf4/+0xf5/+0xf9/+0xfa` |
+| Last closed package | AI5.5b — named tile position and battle-list index |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 16/16; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 18/18; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -91,6 +91,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.4g | 2026-08-25 | Named stat `0x28` / `+0xd8` as the Zombie revival countdown | Executed effective-Zombie reset seeds 3 while blank stays 0; dead-Zombie turn path decrements and schedules revival at zero |
 | AI5.4h | 2026-08-25 | Named stat `0x37` / `+0xe7` as packed recent target ids | Executed MRU insertion/promotion/eviction and membership; four action writers join to the AI reader |
 | AI5.5a | 2026-08-25 | Named stats `0x39/0x3a` / `+0xf1/+0xf2` as KOs inflicted/suffered | Forced-KO execution zeros target HP and increments actor/target counters 9/11→10/12 |
+| AI5.5b | 2026-08-25 | Named stats `0x3e..0x40` as tile X/Y/height and `0x43` as battle-list index | Executed movement-origin copy and two-node list insertion index; range/list consumers preserved |
 
 ## Decisions and evidence
 
@@ -417,6 +418,16 @@ status and backlog tables are living sections and should be kept current.
 - Decision: name them `ko_inflicted_count` and `ko_suffered_count`. Do not
   generalize the adjacent numeric bytes from proximity.
 
+### D-031 — Separate spatial state from late battle counters
+
+- `+0xf6/+0xf7` are copied into movement-search origin X/Y and used by
+  Manhattan-distance consumers; `+0xf8` is passed as the adjacent signed
+  vertical component in combat range formulas.
+- Battle-object creation computes the current unit-list length, uses it as the
+  insertion key, and stores the same byte at unit `+0xfb`.
+- Decision: name stats `0x3e..0x40` `tile_x/tile_y/tile_height` and stat `0x43`
+  `battle_list_index`. These are runtime placement/identity, not counters.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -428,6 +439,33 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Battle tile position and list index
+
+Objective:
+
+- Close the high-traffic spatial fields and independently resolve `+0xfb`.
+
+Completed:
+
+- Named stats `0x3e..0x40` / `+0xf6..+0xf8` as tile X, tile Y, and tile height.
+- Named stat `0x43` / `+0xfb` as the zero-based battle-list index.
+- Increased behavior-backed scalar coverage to 57/63.
+
+Evidence recorded during the batch:
+
+- Executed synthetic tile state `12/9/4`; the movement-search fragment copied
+  X/Y `12/9` into its origin and the generic stat getter returned all three.
+- Range formulas consume the same signed X/Y/height triplet.
+- A synthetic two-node battle list returns length 2; battle-object creation
+  stores that value both as its insertion key and unit `+0xfb`.
+- Status/state validation is 18/18.
+
+Next action:
+
+- Complete the mutation/read census for `+0xf3/+0xf4/+0xf5/+0xf9/+0xfa`.
+  Promote `+0xf4` only if its formula role can be named; classify fields with
+  no non-initializer access as dormant rather than guessing.
 
 ### 2026-08-25 — Paired KO counters
 

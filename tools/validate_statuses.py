@@ -36,6 +36,9 @@ ZERO_HP_PREDICATE = 0x080C8280
 RECENT_TARGET_PUSH = 0x08134170
 RECENT_TARGET_CONTAINS = 0x081341BC
 FORCED_KO_START, FORCED_KO_END = 0x08132AEA, 0x08132B34
+MOVEMENT_ORIGIN_START, MOVEMENT_ORIGIN_END = 0x080C537C, 0x080C5390
+BATTLE_LIST_SIZE = 0x080C7B08
+BATTLE_LIST_INDEX_READER = 0x08099CB8
 ROM = 0x08000000
 
 
@@ -378,6 +381,53 @@ def main(argv=None):
     if not ko_ok:
         failures.append("KO counters")
 
+    # +0xf6/+0xf7 are copied into the movement-search origin, while the
+    # adjacent +0xf8 is the vertical component passed with that X/Y pair to
+    # spatial range formulas.
+    unit = 0x02001000
+    holder, movement = 0x02001200, 0x02001400
+    gba.reset_ram()
+    gba.write8(unit + 0xF6, 12)
+    gba.write8(unit + 0xF7, 9)
+    gba.write8(unit + 0xF8, 4)
+    gba.write32(holder, unit)
+    gba.write32(movement, holder)
+    gba.run_range(MOVEMENT_ORIGIN_START, MOVEMENT_ORIGIN_END,
+                  {"r4": movement})
+    spatial_stats = tuple(gba.call(STAT_GETTER, [unit, stat])
+                          for stat in (0x3E, 0x3F, 0x40))
+    movement_origin = tuple(gba.uc.mem_read(movement + 0x18, 2))
+    range_calls = calls_from(rom, 0x0812D2F0, 0x0812D350)
+    spatial_ok = (spatial_stats == (12, 9, 4) and
+                  movement_origin == (12, 9) and 0x0812D1DC in range_calls)
+    print(f"16. battle tile position: {'OK' if spatial_ok else 'FAIL'} "
+          f"(stats={spatial_stats}; movement origin={movement_origin})")
+    if not spatial_ok:
+        failures.append("battle tile position")
+
+    # The battle object builder stores the current unit-list length both as
+    # its insertion key and in unit +0xfb, making it a zero-based list index.
+    owner, unit_list = 0x02001800, 0x02001A00
+    node_a, node_b = 0x02001C00, 0x02001E00
+    gba.reset_ram()
+    gba.write32(owner + 0x10, unit_list)
+    gba.write32(unit_list + 4, node_a)
+    gba.write32(node_a + 8, node_b)
+    gba.write32(node_b + 8, 0)
+    list_size = gba.call(BATTLE_LIST_INDEX_READER, [owner])
+    gba.write8(unit + 0xFB, list_size)
+    list_stat = gba.call(STAT_GETTER, [unit, 0x43])
+    builder_calls = calls_from(rom, 0x0809716C, 0x080971F0)
+    builder_store = rom[0x971AA:0x971B0] == bytes.fromhex("2968fb310870")
+    list_ok = (list_size == 2 and list_stat == 2 and
+               BATTLE_LIST_SIZE in calls_from(rom, BATTLE_LIST_INDEX_READER,
+                                              0x08099CC4) and
+               BATTLE_LIST_INDEX_READER in builder_calls and builder_store)
+    print(f"17. battle list index: {'OK' if list_ok else 'FAIL'} "
+          f"(two-node list -> index/stat={list_size}/{list_stat})")
+    if not list_ok:
+        failures.append("battle list index")
+
     yellow = next(entry for entry in PERSISTENT_STATUS_FLAGS
                   if entry["name"] == "yellow_card")
     raw_effect = rom[ABILITY_TABLE - ROM +
@@ -408,7 +458,7 @@ def main(argv=None):
                  cancel_case == yellow["cancel_case"] and
                  cancel_pointer == yellow["cancel_handler"] and
                  cleared == 0)
-    print(f"16. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
+    print(f"18. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
           f"(apply={persistent:#06x}, clip={cleared:#06x})")
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
@@ -417,7 +467,7 @@ def main(argv=None):
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 16/16 status/state checks")
+    print("PASS: 18/18 status/state checks")
     return 0
 
 

@@ -110,6 +110,8 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x37` | `ldrb` | `+0xE7` | **recent target ids** (two packed 4-bit ids) |
 | `0x39` | `ldrb` | `+0xF1` | **KOs inflicted** |
 | `0x3a` | `ldrb` | `+0xF2` | **KOs suffered** |
+| `0x3e..0x40` | `ldrb` | `+0xF6..+0xF8` | **tile X, tile Y, tile height** |
+| `0x43` | `ldrb` | `+0xFB` | **battle list index** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain
@@ -166,8 +168,10 @@ movement/ability-usability readers distinguish their roles. Cover independently
 copies the covered unit's `+0x104` id to `+0xe6`; linked-state consumers compare
 it against other unit ids. Zombie revival and recent-target history close the
 other two bytes in this block. The paired KO result path then names
-`+0xf1/+0xf2` as KOs inflicted/suffered. This names 53 of 63 scalar loads. Ten
-remain numeric: stat `0x00` and `+0xf3..+0xfb`; six stat ids return addresses.
+`+0xf1/+0xf2` as KOs inflicted/suffered. Movement and range consumers name
+`+0xf6..+0xf8` as tile X/Y/height, while battle-object insertion names `+0xfb`
+as its list index. This names 57 of 63 scalar loads. Six remain numeric: stat
+`0x00` and `+0xf3/+0xf4/+0xf5/+0xf9/+0xfa`; six stat ids return addresses.
 
 ## The AI is randomised
 
