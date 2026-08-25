@@ -33,6 +33,8 @@ STATUS_LINK_GETTER = 0x080CE410
 ZOMBIE_COUNT_GETTER = 0x080CE3A0
 ZOMBIE_COUNT_SETTER = 0x080CE418
 ZERO_HP_PREDICATE = 0x080C8280
+RECENT_TARGET_PUSH = 0x08134170
+RECENT_TARGET_CONTAINS = 0x081341BC
 ROM = 0x08000000
 
 
@@ -44,6 +46,17 @@ def calls_from(rom, start, end):
         if first & 0xF800 == 0xF000 and second & 0xF800 == 0xF800:
             calls.add(bl_target(ROM + offset, first, second))
     return calls
+
+
+def call_sites_to(rom, start, end, target):
+    sites = []
+    for offset in range(start - ROM, end - ROM - 3, 2):
+        first = int.from_bytes(rom[offset:offset + 2], "little")
+        second = int.from_bytes(rom[offset + 2:offset + 4], "little")
+        if (first & 0xF800 == 0xF000 and second & 0xF800 == 0xF800 and
+                bl_target(ROM + offset, first, second) == target):
+            sites.append(ROM + offset)
+    return sites
 
 
 def main(argv=None):
@@ -318,6 +331,32 @@ def main(argv=None):
     if not revive_ok:
         failures.append("Zombie revival countdown")
 
+    # +0xe7 is a two-entry MRU of distinct action targets. Each nibble stores
+    # unit +0x104; the low nibble is newest and 0xf is the empty sentinel.
+    actor = 0x02001000
+    target_a, target_b, target_c = 0x02001200, 0x02001400, 0x02001600
+    gba.reset_ram()
+    gba.write8(actor + 0xE7, 0xFF)
+    for target, unit_id in ((target_a, 5), (target_b, 6), (target_c, 7)):
+        gba.write8(target + 0x104, unit_id)
+    history_states = []
+    for target in (target_a, target_b, target_a, target_c):
+        gba.call(RECENT_TARGET_PUSH, [actor, target])
+        history_states.append(gba.call(STAT_GETTER, [actor, 0x37]))
+    memberships = tuple(gba.call(RECENT_TARGET_CONTAINS, [actor, target])
+                        for target in (target_a, target_b, target_c))
+    action_sites = call_sites_to(rom, 0x080A23B8, 0x080A3778,
+                                RECENT_TARGET_PUSH)
+    ai_calls = calls_from(rom, 0x080C32C0, 0x080C35B0)
+    history_ok = (history_states == [0xF5, 0x56, 0x65, 0x57] and
+                  memberships == (1, 0, 1) and len(action_sites) == 4 and
+                  RECENT_TARGET_CONTAINS in ai_calls)
+    print(f"14. recent target ids: {'OK' if history_ok else 'FAIL'} "
+          f"(states={[hex(v) for v in history_states]}; "
+          f"contains={memberships}; action writers={len(action_sites)})")
+    if not history_ok:
+        failures.append("recent target ids")
+
     yellow = next(entry for entry in PERSISTENT_STATUS_FLAGS
                   if entry["name"] == "yellow_card")
     raw_effect = rom[ABILITY_TABLE - ROM +
@@ -348,7 +387,7 @@ def main(argv=None):
                  cancel_case == yellow["cancel_case"] and
                  cancel_pointer == yellow["cancel_handler"] and
                  cleared == 0)
-    print(f"14. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
+    print(f"15. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
           f"(apply={persistent:#06x}, clip={cleared:#06x})")
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
@@ -357,7 +396,7 @@ def main(argv=None):
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 14/14 status checks")
+    print("PASS: 15/15 status checks")
     return 0
 
 

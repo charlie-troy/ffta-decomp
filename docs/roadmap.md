@@ -325,6 +325,10 @@ behaviour mod needs to reach.
    3 when battle statuses reset on an effective Zombie, stays 0 for an ordinary
    unit, and the zero-HP Zombie turn path decrements it before scheduling
    revival at zero. Only `+0xe7` remains numeric in this region.
+14. **Recent target history closed 2026-08-25:** stat `0x37` / `+0xe7` packs
+   the two most recent distinct action-target unit ids into nibbles, newest
+   first. Action resolution writes it and the AI evaluator tests membership.
+   All sixteen scalar bytes in the status-state region are now named.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

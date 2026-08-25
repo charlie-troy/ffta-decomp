@@ -107,6 +107,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x34` | `ldrb` | `+0xE4` | **Disable duration** |
 | `0x35` | `ldrb` | `+0xE5` | **Addle duration** |
 | `0x36` | `ldrb` | `+0xE6` | **status link id** |
+| `0x37` | `ldrb` | `+0xE7` | **recent target ids** (two packed 4-bit ids) |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain

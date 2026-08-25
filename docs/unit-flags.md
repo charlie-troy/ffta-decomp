@@ -109,7 +109,14 @@ copies the covered target's byte `+0x104` to the covering actor's `+0xe6` while
 setting its live state. Two other application handlers share the field, and
 battle consumers compare it with candidate units' `+0x104` ids. The status
 gate executes Cover with target id 42 and reads 42 through both the dedicated
-getter and generic stat `0x36`. Only `+0xe7` remains open in this region.
+getter and generic stat `0x36`.
+
+`+0xe7` is the packed **recent target id** history, not a status payload. It
+starts at `0xff`; each 4-bit slot holds unit `+0x104`, with the newest distinct
+target in the low nibble. The action resolver has four writer sites and the AI
+ability evaluator calls the membership helper. The status gate executes
+`ff -> f5 -> 56 -> 65 -> 57`, including promotion and eviction, and verifies
+the final history contains ids 5 and 7 but not 6.
 
 ## Named status flags
 
@@ -143,7 +150,8 @@ executes Checkmate's Doom application and checks its expiry call chain, runs
 the Aim: Arm/Aim: Legs handlers and the movement/usability consumers, runs
 the speed arithmetic, exercises Sleep's hit-chance branch, preserves
 the separate display/adjacency anchors, executes the persistent/live Zombie
-bridge and its three-turn revival counter, plus Yellow Card's write to `+0x28`
+bridge and its three-turn revival counter, verifies the packed two-target
+history consumed by AI, plus Yellow Card's write to `+0x28`
 bit `0x0040`. Raw ability effects and internal cases are separate namespaces joined
 by descriptor byte `+0x01`.
 

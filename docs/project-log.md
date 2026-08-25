@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4h — resolve the packed two-unit history at `+0xe7` |
-| Last closed package | AI5.4g — named `+0xd8` as the Zombie revival countdown |
+| Current work package | AI5.5a — resolve the `+0xf1..+0xfb` battle counters |
+| Last closed package | AI5.4h — named `+0xe7` as packed recent target ids |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 14/14; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 15/15; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -89,6 +89,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.4e | 2026-08-25 | Named `+0xeb` bits 6/7 as Immobilize/Disable and stats `0x33/0x34` as their durations | Executed Aim: Legs/Arm handlers; movement mode 5→0 under Immobilize; Disable ability-usability rejection; statuses 12/12 |
 | AI5.4f | 2026-08-25 | Named stat `0x36` / `+0xe6` as a shared status link id | Executed Cover copies target unit id 42; dedicated/stat getters return 42; linked-state comparison consumers |
 | AI5.4g | 2026-08-25 | Named stat `0x28` / `+0xd8` as the Zombie revival countdown | Executed effective-Zombie reset seeds 3 while blank stays 0; dead-Zombie turn path decrements and schedules revival at zero |
+| AI5.4h | 2026-08-25 | Named stat `0x37` / `+0xe7` as packed recent target ids | Executed MRU insertion/promotion/eviction and membership; four action writers join to the AI reader |
 
 ## Decisions and evidence
 
@@ -395,6 +396,16 @@ status and backlog tables are living sections and should be kept current.
 - Decision: name stat `0x28` `zombie_revive_countdown`; this is a delayed
   revival counter, not a generic status duration.
 
+### D-029 — Treat `+0xe7` as action-target history, not status state
+
+- Battle initialization writes `0xff`; both nibbles use `0xf` as empty and
+  otherwise store the target unit's 4-bit `+0x104` id.
+- Four sites in action resolution call the rolling writer. Repeated older ids
+  are promoted, third distinct ids evict the oldest, and the AI evaluator calls
+  the paired membership helper.
+- Decision: name stat `0x37` `recent_target_ids`. Keep the packed representation
+  visible because it holds two identities rather than one scalar id.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -406,6 +417,32 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Packed recent-target history
+
+Objective:
+
+- Resolve the final byte in the `+0xd8..+0xe7` status-state region.
+
+Completed:
+
+- Named stat `0x37` / unit `+0xe7` as `recent_target_ids`.
+- Closed all sixteen scalar bytes in the status-state region and increased
+  behavior-backed scalar coverage to 51/63.
+
+Evidence recorded during the batch:
+
+- Executed history states are `ff -> f5 -> 56 -> 65 -> 57` for target ids
+  `5, 6, 5, 7`, proving insertion, promotion, and oldest-entry eviction.
+- Final membership accepts ids 5 and 7 and rejects evicted id 6; generic stat
+  `0x37` returns each packed byte.
+- The writer has four call sites in action resolution and the AI ability
+  evaluator consumes the membership result. Status/state validation is 15/15.
+
+Next action:
+
+- Trace the eleven remaining `+0xf1..+0xfb` scalars as one mutation family,
+  starting from the saturating counters already visible in action resolution.
 
 ### 2026-08-25 — Zombie revival countdown
 

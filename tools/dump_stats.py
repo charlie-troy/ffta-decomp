@@ -74,6 +74,7 @@ KNOWN = {
     0x34: "disable_duration",
     0x35: "addle_duration",
     0x36: "status_link_id",
+    0x37: "recent_target_ids",
     0x09: "elemental_resistance_array",
     0x1C: "equipment_array",
     0x27: "status_state_array",

@@ -21,7 +21,9 @@ struct Unit
     u16 hp;             /* +0x18, stat id 0x13 */
     u16 maxHp;          /* +0x1A, stat id 0x14 */
     u16 mp;             /* +0x1C, stat id 0x15 */
-    u8  filler_1E[0xD8];
+    u8  filler_1E[0xC9];
+    u8  recentTargetIds; /* +0xE7, two 4-bit unit ids; newest in low nibble */
+    u8  filler_E8[0x0E];
     u8  unk_F6;         /* +0xF6 */
     u8  unk_F7;         /* +0xF7 */
 };
@@ -60,7 +62,7 @@ extern u8 sub_080CDB54(struct Unit *u);
 extern u8 sub_080CDB6C(struct Unit *u);
 extern u8 sub_080CD8FC(struct Unit *u);
 extern u8 sub_0812F154(struct Unit *u);
-extern u8 sub_081341BC(struct Unit *a, struct Unit *b);
+extern u8 sub_081341BC(struct Unit *a, struct Unit *b); /* recent-target membership */
 extern u8 sub_0812F1DC(s16 v);
 extern u8 sub_0812F0E4(struct Unit *u, int a, int b);
 extern u16 sub_0812E6A4(struct Unit *u);

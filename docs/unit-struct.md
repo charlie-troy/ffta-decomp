@@ -53,6 +53,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x34` | `+0xE4` | u8 | **Disable duration** | Aim: Arm applies live Disable/count 3; the ability-usability path rejects on the paired live getter |
 | `0x35` | `+0xE5` | u8 | **Addle duration** | Addle's case-71 handler writes this counter; the live-bit reconciler pairs it with Addle |
 | `0x36` | `+0xE6` | u8 | **status link id** | Cover copies the covered unit's `+0x104` id here; two other linked-state handlers share the same field |
+| `0x37` | `+0xE7` | u8 | **recent target ids** | two packed 4-bit unit ids; action resolution records the two most recent distinct targets and AI tests membership |
 
 ## Complete numeric layout
 
@@ -69,7 +70,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x23..0x25` | `+0xd0/+0xd2/+0xd4` | CT, Speed, and CT carry (three s16 loads) |
 | `0x26` | `+0xd6` | Judge Points (u16) |
 | `0x27` | `+0xd8` | address of status-state array |
-| `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads; fourteen named countdowns/durations, one link id, one numeric |
+| `0x28..0x37` | `+0xd8..+0xe7` | sixteen named u8 loads: fourteen countdowns/durations, one link id, and packed recent-target ids |
 | `0x38` | `+0xe8` | address of live-status flags |
 | `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads |
 | `0x44` | `+0xfc` | address |
@@ -136,3 +137,10 @@ This names 49 of 63 scalar loads. Fourteen remain numeric: stat `0x00`, the
 two status-state bytes `+0xd8/+0xe7`, and the eleven fields at `+0xf1..+0xfb`. The two
 remaining unnamed address regions are `+0x34` and `+0xfc`; `+0xd8` is now the
 status-state array and `+0xe8` the live-status array.
+
+`+0xe7` closes the status-state block but is not itself a status. It is a
+two-entry most-recently-used target history: each nibble holds a unit's
+`+0x104` id, `0xf` is empty, and the newest distinct target occupies the low
+nibble. Re-targeting the older entry promotes it; a third distinct target
+evicts the oldest. The writer has four call sites in action resolution and the
+AI ability evaluator queries the paired membership helper.
