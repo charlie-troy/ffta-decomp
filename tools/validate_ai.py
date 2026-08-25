@@ -176,6 +176,17 @@ def check_stat_ids(gba, rom):
     print("   0x02/0x04..0x07 == base job/active job/secondary job/level/EXP "
           f"-> {'PASS' if got == want else 'FAIL'}")
 
+    pointer_stats = ((0x09, 0x0C), (0x1C, 0x2A), (0x22, 0x34),
+                     (0x27, 0xD8), (0x38, 0xE8), (0x44, 0xFC))
+    pointer_values = tuple(gba.call(STAT_GET, [UNIT, stat])
+                           for stat, _ in pointer_stats)
+    pointer_want = tuple(UNIT + off for _, off in pointer_stats)
+    if pointer_values != pointer_want:
+        ok = False
+        print(f"   pointer stats read {pointer_values}, expected {pointer_want}")
+    print("   six address-returning stat ids point to their exact unit regions "
+          f"-> {'PASS' if pointer_values == pointer_want else 'FAIL'}")
+
     # The unit constructor copies its record discriminator to +0x04 and the
     # selected job's race property to +0x06. Jelly (job 46) is race 7.
     gba.uc.mem_write(UNIT, BLANK)

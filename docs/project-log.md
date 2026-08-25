@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4 — map address-returning unit-stat substructures |
-| Last closed package | AI5.3d — completed all 31 direct-load stat names |
+| Current work package | AI5.4 — name later battle-state scalars and address regions |
+| Last closed package | AI5.4a — corrected accessor coverage to 63 scalar / 6 address cases |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
@@ -81,7 +81,8 @@ status and backlog tables are living sections and should be kept current.
 | AI5.3a | 2026-08-25 | Named base job, active job, secondary job, level, and experience in the one-byte unit block | Direct accessor reads; executed job switch and EXP award; level-up cap at 50/99 |
 | AI5.3b | 2026-08-25 | Named unit type/race and nine damage-resistance fields; closed packed slot 2 | Constructor/job initialization; five executed Fire outcomes; retail Wind/Earth source proof |
 | AI5.3c | 2026-08-25 | Named stats `0x1d..0x21` as five equipped-item ids | Direct stat reads plus four combat-total helpers iterating all five slots |
-| AI5.3d | 2026-08-25 | Named stat `0x08` / unit `+0x0b` as innate element and closed direct-load coverage | Jelly Fire initializer; 12 elemental monster families; 31/31 direct fields named |
+| AI5.3d | 2026-08-25 | Named stat `0x08` / unit `+0x0b` as innate element and closed identity-through-equipment scalar coverage | Jelly Fire initializer; 12 elemental monster families; 31 early/equipment fields named |
+| AI5.4a | 2026-08-25 | Fixed the stat extractor's r0-indirect load handling and corrected coverage | 63 scalar loads / 6 address returns; full 69-case numeric layout |
 
 ## Decisions and evidence
 
@@ -342,7 +343,39 @@ status and backlog tables are living sections and should be kept current.
 
 ## Session log
 
-### 2026-08-25 — Innate element and direct-load milestone
+### 2026-08-25 — Stat-accessor coverage correction
+
+Objective:
+
+- Begin the address-region pass by making the extractor report every case
+  accurately.
+
+Completed:
+
+- Fixed `dump_stats.py` to follow offsets accumulated in `r0` before an
+  indirect load and to stop each case at its branch boundary.
+- Corrected the accessor classification from 31 scalar / 38 address cases to
+  63 scalar / 6 address cases.
+- Added the complete later layout: four values at `+0xd0..+0xd6`, sixteen at
+  `+0xd8..+0xe7`, eleven at `+0xf1..+0xfb`, plus address returns at `+0x34`,
+  `+0xd8`, `+0xe8`, and `+0xfc`.
+
+Evidence recorded during the batch:
+
+- The only address-returning stat ids are `0x09`, `0x1c`, `0x22`, `0x27`,
+  `0x38`, and `0x44`.
+- AI check 4 executes all six and gets unit `+0x0c/+0x2a/+0x34/+0xd8/+0xe8/
+  +0xfc` exactly; the extractor asserts the same id set.
+- The 31 existing semantic names remain valid; the corrected boundary is that
+  32 later battle-state scalar loads still need names.
+
+Next action:
+
+- Name the four `+0xd0..+0xd6` values and the `+0xd8..+0xe7` block from their
+  constructors and battle consumers, retaining numeric labels where behavior
+  does not distinguish a field.
+
+### 2026-08-25 — Innate element and early-scalar milestone
 
 Objective:
 
@@ -354,8 +387,8 @@ Completed:
   `innate_element_id` in the editor and documentation.
 - Named unit stat `0x08` from its constructor position and elemental-monster
   population.
-- Closed all 31 direct-load stat cases; the remaining 38 return addresses into
-  larger unit regions.
+- Closed all 31 scalar fields from identity through equipment. A later parser
+  audit corrected the full accessor total to 63 scalar and six address cases.
 
 Evidence recorded during the batch:
 
@@ -368,9 +401,7 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Decode the 38 address-returning stat ids into named regions, starting with
-  the already-known `+0x2a` equipment base and `+0x0b` innate/affinity base,
-  then movement, ability, status, and duration blocks.
+- Audit and name the later battle-state scalar and address cases.
 
 ### 2026-08-25 — Equipped-item stat fields
 
@@ -580,8 +611,9 @@ Completed:
 
 - Named stat id `0x16` / unit `+0x1e` as max MP.
 - Extended the AI execution gate to cover HP, max HP, MP, and max MP together.
-- Corrected stale documentation: the 69-entry accessor has 31 direct loads and
-  38 address-returning cases, not 65 direct loads and four pointers.
+- Corrected an earlier 65/4 estimate to 31/38. A subsequent complete case-body
+  parser superseded both estimates with the verified 63 scalar / 6 address
+  classification.
 
 Evidence recorded during the batch:
 

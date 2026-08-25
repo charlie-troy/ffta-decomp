@@ -17,8 +17,10 @@ import romlib
 
 TABLE_POOL = 0x0C7EBC
 N = 0x45
+EXPECTED_POINTERS = (0x09, 0x1C, 0x22, 0x27, 0x38, 0x44)
 LOAD = re.compile(r"^(ldrb|ldrh|ldr|ldrsb|ldrsh)$")
-OFF = re.compile(r"\[\w+,\s*#(0x[0-9a-fA-F]+|\d+)\]")
+MEM = re.compile(r"\[(\w+)(?:,\s*#(0x[0-9a-fA-F]+|\d+)|,\s*\w+)?\]")
+IMM = re.compile(r"#(0x[0-9a-fA-F]+|\d+)")
 
 WIDTH = {"ldrb": "u8", "ldrsb": "s8", "ldrh": "u16", "ldrsh": "s16", "ldr": "u32"}
 KNOWN = {
@@ -53,6 +55,9 @@ KNOWN = {
     0x1F: "equipped_item_2",
     0x20: "equipped_item_3",
     0x21: "equipped_item_4",
+    0x09: "elemental_resistance_array",
+    0x1C: "equipment_array",
+    0x38: "live_status_flags",
 }
 
 
@@ -70,32 +75,50 @@ def main(argv):
     rows = []
     for sid in range(N):
         tgt = (w(table + sid * 4) & ~1) - 0x08000000
-        ins = romlib.disasm(rom, tgt, tgt + 12)
-        off = width = None
-        for i in ins[:3]:
-            if LOAD.match(i.mnemonic):
-                m = OFF.search(i.op_str)
-                if m:
-                    off, width = int(m.group(1), 0), WIDTH.get(i.mnemonic, "?")
+        ins = romlib.disasm(rom, tgt, tgt + 16)
+        body = []
+        for i in ins:
+            body.append(i)
+            if i.mnemonic == "b":
                 break
-        first = "; ".join(f"{i.mnemonic} {i.op_str}" for i in ins[:2])
+        off = width = None
+        address_off = 0
+        for i in body:
+            if i.mnemonic == "adds" and i.op_str.startswith("r0, #"):
+                m = IMM.search(i.op_str)
+                if m:
+                    address_off += int(m.group(1), 0)
+            if LOAD.match(i.mnemonic):
+                m = MEM.search(i.op_str)
+                if m:
+                    extra = int(m.group(2), 0) if m.group(2) else 0
+                    off = (address_off if m.group(1) == "r0" else 0) + extra
+                    width = WIDTH.get(i.mnemonic, "?")
+                break
+        if width is None:
+            off, width = address_off, "ptr"
+        first = "; ".join(f"{i.mnemonic} {i.op_str}" for i in body[:2])
         rows.append((sid, off, width, first))
 
-    known = sum(1 for r in rows if r[1] is not None)
+    values = sum(1 for r in rows if r[2] != "ptr")
+    pointers = len(rows) - values
+    pointer_ids = tuple(r[0] for r in rows if r[2] == "ptr")
+    if pointer_ids != EXPECTED_POINTERS:
+        print(f"ERROR: pointer ids {pointer_ids}, expected {EXPECTED_POINTERS}")
+        return 1
     if md:
         print("| stat | offset | width | meaning |")
         print("|---|---|---|---|")
         for sid, off, width, _ in rows:
-            if off is not None:
-                print(f"| `{sid:#04x}` | `+{off:#x}` | {width} | "
-                      f"{KNOWN.get(sid, '')} |")
+            print(f"| `{sid:#04x}` | `+{off:#x}` | {width} | "
+                  f"{KNOWN.get(sid, '')} |")
     else:
         print(f"{'stat':>5} {'offset':>7} {'w':>4}  first instructions")
         print("-" * 62)
         for sid, off, width, first in rows:
             o = f"+{off:#x}" if off is not None else "-"
             print(f"{sid:>#5x} {o:>7} {width or '-':>4}  {first[:40]}")
-        print(f"\n{known} of {N} stats resolve to a direct field load")
+        print(f"\n{values} scalar loads; {pointers} address returns")
     return 0
 
 

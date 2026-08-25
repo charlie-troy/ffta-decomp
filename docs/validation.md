@@ -58,7 +58,9 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    parse of `+0x10`, confirming the `prop - 0x0B` mapping across the live range.
 4. **Stat ids, transitions, resistances, and combat totals.** Constructor
    execution confirms unit type/race at stats `0x01/0x03`; direct reads confirm
-   base/active/secondary job, level, and EXP at `0x02/0x04..0x07`. Job
+   base/active/secondary job, level, and EXP at `0x02/0x04..0x07`. The six
+   address cases execute and return unit `+0x0c/+0x2a/+0x34/+0xd8/+0xe8/
+   +0xfc` exactly. Job
    initialization fills stat `0x08` as innate element and stats `0x0a..0x12`
    as neutral, Fire, Wind, Earth, Water, Ice, Lightning, Holy, and Dark
    resistance, including the retail duplicate-Wind Earth source. Executing

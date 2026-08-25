@@ -135,9 +135,10 @@ combat-total helpers iterate unit `+0x2a..+0x32`, pass every nonzero id to the
 item property accessor, and add properties 10–13 to the matching combat base.
 Check 4 verifies both the stat-id reads and those executed totals.
 
-All 31 direct-load stat ids now have behavior-backed names. The remaining 38
-dispatch cases return addresses into larger unit substructures and should be
-mapped as regions rather than mislabeled as scalar stats.
+The 31 scalar fields from identity through equipment now have behavior-backed
+names. The accessor actually has 63 scalar loads and six address returns; a
+fixed extractor now exposes the additional 32 numeric battle-state scalars at
+`+0xd0..+0xfb` and the six address cases separately.
 
 ## The AI is randomised
 

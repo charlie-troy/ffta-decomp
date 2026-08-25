@@ -134,7 +134,7 @@ Anything reported outside a function you deliberately edited is a bug.
 ## What is known
 
 - `docs/ability-table.md` — all 28 bytes of an ability entry
-- `docs/unit-struct.md` — all 31 direct-load unit stats behaviorally named, including identity/jobs, level/EXP, innate element plus nine affinities, HP/MP, combat stats, persistent flags, and equipment; 38 address-returning cases are structurally mapped
+- `docs/unit-struct.md` — 31 identity-through-equipment scalars behaviorally named; all 63 scalar loads and six address returns structurally mapped, with 32 later battle-state scalars still numeric
 - `docs/unit-flags.md` — 56 status/capability bits and the accessors for each
 - `docs/ai-findings.md` — the evaluator, its data tables and the rules read so far
 
