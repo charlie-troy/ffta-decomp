@@ -84,6 +84,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x05` | `ldrb` | `+0x08` | **secondary job id** |
 | `0x06` | `ldrb` | `+0x09` | **level** |
 | `0x07` | `ldrb` | `+0x0A` | **experience** |
+| `0x08` | `ldrb` | `+0x0B` | **innate element id** |
 | `0x0A..0x12` | `ldrb` | `+0x0C..+0x14` | **neutral + eight elemental resistances** |
 | `0x13` | `ldrh` | **`+0x18`** | **current HP** |
 | `0x14` | `ldrh` | **`+0x1A`** | **max HP** |
@@ -124,10 +125,19 @@ table's nominal Earth slot is not read: the accessor duplicates Wind for the
 unit Earth byte, and the two packed slots happen to be equal in all retail
 jobs.
 
+Stat `0x08` completes the direct byte block as innate element id. The job
+initializer copies property `0x0d` to unit `+0x0b` immediately before the
+affinity array; Jelly executes as Fire (1). Across the table, the only nonzero
+values belong to elemental monsters and use the same element ids as abilities.
+
 The five trailing direct halfword loads are equipped item ids. The four retail
 combat-total helpers iterate unit `+0x2a..+0x32`, pass every nonzero id to the
 item property accessor, and add properties 10–13 to the matching combat base.
 Check 4 verifies both the stat-id reads and those executed totals.
+
+All 31 direct-load stat ids now have behavior-backed names. The remaining 38
+dispatch cases return addresses into larger unit substructures and should be
+mapped as regions rather than mislabeled as scalar stats.
 
 ## The AI is randomised
 

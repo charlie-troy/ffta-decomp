@@ -93,7 +93,7 @@ python tools/ability_table.py apply-resist baserom.gba resist.csv out.gba
 | offset | name | basis |
 |---|---|---|
 | `+0x04` | `race` | see below |
-| `+0x11` | `unit_class` | field id `0x0d`, low nibble, values 0–8 |
+| `+0x11` | `innate_element_id` | field id `0x0d`; copied to unit `+0x0b` before the elemental affinity array |
 | `+0x12`–`+0x15` | packed resistances | the table above |
 | `+0x27` | `growth_magic_res_copy` | byte-for-byte equal to `+0x26` in all 116 entries |
 
@@ -104,6 +104,14 @@ ascending blocks, with values 0–5 taking the large blocks (7, 24, 7, 8, 12 and
 9 entries) and 6–18 taking exactly two entries each. That is five playable
 races with their job lists, followed by monster families. The table covers
 monsters, so a wider family enum is expected.
+
+**`+0x11` is the innate element id.** It is zero for 104 jobs. The twelve
+nonzero entries are exactly the elemental monster families: Fire Jelly/Bomb/
+Firewyrm use 1, Ice Flan/Grenade/Icedrake use 5, Cream/Thundrake use 6,
+Sprite/Titania use 7, and Zombie/Vampire use 8. Those are the same Fire, Ice,
+Lightning, Holy, and Dark ids used by abilities. Job initialization copies the
+value to unit `+0x0b`, immediately before neutral and the eight elemental
+resistance bytes; the unit stat accessor exposes it as stat `0x08`.
 
 **`+0x27` duplicates `+0x26`.** Not approximately — identically, in all 116
 entries. Field ids `0x2a` and `0x2b` both reach the pair. It is listed as

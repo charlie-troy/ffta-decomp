@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.3c — named the five equipped-item fields |
+| Current work package | AI5.4 — map address-returning unit-stat substructures |
+| Last closed package | AI5.3d — completed all 31 direct-load stat names |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
@@ -81,6 +81,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.3a | 2026-08-25 | Named base job, active job, secondary job, level, and experience in the one-byte unit block | Direct accessor reads; executed job switch and EXP award; level-up cap at 50/99 |
 | AI5.3b | 2026-08-25 | Named unit type/race and nine damage-resistance fields; closed packed slot 2 | Constructor/job initialization; five executed Fire outcomes; retail Wind/Earth source proof |
 | AI5.3c | 2026-08-25 | Named stats `0x1d..0x21` as five equipped-item ids | Direct stat reads plus four combat-total helpers iterating all five slots |
+| AI5.3d | 2026-08-25 | Named stat `0x08` / unit `+0x0b` as innate element and closed direct-load coverage | Jelly Fire initializer; 12 elemental monster families; 31/31 direct fields named |
 
 ## Decisions and evidence
 
@@ -317,6 +318,18 @@ status and backlog tables are living sections and should be kept current.
   as combat-inert. Do not silently reroute Earth to slot 2 in modding tools;
   that would change retail behavior.
 
+### D-022 — Separate innate element from resistance behavior
+
+- Job `+0x11` / unit `+0x0b` is an element id, not the previously guessed
+  `unit_class`. The constructor places it immediately before the affinity
+  array; the unit getter exposes it as stat `0x08`.
+- Population evidence is exact: only twelve elemental monsters are nonzero,
+  using Fire 1, Ice 5, Lightning 6, Holy 7, and Dark 8 consistently with the
+  ability element namespace.
+- Decision: name it `innate_element_id`, but keep resistance behavior assigned
+  to the separate `+0x0c..+0x14` array. Do not imply that innate element alone
+  changes damage.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -328,6 +341,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Innate element and direct-load milestone
+
+Objective:
+
+- Resolve the last unnamed direct-load byte, stat `0x08` / unit `+0x0b`.
+
+Completed:
+
+- Corrected job `+0x11` from the unsupported `unit_class` label to
+  `innate_element_id` in the editor and documentation.
+- Named unit stat `0x08` from its constructor position and elemental-monster
+  population.
+- Closed all 31 direct-load stat cases; the remaining 38 return addresses into
+  larger unit regions.
+
+Evidence recorded during the batch:
+
+- Jelly job 46 initializes unit `+0x0b` to Fire id 1 and reads it through stat
+  `0x08`.
+- The only nonzero job values are twelve Fire/Ice/Lightning/Holy/Dark monster
+  entries, all in the shared ability element namespace.
+- Job CSV now exposes `innate_element_id`; byte layout and write behavior are
+  unchanged by the label correction.
+
+Next action:
+
+- Decode the 38 address-returning stat ids into named regions, starting with
+  the already-known `+0x2a` equipment base and `+0x0b` innate/affinity base,
+  then movement, ability, status, and duration blocks.
 
 ### 2026-08-25 — Equipped-item stat fields
 

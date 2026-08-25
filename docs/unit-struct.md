@@ -20,6 +20,7 @@ counted address-returning cases as direct loads.
 | `0x05` | `+0x08` | u8 | **secondary job id** | the job-change routine clears it when it duplicates the new active job; A-ability lookup reads it as the secondary job |
 | `0x06` | `+0x09` | u8 | **level** | the level-up routine increments it and caps it at 50 |
 | `0x07` | `+0x0A` | u8 | **experience** | EXP awards accumulate here; level-up resets it and the level-50 cap restores 99 |
+| `0x08` | `+0x0B` | u8 | **innate element id** | copied from job property `0x0d`; Jelly initializes to Fire (1) immediately before the affinity array |
 | `0x0A` | `+0x0C` | u8 | **neutral resistance** | damage routine loads stats `0x0a..0x12` and indexes them by element id |
 | `0x0B` | `+0x0D` | u8 | **Fire resistance** | element 1; executed Fire damage covers all five resistance codes |
 | `0x0C` | `+0x0E` | u8 | **Wind resistance** | element 2; initialized from packed resistance slot 1 |
@@ -81,13 +82,14 @@ counted address-returning cases as direct loads.
 Bytes `+0x04`-`+0x14` are a run of 17 u8 stats (ids `0x01`-`0x12`), then
 u16 stats run from `+0x18` upward in pairs. The HP pair sits at the start of
 the u16 block, with MP immediately after it.
-Seven early bytes are now behavior-backed: unit type at `+0x04`, base job at
+Eight early bytes are now behavior-backed: unit type at `+0x04`, base job at
 `+0x05`, race at `+0x06`, active job at `+0x07`, secondary job at `+0x08`,
-level at `+0x09`, and experience at `+0x0a`. Executing the constructor with
-Jelly writes type 1 / race 7. The retail job-change fragment synchronizes
-base/active job for an ordinary unit and clears a duplicate secondary job.
-The EXP award path changes 40 to 45, while level-up enforces the retail
-level-50 / EXP-99 ceiling.
+level at `+0x09`, experience at `+0x0a`, and innate element at `+0x0b`.
+Executing the constructor with Jelly writes type 1 / race 7, and job
+initialization writes innate Fire (1). The retail job-change fragment
+synchronizes base/active job for an ordinary unit and clears a duplicate
+secondary job. The EXP award path changes 40 to 45, while level-up enforces
+the retail level-50 / EXP-99 ceiling.
 
 Stats `0x0a..0x12` form the damage-resistance array: neutral, Fire, Wind,
 Earth, Water, Ice, Lightning, Holy, and Dark. The damage routine indexes this
@@ -109,3 +111,7 @@ predicate and is copied into the live Zombie status during initialization.
 The remaining bits stay numeric. Five adjacent halfwords at `+0x2a..+0x32`
 are equipped item ids. Check 4 reads them through stats `0x1d..0x21`, then
 executes the four combat totals that iterate all five slots.
+
+This closes all **31 direct-load stat ids** with behavior-backed names. The
+other 38 ids return addresses into larger unit substructures and are the next
+mapping layer rather than unnamed scalar fields.

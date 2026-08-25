@@ -205,9 +205,16 @@ def check_stat_ids(gba, rom):
     want_resist = (1, slots[0], slots[1], slots[1], *slots[3:])
     got_resist = tuple(gba.call(STAT_GET, [UNIT, stat])
                        for stat in range(0x0A, 0x13))
+    innate_element = gba.call(STAT_GET, [UNIT, 0x08])
+    want_element = rom[JOB_TABLE + 46 * JOB_STRIDE + 0x11] & 0x0F
     if got_resist != want_resist:
         ok = False
         print(f"   elemental resistance fields {got_resist}, expected {want_resist}")
+    if innate_element != want_element or innate_element != 1:
+        ok = False
+        print(f"   innate element {innate_element}, expected Jelly Fire (1)")
+    print("   stat 0x08 == innate element; Jelly is Fire "
+          f"-> {'PASS' if innate_element == want_element == 1 else 'FAIL'}")
     print("   neutral/Fire/Wind/Earth/Water/Ice/Lightning/Holy/Dark fields "
           f"-> {'PASS' if got_resist == want_resist else 'FAIL'}")
 

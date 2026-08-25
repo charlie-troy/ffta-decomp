@@ -29,6 +29,7 @@ KNOWN = {
     0x05: "secondary_job_id",
     0x06: "level",
     0x07: "experience",
+    0x08: "innate_element_id",
     0x0A: "neutral_resistance",
     0x0B: "fire_resistance",
     0x0C: "wind_resistance",

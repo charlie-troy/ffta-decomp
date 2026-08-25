@@ -59,9 +59,10 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
 4. **Stat ids, transitions, resistances, and combat totals.** Constructor
    execution confirms unit type/race at stats `0x01/0x03`; direct reads confirm
    base/active/secondary job, level, and EXP at `0x02/0x04..0x07`. Job
-   initialization fills stats `0x0a..0x12` as neutral, Fire, Wind, Earth,
-   Water, Ice, Lightning, Holy, and Dark resistance, including the retail
-   duplicate-Wind Earth source. Executing Fire damage produces positive
+   initialization fills stat `0x08` as innate element and stats `0x0a..0x12`
+   as neutral, Fire, Wind, Earth, Water, Ice, Lightning, Holy, and Dark
+   resistance, including the retail duplicate-Wind Earth source. Executing
+   Fire damage produces positive
    weak/normal/resist results in descending order, zero for nullify, and a
    negative result for absorb. The job-change fragment synchronizes
    base/active job and clears a duplicate secondary job; the EXP path changes

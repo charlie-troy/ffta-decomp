@@ -176,7 +176,7 @@ UNIT_NAMED = {
     0x12: "resist_packed_0", 0x13: "resist_packed_1",
     0x14: "resist_packed_2", 0x15: "resist_packed_3",
     # Read by field id 0x0d as the low nibble; values 0-8.
-    0x11: "unit_class",
+    0x11: "innate_element_id",
     0x16: "status_defense",
     0x17: "base_hp", 0x18: "base_mp", 0x19: "base_speed",
     0x1A: "base_melee_0", 0x1B: "base_melee_1", 0x1C: "base_melee_2",

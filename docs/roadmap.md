@@ -294,6 +294,9 @@ behaviour mod needs to reach.
 6. **Continued 2026-08-25:** stats `0x1d..0x21` / unit `+0x2a..+0x32` are the
    five equipped item ids. Direct stat reads and all four item-derived combat
    totals execute in the AI gate.
+7. **Direct-load milestone complete 2026-08-25:** stat `0x08` / unit `+0x0b`
+   is innate element id, copied from the matching job field. All 31 direct-load
+   cases are named; the remaining 38 cases return substructure addresses.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a
