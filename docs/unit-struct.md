@@ -46,6 +46,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x25` | `+0xD4` | s16 | **CT carry** | consumed into CT and cleared during charging; normalization then stores either its common delta or the unit's smaller pre-subtraction CT here |
 | `0x26` | `+0xD6` | u16 | **Judge Points (JP)** | 10+ exposes the race-specific Totema command; combo damage uses `JP * 4 + 10` |
 | `0x27` | `+0xD8` | ptr | **status-duration array** | parallel getter/setter families expose fifteen adjacent counters; application and reconciliation paths join them to live status bits |
+| `0x29` | `+0xD9` | u8 | **Doom countdown** | Checkmate applies live Doom with count 3; the per-turn path decrements it and clears battle statuses at expiry |
 | `0x2a..0x32` | `+0xDA..+0xE2` | u8 | **Haste, Slow, Stop, Shell, Protect, Sleep, Silence, Confuse, Charm durations** | each named handler sets its live bit and matching counter; reconciliation clears the counter when the live bit is absent |
 | `0x35` | `+0xE5` | u8 | **Addle duration** | Addle's case-71 handler writes this counter; the live-bit reconciler pairs it with Addle |
 
@@ -64,7 +65,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x23..0x25` | `+0xd0/+0xd2/+0xd4` | CT, Speed, and CT carry (three s16 loads) |
 | `0x26` | `+0xd6` | Judge Points (u16) |
 | `0x27` | `+0xd8` | address of status-duration array |
-| `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads; ten named durations, six numeric |
+| `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads; eleven named durations, five numeric |
 | `0x38` | `+0xe8` | address of live-status flags |
 | `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads |
 | `0x44` | `+0xfc` | address |
@@ -112,13 +113,15 @@ the action-menu selector leaves its default command at 9 JP but selects command
 same UI table labels the stat `Judge Pts?`. A separate combo formula multiplies
 damage by `JP * 4 + 10`, completing the behavioral join.
 
-Ten bytes in the next region are status durations. Each application handler
+Eleven bytes in the next region are status durations. Each application handler
 sets both the named live status and its counter, `sub_08131C58` clears a
 counter when that live bit is absent, and the validator executes the dedicated
-counter getter/setter plus the generic stat getter. Six bytes in the region
-remain numeric: `+0xd8/+0xd9/+0xe3/+0xe4/+0xe6/+0xe7`.
+counter getter/setter plus the generic stat getter. Doom is independently
+executed from Checkmate to live bit/count `1/3`, with the per-turn expiry chain
+clearing its live bit and battle statuses. Five bytes in the region remain
+numeric: `+0xd8/+0xe3/+0xe4/+0xe6/+0xe7`.
 
-This names 45 of 63 scalar loads. Eighteen remain numeric: stat `0x00`, those
-six duration-region bytes, and the eleven fields at `+0xf1..+0xfb`. The two
+This names 46 of 63 scalar loads. Seventeen remain numeric: stat `0x00`, those
+five duration-region bytes, and the eleven fields at `+0xf1..+0xfb`. The two
 remaining unnamed address regions are `+0x34` and `+0xfc`; `+0xd8` is now the
 status-duration array and `+0xe8` the live-status array.

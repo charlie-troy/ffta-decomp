@@ -262,7 +262,7 @@ behaviour mod needs to reach.
    descriptor and executed behavior name Speed Down (`+0xec` bit 2 / case
    20), Sleep (`+0xeb` bit 2 / case 45), Slow (`+0xea` bit 6 / case 51), Haste
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
-   `tools/validate_statuses.py` is the ten-check regression gate. Raw ability
+   `tools/validate_statuses.py` is the eleven-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
    the four-byte descriptor table at `0x08553E70`. The same join now names 16
    bits total, adding Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and
@@ -310,6 +310,10 @@ behaviour mod needs to reach.
    Shell, Protect, Sleep, Silence, Confuse, Charm, and Addle. Handler, live-bit,
    reconciler, dedicated accessor, and generic-stat joins execute. Six bytes in
    this block remain numeric rather than inheriting candidate names.
+10. **Doom countdown closed 2026-08-25:** stat `0x29` / unit `+0xd9` starts at
+   3 when Checkmate applies live Doom. The per-turn path decrements it, then
+   clears the live bit and battle statuses on expiry. The handler executes in
+   the eleven-check status gate.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

@@ -22,6 +22,8 @@ STATUS_INITIALIZER = 0x08133A58
 DURATION_RECONCILER = 0x08131C58
 YELLOW_CARD_HANDLER = 0x081337F4
 YELLOW_CLIP_HANDLER = 0x08133758
+DOOM_TICK_START, DOOM_TICK_END = 0x0809E328, 0x0809E398
+CLEAR_BATTLE_STATUSES = 0x08097298
 ROM = 0x08000000
 
 
@@ -140,6 +142,26 @@ def main(argv=None):
     if not duration_ok:
         failures.append("named status durations")
 
+    doom = next(entry for entry in STATUS_FLAGS if entry["name"] == "doom")
+    context, doom_target = 0x02001400, 0x02001600
+    gba.reset_ram()
+    gba.write32(context + 8, doom_target)
+    gba.call(doom["handler"] & ~1, [context])
+    applied_doom = gba.call(doom["getter"], [doom_target])
+    doom_count = gba.call(doom["duration_getter"], [doom_target])
+    doom_tick_calls = calls_from(rom, DOOM_TICK_START, DOOM_TICK_END)
+    doom_ok = (applied_doom == 1 and doom_count == 3 and
+               doom["getter"] in doom_tick_calls and
+               doom["setter"] in doom_tick_calls and
+               doom["duration_getter"] in doom_tick_calls and
+               doom["duration_setter"] in doom_tick_calls and
+               CLEAR_BATTLE_STATUSES in doom_tick_calls)
+    print(f"6. Doom countdown: {'OK' if doom_ok else 'FAIL'} "
+          f"(Checkmate applies live Doom/count={applied_doom}/{doom_count}; "
+          "expiry path clears battle statuses)")
+    if not doom_ok:
+        failures.append("Doom countdown")
+
     def speed(ea=0, eb=0, ec=0):
         gba.reset_ram()
         gba.uc.mem_write(unit + 0xD2, struct.pack("<H", 100))
@@ -157,7 +179,7 @@ def main(argv=None):
                 "unidentified_ea_bit1": 50, "sleep": 100,
                 "slow": 50, "haste": 200, "haste_slow": 100}
     speed_ok = speeds == expected
-    print(f"6. effective speed: {'OK' if speed_ok else 'FAIL'} ({speeds})")
+    print(f"7. effective speed: {'OK' if speed_ok else 'FAIL'} ({speeds})")
     if not speed_ok:
         failures.append("effective speed")
 
@@ -171,18 +193,22 @@ def main(argv=None):
     gba.write8(target + 0xEB, 0x04)
     sleep_hit = gba.call(HIT_READER, [source, target, 0, 0])
     sleep_ok = ordinary_hit == 95 and sleep_hit == 100
-    print(f"7. Sleep vulnerability: {'OK' if sleep_ok else 'FAIL'} "
+    print(f"8. Sleep vulnerability: {'OK' if sleep_ok else 'FAIL'} "
           f"(hit chance {ordinary_hit} -> {sleep_hit})")
     if not sleep_ok:
         failures.append("Sleep vulnerability")
 
     # The speed-down bit also controls the red stat-display palette, while
     # Slow/Haste are the adjacent inverse pair in the effect table.
+    slow_case = next(entry["case"] for entry in STATUS_FLAGS
+                     if entry["name"] == "slow")
+    haste_case = next(entry["case"] for entry in STATUS_FLAGS
+                      if entry["name"] == "haste")
     display_ok = (0x080CDA34 in calls_from(rom, 0x08075AA0, 0x08075B30) and
                   rom[0x75AEE:0x75AFA] ==
                   bytes.fromhex("d0263602002801d0a0263602") and
-                  STATUS_FLAGS[2]["case"] + 1 == STATUS_FLAGS[3]["case"])
-    print(f"8. independent naming anchors: {'OK' if display_ok else 'FAIL'} "
+                  slow_case + 1 == haste_case)
+    print(f"9. independent naming anchors: {'OK' if display_ok else 'FAIL'} "
           "(Speed Down display; adjacent Slow/Haste pair)")
     if not display_ok:
         failures.append("independent naming anchors")
@@ -205,7 +231,7 @@ def main(argv=None):
                  STAT_GETTER in effective_calls and
                  0x080CD9A4 in effective_calls and
                  0x080CDE80 in init_calls)
-    print(f"9. persistent Zombie bridge: {'OK' if persistent_ok else 'FAIL'} "
+    print(f"10. persistent Zombie bridge: {'OK' if persistent_ok else 'FAIL'} "
           f"(blank/live/persistent={blank_zombie}/{live_zombie}/{persistent_zombie})")
     if not persistent_ok:
         failures.append("persistent Zombie bridge")
@@ -240,7 +266,7 @@ def main(argv=None):
                  cancel_case == yellow["cancel_case"] and
                  cancel_pointer == yellow["cancel_handler"] and
                  cleared == 0)
-    print(f"10. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
+    print(f"11. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
           f"(apply={persistent:#06x}, clip={cleared:#06x})")
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
@@ -249,7 +275,7 @@ def main(argv=None):
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 10/10 status checks")
+    print("PASS: 11/11 status checks")
     return 0
 
 

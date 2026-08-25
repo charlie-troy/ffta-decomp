@@ -100,6 +100,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x25` | `ldrsh` | `+0xD4` | **CT carry** |
 | `0x26` | `ldrh` | `+0xD6` | **Judge Points (JP)** |
 | `0x27` | address | `+0xD8` | **status-duration array** |
+| `0x29` | `ldrb` | `+0xD9` | **Doom countdown** |
 | `0x2A..0x32` | `ldrb` | `+0xDA..+0xE2` | **Haste through Charm durations** |
 | `0x35` | `ldrb` | `+0xE5` | **Addle duration** |
 
@@ -149,10 +150,12 @@ The base-Speed helper adds signed item property 14. The
 Totema selector crosses its boundary at 10 JP (Human command `0x50`, whose UI
 label is `Totema`), and combo damage scales by `JP * 4 + 10`.
 
-The next block is a status-duration array. Ten named application handlers set
+The next block is a status-duration array. Eleven named application handlers set
 their matching live bit and `+0xda..+0xe2/+0xe5` counter; the reconciliation
-routine pairs and clears those same counters. This names 45 of 63 scalar loads.
-Eighteen remain numeric, including six bytes in this block, stat `0x00`, and
+routine pairs and clears those same counters. Checkmate additionally executes
+as live Doom with count 3 at `+0xd9`, whose expiry path clears battle statuses.
+This names 46 of 63 scalar loads.
+Seventeen remain numeric, including five bytes in this block, stat `0x00`, and
 the eleven fields at `+0xf1..+0xfb`; six stat ids return addresses.
 
 ## The AI is randomised

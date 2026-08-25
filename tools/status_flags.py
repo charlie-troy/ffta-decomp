@@ -6,6 +6,21 @@ does something identifiable. Layout-only flags remain in flag_map.py.
 
 STATUS_FLAGS = [
     {
+        "name": "doom",
+        "ability_name": "Checkmate",
+        "ability_id": 142,
+        "raw_effect": 170,
+        "getter": 0x080CDA94,
+        "setter": 0x080CDFE4,
+        "offset": 0xEA,
+        "mask": 0x10,
+        "case": 42,
+        "handler": 0x08132655,
+        "duration_offset": 0xD9,
+        "duration_getter": 0x080CE3A8,
+        "duration_setter": 0x080CE420,
+    },
+    {
         "name": "speed_down",
         "ability_name": "Speedbreak",
         "ability_id": 80,

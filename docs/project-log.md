@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4d — resolve the six remaining duration-region bytes |
-| Last closed package | AI5.4c — named ten status-duration counters and their array |
+| Current work package | AI5.4e — resolve the five remaining duration-region bytes |
+| Last closed package | AI5.4d — named live Doom and its three-turn countdown |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 10/10; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 11/11; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -85,6 +85,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.4a | 2026-08-25 | Fixed the stat extractor's r0-indirect load handling and corrected coverage | 63 scalar loads / 6 address returns; full 69-case numeric layout |
 | AI5.4b | 2026-08-25 | Named stats `0x23..0x26` as CT, Speed, CT carry, and Judge Points | Executed Speed/item join; one-unit CT tick; 9/10 JP Totema boundary and decoded UI command |
 | AI5.4c | 2026-08-25 | Corrected `+0xd8` from capability state to a status-duration array and named ten counters | Ten named handler/live-bit/reconciler/counter/stat joins; statuses 10/10 |
+| AI5.4d | 2026-08-25 | Named `+0xea` bit 4 as Doom and stat `0x29` / `+0xd9` as its countdown | Executed Checkmate application produces live Doom/count 3; expiry call chain clears battle statuses; statuses 11/11 |
 
 ## Decisions and evidence
 
@@ -356,6 +357,15 @@ status and backlog tables are living sections and should be kept current.
   +0xe6/+0xe7` numeric until their overlapping or candidate semantics are
   distinguished by another behavioral anchor.
 
+### D-025 — Name Doom from its countdown-to-clear behavior
+
+- Case 42 is not named merely because its abilities sound lethal. Executing
+  Checkmate sets `+0xea` bit 4 and `+0xd9` to 3; the turn processor decrements
+  the counter and, at expiry, clears the live bit and calls the complete
+  battle-status clear routine.
+- Decision: name the bit Doom and the byte Doom countdown. This behavioral
+  sequence distinguishes it from an immediate KO/death flag.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -367,6 +377,35 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Doom countdown closure
+
+Objective:
+
+- Resolve `+0xd9` without choosing between Death and Doom from ability names.
+
+Completed:
+
+- Added Doom as the seventeenth named live status and `+0xd9` / stat `0x29` as
+  its countdown.
+- Extended the duration registry to eleven counters and status validation to
+  eleven checks.
+- Increased behavior-backed scalar coverage from 45 to 46 of 63.
+
+Evidence recorded during the batch:
+
+- Executing Checkmate's case-42 handler on a blank target sets live bit
+  `+0xea:0x10` and countdown 3.
+- The isolated per-turn path reads both, decrements the counter, and at expiry
+  calls the live-bit clearer plus `sub_08097298`, which clears the full battle
+  status set.
+- Status validation is 11/11.
+
+Next action:
+
+- Resolve `+0xe3/+0xe4` together from cases 22–25 and Bind, testing the
+  Disable/Immobilize candidates against movement/action consumers. Then inspect
+  the shared `+0xe6` counter and isolated `+0xd8/+0xe7` bytes.
 
 ### 2026-08-25 — Named status-duration counters
 

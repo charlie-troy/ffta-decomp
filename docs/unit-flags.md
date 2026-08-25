@@ -79,7 +79,7 @@ The duration getters (`0x080CE3A8`-`0x080CE408`) and setters
 
 | status getter | struct bit | duration | duration setter | meaning |
 |---|---|---|---|---|
-| `sub_080CDA94` | 0xea bit 4 | `+0xd9` | `sub_080CE420` | numeric; application case 42 sets it to 3 |
+| `sub_080CDA94` | 0xea bit 4 | `+0xd9` | `sub_080CE420` | **Doom countdown**; application starts at 3 |
 | `sub_080CDAAC` | 0xea bit 5 | `+0xda` | `sub_080CE428` | **Haste duration** |
 | `sub_080CDAC4` | 0xea bit 6 | `+0xdb` | `sub_080CE430` | **Slow duration** |
 | `sub_080CDADC` | 0xea bit 7 | `+0xdc` | `sub_080CE438` | **Stop duration** |
@@ -93,16 +93,18 @@ The duration getters (`0x080CE3A8`-`0x080CE408`) and setters
 | `sub_080CDB9C` | 0xeb bit 7 | `+0xe4` | `sub_080CE478` | numeric; Aim: Arm family candidate |
 | `sub_080CDBB4` | 0xec bit 0 | `+0xe5` | `sub_080CE480` | **Addle duration** |
 
-Ten names are promoted because the same named application handler calls both
-the live-bit setter and the paired duration setter. The `+0xd9`, `+0xe3`, and
-`+0xe4` semantics remain numeric under the project rule against naming from a
-plausible ability family alone. `+0xd8`, `+0xe6`, and `+0xe7` are outside this
-one-to-one table and remain open.
+Eleven names are promoted because the same named application handler calls
+both the live-bit setter and the paired duration setter. `+0xd9` is Doom:
+Checkmate applies the live bit with count 3, and the per-turn expiry path
+clears the bit and all battle statuses. `+0xe3/+0xe4` remain numeric under the
+project rule against naming from a plausible ability family alone. `+0xd8`,
+`+0xe6`, and `+0xe7` are outside this one-to-one table and remain open.
 
 ## Named status flags
 
 | getter | status | how |
 |---|---|---|
+| `sub_080CDA94` | **Doom** | Checkmate raw effect 170 selects case 42; its handler sets this bit and countdown 3. The per-turn path decrements `+0xd9`, then clears the bit and all battle statuses when it expires |
 | `sub_080CDA34` | **Speed Down** | `+0xec` bit 2. Status case 20 calls its setter; `sub_0812E368` halves effective speed, and the stat display changes the speed value from its ordinary palette to the red penalty palette |
 | `sub_080CDB24` | **Sleep** | `+0xeb` bit 2. Sleep ability 32 stores raw effect 97; its descriptor selects internal case 45, whose handler calls this bit's setter. `sub_0812C8DC` forces an ordinary attack's hit chance from 95 to 100 against this state |
 | `sub_080CDAC4` | **Slow** | `+0xea` bit 6. Status case 51 calls its setter and `sub_0812E368` halves effective speed |
@@ -120,10 +122,11 @@ one-to-one table and remain open.
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 
-`tools/validate_statuses.py` protects all 16 joins independently: it
+`tools/validate_statuses.py` protects all 17 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
-pair, verifies ten named duration handlers and direct counter/stat reads, runs
+pair, verifies eleven named duration handlers and direct counter/stat reads,
+executes Checkmate's Doom application and checks its expiry call chain, runs
 the speed arithmetic, exercises Sleep's hit-chance branch, preserves
 the separate display/adjacency anchors, and executes the persistent/live Zombie
 bridge plus Yellow Card's write to `+0x28` bit `0x0040`. Raw ability effects and internal cases are separate namespaces joined
