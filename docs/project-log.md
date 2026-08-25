@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4f — resolve `+0xd8/+0xe6/+0xe7` |
-| Last closed package | AI5.4e — named Disable/Immobilize and their durations |
+| Current work package | AI5.4g — resolve `+0xd8/+0xe7` |
+| Last closed package | AI5.4f — named `+0xe6` as the shared status link id |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 12/12; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 13/13; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -84,9 +84,10 @@ status and backlog tables are living sections and should be kept current.
 | AI5.3d | 2026-08-25 | Named stat `0x08` / unit `+0x0b` as innate element and closed identity-through-equipment scalar coverage | Jelly Fire initializer; 12 elemental monster families; 31 early/equipment fields named |
 | AI5.4a | 2026-08-25 | Fixed the stat extractor's r0-indirect load handling and corrected coverage | 63 scalar loads / 6 address returns; full 69-case numeric layout |
 | AI5.4b | 2026-08-25 | Named stats `0x23..0x26` as CT, Speed, CT carry, and Judge Points | Executed Speed/item join; one-unit CT tick; 9/10 JP Totema boundary and decoded UI command |
-| AI5.4c | 2026-08-25 | Corrected `+0xd8` from capability state to a status-duration array and named ten counters | Ten named handler/live-bit/reconciler/counter/stat joins; statuses 10/10 |
+| AI5.4c | 2026-08-25 | Corrected `+0xd8` from capability state to a status-state array and named ten duration counters | Ten named handler/live-bit/reconciler/counter/stat joins; statuses 10/10 |
 | AI5.4d | 2026-08-25 | Named `+0xea` bit 4 as Doom and stat `0x29` / `+0xd9` as its countdown | Executed Checkmate application produces live Doom/count 3; expiry call chain clears battle statuses; statuses 11/11 |
 | AI5.4e | 2026-08-25 | Named `+0xeb` bits 6/7 as Immobilize/Disable and stats `0x33/0x34` as their durations | Executed Aim: Legs/Arm handlers; movement mode 5→0 under Immobilize; Disable ability-usability rejection; statuses 12/12 |
+| AI5.4f | 2026-08-25 | Named stat `0x36` / `+0xe6` as a shared status link id | Executed Cover copies target unit id 42; dedicated/stat getters return 42; linked-state comparison consumers |
 
 ## Decisions and evidence
 
@@ -347,13 +348,14 @@ status and backlog tables are living sections and should be kept current.
 - Consequence: these four scalar names are stable modding vocabulary; the next
   pass starts at the separate `+0xd8` address/byte region.
 
-### D-024 — `+0xd8` is status duration, not capability state
+### D-024 — `+0xd8` is status state, not capability state
 
 - The parallel functions at `0x080CE3A0..0x080CE488` are byte getters/setters.
   Named status application handlers write them, per-turn paths decrement them,
   and `sub_08131C58` clears them when the corresponding live bit is absent.
 - The previous "capability setter" label described only the observed clearing
-  relationship and is retracted. These are duration counters.
+  relationship and is retracted. Most are duration counters; `+0xe6` is a
+  linked-unit id, so the enclosing region is status state.
 - Promote only the ten one-to-one named joins. Keep `+0xd8/+0xd9/+0xe3/+0xe4/
   +0xe6/+0xe7` numeric until their overlapping or candidate semantics are
   distinguished by another behavioral anchor.
@@ -375,6 +377,14 @@ status and backlog tables are living sections and should be kept current.
   so it is Immobilize. The ability-usability predicate rejects on bit 7 before
   success, so bit 7 is Disable. Their paired counters are `+0xe3/+0xe4`.
 
+### D-027 — Keep the shared link separate from duration semantics
+
+- Cover copies target unit byte `+0x104` into actor `+0xe6`; other status
+  consumers compare `+0xe6` against candidate unit ids. Values are identities,
+  not turn counts.
+- Decision: name stat `0x36` `status_link_id` and widen stat `0x27` from
+  `status_duration_array` to `status_state_array`.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -386,6 +396,33 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Shared status-link id
+
+Objective:
+
+- Determine whether the shared `+0xe6` field is a duration or status payload.
+
+Completed:
+
+- Named stat `0x36` / unit `+0xe6` as `status_link_id`.
+- Corrected the region/pointer name from status-duration array to status-state
+  array.
+- Added a thirteenth status check and increased named scalar coverage to 49/63.
+
+Evidence recorded during the batch:
+
+- Executing Cover with target unit id 42 sets the actor's Cover live bit and
+  copies 42 to `+0xe6`; dedicated and generic stat getters both return 42.
+- Two other application handlers also write identifiers, and battle selection
+  paths compare this field to other units' `+0x104` ids.
+- Status validation is 13/13.
+
+Next action:
+
+- Resolve the last two status-state bytes: `+0xd8` is tied to zero-HP state and
+  `+0xe7` lacks the parallel accessor family. Trace their full mutation sets
+  before moving to the eleven `+0xf1..+0xfb` fields.
 
 ### 2026-08-25 — Disable and Immobilize closure
 

@@ -262,7 +262,7 @@ behaviour mod needs to reach.
    descriptor and executed behavior name Speed Down (`+0xec` bit 2 / case
    20), Sleep (`+0xeb` bit 2 / case 45), Slow (`+0xea` bit 6 / case 51), Haste
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
-   `tools/validate_statuses.py` is the twelve-check regression gate. Raw ability
+   `tools/validate_statuses.py` is the thirteen-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
    the four-byte descriptor table at `0x08553E70`. The same join now names 16
    bits total, adding Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and
@@ -313,11 +313,14 @@ behaviour mod needs to reach.
 10. **Doom countdown closed 2026-08-25:** stat `0x29` / unit `+0xd9` starts at
    3 when Checkmate applies live Doom. The per-turn path decrements it, then
    clears the live bit and battle statuses on expiry. The handler executes in
-   the status gate (now twelve checks after the next package).
+   the status gate (now thirteen checks after later packages).
 11. **Action restrictions closed 2026-08-25:** stats `0x33/0x34` are
    Immobilize/Disable durations. Aim: Legs/Aim: Arm handlers execute with count
    3; Immobilize zeros movement mode and Disable is a hard ability-usability
    rejection. Only `+0xd8/+0xe6/+0xe7` remain numeric in the duration region.
+12. **Shared link closed 2026-08-25:** stat `0x36` / `+0xe6` is a status link
+   id, not a duration. Cover copies target unit id `+0x104`; linked-state
+   consumers compare that id. Only `+0xd8/+0xe7` remain numeric in this region.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

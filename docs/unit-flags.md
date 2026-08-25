@@ -93,13 +93,20 @@ The duration getters (`0x080CE3A8`-`0x080CE408`) and setters
 | `sub_080CDB9C` | 0xeb bit 7 | `+0xe4` | `sub_080CE478` | **Disable duration** |
 | `sub_080CDBB4` | 0xec bit 0 | `+0xe5` | `sub_080CE480` | **Addle duration** |
 
-Eleven names are promoted because the same named application handler calls
+Thirteen duration names are promoted because the same named application handler calls
 both the live-bit setter and the paired duration setter. `+0xd9` is Doom:
 Checkmate applies the live bit with count 3, and the per-turn expiry path
 clears the bit and all battle statuses. `+0xe3/+0xe4` are independently closed
 as Immobilize/Disable by executed Aim: Legs/Aim: Arm handlers plus movement
 and ability-usability consumers. `+0xd8`, `+0xe6`, and `+0xe7` are outside this
-one-to-one table and remain open.
+one-to-one duration table.
+
+`+0xe6` is a shared **status link id**, not another timer. Executing Cover
+copies the covered target's byte `+0x104` to the covering actor's `+0xe6` while
+setting its live state. Two other application handlers share the field, and
+battle consumers compare it with candidate units' `+0x104` ids. The status
+gate executes Cover with target id 42 and reads 42 through both the dedicated
+getter and generic stat `0x36`. Only `+0xd8/+0xe7` remain open in this region.
 
 ## Named status flags
 
