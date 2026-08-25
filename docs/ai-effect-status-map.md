@@ -104,4 +104,5 @@ and Poison.
 | 80 | 10, 49 | `sub_080CDB6C` | `+0xeb` bit 5 — **Charm** |
 | 82 | 10, 49 | `sub_080CDB0C` | `+0xeb` bit 1 — **Protect** |
 | 83 | 10, 49 | `sub_080CDAF4` | `+0xeb` bit 0 — **Shell** |
-| 92 | - | `sub_080C832C` | `+0x28` bit 6 — **Yellow Card** |
+| 91 | - | `sub_080C832C` | clear `+0x28` bit 6 — **Yellow Clip** |
+| 92 | - | `sub_080C832C` | set `+0x28` bit 6 — **Yellow Card** |

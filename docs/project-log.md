@@ -1,6 +1,6 @@
 # Project log
 
-Last updated: 2026-08-24
+Last updated: 2026-08-25
 
 This is the operational source of truth for resuming the project. `README.md`
 describes the product, `CLAUDE.md` describes the working method, and
@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.2d — named Yellow Card and corrected the persistent-field scope |
+| Last closed package | AI5.2e — confirmed Yellow Clip and bounded the persistent-mask map |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
@@ -77,6 +77,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.2b | 2026-08-24 | Named stats `0x17..0x1a` as Attack, Defense, Magic Power, and Resistance | Executed stat reads and item-property joins through four combat-total helpers |
 | AI5.2c | 2026-08-24 | Named stat `0x1b` as persistent-status flags and bit `0x0800` as persistent Zombie | Zombify descriptor/handler chain; executed live/persistent effective predicate; initializer setter join |
 | AI5.2d | 2026-08-24 | Named persistent bit `0x0040` as Yellow Card and corrected the field's overly narrow innate label | Yellow Card descriptor/case-92 join; executed handler write to target `+0x28` |
+| AI5.2e | 2026-08-25 | Confirmed Yellow Clip as the exact inverse and held eight other persistent masks numeric | Executed `0x0000 -> 0x0040 -> 0x0000`; complete caller sweep found no unique named joins for the remainder |
 
 ## Decisions and evidence
 
@@ -296,6 +297,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Yellow Clip inverse and persistent-mask boundary
+
+Objective:
+
+- Finish the caller/application sweep for unit `+0x28` before moving to the
+  one-byte stat block.
+
+Completed:
+
+- Joined Yellow Clip to raw effect 206, descriptor case 91, and handler
+  `0x08133758`.
+- Extended the Yellow Card execution test through the inverse clear.
+- Recorded the eight remaining observed masks as intentionally numeric.
+
+Evidence recorded during the batch:
+
+- Yellow Card case 92 writes `0x0040`; Yellow Clip case 91 checks that same
+  predicate and clears the same mask.
+- A synthetic target now executes `0x0000 -> 0x0040 -> 0x0000` across the two
+  retail handlers.
+- The other mask predicates have category/capability callers, but no named
+  ability descriptor or unique behavioral join strong enough to promote.
+
+Next action:
+
+- Name the direct one-byte fields for base/active job, level, and experience,
+  then continue only where a constructor or gameplay formula closes the name.
 
 ### 2026-08-24 — Yellow Card and persistent-field correction
 

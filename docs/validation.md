@@ -44,7 +44,8 @@ preserve the independent Speed Down display and Slow/Haste adjacency anchors.
 The eighth check proves unit `+0x28` bit `0x0800` and live status `+0xe9` bit 3
 both satisfy the effective Zombie predicate, and that initialization calls the
 Zombie setter. The ninth executes Yellow Card's handler through its write and
-confirms target `+0x28` becomes `0x0040`.
+Yellow Clip through its inverse store, confirming target `+0x28` changes
+`0x0000 -> 0x0040 -> 0x0000`.
 
 ## The eight checks
 

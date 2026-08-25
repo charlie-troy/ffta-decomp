@@ -212,6 +212,11 @@ PERSISTENT_STATUS_FLAGS = [
         "raw_effect": 207,
         "case": 92,
         "handler": 0x081337F5,
+        "cancel_ability_name": "Yellow Clip",
+        "cancel_ability_id": 342,
+        "cancel_raw_effect": 206,
+        "cancel_case": 91,
+        "cancel_handler": 0x08133759,
         "mask": 0x0040,
     },
     {

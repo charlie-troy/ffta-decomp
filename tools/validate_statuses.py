@@ -20,6 +20,7 @@ STAT_GETTER = 0x080C7EA4
 EFFECTIVE_ZOMBIE = 0x081308F4
 STATUS_INITIALIZER = 0x08133A58
 YELLOW_CARD_HANDLER = 0x081337F4
+YELLOW_CLIP_HANDLER = 0x08133758
 ROM = 0x08000000
 
 
@@ -196,12 +197,26 @@ def main(argv=None):
     gba.write8(0x02003C33, 1)
     gba.run_range(YELLOW_CARD_HANDLER, 0x0813382E, {"r0": context})
     persistent = struct.unpack("<H", gba.uc.mem_read(target + 0x28, 2))[0]
+    cancel_raw = rom[ABILITY_TABLE - ROM +
+                     yellow["cancel_ability_id"] * ABILITY_STRIDE + 0x0C]
+    cancel_case = rom[EFFECT_TABLE - ROM + cancel_raw * 4 + 1]
+    cancel_pointer = pointers[yellow["cancel_case"] - 1]
+    gba.run_range(YELLOW_CLIP_HANDLER, 0x0813377C, {"r0": context})
+    cleared = struct.unpack("<H", gba.uc.mem_read(target + 0x28, 2))[0]
     yellow_ok = (raw_effect == yellow["raw_effect"] and
+                 names.ability(yellow["ability_id"]) ==
+                 yellow["ability_name"] and
                  descriptor_case == yellow["case"] and
                  handler_pointer == yellow["handler"] and
-                 persistent == yellow["mask"])
+                 persistent == yellow["mask"] and
+                 cancel_raw == yellow["cancel_raw_effect"] and
+                 names.ability(yellow["cancel_ability_id"]) ==
+                 yellow["cancel_ability_name"] and
+                 cancel_case == yellow["cancel_case"] and
+                 cancel_pointer == yellow["cancel_handler"] and
+                 cleared == 0)
     print(f"9. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
-          f"(unit +0x28={persistent:#06x})")
+          f"(apply={persistent:#06x}, clip={cleared:#06x})")
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
 

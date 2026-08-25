@@ -276,7 +276,9 @@ behaviour mod needs to reach.
    Resistance; the four total-stat helpers join them to item properties 10–13.
    The AI validator executes both groups. Stat `0x1b` / unit `+0x28` is now an
    persistent-status bitfield with bit `0x0040` proven as Yellow Card and bit
-   `0x0800` proven as persistent Zombie; the other bits remain numeric.
+   `0x0800` proven as persistent Zombie. Yellow Clip is the executed inverse
+   of Yellow Card; eight other observed masks remain numeric after a complete
+   caller sweep found no unique named application join.
 4. Decompile the **capability setters** `0x080CE420`–`0x080CE480`.
 5. Resolve whether **resistance slot 2** (a real slot no field id reaches) is
    read by any path.

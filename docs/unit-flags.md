@@ -128,10 +128,12 @@ application or effective-state joins:
 
 | mask | meaning | evidence |
 |---|---|---|
-| `0x0040` | **Yellow Card** | Yellow Card raw effect 207 selects case 92; its handler writes this bit to the target |
+| `0x0040` | **Yellow Card** | Yellow Card raw effect 207/case 92 writes this bit; Yellow Clip raw effect 206/case 91 clears it |
 | `0x0800` | **Zombie** | the effective Zombie predicate accepts this bit or live `+0xe9` bit 3; initialization copies it through the live setter |
 
-Other observed masks remain numeric.
+The other observed masks (`0x0004`, `0x0008`, `0x0020`, `0x0100`, `0x1000`,
+`0x2000`, `0x4000`, and `0x8000`) have broad category/capability callers but
+no unique named application join, so they remain numeric.
 
 Two patterns name a status bit, both keyed on a documented ability flag:
 
