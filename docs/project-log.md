@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4e — resolve the five remaining duration-region bytes |
-| Last closed package | AI5.4d — named live Doom and its three-turn countdown |
+| Current work package | AI5.4f — resolve `+0xd8/+0xe6/+0xe7` |
+| Last closed package | AI5.4e — named Disable/Immobilize and their durations |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 11/11; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 12/12; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -86,6 +86,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.4b | 2026-08-25 | Named stats `0x23..0x26` as CT, Speed, CT carry, and Judge Points | Executed Speed/item join; one-unit CT tick; 9/10 JP Totema boundary and decoded UI command |
 | AI5.4c | 2026-08-25 | Corrected `+0xd8` from capability state to a status-duration array and named ten counters | Ten named handler/live-bit/reconciler/counter/stat joins; statuses 10/10 |
 | AI5.4d | 2026-08-25 | Named `+0xea` bit 4 as Doom and stat `0x29` / `+0xd9` as its countdown | Executed Checkmate application produces live Doom/count 3; expiry call chain clears battle statuses; statuses 11/11 |
+| AI5.4e | 2026-08-25 | Named `+0xeb` bits 6/7 as Immobilize/Disable and stats `0x33/0x34` as their durations | Executed Aim: Legs/Arm handlers; movement mode 5→0 under Immobilize; Disable ability-usability rejection; statuses 12/12 |
 
 ## Decisions and evidence
 
@@ -366,6 +367,14 @@ status and backlog tables are living sections and should be kept current.
 - Decision: name the bit Doom and the byte Doom countdown. This behavioral
   sequence distinguishes it from an immediate KO/death flag.
 
+### D-026 — Distinguish Immobilize from Disable by their consumers
+
+- Aim: Legs/Aim: Arm and cases 24/22 identify candidates, but do not alone
+  distinguish movement from action restriction.
+- Executed result: `+0xeb` bit 6 forces a synthetic movement mode from 5 to 0,
+  so it is Immobilize. The ability-usability predicate rejects on bit 7 before
+  success, so bit 7 is Disable. Their paired counters are `+0xe3/+0xe4`.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -377,6 +386,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Disable and Immobilize closure
+
+Objective:
+
+- Resolve `+0xe3/+0xe4` using consumers rather than Aim ability names alone.
+
+Completed:
+
+- Named live `+0xeb` bit 6 / stat `0x33` as Immobilize and its duration.
+- Named live `+0xeb` bit 7 / stat `0x34` as Disable and its duration.
+- Expanded the status registry to 19 live statuses / 13 durations and the
+  status gate to 12 checks.
+- Increased behavior-backed scalar coverage from 46 to 48 of 63.
+
+Evidence recorded during the batch:
+
+- Executing Aim: Legs applies Immobilize/count `1/3`; Aim: Arm applies
+  Disable/count `1/3`.
+- With the same synthetic movement object, no status preserves mode 5 and
+  Immobilize forces mode 0.
+- `sub_08133E18`, the ability-usability predicate, checks Disable and returns
+  through its failure path when set.
+- Status validation is 12/12.
+
+Next action:
+
+- Resolve the shared `+0xe6` counter across Cover and monster-state handlers,
+  then isolate `+0xd8` and `+0xe7`. Do not force a single status name onto
+  `+0xe6` if its three live-bit consumers intentionally share generic state.
 
 ### 2026-08-25 — Doom countdown closure
 

@@ -48,6 +48,8 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x27` | `+0xD8` | ptr | **status-duration array** | parallel getter/setter families expose fifteen adjacent counters; application and reconciliation paths join them to live status bits |
 | `0x29` | `+0xD9` | u8 | **Doom countdown** | Checkmate applies live Doom with count 3; the per-turn path decrements it and clears battle statuses at expiry |
 | `0x2a..0x32` | `+0xDA..+0xE2` | u8 | **Haste, Slow, Stop, Shell, Protect, Sleep, Silence, Confuse, Charm durations** | each named handler sets its live bit and matching counter; reconciliation clears the counter when the live bit is absent |
+| `0x33` | `+0xE3` | u8 | **Immobilize duration** | Aim: Legs applies live Immobilize/count 3; the movement-mode reader forces its mode to zero while live |
+| `0x34` | `+0xE4` | u8 | **Disable duration** | Aim: Arm applies live Disable/count 3; the ability-usability path rejects on the paired live getter |
 | `0x35` | `+0xE5` | u8 | **Addle duration** | Addle's case-71 handler writes this counter; the live-bit reconciler pairs it with Addle |
 
 ## Complete numeric layout
@@ -65,7 +67,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x23..0x25` | `+0xd0/+0xd2/+0xd4` | CT, Speed, and CT carry (three s16 loads) |
 | `0x26` | `+0xd6` | Judge Points (u16) |
 | `0x27` | `+0xd8` | address of status-duration array |
-| `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads; eleven named durations, five numeric |
+| `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads; thirteen named durations, three numeric |
 | `0x38` | `+0xe8` | address of live-status flags |
 | `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads |
 | `0x44` | `+0xfc` | address |
@@ -118,10 +120,12 @@ sets both the named live status and its counter, `sub_08131C58` clears a
 counter when that live bit is absent, and the validator executes the dedicated
 counter getter/setter plus the generic stat getter. Doom is independently
 executed from Checkmate to live bit/count `1/3`, with the per-turn expiry chain
-clearing its live bit and battle statuses. Five bytes in the region remain
-numeric: `+0xd8/+0xe3/+0xe4/+0xe6/+0xe7`.
+clearing its live bit and battle statuses. Aim: Legs and Aim: Arm execute as
+Immobilize/Disable with count 3; a separate movement reader zeros its mode for
+Immobilize, while the ability-usability predicate rejects Disable. Three bytes
+in the region remain numeric: `+0xd8/+0xe6/+0xe7`.
 
-This names 46 of 63 scalar loads. Seventeen remain numeric: stat `0x00`, those
-five duration-region bytes, and the eleven fields at `+0xf1..+0xfb`. The two
+This names 48 of 63 scalar loads. Fifteen remain numeric: stat `0x00`, those
+three duration-region bytes, and the eleven fields at `+0xf1..+0xfb`. The two
 remaining unnamed address regions are `+0x34` and `+0xfc`; `+0xd8` is now the
 status-duration array and `+0xe8` the live-status array.

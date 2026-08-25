@@ -69,6 +69,8 @@ KNOWN = {
     0x30: "silence_duration",
     0x31: "confuse_duration",
     0x32: "charm_duration",
+    0x33: "immobilize_duration",
+    0x34: "disable_duration",
     0x35: "addle_duration",
     0x09: "elemental_resistance_array",
     0x1C: "equipment_array",

@@ -102,6 +102,8 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x27` | address | `+0xD8` | **status-duration array** |
 | `0x29` | `ldrb` | `+0xD9` | **Doom countdown** |
 | `0x2A..0x32` | `ldrb` | `+0xDA..+0xE2` | **Haste through Charm durations** |
+| `0x33` | `ldrb` | `+0xE3` | **Immobilize duration** |
+| `0x34` | `ldrb` | `+0xE4` | **Disable duration** |
 | `0x35` | `ldrb` | `+0xE5` | **Addle duration** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
@@ -154,8 +156,10 @@ The next block is a status-duration array. Eleven named application handlers set
 their matching live bit and `+0xda..+0xe2/+0xe5` counter; the reconciliation
 routine pairs and clears those same counters. Checkmate additionally executes
 as live Doom with count 3 at `+0xd9`, whose expiry path clears battle statuses.
-This names 46 of 63 scalar loads.
-Seventeen remain numeric, including five bytes in this block, stat `0x00`, and
+Aim: Legs/Aim: Arm execute as Immobilize/Disable count 3, and independent
+movement/ability-usability readers distinguish their roles. This names 48 of
+63 scalar loads. Fifteen remain numeric, including three bytes in this block,
+stat `0x00`, and
 the eleven fields at `+0xf1..+0xfb`; six stat ids return addresses.
 
 ## The AI is randomised
