@@ -13,11 +13,22 @@ counted address-returning cases as direct loads.
 
 | stat | offset | width | meaning | how it is known |
 |---|---|---|---|---|
+| `0x01` | `+0x04` | u8 | **unit type** | constructor copies the unit-definition discriminator; job changes use type 1 as the ordinary-unit path |
 | `0x02` | `+0x05` | u8 | **base job id** | ordinary job changes synchronize it with the active job; canonical-job checks read it |
+| `0x03` | `+0x06` | u8 | **race id** | constructor copies job property 1; Jelly job 46 produces race 7 |
 | `0x04` | `+0x07` | u8 | **active job id** | the job-change routine always writes the selected job here |
 | `0x05` | `+0x08` | u8 | **secondary job id** | the job-change routine clears it when it duplicates the new active job; A-ability lookup reads it as the secondary job |
 | `0x06` | `+0x09` | u8 | **level** | the level-up routine increments it and caps it at 50 |
 | `0x07` | `+0x0A` | u8 | **experience** | EXP awards accumulate here; level-up resets it and the level-50 cap restores 99 |
+| `0x0A` | `+0x0C` | u8 | **neutral resistance** | damage routine loads stats `0x0a..0x12` and indexes them by element id |
+| `0x0B` | `+0x0D` | u8 | **Fire resistance** | element 1; executed Fire damage covers all five resistance codes |
+| `0x0C` | `+0x0E` | u8 | **Wind resistance** | element 2; initialized from packed resistance slot 1 |
+| `0x0D` | `+0x0F` | u8 | **Earth resistance** | element 3; retail initializer duplicates the Wind accessor instead of reading packed slot 2 |
+| `0x0E` | `+0x10` | u8 | **Water resistance** | element 4; initialized from packed resistance slot 3 |
+| `0x0F` | `+0x11` | u8 | **Ice resistance** | element 5; initialized from packed resistance slot 4 |
+| `0x10` | `+0x12` | u8 | **Lightning resistance** | element 6; initialized from packed resistance slot 5 |
+| `0x11` | `+0x13` | u8 | **Holy resistance** | element 7; initialized from packed resistance slot 6 |
+| `0x12` | `+0x14` | u8 | **Dark resistance** | element 8; initialized from packed resistance slot 7 |
 | `0x13` | `+0x18` | u16 | **current HP** | AI compares it against half of `0x14` |
 | `0x14` | `+0x1A` | u16 | **max HP** | the other half of that comparison |
 | `0x15` | `+0x1C` | u16 | **current MP** | the field the ability-cost check reads |
@@ -69,12 +80,25 @@ counted address-returning cases as direct loads.
 Bytes `+0x04`-`+0x14` are a run of 17 u8 stats (ids `0x01`-`0x12`), then
 u16 stats run from `+0x18` upward in pairs. The HP pair sits at the start of
 the u16 block, with MP immediately after it.
-Five early bytes are now behavior-backed: base job at `+0x05`, active job at
-`+0x07`, secondary job at `+0x08`, level at `+0x09`, and experience at
-`+0x0a`. Executing the retail job-change fragment synchronizes base/active job
-for an ordinary unit and clears a duplicate secondary job. Executing the EXP
-award path changes 40 to 45, while the level-up routine enforces the retail
+Seven early bytes are now behavior-backed: unit type at `+0x04`, base job at
+`+0x05`, race at `+0x06`, active job at `+0x07`, secondary job at `+0x08`,
+level at `+0x09`, and experience at `+0x0a`. Executing the constructor with
+Jelly writes type 1 / race 7. The retail job-change fragment synchronizes
+base/active job for an ordinary unit and clears a duplicate secondary job.
+The EXP award path changes 40 to 45, while level-up enforces the retail
 level-50 / EXP-99 ceiling.
+
+Stats `0x0a..0x12` form the damage-resistance array: neutral, Fire, Wind,
+Earth, Water, Ice, Lightning, Holy, and Dark. The damage routine indexes this
+array by an ability's element id. Executed Fire damage proves the stored codes:
+0 is weak, 1 normal, 2 nullify, 3 absorb, and 4 resist/half damage.
+
+The Earth source has a retail quirk. The packed job table contains eight
+three-bit element slots, but its Wind and Earth slots are equal in all 116
+entries. The job accessor and unit initializer read packed Wind twice, filling
+both unit Wind and Earth, and never read packed slot 2. Editing packed slot 2
+therefore has no combat effect. Divergent Wind/Earth affinities require a code
+change to the accessor or initializer rather than a table-only edit.
 The executed restoration clamp makes the first four fields two complete pairs:
 current/max HP, then current/max MP. The next four are the unit's base physical
 and magical combat stats in Attack/Defense and Magic Power/Resistance pairs.

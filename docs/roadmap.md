@@ -282,10 +282,15 @@ behaviour mod needs to reach.
    2026-08-25:** stats `0x02/0x04..0x07` name base job, active job, secondary
    job, level, and experience at unit `+0x05/+0x07..+0x0a`. Retail job-change,
    EXP-award, and level-cap paths execute in the AI gate, including the
-   level-50 / EXP-99 ceiling.
+   level-50 / EXP-99 ceiling. Stats `0x01/0x03` are now constructor-backed unit
+   type/race. Stats `0x0a..0x12` are neutral plus Fire/Wind/Earth/Water/Ice/
+   Lightning/Holy/Dark resistance; executed damage proves all five affinity
+   codes and the duplicated-Wind Earth source.
 4. Decompile the **capability setters** `0x080CE420`–`0x080CE480`.
-5. Resolve whether **resistance slot 2** (a real slot no field id reaches) is
-   read by any path.
+5. ~~Resolve whether resistance slot 2 is read by any path.~~ **Closed
+   2026-08-25:** slots 1/2 are equal in all retail jobs, the accessor and unit
+   initializer duplicate slot 1 for Wind/Earth, and battle damage consumes the
+   unit array. Packed slot 2 has no combat effect.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

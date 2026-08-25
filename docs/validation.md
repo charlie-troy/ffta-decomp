@@ -56,16 +56,17 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    matches published AP cost.
 3. **Flag decoding.** 1239 bit reads through the property API match a direct
    parse of `+0x10`, confirming the `prop - 0x0B` mapping across the live range.
-4. **Stat ids, transitions, and combat totals.** Direct getter reads confirm
-   base job, active job, secondary job, level, and EXP at stats
-   `0x02/0x04..0x07` and unit `+0x05/+0x07..+0x0a`. The executed job-change
-   fragment synchronizes base/active job and clears a duplicate secondary job;
-   the EXP path changes 40 to 45; and the level-up routine enforces level 50 /
-   EXP 99. Writing HP, max HP, MP, max MP, Attack, Defense, Magic Power, and
-   Resistance and reading them through `sub_080C7EA4` confirms stats
-   `0x13..0x1A` are unit `+0x18..+0x26`. Executing the four total-stat helpers
-   with five synthetic equipment slots also confirms item properties 10–13
-   add to the matching combat base.
+4. **Stat ids, transitions, resistances, and combat totals.** Constructor
+   execution confirms unit type/race at stats `0x01/0x03`; direct reads confirm
+   base/active/secondary job, level, and EXP at `0x02/0x04..0x07`. Job
+   initialization fills stats `0x0a..0x12` as neutral, Fire, Wind, Earth,
+   Water, Ice, Lightning, Holy, and Dark resistance, including the retail
+   duplicate-Wind Earth source. Executing Fire damage produces positive
+   weak/normal/resist results in descending order, zero for nullify, and a
+   negative result for absorb. The job-change fragment synchronizes
+   base/active job and clears a duplicate secondary job; the EXP path changes
+   40 to 45; and level-up enforces 50/99. HP/MP and the four combat bases still
+   read through stats `0x13..0x1a`, and all four equipped-item totals execute.
 5. **The healthy-target rule.** Running the `ai_behaviour == 2` fragment against
    synthetic targets shows it rejects exactly when HP < MaxHP/2, including at
    the boundaries (50 of 100 passes, 49 rejects; 30 of 60 passes, 29 rejects).

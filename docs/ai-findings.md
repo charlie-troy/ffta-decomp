@@ -77,14 +77,14 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 
 | stat id | load | struct offset | meaning |
 |---|---|---|---|
+| `0x01` | `ldrb` | `+0x04` | **unit type** |
 | `0x02` | `ldrb` | `+0x05` | **base job id** |
+| `0x03` | `ldrb` | `+0x06` | **race id** |
 | `0x04` | `ldrb` | `+0x07` | **active job id** |
 | `0x05` | `ldrb` | `+0x08` | **secondary job id** |
 | `0x06` | `ldrb` | `+0x09` | **level** |
 | `0x07` | `ldrb` | `+0x0A` | **experience** |
-| `0x10` | `ldrb` | `+0x12` | byte stat |
-| `0x11` | `ldrb` | `+0x13` | byte stat |
-| `0x12` | `ldrb` | `+0x14` | byte stat |
+| `0x0A..0x12` | `ldrb` | `+0x0C..+0x14` | **neutral + eight elemental resistances** |
 | `0x13` | `ldrh` | **`+0x18`** | **current HP** |
 | `0x14` | `ldrh` | **`+0x1A`** | **max HP** |
 | `0x15` | `ldrh` | **`+0x1C`** | **current MP** (the field the cost check uses) |
@@ -113,6 +113,15 @@ active job. The later A-ability path reads a nonzero `+0x08` as a secondary
 job. `sub_080C9B8C` increments `+0x09`, clears `+0x0a`, and caps the pair at
 level 50 / EXP 99; the award loop at `0x080A718E` adds earned EXP to `+0x0a`.
 These transitions execute in check 4 of `tools/validate_ai.py`.
+
+That check also executes the constructor join for unit type/race, the complete
+job-to-unit elemental initialization, and the damage consumer. The element
+order is neutral, Fire, Wind, Earth, Water, Ice, Lightning, Holy, Dark; codes
+0–4 mean weak, normal, nullify, absorb, and resist. Fire damage under a fixed
+RNG state produces `33, 24, 0, -19, 11` for those five states. The packed job
+table's nominal Earth slot is not read: the accessor duplicates Wind for the
+unit Earth byte, and the two packed slots happen to be equal in all retail
+jobs.
 
 ## The AI is randomised
 

@@ -70,11 +70,13 @@ resistance table with 1 as the neutral default, not an index or a bitmask.
 | 6 | 29 | `+0x14` bits 5–6 | `0x14` |
 | 7 | 32 | `+0x15` bits 0–1 | `0x15` |
 
-Slot 2 is a real slot — its values carry the same 1-dominant distribution as
-the other seven — but no field id in the accessor resolves to it, because
-`0x10` duplicates slot 1 instead. Anything that reads resistances through this
-accessor therefore cannot see slot 2. Whether another path reads it has not
-been established, so **treat editing slot 2 as unverified**.
+Slot 2 occupies real packed bits, but its 116 retail values are **exactly equal
+to slot 1**, not merely similar in distribution. The field accessor duplicates
+slot 1 for ids `0x0f/0x10`; unit initialization consequently fills both Wind
+and Earth from slot 1. The battle damage routine reads only the resulting unit
+array, so packed slot 2 has no combat reader. **Editing packed slot 2 has no
+effect on retail damage.** This may be a dormant field or a deliberate shared
+Wind/Earth source; the evidence does not distinguish intent.
 
 Because the slots straddle byte boundaries, editing them by hand in the
 byte-level CSV is error-prone. Use the dedicated commands, which are

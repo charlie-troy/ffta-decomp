@@ -99,8 +99,13 @@ COMBAT_TOTALS = (
     ("Resistance", 0x1A, 0x26, 0x13, 0x080CA6FC),
 )
 JOB_SWITCH_START, JOB_SWITCH_END = 0x080C8C32, 0x080C8C46
+UNIT_IDENTITY_START, UNIT_IDENTITY_END = 0x080C975C, 0x080C9768
+JOB_DERIVED_START, JOB_DERIVED_END = 0x080C8C46, 0x080C8CB6
 EXP_AWARD_START, EXP_AWARD_END = 0x080A718E, 0x080A71AC
 LEVEL_UP = 0x080C9B8C
+DAMAGE = 0x0812FE38
+JOB_TABLE = 0x08521A14 - 0x08000000
+JOB_STRIDE = 0x34
 # The ai_behaviour == 2 fragment of the evaluator, and its bail-out call.
 HEALTHY_START, HEALTHY_END, HEALTHY_REJECT = 0x080C3364, 0x080C3380, 0x080C337C
 # One case body's probability gate, up to the pass/fail test.
@@ -170,6 +175,63 @@ def check_stat_ids(gba, rom):
         print(f"   job/level fields read {got}, expected {want}")
     print("   0x02/0x04..0x07 == base job/active job/secondary job/level/EXP "
           f"-> {'PASS' if got == want else 'FAIL'}")
+
+    # The unit constructor copies its record discriminator to +0x04 and the
+    # selected job's race property to +0x06. Jelly (job 46) is race 7.
+    gba.uc.mem_write(UNIT, BLANK)
+    gba.write8(UNIT + 0x05, 46)
+    gba.write8(UNIT + 0x07, 46)
+    gba.run_range(UNIT_IDENTITY_START, UNIT_IDENTITY_END,
+                  {"r2": 1, "r7": UNIT})
+    unit_identity = tuple(gba.uc.mem_read(UNIT + off, 1)[0]
+                          for off in (0x04, 0x06))
+    identity_getters = (gba.call(STAT_GET, [UNIT, 0x01]),
+                        gba.call(STAT_GET, [UNIT, 0x03]))
+    if unit_identity != (1, 7) or identity_getters != unit_identity:
+        ok = False
+        print(f"   unit type/race wrote {unit_identity}, getters {identity_getters}")
+    print("   constructor copies unit type 1 and Jelly race 7 "
+          f"-> {'PASS' if unit_identity == (1, 7) and identity_getters == unit_identity else 'FAIL'}")
+
+    # Job initialization writes the neutral element plus eight elemental
+    # resistance codes to +0x0C..+0x14. The retail field accessor duplicates
+    # packed slot 1 for Earth; packed slot 2 is never copied.
+    gba.run_range(JOB_DERIVED_START, JOB_DERIVED_END,
+                  {"r4": UNIT, "r6": 1, "r7": 0})
+    packed = int.from_bytes(
+        rom[JOB_TABLE + 46 * JOB_STRIDE + 0x11:
+            JOB_TABLE + 46 * JOB_STRIDE + 0x16], "little")
+    slots = tuple((packed >> (11 + n * 3)) & 3 for n in range(8))
+    want_resist = (1, slots[0], slots[1], slots[1], *slots[3:])
+    got_resist = tuple(gba.call(STAT_GET, [UNIT, stat])
+                       for stat in range(0x0A, 0x13))
+    if got_resist != want_resist:
+        ok = False
+        print(f"   elemental resistance fields {got_resist}, expected {want_resist}")
+    print("   neutral/Fire/Wind/Earth/Water/Ice/Lightning/Holy/Dark fields "
+          f"-> {'PASS' if got_resist == want_resist else 'FAIL'}")
+
+    # Fire is element 1, so the damage routine indexes target +0x0D. Execute
+    # all five retail resistance meanings under the same RNG state.
+    TARGET = UNIT + 0x800
+    for actor in (UNIT, TARGET):
+        gba.uc.mem_write(actor, bytes(0x108))
+        for off, value in ((0x18, 100), (0x1A, 100), (0x20, 100),
+                           (0x22, 50), (0x24, 100), (0x26, 50)):
+            _put16(gba, actor + off, value)
+    damage = []
+    for resistance in range(5):
+        gba.write8(TARGET + 0x0D, resistance)
+        gba.write32(RNG_STATE, 0x12345678)
+        value = gba.call(DAMAGE, [UNIT, TARGET, 23, 0], timeout_insns=500000)
+        damage.append(value - 0x100000000 if value & 0x80000000 else value)
+    damage_ok = (damage[0] > damage[1] > damage[4] > 0 and
+                 damage[2] == 0 and damage[3] < 0)
+    if not damage_ok:
+        ok = False
+        print(f"   Fire resistance outcomes {damage}")
+    print(f"   Fire weak/normal/null/absorb/resist outcomes {damage} "
+          f"-> {'PASS' if damage_ok else 'FAIL'}")
 
     # An ordinary unit changing to its secondary job synchronizes base and
     # active job, then clears the now-duplicate secondary slot.

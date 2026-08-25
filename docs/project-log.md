@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.3a — named job identity, level, and experience fields |
+| Last closed package | AI5.3b — named unit type/race and elemental resistance array |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
@@ -79,6 +79,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.2d | 2026-08-24 | Named persistent bit `0x0040` as Yellow Card and corrected the field's overly narrow innate label | Yellow Card descriptor/case-92 join; executed handler write to target `+0x28` |
 | AI5.2e | 2026-08-25 | Confirmed Yellow Clip as the exact inverse and held eight other persistent masks numeric | Executed `0x0000 -> 0x0040 -> 0x0000`; complete caller sweep found no unique named joins for the remainder |
 | AI5.3a | 2026-08-25 | Named base job, active job, secondary job, level, and experience in the one-byte unit block | Direct accessor reads; executed job switch and EXP award; level-up cap at 50/99 |
+| AI5.3b | 2026-08-25 | Named unit type/race and nine damage-resistance fields; closed packed slot 2 | Constructor/job initialization; five executed Fire outcomes; retail Wind/Earth source proof |
 
 ## Decisions and evidence
 
@@ -299,6 +300,22 @@ status and backlog tables are living sections and should be kept current.
   level, and experience. Keep neighboring `+0x04/+0x06` numeric until their
   broader value domains have equally specific behavioral joins.
 
+### D-021 — Treat the unit array as combat truth for elemental resistance
+
+- Construction evidence: unit `+0x0c..+0x14` is filled as neutral followed by
+  job accessor properties `0x0e..0x15`. The resulting element order is Fire,
+  Wind, Earth, Water, Ice, Lightning, Holy, Dark.
+- Consumption evidence: `sub_0812FE38` loads stats `0x0a..0x12`, indexes the
+  array by the ability's element id, and applies codes 0–4. Executed Fire
+  outcomes are weak 33, normal 24, nullify 0, absorb -19, resist 11 under the
+  same RNG seed.
+- Slot-2 boundary: packed job slots 1 and 2 are equal in all 116 entries, but
+  the accessor and initializer explicitly read slot 1 twice for unit Wind and
+  Earth. No battle path reads packed slot 2 directly.
+- Decision: expose the nine unit fields by element and document packed slot 2
+  as combat-inert. Do not silently reroute Earth to slot 2 in modding tools;
+  that would change retail behavior.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -310,6 +327,39 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Unit identity and elemental resistance array
+
+Objective:
+
+- Close unit `+0x04/+0x06` and the job-derived damage-affinity bytes using
+  constructor and battle execution.
+
+Completed:
+
+- Named stat `0x01` / unit `+0x04` as unit type and stat `0x03` / `+0x06` as
+  race id.
+- Named stats `0x0a..0x12` / unit `+0x0c..+0x14` as neutral, Fire, Wind,
+  Earth, Water, Ice, Lightning, Holy, and Dark resistance.
+- Closed the packed job-table slot-2 question and documented the retail
+  duplicated-Wind Earth source.
+- Extended AI check 4 through constructor, job initialization, direct stat
+  reads, and the full damage consumer.
+
+Evidence recorded during the batch:
+
+- Constructing Jelly job 46 writes unit type 1 and race 7.
+- Jelly's packed Fire absorb and Ice weakness reach the expected unit bytes.
+- Fire under resistance codes 0/1/2/3/4 produces `33/24/0/-19/11` with fixed
+  RNG, proving weak/normal/nullify/absorb/resist semantics.
+- Packed Wind and Earth slots match in 116/116 jobs; only Wind is copied, twice.
+- AI validation remains 8/8.
+
+Next action:
+
+- Name direct equipment slots at stats `0x1d..0x21` from the already-executed
+  combat-total helpers, then isolate stat `0x08` / unit `+0x0b` without
+  inheriting the job table's unsupported historical label.
 
 ### 2026-08-25 — Job identity, level, and experience fields
 
