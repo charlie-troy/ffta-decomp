@@ -54,6 +54,8 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x35` | `+0xE5` | u8 | **Addle duration** | Addle's case-71 handler writes this counter; the live-bit reconciler pairs it with Addle |
 | `0x36` | `+0xE6` | u8 | **status link id** | Cover copies the covered unit's `+0x104` id here; two other linked-state handlers share the same field |
 | `0x37` | `+0xE7` | u8 | **recent target ids** | two packed 4-bit unit ids; action resolution records the two most recent distinct targets and AI tests membership |
+| `0x39` | `+0xF1` | u8 | **KOs inflicted** | forced-KO result zeroes target HP, then saturating-increments this field on the acting unit |
+| `0x3a` | `+0xF2` | u8 | **KOs suffered** | the same result path saturating-increments this field on the zero-HP target |
 
 ## Complete numeric layout
 
@@ -72,7 +74,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x27` | `+0xd8` | address of status-state array |
 | `0x28..0x37` | `+0xd8..+0xe7` | sixteen named u8 loads: fourteen countdowns/durations, one link id, and packed recent-target ids |
 | `0x38` | `+0xe8` | address of live-status flags |
-| `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads |
+| `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads; KO-inflicted/suffered pair named at `+0xf1/+0xf2` |
 | `0x44` | `+0xfc` | address |
 
 ## Shape
@@ -125,18 +127,19 @@ counter getter/setter plus the generic stat getter. Doom is independently
 executed from Checkmate to live bit/count `1/3`, with the per-turn expiry chain
 clearing its live bit and battle statuses. Aim: Legs and Aim: Arm execute as
 Immobilize/Disable with count 3; a separate movement reader zeros its mode for
-Immobilize, while the ability-usability predicate rejects Disable. Three bytes
-in the region remain numeric: `+0xd8/+0xe6/+0xe7`.
+Immobilize, while the ability-usability predicate rejects Disable. The
+remaining bytes are Zombie revival countdown, a shared status link id, and
+packed recent-target ids, all independently executed below.
 
 `+0xe6` is not a duration. Executing Cover copies target unit id `0x2a` from
 target `+0x104` into the actor's `+0xe6`; both its dedicated getter and stat
 `0x36` return 42. Other consumers compare this byte to unit ids when resolving
 linked states, so the encompassing pointer is a status-state array.
 
-This names 49 of 63 scalar loads. Fourteen remain numeric: stat `0x00`, the
-two status-state bytes `+0xd8/+0xe7`, and the eleven fields at `+0xf1..+0xfb`. The two
-remaining unnamed address regions are `+0x34` and `+0xfc`; `+0xd8` is now the
-status-state array and `+0xe8` the live-status array.
+This names 53 of 63 scalar loads. Ten remain numeric: stat `0x00` and the nine
+fields at `+0xf3..+0xfb`. The two remaining unnamed address regions are
+`+0x34` and `+0xfc`; `+0xd8` is the status-state array and `+0xe8` the
+live-status array.
 
 `+0xe7` closes the status-state block but is not itself a status. It is a
 two-entry most-recently-used target history: each nibble holds a unit's
@@ -144,3 +147,9 @@ two-entry most-recently-used target history: each nibble holds a unit's
 nibble. Re-targeting the older entry promotes it; a third distinct target
 evicts the oldest. The writer has four call sites in action resolution and the
 AI ability evaluator queries the paired membership helper.
+
+The next pair records battle KOs. In the forced-KO result path, the target's
+HP is first set to zero, the acting unit's `+0xf1` is saturating-incremented,
+and the target's `+0xf2` is saturating-incremented. Executing this path from
+starting values 9/11 produces target HP 0 and generic stats `0x39/0x3a` equal
+to 10/12. `+0xf1` also has two independent formula consumers.

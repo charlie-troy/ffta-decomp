@@ -23,7 +23,10 @@ struct Unit
     u16 mp;             /* +0x1C, stat id 0x15 */
     u8  filler_1E[0xC9];
     u8  recentTargetIds; /* +0xE7, two 4-bit unit ids; newest in low nibble */
-    u8  filler_E8[0x0E];
+    u8  filler_E8[0x09];
+    u8  koInflictedCount; /* +0xF1 */
+    u8  koSufferedCount;  /* +0xF2 */
+    u8  filler_F3[3];
     u8  unk_F6;         /* +0xF6 */
     u8  unk_F7;         /* +0xF7 */
 };

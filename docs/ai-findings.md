@@ -108,6 +108,8 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x35` | `ldrb` | `+0xE5` | **Addle duration** |
 | `0x36` | `ldrb` | `+0xE6` | **status link id** |
 | `0x37` | `ldrb` | `+0xE7` | **recent target ids** (two packed 4-bit ids) |
+| `0x39` | `ldrb` | `+0xF1` | **KOs inflicted** |
+| `0x3a` | `ldrb` | `+0xF2` | **KOs suffered** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain
@@ -162,9 +164,10 @@ as live Doom with count 3 at `+0xd9`, whose expiry path clears battle statuses.
 Aim: Legs/Aim: Arm execute as Immobilize/Disable count 3, and independent
 movement/ability-usability readers distinguish their roles. Cover independently
 copies the covered unit's `+0x104` id to `+0xe6`; linked-state consumers compare
-it against other unit ids. This names 49 of 63 scalar loads. Fourteen remain
-numeric: two bytes in this block, stat `0x00`, and the eleven fields at
-`+0xf1..+0xfb`; six stat ids return addresses.
+it against other unit ids. Zombie revival and recent-target history close the
+other two bytes in this block. The paired KO result path then names
+`+0xf1/+0xf2` as KOs inflicted/suffered. This names 53 of 63 scalar loads. Ten
+remain numeric: stat `0x00` and `+0xf3..+0xfb`; six stat ids return addresses.
 
 ## The AI is randomised
 

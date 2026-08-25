@@ -329,6 +329,10 @@ behaviour mod needs to reach.
    the two most recent distinct action-target unit ids into nibbles, newest
    first. Action resolution writes it and the AI evaluator tests membership.
    All sixteen scalar bytes in the status-state region are now named.
+15. **KO counters closed 2026-08-25:** stats `0x39/0x3a` / `+0xf1/+0xf2`
+   count KOs inflicted by the actor and suffered by the target. A forced-KO
+   path executes target HP `123 -> 0` and counters `9/11 -> 10/12`; both
+   increments saturate. Nine bytes at `+0xf3..+0xfb` remain numeric.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

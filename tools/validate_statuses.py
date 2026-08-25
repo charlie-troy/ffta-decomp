@@ -35,6 +35,7 @@ ZOMBIE_COUNT_SETTER = 0x080CE418
 ZERO_HP_PREDICATE = 0x080C8280
 RECENT_TARGET_PUSH = 0x08134170
 RECENT_TARGET_CONTAINS = 0x081341BC
+FORCED_KO_START, FORCED_KO_END = 0x08132AEA, 0x08132B34
 ROM = 0x08000000
 
 
@@ -357,6 +358,26 @@ def main(argv=None):
     if not history_ok:
         failures.append("recent target ids")
 
+    # The forced-KO result path exposes the direction of the adjacent counters:
+    # actor +0xf1 records the inflicted KO and target +0xf2 records suffering it.
+    result = 0x02001000
+    ko_actor, ko_target = 0x02001200, 0x02001400
+    gba.reset_ram()
+    gba.write32(result, ko_actor)
+    gba.write32(result + 8, ko_target)
+    gba.write8(ko_actor + 0xF1, 9)
+    gba.write8(ko_target + 0xF2, 11)
+    gba.uc.mem_write(ko_target + 0x18, struct.pack("<H", 123))
+    gba.run_range(FORCED_KO_START, FORCED_KO_END, {"r4": result, "r1": 0})
+    ko_hp = struct.unpack("<H", gba.uc.mem_read(ko_target + 0x18, 2))[0]
+    ko_inflicted = gba.call(STAT_GETTER, [ko_actor, 0x39])
+    ko_suffered = gba.call(STAT_GETTER, [ko_target, 0x3A])
+    ko_ok = (ko_hp, ko_inflicted, ko_suffered) == (0, 10, 12)
+    print(f"15. KO counters: {'OK' if ko_ok else 'FAIL'} "
+          f"(target HP={ko_hp}; inflicted/suffered={ko_inflicted}/{ko_suffered})")
+    if not ko_ok:
+        failures.append("KO counters")
+
     yellow = next(entry for entry in PERSISTENT_STATUS_FLAGS
                   if entry["name"] == "yellow_card")
     raw_effect = rom[ABILITY_TABLE - ROM +
@@ -387,7 +408,7 @@ def main(argv=None):
                  cancel_case == yellow["cancel_case"] and
                  cancel_pointer == yellow["cancel_handler"] and
                  cleared == 0)
-    print(f"15. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
+    print(f"16. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
           f"(apply={persistent:#06x}, clip={cleared:#06x})")
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
@@ -396,7 +417,7 @@ def main(argv=None):
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 15/15 status checks")
+    print("PASS: 16/16 status/state checks")
     return 0
 
 

@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.5a — resolve the `+0xf1..+0xfb` battle counters |
-| Last closed package | AI5.4h — named `+0xe7` as packed recent target ids |
+| Current work package | AI5.5b — resolve the remaining `+0xf3..+0xfb` battle state |
+| Last closed package | AI5.5a — named the paired KO counters at `+0xf1/+0xf2` |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 15/15; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 16/16; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -90,6 +90,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.4f | 2026-08-25 | Named stat `0x36` / `+0xe6` as a shared status link id | Executed Cover copies target unit id 42; dedicated/stat getters return 42; linked-state comparison consumers |
 | AI5.4g | 2026-08-25 | Named stat `0x28` / `+0xd8` as the Zombie revival countdown | Executed effective-Zombie reset seeds 3 while blank stays 0; dead-Zombie turn path decrements and schedules revival at zero |
 | AI5.4h | 2026-08-25 | Named stat `0x37` / `+0xe7` as packed recent target ids | Executed MRU insertion/promotion/eviction and membership; four action writers join to the AI reader |
+| AI5.5a | 2026-08-25 | Named stats `0x39/0x3a` / `+0xf1/+0xf2` as KOs inflicted/suffered | Forced-KO execution zeros target HP and increments actor/target counters 9/11→10/12 |
 
 ## Decisions and evidence
 
@@ -406,6 +407,16 @@ status and backlog tables are living sections and should be kept current.
 - Decision: name stat `0x37` `recent_target_ids`. Keep the packed representation
   visible because it holds two identities rather than one scalar id.
 
+### D-030 — Name the KO pair by actor/target mutation direction
+
+- Two independent result paths saturating-increment actor `+0xf1` when an
+  action reduces its target to zero HP. The target's `+0xf2` increments in the
+  same transition unless its exclusion flag is set.
+- Executing the forced-KO path produces target HP `123 -> 0`, actor `+0xf1`
+  `9 -> 10`, and target `+0xf2` `11 -> 12`; generic stats return both results.
+- Decision: name them `ko_inflicted_count` and `ko_suffered_count`. Do not
+  generalize the adjacent numeric bytes from proximity.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -417,6 +428,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Paired KO counters
+
+Objective:
+
+- Start the `+0xf1..+0xfb` family with fields whose actor/target roles can be
+  executed directly.
+
+Completed:
+
+- Named stat `0x39` / unit `+0xf1` as `ko_inflicted_count` and stat `0x3a` /
+  `+0xf2` as `ko_suffered_count`.
+- Increased behavior-backed scalar coverage to 53/63 without projecting names
+  onto the remaining adjacent bytes.
+
+Evidence recorded during the batch:
+
+- The forced-KO path zeroes target HP and increments the actor/target fields
+  from 9/11 to 10/12; the generic stat getter returns both new values.
+- Both writes use the same saturating-at-255 pattern. A second ordinary damage
+  resolution path independently increments target `+0xf2`, while `+0xf1` has
+  two formula consumers.
+- Status/state validation is 16/16.
+
+Next action:
+
+- Separate unused stats from live state among `+0xf3..+0xfb`; prioritize
+  generic-stat `0x3c` / `+0xf4` and the direct `+0xfb` initialization reader.
 
 ### 2026-08-25 — Packed recent-target history
 
