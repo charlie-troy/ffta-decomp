@@ -41,6 +41,10 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x1a` | `+0x26` | u16 | **Resistance** | `sub_080CA6FC` adds equipped item property 13 (resistance) to this base |
 | `0x1b` | `+0x28` | u16 | **persistent status flags** *(partially decoded)* | bit `0x0040` is Yellow Card; bit `0x0800` is persistent Zombie |
 | `0x1d..0x21` | `+0x2A..+0x32` | u16 | **equipped item ids 0–4** | four combat-total helpers iterate all five ids and add matching item properties |
+| `0x23` | `+0xD0` | s16 | **charge time (CT)** | the turn tick adds effective Speed and CT carry here; units become eligible at 1000 |
+| `0x24` | `+0xD2` | s16 | **Speed** | `sub_080CA580` adds signed item property 14; level-up grows this field from the job Speed growth property |
+| `0x25` | `+0xD4` | s16 | **CT carry** | consumed into CT and cleared during charging; normalization then stores either its common delta or the unit's smaller pre-subtraction CT here |
+| `0x26` | `+0xD6` | u16 | **Judge Points (JP)** | 10+ exposes the race-specific Totema command; combo damage uses `JP * 4 + 10` |
 
 ## Complete numeric layout
 
@@ -54,8 +58,8 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x1c` | `+0x2a` | address of equipment array |
 | `0x1d..0x21` | `+0x2a..+0x32` | five u16 loads |
 | `0x22` | `+0x34` | address |
-| `0x23..0x25` | `+0xd0/+0xd2/+0xd4` | three s16 loads |
-| `0x26` | `+0xd6` | u16 load |
+| `0x23..0x25` | `+0xd0/+0xd2/+0xd4` | CT, Speed, and CT carry (three s16 loads) |
+| `0x26` | `+0xd6` | Judge Points (u16) |
 | `0x27` | `+0xd8` | address |
 | `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads |
 | `0x38` | `+0xe8` | address of live-status flags |
@@ -97,7 +101,14 @@ The remaining bits stay numeric. Five adjacent halfwords at `+0x2a..+0x32`
 are equipped item ids. Check 4 reads them through stats `0x1d..0x21`, then
 executes the four combat totals that iterate all five slots.
 
-This closes the 31 scalar fields from unit identity through equipment with
-behavior-backed names. Another 32 scalar loads at `+0xd0..+0xfb` remain
-numeric, alongside four not-yet-named address regions. Those later battle
-state fields are the next mapping layer.
+The first four later battle values are also closed. Executing the one-unit turn
+tick changes CT 900 with Speed 100 and carry 25 into CT 1000 / carry 25. The
+Speed-total helper independently adds signed item property 14. At `+0xd6`,
+the action-menu selector leaves its default command at 9 JP but selects command
+`0x50` at 10 JP for a Human; UI string `0x50` decodes to `Totema`, while the
+same UI table labels the stat `Judge Pts?`. A separate combo formula multiplies
+damage by `JP * 4 + 10`, completing the behavioral join.
+
+This names 35 of 63 scalar loads. The remaining 28 at `+0xd8..+0xfb` stay
+numeric, alongside three not-yet-named address regions (`+0x34`, `+0xd8`, and
+`+0xfc`; `+0xe8` is already the live-status array).

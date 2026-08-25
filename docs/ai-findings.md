@@ -95,6 +95,10 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x19` | `ldrh` | `+0x24` | **Magic Power** |
 | `0x1A` | `ldrh` | `+0x26` | **Resistance** |
 | `0x1D..0x21` | `ldrh` | `+0x2A..+0x32` | **equipped item ids 0–4** |
+| `0x23` | `ldrsh` | `+0xD0` | **charge time (CT)** |
+| `0x24` | `ldrsh` | `+0xD2` | **Speed** |
+| `0x25` | `ldrsh` | `+0xD4` | **CT carry** |
+| `0x26` | `ldrh` | `+0xD6` | **Judge Points (JP)** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain
@@ -135,10 +139,15 @@ combat-total helpers iterate unit `+0x2a..+0x32`, pass every nonzero id to the
 item property accessor, and add properties 10–13 to the matching combat base.
 Check 4 verifies both the stat-id reads and those executed totals.
 
-The 31 scalar fields from identity through equipment now have behavior-backed
-names. The accessor actually has 63 scalar loads and six address returns; a
-fixed extractor now exposes the additional 32 numeric battle-state scalars at
-`+0xd0..+0xfb` and the six address cases separately.
+The first later battle-state group is now behavior-backed too. The turn tick
+adds Speed and carry to CT, clears carry during charging, and normalizes an
+over-threshold leader to CT 1000 while recording the common advance in carry.
+The base-Speed helper adds signed item property 14. The
+Totema selector crosses its boundary at 10 JP (Human command `0x50`, whose UI
+label is `Totema`), and combo damage scales by `JP * 4 + 10`.
+
+This names 35 of the accessor's 63 scalar loads. The remaining 28 numeric
+battle-state scalars occupy `+0xd8..+0xfb`; six stat ids return addresses.
 
 ## The AI is randomised
 

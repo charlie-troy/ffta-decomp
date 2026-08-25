@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4 — name later battle-state scalars and address regions |
-| Last closed package | AI5.4a — corrected accessor coverage to 63 scalar / 6 address cases |
+| Current work package | AI5.4c — name the `+0xd8..+0xe7` battle-state byte block |
+| Last closed package | AI5.4b — named CT, Speed, CT carry, and Judge Points |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
@@ -83,6 +83,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.3c | 2026-08-25 | Named stats `0x1d..0x21` as five equipped-item ids | Direct stat reads plus four combat-total helpers iterating all five slots |
 | AI5.3d | 2026-08-25 | Named stat `0x08` / unit `+0x0b` as innate element and closed identity-through-equipment scalar coverage | Jelly Fire initializer; 12 elemental monster families; 31 early/equipment fields named |
 | AI5.4a | 2026-08-25 | Fixed the stat extractor's r0-indirect load handling and corrected coverage | 63 scalar loads / 6 address returns; full 69-case numeric layout |
+| AI5.4b | 2026-08-25 | Named stats `0x23..0x26` as CT, Speed, CT carry, and Judge Points | Executed Speed/item join; one-unit CT tick; 9/10 JP Totema boundary and decoded UI command |
 
 ## Decisions and evidence
 
@@ -331,6 +332,18 @@ status and backlog tables are living sections and should be kept current.
   to the separate `+0x0c..+0x14` array. Do not imply that innate element alone
   changes damage.
 
+### D-023 — Treat CT and Judge Points as directly executable unit state
+
+- CT/Speed/carry are named from the complete turn-tick dataflow, not field
+  order: Speed and carry are added to CT, and normalization records the common
+  advance back into carry at the 1000 action threshold.
+- `+0xd6` is Judge Points because the retail selector crosses at 10, produces
+  Human command id `0x50`, and UI string `0x50` is `Totema`; combo damage also
+  uses the field as `JP * 4 + 10`. UI string 751 independently reads
+  `Judge Pts?`.
+- Consequence: these four scalar names are stable modding vocabulary; the next
+  pass starts at the separate `+0xd8` address/byte region.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -342,6 +355,37 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — CT, Speed, carry, and Judge Points
+
+Objective:
+
+- Name the first four later battle-state scalars from executable consumers.
+
+Completed:
+
+- Named stat `0x23` / unit `+0xd0` as charge time (CT), `0x24` / `+0xd2` as
+  Speed, `0x25` / `+0xd4` as CT carry, and `0x26` / `+0xd6` as Judge Points.
+- Extended AI check 4 with direct reads, Speed's signed item-property join, a
+  complete one-unit CT tick, and the Totema JP boundary.
+- Reduced the unnamed later-scalar count from 32 to 28.
+
+Evidence recorded during the batch:
+
+- `sub_080CA580` reads base Speed and adds item property 14 across all five
+  equipment slots; the level-up routine grows the same `+0xd2` field.
+- Executing `sub_0809DF7C` changes CT 900 / Speed 100 / carry 25 into CT 1000
+  / carry 25 after its over-threshold normalization, correcting the prior
+  zero-carry interpretation.
+- With identical Human units, `sub_080260E0` leaves command `0x0e` at 9 JP
+  and selects `0x50` at 10 JP; UI string `0x50` decodes to `Totema`.
+- Combo damage separately uses the same stat as `JP * 4 + 10`; UI string 751
+  is `Judge Pts?`.
+
+Next action:
+
+- Map the address at stat `0x27` / unit `+0xd8` and its sixteen scalar bytes
+  (`0x28..0x37`) from constructors, mutation sites, and battle consumers.
 
 ### 2026-08-25 — Stat-accessor coverage correction
 

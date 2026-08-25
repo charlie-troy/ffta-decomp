@@ -36,6 +36,11 @@ system rather than as more AI logic.
 The stride is proven twice: `sub_0809E05C` computes `index * 33 * 8` to reach
 a slot, and `sub_0809DF7C` advances both its pointers by `0x84 << 1`.
 
+These fields are also exposed by the generic unit-stat accessor: stat `0x23`
+is CT at unit `+0xd0`, stat `0x24` is base Speed at `+0xd2`, and stat `0x25`
+is CT carry at `+0xd4`. AI validation executes a one-unit tick and observes
+`900 + 100 + 25` normalize to CT 1000 with carry 25.
+
 ## The CT tick (`sub_0809DF7C`)
 
 For every slot, in order:
@@ -61,15 +66,17 @@ When some unit's CT *does* exceed 1000, the advance is:
 ```
 delta = min(max_CT - 1000, 500)
 for each unit:
-    if CT >= delta:  CT -= delta
+    if CT >= delta:  CT -= delta; carry = delta
     else:            carry = CT; CT = 0
 ```
 
-`delta` is capped at 500 so no single tick can erase more than half the gauge;
-the leader's CT lands exactly on 1000 (unless the cap bites), and units with
-less charge than `delta` spill their whole remaining CT into the carry, which
-the next tick adds straight back. That is a fractional-charge mechanism, and
-it is why the carry field exists.
+`delta` is capped at 500 so no single tick can remove more than half the gauge;
+the leader's CT lands exactly on 1000 (unless the cap bites). Every unit stores
+the amount removed in carry: `delta` when it had enough CT, or its whole CT
+when it did not. The next charging pass adds that value back before performing
+another common normalization. The earlier documentation incorrectly said the
+non-underflow branch left carry at zero; execution of the complete tick exposed
+the missing `strh delta, [carry]` at `0x0809E03E`.
 
 The two literals involved are `0xFFFFE0C0 = -8000` (the initial max-CT
 sentinel) and `0xFFFFFC18 = -1000` (the threshold subtraction).

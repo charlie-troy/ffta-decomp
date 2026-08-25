@@ -56,7 +56,7 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    matches published AP cost.
 3. **Flag decoding.** 1239 bit reads through the property API match a direct
    parse of `+0x10`, confirming the `prop - 0x0B` mapping across the live range.
-4. **Stat ids, transitions, resistances, and combat totals.** Constructor
+4. **Stat ids, transitions, resistances, combat totals, and turn state.** Constructor
    execution confirms unit type/race at stats `0x01/0x03`; direct reads confirm
    base/active/secondary job, level, and EXP at `0x02/0x04..0x07`. The six
    address cases execute and return unit `+0x0c/+0x2a/+0x34/+0xd8/+0xe8/
@@ -71,6 +71,10 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    40 to 45; and level-up enforces 50/99. HP/MP and the four combat bases still
    read through stats `0x13..0x1a`. Stats `0x1d..0x21` read the five equipped
    item ids at `+0x2a..+0x32`, and all four item-derived combat totals execute.
+   Stats `0x23..0x26` then read CT, Speed, CT carry, and Judge Points. The
+   base-Speed/item join executes; a one-unit tick normalizes `900 + 100 + 25`
+   to CT 1000 / carry 25; and the action selector exposes Human Totema command
+   `0x50` at 10 JP but not 9 JP, with the command's UI text decoded as `Totema`.
 5. **The healthy-target rule.** Running the `ai_behaviour == 2` fragment against
    synthetic targets shows it rejects exactly when HP < MaxHP/2, including at
    the boundaries (50 of 100 passes, 49 rejects; 30 of 60 passes, 29 rejects).

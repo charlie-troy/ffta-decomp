@@ -21,6 +21,7 @@ import struct
 import collections
 
 from emulate import Gba
+from ffta_names import Names
 from unicorn import UC_HOOK_CODE
 
 PRIO_FILTER = 0x0812F1DC
@@ -104,6 +105,9 @@ JOB_DERIVED_START, JOB_DERIVED_END = 0x080C8C46, 0x080C8CB6
 EXP_AWARD_START, EXP_AWARD_END = 0x080A718E, 0x080A71AC
 LEVEL_UP = 0x080C9B8C
 DAMAGE = 0x0812FE38
+BASE_SPEED_TOTAL = 0x080CA580
+CT_TICK = 0x0809DF7C
+TOTEMA_SELECT = 0x080260E0
 JOB_TABLE = 0x08521A14 - 0x08000000
 JOB_STRIDE = 0x34
 # The ai_behaviour == 2 fragment of the evaluator, and its bail-out call.
@@ -323,6 +327,72 @@ def check_stat_ids(gba, rom):
                   f"expected {base}+{item_bonus}")
     print("   0x17..0x1A == Attack/Defense/Magic Power/Resistance and "
           f"item props 10..13 join correctly -> {'PASS' if ok else 'FAIL'}")
+
+    # The next four scalar ids are CT, base Speed, CT carry, and Judge Points.
+    # Speed's item join is independent of the direct accessor. The one-unit CT
+    # tick consumes base speed and carry, then normalizes 1025 to CT 1000 and
+    # records the 25-point common advance back into carry.
+    gba.uc.mem_write(UNIT, bytes(0x108))
+    later = ((0x23, 0xD0, 900), (0x24, 0xD2, 73),
+             (0x25, 0xD4, 25), (0x26, 0xD6, 10))
+    for _, off, value in later:
+        _put16(gba, UNIT + off, value)
+    later_got = tuple(gba.call(STAT_GET, [UNIT, stat])
+                      for stat, _, _ in later)
+    later_want = tuple(value for _, _, value in later)
+    if later_got != later_want:
+        ok = False
+        print(f"   CT/Speed/carry/JP reads {later_got}, expected {later_want}")
+
+    speed_items = (1, 3, 7, 10, 0)
+    for n, item in enumerate(speed_items):
+        _put16(gba, UNIT + 0x2A + n * 2, item)
+    speed_bonus = sum(struct.unpack("<b", bytes([
+        rom[ITEM_TABLE + item * ITEM_STRIDE + 0x14]
+    ]))[0] for item in speed_items if item)
+    speed_total = gba.call(BASE_SPEED_TOTAL, [UNIT])
+    if speed_total != 73 + speed_bonus:
+        ok = False
+        print(f"   total Speed {speed_total}, expected 73+{speed_bonus}")
+    print("   0x23..0x26 == CT/Speed/CT carry/Judge Points at +0xD0..+0xD6; "
+          f"item Speed joins -> {'PASS' if later_got == later_want and speed_total == 73 + speed_bonus else 'FAIL'}")
+
+    BATTLE = 0x02002000
+    battle_unit = BATTLE + 4
+    gba.uc.mem_write(BATTLE, bytes(0x10C))
+    gba.write32(BATTLE, 1)
+    _put16(gba, battle_unit + 0xD0, 900)
+    _put16(gba, battle_unit + 0xD2, 100)
+    _put16(gba, battle_unit + 0xD4, 25)
+    gba.call(CT_TICK, [BATTLE])
+    ct_after = (
+        struct.unpack("<H", gba.uc.mem_read(battle_unit + 0xD0, 2))[0],
+        struct.unpack("<H", gba.uc.mem_read(battle_unit + 0xD4, 2))[0],
+    )
+    if ct_after != (1000, 25):
+        ok = False
+        print(f"   CT tick wrote {ct_after}, expected (1000, 25)")
+    print(f"   CT tick 900 + Speed 100 + carry 25 -> {ct_after} "
+          f"-> {'PASS' if ct_after == (1000, 25) else 'FAIL'}")
+
+    # The action-menu selector exposes a race-specific Totema command only at
+    # 10+ JP. Human race 1 selects command/string id 0x50, decoded as Totema.
+    MENU = UNIT + 0x200
+    gba.uc.mem_write(UNIT, bytes(0x108))
+    gba.write8(UNIT + 0x06, 1)
+    totema_commands = []
+    for jp in (9, 10):
+        _put16(gba, UNIT + 0xD6, jp)
+        gba.uc.mem_write(MENU, bytes(0x20))
+        gba.call(TOTEMA_SELECT, [UNIT, MENU])
+        totema_commands.append(struct.unpack("<H", gba.uc.mem_read(MENU, 2))[0])
+    totema_label = Names(rom)._string(0x085567F0, 0x50)
+    jp_ok = totema_commands == [0x0E, 0x50] and totema_label == "Totema"
+    if not jp_ok:
+        ok = False
+        print(f"   JP boundary commands {totema_commands}, label {totema_label!r}")
+    print(f"   JP 9/10 selects commands {totema_commands}; 0x50={totema_label!r} "
+          f"-> {'PASS' if jp_ok else 'FAIL'}")
     return ok
 
 

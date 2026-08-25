@@ -299,6 +299,10 @@ behaviour mod needs to reach.
    31 scalar fields through equipment are named. **Coverage correction:** the
    accessor contains 63 scalar loads and six address returns, not 31/38; the
    additional 32 battle-state scalars at `+0xd0..+0xfb` remain numeric.
+8. **Later scalar batch started 2026-08-25:** stats `0x23..0x26` / unit
+   `+0xd0..+0xd6` are CT, Speed, CT carry, and Judge Points. The execution gate
+   covers Speed's item join, a complete CT tick/normalization, and the 9/10 JP
+   Totema boundary. This leaves 28 scalar loads at `+0xd8..+0xfb` numeric.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a
