@@ -13,6 +13,11 @@ counted address-returning cases as direct loads.
 
 | stat | offset | width | meaning | how it is known |
 |---|---|---|---|---|
+| `0x02` | `+0x05` | u8 | **base job id** | ordinary job changes synchronize it with the active job; canonical-job checks read it |
+| `0x04` | `+0x07` | u8 | **active job id** | the job-change routine always writes the selected job here |
+| `0x05` | `+0x08` | u8 | **secondary job id** | the job-change routine clears it when it duplicates the new active job; A-ability lookup reads it as the secondary job |
+| `0x06` | `+0x09` | u8 | **level** | the level-up routine increments it and caps it at 50 |
+| `0x07` | `+0x0A` | u8 | **experience** | EXP awards accumulate here; level-up resets it and the level-50 cap restores 99 |
 | `0x13` | `+0x18` | u16 | **current HP** | AI compares it against half of `0x14` |
 | `0x14` | `+0x1A` | u16 | **max HP** | the other half of that comparison |
 | `0x15` | `+0x1C` | u16 | **current MP** | the field the ability-cost check reads |
@@ -64,6 +69,12 @@ counted address-returning cases as direct loads.
 Bytes `+0x04`-`+0x14` are a run of 17 u8 stats (ids `0x01`-`0x12`), then
 u16 stats run from `+0x18` upward in pairs. The HP pair sits at the start of
 the u16 block, with MP immediately after it.
+Five early bytes are now behavior-backed: base job at `+0x05`, active job at
+`+0x07`, secondary job at `+0x08`, level at `+0x09`, and experience at
+`+0x0a`. Executing the retail job-change fragment synchronizes base/active job
+for an ordinary unit and clears a duplicate secondary job. Executing the EXP
+award path changes 40 to 45, while the level-up routine enforces the retail
+level-50 / EXP-99 ceiling.
 The executed restoration clamp makes the first four fields two complete pairs:
 current/max HP, then current/max MP. The next four are the unit's base physical
 and magical combat stats in Attack/Defense and Magic Power/Resistance pairs.

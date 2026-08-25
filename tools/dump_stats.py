@@ -22,6 +22,11 @@ OFF = re.compile(r"\[\w+,\s*#(0x[0-9a-fA-F]+|\d+)\]")
 
 WIDTH = {"ldrb": "u8", "ldrsb": "s8", "ldrh": "u16", "ldrsh": "s16", "ldr": "u32"}
 KNOWN = {
+    0x02: "base_job_id",
+    0x04: "active_job_id",
+    0x05: "secondary_job_id",
+    0x06: "level",
+    0x07: "experience",
     0x13: "current_hp",
     0x14: "max_hp",
     0x15: "current_mp",

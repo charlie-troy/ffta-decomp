@@ -77,6 +77,11 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 
 | stat id | load | struct offset | meaning |
 |---|---|---|---|
+| `0x02` | `ldrb` | `+0x05` | **base job id** |
+| `0x04` | `ldrb` | `+0x07` | **active job id** |
+| `0x05` | `ldrb` | `+0x08` | **secondary job id** |
+| `0x06` | `ldrb` | `+0x09` | **level** |
+| `0x07` | `ldrb` | `+0x0A` | **experience** |
 | `0x10` | `ldrb` | `+0x12` | byte stat |
 | `0x11` | `ldrb` | `+0x13` | byte stat |
 | `0x12` | `ldrb` | `+0x14` | byte stat |
@@ -100,6 +105,14 @@ and `sub_080CA6FC` add item properties 10, 11, 12, and 13 respectively to
 unit `+0x20`, `+0x22`, `+0x24`, and `+0x26`; those item properties are the
 independently mapped Attack, Defense, Magic Power, and Resistance fields.
 The stat reads and all four equipment joins are covered by the emulator gate.
+
+The five named byte fields are also behavioral joins rather than ordering
+guesses. `sub_080C8C24` always writes a selected job to `+0x07`, synchronizes
+`+0x05` for ordinary units, and clears `+0x08` when it would duplicate the new
+active job. The later A-ability path reads a nonzero `+0x08` as a secondary
+job. `sub_080C9B8C` increments `+0x09`, clears `+0x0a`, and caps the pair at
+level 50 / EXP 99; the award loop at `0x080A718E` adds earned EXP to `+0x0a`.
+These transitions execute in check 4 of `tools/validate_ai.py`.
 
 ## The AI is randomised
 

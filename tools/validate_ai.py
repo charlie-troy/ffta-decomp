@@ -98,6 +98,9 @@ COMBAT_TOTALS = (
     ("Magic Power", 0x19, 0x24, 0x12, 0x080CA66C),
     ("Resistance", 0x1A, 0x26, 0x13, 0x080CA6FC),
 )
+JOB_SWITCH_START, JOB_SWITCH_END = 0x080C8C32, 0x080C8C46
+EXP_AWARD_START, EXP_AWARD_END = 0x080A718E, 0x080A71AC
+LEVEL_UP = 0x080C9B8C
 # The ai_behaviour == 2 fragment of the evaluator, and its bail-out call.
 HEALTHY_START, HEALTHY_END, HEALTHY_REJECT = 0x080C3364, 0x080C3380, 0x080C337C
 # One case body's probability gate, up to the pass/fail test.
@@ -133,7 +136,7 @@ def _put16(gba, addr, val):
 
 
 def check_stat_ids(gba, rom):
-    """Named stat ids and equipped-item combat totals should agree."""
+    """Named unit fields, transitions, and combat totals should agree."""
     print("")
     print("4. stat ids against a synthetic unit")
     UNIT = 0x02001000
@@ -153,6 +156,66 @@ def check_stat_ids(gba, rom):
             print(f"   wrote {hp}/{mx}/{mp}/{max_mp}, read {got}")
     print("   0x13..0x16 == HP/MaxHP/MP/MaxMP at +0x18..+0x1E "
           f"-> {'PASS' if ok else 'FAIL'}")
+
+    gba.uc.mem_write(UNIT, BLANK)
+    identity = ((0x02, 0x05, 0x3C), (0x04, 0x07, 0x3D),
+                (0x05, 0x08, 7), (0x06, 0x09, 50), (0x07, 0x0A, 99))
+    for _, off, value in identity:
+        gba.write8(UNIT + off, value)
+    got = tuple(gba.call(STAT_GET, [UNIT, stat])
+                for stat, _, _ in identity)
+    want = tuple(value for _, _, value in identity)
+    if got != want:
+        ok = False
+        print(f"   job/level fields read {got}, expected {want}")
+    print("   0x02/0x04..0x07 == base job/active job/secondary job/level/EXP "
+          f"-> {'PASS' if got == want else 'FAIL'}")
+
+    # An ordinary unit changing to its secondary job synchronizes base and
+    # active job, then clears the now-duplicate secondary slot.
+    gba.uc.mem_write(UNIT, BLANK)
+    gba.write8(UNIT + 0x04, 1)
+    gba.write8(UNIT + 0x05, 2)
+    gba.write8(UNIT + 0x08, 7)
+    gba.run_range(JOB_SWITCH_START, JOB_SWITCH_END,
+                  {"r4": UNIT, "r5": 7, "r6": 7})
+    switched = tuple(gba.uc.mem_read(UNIT + off, 1)[0]
+                     for off in (0x05, 0x07, 0x08))
+    if switched != (7, 7, 0):
+        ok = False
+        print(f"   job switch wrote {switched}, expected (7, 7, 0)")
+    print("   ordinary job switch synchronizes base/active and clears duplicate "
+          f"secondary -> {'PASS' if switched == (7, 7, 0) else 'FAIL'}")
+
+    # The award loop dereferences a list node twice, reads stat 7, and writes
+    # the bounded sum to unit +0x0A.
+    NODE, HOLDER = UNIT + 0x400, UNIT + 0x500
+    gba.uc.mem_write(UNIT, BLANK)
+    gba.write8(UNIT + 0x0A, 40)
+    gba.write32(NODE, HOLDER)
+    gba.write32(HOLDER, UNIT)
+    _put16(gba, NODE + 4, 5)
+    gba.run_range(EXP_AWARD_START, EXP_AWARD_END, {"r4": NODE})
+    awarded = gba.uc.mem_read(UNIT + 0x0A, 1)[0]
+    if awarded != 45:
+        ok = False
+        print(f"   EXP award wrote {awarded}, expected 45")
+    print(f"   EXP award 40 + 5 -> {awarded} -> "
+          f"{'PASS' if awarded == 45 else 'FAIL'}")
+
+    # At the retail cap, the level-up routine restores level 50 / EXP 99 and
+    # returns before entering the stat-growth path.
+    gba.uc.mem_write(UNIT, BLANK)
+    gba.write8(UNIT + 0x09, 50)
+    gba.write8(UNIT + 0x0A, 99)
+    gba.call(LEVEL_UP, [UNIT])
+    capped = tuple(gba.uc.mem_read(UNIT + off, 1)[0]
+                   for off in (0x09, 0x0A))
+    if capped != (50, 99):
+        ok = False
+        print(f"   level cap wrote {capped}, expected (50, 99)")
+    print("   level-up cap restores level 50 / EXP 99 "
+          f"-> {'PASS' if capped == (50, 99) else 'FAIL'}")
 
     bases = (71, 83, 97, 109)
     items = (1, 3, 7, 10, 0)

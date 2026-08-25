@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.2e — confirmed Yellow Clip and bounded the persistent-mask map |
+| Last closed package | AI5.3a — named job identity, level, and experience fields |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
@@ -78,6 +78,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.2c | 2026-08-24 | Named stat `0x1b` as persistent-status flags and bit `0x0800` as persistent Zombie | Zombify descriptor/handler chain; executed live/persistent effective predicate; initializer setter join |
 | AI5.2d | 2026-08-24 | Named persistent bit `0x0040` as Yellow Card and corrected the field's overly narrow innate label | Yellow Card descriptor/case-92 join; executed handler write to target `+0x28` |
 | AI5.2e | 2026-08-25 | Confirmed Yellow Clip as the exact inverse and held eight other persistent masks numeric | Executed `0x0000 -> 0x0040 -> 0x0000`; complete caller sweep found no unique named joins for the remainder |
+| AI5.3a | 2026-08-25 | Named base job, active job, secondary job, level, and experience in the one-byte unit block | Direct accessor reads; executed job switch and EXP award; level-up cap at 50/99 |
 
 ## Decisions and evidence
 
@@ -286,6 +287,18 @@ status and backlog tables are living sections and should be kept current.
   handler setter chain, plus execution where practical. Never infer equality
   between raw effect ids and internal case ids.
 
+### D-020 — Name one-byte unit fields from state transitions
+
+- Job identity: `sub_080C8C24` writes the selected job to unit `+0x07`, also
+  synchronizes `+0x05` for ordinary units, and clears `+0x08` when it would
+  duplicate the selected job. A later A-ability lookup reads nonzero `+0x08`
+  as the secondary job.
+- Progression: `sub_080C9B8C` increments `+0x09`, clears `+0x0a`, and caps the
+  pair at 50/99; the award path at `0x080A718E` adds earned EXP to `+0x0a`.
+- Decision: expose the five fields as base job, active job, secondary job,
+  level, and experience. Keep neighboring `+0x04/+0x06` numeric until their
+  broader value domains have equally specific behavioral joins.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -297,6 +310,37 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Job identity, level, and experience fields
+
+Objective:
+
+- Name the highest-confidence members of the direct one-byte unit-stat block
+  and make each interpretation executable.
+
+Completed:
+
+- Named stat `0x02` / unit `+0x05` as base job, stat `0x04` / `+0x07` as
+  active job, and stat `0x05` / `+0x08` as secondary job.
+- Named stat `0x06` / `+0x09` as level and stat `0x07` / `+0x0a` as
+  experience.
+- Extended the AI stat gate with direct accessor reads plus job-change,
+  EXP-award, and level-cap execution.
+
+Evidence recorded during the batch:
+
+- An ordinary unit switching to its existing secondary job changes
+  base/active/secondary from `2/0/7` to `7/7/0`.
+- The retail award fragment changes 40 EXP plus 5 to 45.
+- Calling the level-up routine at level 50 / EXP 99 attempts the increment,
+  then restores the retail ceiling of 50/99 before stat growth.
+- AI validation remains 8/8; check 4 now protects all five new meanings.
+
+Next action:
+
+- Trace unit `+0x04` and `+0x06` from constructors and canonicalization
+  readers. Then map the job-derived byte run at `+0x0b..+0x14` only where a
+  job property and a gameplay consumer agree.
 
 ### 2026-08-25 — Yellow Clip inverse and persistent-mask boundary
 

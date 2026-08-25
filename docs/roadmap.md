@@ -278,7 +278,11 @@ behaviour mod needs to reach.
    persistent-status bitfield with bit `0x0040` proven as Yellow Card and bit
    `0x0800` proven as persistent Zombie. Yellow Clip is the executed inverse
    of Yellow Card; eight other observed masks remain numeric after a complete
-   caller sweep found no unique named application join.
+   caller sweep found no unique named application join. **Continued
+   2026-08-25:** stats `0x02/0x04..0x07` name base job, active job, secondary
+   job, level, and experience at unit `+0x05/+0x07..+0x0a`. Retail job-change,
+   EXP-award, and level-cap paths execute in the AI gate, including the
+   level-50 / EXP-99 ceiling.
 4. Decompile the **capability setters** `0x080CE420`–`0x080CE480`.
 5. Resolve whether **resistance slot 2** (a real slot no field id reaches) is
    read by any path.
