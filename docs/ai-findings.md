@@ -100,6 +100,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x25` | `ldrsh` | `+0xD4` | **CT carry** |
 | `0x26` | `ldrh` | `+0xD6` | **Judge Points (JP)** |
 | `0x27` | address | `+0xD8` | **status-state array** |
+| `0x28` | `ldrb` | `+0xD8` | **Zombie revival countdown** |
 | `0x29` | `ldrb` | `+0xD9` | **Doom countdown** |
 | `0x2A..0x32` | `ldrb` | `+0xDA..+0xE2` | **Haste through Charm durations** |
 | `0x33` | `ldrb` | `+0xE3` | **Immobilize duration** |

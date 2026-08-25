@@ -98,15 +98,18 @@ both the live-bit setter and the paired duration setter. `+0xd9` is Doom:
 Checkmate applies the live bit with count 3, and the per-turn expiry path
 clears the bit and all battle statuses. `+0xe3/+0xe4` are independently closed
 as Immobilize/Disable by executed Aim: Legs/Aim: Arm handlers plus movement
-and ability-usability consumers. `+0xd8`, `+0xe6`, and `+0xe7` are outside this
-one-to-one duration table.
+and ability-usability consumers. `+0xd8` is the **Zombie revival countdown**:
+clearing transient battle statuses seeds it to 3 for an effective Zombie and
+0 otherwise, then the zero-HP Zombie turn path decrements it and schedules the
+revival result at zero. `+0xe6` and `+0xe7` are outside the one-to-one duration
+table.
 
 `+0xe6` is a shared **status link id**, not another timer. Executing Cover
 copies the covered target's byte `+0x104` to the covering actor's `+0xe6` while
 setting its live state. Two other application handlers share the field, and
 battle consumers compare it with candidate units' `+0x104` ids. The status
 gate executes Cover with target id 42 and reads 42 through both the dedicated
-getter and generic stat `0x36`. Only `+0xd8/+0xe7` remain open in this region.
+getter and generic stat `0x36`. Only `+0xe7` remains open in this region.
 
 ## Named status flags
 
@@ -139,8 +142,9 @@ pair, verifies thirteen named duration handlers and direct counter/stat reads,
 executes Checkmate's Doom application and checks its expiry call chain, runs
 the Aim: Arm/Aim: Legs handlers and the movement/usability consumers, runs
 the speed arithmetic, exercises Sleep's hit-chance branch, preserves
-the separate display/adjacency anchors, and executes the persistent/live Zombie
-bridge plus Yellow Card's write to `+0x28` bit `0x0040`. Raw ability effects and internal cases are separate namespaces joined
+the separate display/adjacency anchors, executes the persistent/live Zombie
+bridge and its three-turn revival counter, plus Yellow Card's write to `+0x28`
+bit `0x0040`. Raw ability effects and internal cases are separate namespaces joined
 by descriptor byte `+0x01`.
 
 ## Persistent status flags at `+0x28`

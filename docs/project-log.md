@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4g — resolve `+0xd8/+0xe7` |
-| Last closed package | AI5.4f — named `+0xe6` as the shared status link id |
+| Current work package | AI5.4h — resolve the packed two-unit history at `+0xe7` |
+| Last closed package | AI5.4g — named `+0xd8` as the Zombie revival countdown |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 13/13; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 14/14; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -88,6 +88,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.4d | 2026-08-25 | Named `+0xea` bit 4 as Doom and stat `0x29` / `+0xd9` as its countdown | Executed Checkmate application produces live Doom/count 3; expiry call chain clears battle statuses; statuses 11/11 |
 | AI5.4e | 2026-08-25 | Named `+0xeb` bits 6/7 as Immobilize/Disable and stats `0x33/0x34` as their durations | Executed Aim: Legs/Arm handlers; movement mode 5→0 under Immobilize; Disable ability-usability rejection; statuses 12/12 |
 | AI5.4f | 2026-08-25 | Named stat `0x36` / `+0xe6` as a shared status link id | Executed Cover copies target unit id 42; dedicated/stat getters return 42; linked-state comparison consumers |
+| AI5.4g | 2026-08-25 | Named stat `0x28` / `+0xd8` as the Zombie revival countdown | Executed effective-Zombie reset seeds 3 while blank stays 0; dead-Zombie turn path decrements and schedules revival at zero |
 
 ## Decisions and evidence
 
@@ -385,6 +386,15 @@ status and backlog tables are living sections and should be kept current.
 - Decision: name stat `0x36` `status_link_id` and widen stat `0x27` from
   `status_duration_array` to `status_state_array`.
 
+### D-028 — Name `+0xd8` from the complete Zombie revival lifecycle
+
+- Battle-status reset writes 3 only when the unit satisfies the effective
+  Zombie predicate; an ordinary unit receives 0.
+- The per-turn path requires effective Zombie and zero HP, decrements the same
+  byte, and schedules battle result `0x2000` when the value reaches zero.
+- Decision: name stat `0x28` `zombie_revive_countdown`; this is a delayed
+  revival counter, not a generic status duration.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -396,6 +406,31 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Zombie revival countdown
+
+Objective:
+
+- Resolve `+0xd8` from its reset, eligibility, and expiry behavior.
+
+Completed:
+
+- Named stat `0x28` / unit `+0xd8` as `zombie_revive_countdown`.
+- Added an executed lifecycle check and increased named scalar coverage to
+  50/63.
+
+Evidence recorded during the batch:
+
+- Battle-status reset gives a persistent Zombie count 3 and a blank unit 0;
+  generic stat `0x28` independently returns 3.
+- The per-turn consumer requires effective Zombie and zero HP, decrements via
+  the dedicated getter/setter pair, and schedules the revival result at zero.
+- Status validation is 14/14.
+
+Next action:
+
+- Resolve the final `+0xe7` status-state byte by joining its two-id rolling
+  writer to the action-resolution call sites and AI membership test.
 
 ### 2026-08-25 — Shared status-link id
 

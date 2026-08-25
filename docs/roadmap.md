@@ -317,10 +317,14 @@ behaviour mod needs to reach.
 11. **Action restrictions closed 2026-08-25:** stats `0x33/0x34` are
    Immobilize/Disable durations. Aim: Legs/Aim: Arm handlers execute with count
    3; Immobilize zeros movement mode and Disable is a hard ability-usability
-   rejection. Only `+0xd8/+0xe6/+0xe7` remain numeric in the duration region.
+   rejection. Only `+0xd8/+0xe6/+0xe7` remained numeric at this stage.
 12. **Shared link closed 2026-08-25:** stat `0x36` / `+0xe6` is a status link
    id, not a duration. Cover copies target unit id `+0x104`; linked-state
-   consumers compare that id. Only `+0xd8/+0xe7` remain numeric in this region.
+   consumers compare that id. Only `+0xd8/+0xe7` remained numeric at this stage.
+13. **Zombie revival closed 2026-08-25:** stat `0x28` / `+0xd8` is seeded to
+   3 when battle statuses reset on an effective Zombie, stays 0 for an ordinary
+   unit, and the zero-HP Zombie turn path decrements it before scheduling
+   revival at zero. Only `+0xe7` remains numeric in this region.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

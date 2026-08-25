@@ -45,7 +45,8 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x24` | `+0xD2` | s16 | **Speed** | `sub_080CA580` adds signed item property 14; level-up grows this field from the job Speed growth property |
 | `0x25` | `+0xD4` | s16 | **CT carry** | consumed into CT and cleared during charging; normalization then stores either its common delta or the unit's smaller pre-subtraction CT here |
 | `0x26` | `+0xD6` | u16 | **Judge Points (JP)** | 10+ exposes the race-specific Totema command; combo damage uses `JP * 4 + 10` |
-| `0x27` | `+0xD8` | ptr | **status-state array** | holds status durations plus the shared linked-unit id at `+0xe6` |
+| `0x27` | `+0xD8` | ptr | **status-state array** | holds the Zombie revival countdown, other status durations, and shared status payloads |
+| `0x28` | `+0xD8` | u8 | **Zombie revival countdown** | status reset seeds effective Zombie units to 3; the dead-Zombie turn path decrements it and schedules revival at zero |
 | `0x29` | `+0xD9` | u8 | **Doom countdown** | Checkmate applies live Doom with count 3; the per-turn path decrements it and clears battle statuses at expiry |
 | `0x2a..0x32` | `+0xDA..+0xE2` | u8 | **Haste, Slow, Stop, Shell, Protect, Sleep, Silence, Confuse, Charm durations** | each named handler sets its live bit and matching counter; reconciliation clears the counter when the live bit is absent |
 | `0x33` | `+0xE3` | u8 | **Immobilize duration** | Aim: Legs applies live Immobilize/count 3; the movement-mode reader forces its mode to zero while live |
@@ -68,7 +69,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x23..0x25` | `+0xd0/+0xd2/+0xd4` | CT, Speed, and CT carry (three s16 loads) |
 | `0x26` | `+0xd6` | Judge Points (u16) |
 | `0x27` | `+0xd8` | address of status-state array |
-| `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads; thirteen named durations, one link id, two numeric |
+| `0x28..0x37` | `+0xd8..+0xe7` | sixteen u8 loads; fourteen named countdowns/durations, one link id, one numeric |
 | `0x38` | `+0xe8` | address of live-status flags |
 | `0x39..0x43` | `+0xf1..+0xfb` | eleven u8 loads |
 | `0x44` | `+0xfc` | address |

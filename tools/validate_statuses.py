@@ -18,6 +18,7 @@ SPEED_READER = 0x0812E368
 HIT_READER = 0x0812C8DC
 STAT_GETTER = 0x080C7EA4
 EFFECTIVE_ZOMBIE = 0x081308F4
+BATTLE_ZOMBIE_PREDICATE = 0x08131030
 STATUS_INITIALIZER = 0x08133A58
 DURATION_RECONCILER = 0x08131C58
 YELLOW_CARD_HANDLER = 0x081337F4
@@ -29,6 +30,9 @@ ABILITY_USABILITY = 0x08133E18
 COVER_HANDLER = 0x08131F44
 COVER_GETTER = 0x080CDBCC
 STATUS_LINK_GETTER = 0x080CE410
+ZOMBIE_COUNT_GETTER = 0x080CE3A0
+ZOMBIE_COUNT_SETTER = 0x080CE418
+ZERO_HP_PREDICATE = 0x080C8280
 ROM = 0x08000000
 
 
@@ -291,6 +295,29 @@ def main(argv=None):
     if not persistent_ok:
         failures.append("persistent Zombie bridge")
 
+    # Clearing transient battle statuses is also the reset point for the
+    # three-turn Zombie revival delay. Persistent Zombie proves the effective
+    # status independently of the live bit, while a blank unit remains zero.
+    gba.reset_ram()
+    gba.uc.mem_write(unit + 0x28, struct.pack("<H", 0x0800))
+    gba.call(CLEAR_BATTLE_STATUSES, [unit])
+    revive_count = gba.call(ZOMBIE_COUNT_GETTER, [unit])
+    revive_stat = gba.call(STAT_GETTER, [unit, 0x28])
+    gba.reset_ram()
+    gba.call(CLEAR_BATTLE_STATUSES, [unit])
+    blank_count = gba.call(ZOMBIE_COUNT_GETTER, [unit])
+    zombie_tick_calls = calls_from(rom, 0x0809E7A2, 0x0809E7F2)
+    revive_ok = (revive_count == 3 and revive_stat == 3 and
+                 blank_count == 0 and
+                 BATTLE_ZOMBIE_PREDICATE in zombie_tick_calls and
+                 ZERO_HP_PREDICATE in zombie_tick_calls and
+                 ZOMBIE_COUNT_GETTER in zombie_tick_calls and
+                 ZOMBIE_COUNT_SETTER in zombie_tick_calls)
+    print(f"13. Zombie revival countdown: {'OK' if revive_ok else 'FAIL'} "
+          f"(persistent/blank={revive_count}/{blank_count}; stat={revive_stat})")
+    if not revive_ok:
+        failures.append("Zombie revival countdown")
+
     yellow = next(entry for entry in PERSISTENT_STATUS_FLAGS
                   if entry["name"] == "yellow_card")
     raw_effect = rom[ABILITY_TABLE - ROM +
@@ -321,7 +348,7 @@ def main(argv=None):
                  cancel_case == yellow["cancel_case"] and
                  cancel_pointer == yellow["cancel_handler"] and
                  cleared == 0)
-    print(f"13. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
+    print(f"14. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
           f"(apply={persistent:#06x}, clip={cleared:#06x})")
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
@@ -330,7 +357,7 @@ def main(argv=None):
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 13/13 status checks")
+    print("PASS: 14/14 status checks")
     return 0
 
 

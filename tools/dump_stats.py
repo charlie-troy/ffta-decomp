@@ -59,6 +59,7 @@ KNOWN = {
     0x24: "speed",
     0x25: "charge_time_carry",
     0x26: "judge_points",
+    0x28: "zombie_revive_countdown",
     0x29: "doom_countdown",
     0x2A: "haste_duration",
     0x2B: "slow_duration",
