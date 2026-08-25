@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.4c — name the `+0xd8..+0xe7` battle-state byte block |
-| Last closed package | AI5.4b — named CT, Speed, CT carry, and Judge Points |
+| Current work package | AI5.4d — resolve the six remaining duration-region bytes |
+| Last closed package | AI5.4c — named ten status-duration counters and their array |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 10/10; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -84,6 +84,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.3d | 2026-08-25 | Named stat `0x08` / unit `+0x0b` as innate element and closed identity-through-equipment scalar coverage | Jelly Fire initializer; 12 elemental monster families; 31 early/equipment fields named |
 | AI5.4a | 2026-08-25 | Fixed the stat extractor's r0-indirect load handling and corrected coverage | 63 scalar loads / 6 address returns; full 69-case numeric layout |
 | AI5.4b | 2026-08-25 | Named stats `0x23..0x26` as CT, Speed, CT carry, and Judge Points | Executed Speed/item join; one-unit CT tick; 9/10 JP Totema boundary and decoded UI command |
+| AI5.4c | 2026-08-25 | Corrected `+0xd8` from capability state to a status-duration array and named ten counters | Ten named handler/live-bit/reconciler/counter/stat joins; statuses 10/10 |
 
 ## Decisions and evidence
 
@@ -344,6 +345,17 @@ status and backlog tables are living sections and should be kept current.
 - Consequence: these four scalar names are stable modding vocabulary; the next
   pass starts at the separate `+0xd8` address/byte region.
 
+### D-024 — `+0xd8` is status duration, not capability state
+
+- The parallel functions at `0x080CE3A0..0x080CE488` are byte getters/setters.
+  Named status application handlers write them, per-turn paths decrement them,
+  and `sub_08131C58` clears them when the corresponding live bit is absent.
+- The previous "capability setter" label described only the observed clearing
+  relationship and is retracted. These are duration counters.
+- Promote only the ten one-to-one named joins. Keep `+0xd8/+0xd9/+0xe3/+0xe4/
+  +0xe6/+0xe7` numeric until their overlapping or candidate semantics are
+  distinguished by another behavioral anchor.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -355,6 +367,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Named status-duration counters
+
+Objective:
+
+- Resolve the `+0xd8..+0xe7` address region from its writers and consumers.
+
+Completed:
+
+- Corrected the old capability-state hypothesis: stat `0x27` returns the
+  status-duration array.
+- Named Haste, Slow, Stop, Shell, Protect, Sleep, Silence, Confuse, Charm, and
+  Addle counters at `+0xda..+0xe2/+0xe5` (stats `0x2a..0x32/0x35`).
+- Added duration metadata to the status registry and a tenth status gate.
+- Increased behavior-backed scalar coverage from 35 to 45 of 63.
+
+Evidence recorded during the batch:
+
+- Every named status handler calls its live-bit setter and the matching
+  duration setter; `sub_08131C58` pairs the same live getter/counter setter.
+- Dedicated getters return the exact synthetic value written by each setter,
+  and the generic stat accessor returns that value through the mapped stat id.
+- Status validation is 10/10 across ten handler/live-bit/counter joins.
+
+Next action:
+
+- Separate the six remaining bytes `+0xd8/+0xd9/+0xe3/+0xe4/+0xe6/+0xe7`.
+  Start with `+0xd9`, whose live bit, case-42 handler, value 3, and per-turn
+  decrement path are already isolated; retain numeric labels if the exact
+  player-facing status name cannot be joined.
 
 ### 2026-08-25 — CT, Speed, carry, and Judge Points
 

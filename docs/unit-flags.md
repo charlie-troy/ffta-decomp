@@ -69,28 +69,35 @@ getter and setter belong to each bit.
 
 ## Status bits gate capability bits
 
-`sub_08131C58` recomputes what a unit may do. For each status bit it checks,
-it clears a corresponding capability when the status is unset. That pairs two
-different flag families and is the clearest semantic handle found so far.
+`sub_08131C58` reconciles live status bits with their turn-duration counters.
+For each status it checks, an unset bit clears the corresponding byte at unit
+`+0xd9..+0xe5`. The old documentation called these bytes "capabilities"; the
+application handlers and per-turn decrementers prove they are durations.
 
-The capability setters (`0x080CE420`-`0x080CE480`, spaced 8 bytes) are a
-separate, smaller family that is not yet decompiled.
+The duration getters (`0x080CE3A8`-`0x080CE408`) and setters
+(`0x080CE420`-`0x080CE480`) are eight bytes apart in parallel families.
 
-| status getter | struct bit | clears capability |
-|---|---|---|
-| `sub_080CDA94` | 0xea bit 4 | `sub_080CE420` |
-| `sub_080CDAAC` | 0xea bit 5 | `sub_080CE428` |
-| `sub_080CDAC4` | 0xea bit 6 | `sub_080CE430` |
-| `sub_080CDADC` | 0xea bit 7 | `sub_080CE438` |
-| `sub_080CDAF4` | 0xeb bit 0 | `sub_080CE440` |
-| `sub_080CDB0C` | 0xeb bit 1 | `sub_080CE448` |
-| `sub_080CDB24` | 0xeb bit 2 | `sub_080CE450` |
-| `sub_080CDB3C` | 0xeb bit 3 | `sub_080CE458` |
-| `sub_080CDB54` | 0xeb bit 4 | `sub_080CE460` |
-| `sub_080CDB6C` | 0xeb bit 5 | `sub_080CE468` |
-| `sub_080CDB84` | 0xeb bit 6 | `sub_080CE470` |
-| `sub_080CDB9C` | 0xeb bit 7 | `sub_080CE478` |
-| `sub_080CDBB4` | 0xec bit 0 | `sub_080CE480` |
+| status getter | struct bit | duration | duration setter | meaning |
+|---|---|---|---|---|
+| `sub_080CDA94` | 0xea bit 4 | `+0xd9` | `sub_080CE420` | numeric; application case 42 sets it to 3 |
+| `sub_080CDAAC` | 0xea bit 5 | `+0xda` | `sub_080CE428` | **Haste duration** |
+| `sub_080CDAC4` | 0xea bit 6 | `+0xdb` | `sub_080CE430` | **Slow duration** |
+| `sub_080CDADC` | 0xea bit 7 | `+0xdc` | `sub_080CE438` | **Stop duration** |
+| `sub_080CDAF4` | 0xeb bit 0 | `+0xdd` | `sub_080CE440` | **Shell duration** |
+| `sub_080CDB0C` | 0xeb bit 1 | `+0xde` | `sub_080CE448` | **Protect duration** |
+| `sub_080CDB24` | 0xeb bit 2 | `+0xdf` | `sub_080CE450` | **Sleep duration** |
+| `sub_080CDB3C` | 0xeb bit 3 | `+0xe0` | `sub_080CE458` | **Silence duration** |
+| `sub_080CDB54` | 0xeb bit 4 | `+0xe1` | `sub_080CE460` | **Confuse duration** |
+| `sub_080CDB6C` | 0xeb bit 5 | `+0xe2` | `sub_080CE468` | **Charm duration** |
+| `sub_080CDB84` | 0xeb bit 6 | `+0xe3` | `sub_080CE470` | numeric; Aim: Legs family candidate |
+| `sub_080CDB9C` | 0xeb bit 7 | `+0xe4` | `sub_080CE478` | numeric; Aim: Arm family candidate |
+| `sub_080CDBB4` | 0xec bit 0 | `+0xe5` | `sub_080CE480` | **Addle duration** |
+
+Ten names are promoted because the same named application handler calls both
+the live-bit setter and the paired duration setter. The `+0xd9`, `+0xe3`, and
+`+0xe4` semantics remain numeric under the project rule against naming from a
+plausible ability family alone. `+0xd8`, `+0xe6`, and `+0xe7` are outside this
+one-to-one table and remain open.
 
 ## Named status flags
 
@@ -116,7 +123,8 @@ separate, smaller family that is not yet decompiled.
 `tools/validate_statuses.py` protects all 16 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
-pair, runs the speed arithmetic, exercises Sleep's hit-chance branch, preserves
+pair, verifies ten named duration handlers and direct counter/stat reads, runs
+the speed arithmetic, exercises Sleep's hit-chance branch, preserves
 the separate display/adjacency anchors, and executes the persistent/live Zombie
 bridge plus Yellow Card's write to `+0x28` bit `0x0040`. Raw ability effects and internal cases are separate namespaces joined
 by descriptor byte `+0x01`.

@@ -99,6 +99,9 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x24` | `ldrsh` | `+0xD2` | **Speed** |
 | `0x25` | `ldrsh` | `+0xD4` | **CT carry** |
 | `0x26` | `ldrh` | `+0xD6` | **Judge Points (JP)** |
+| `0x27` | address | `+0xD8` | **status-duration array** |
+| `0x2A..0x32` | `ldrb` | `+0xDA..+0xE2` | **Haste through Charm durations** |
+| `0x35` | `ldrb` | `+0xE5` | **Addle duration** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain
@@ -146,8 +149,11 @@ The base-Speed helper adds signed item property 14. The
 Totema selector crosses its boundary at 10 JP (Human command `0x50`, whose UI
 label is `Totema`), and combo damage scales by `JP * 4 + 10`.
 
-This names 35 of the accessor's 63 scalar loads. The remaining 28 numeric
-battle-state scalars occupy `+0xd8..+0xfb`; six stat ids return addresses.
+The next block is a status-duration array. Ten named application handlers set
+their matching live bit and `+0xda..+0xe2/+0xe5` counter; the reconciliation
+routine pairs and clears those same counters. This names 45 of 63 scalar loads.
+Eighteen remain numeric, including six bytes in this block, stat `0x00`, and
+the eleven fields at `+0xf1..+0xfb`; six stat ids return addresses.
 
 ## The AI is randomised
 

@@ -262,7 +262,7 @@ behaviour mod needs to reach.
    descriptor and executed behavior name Speed Down (`+0xec` bit 2 / case
    20), Sleep (`+0xeb` bit 2 / case 45), Slow (`+0xea` bit 6 / case 51), Haste
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
-   `tools/validate_statuses.py` is the nine-check regression gate. Raw ability
+   `tools/validate_statuses.py` is the ten-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
    the four-byte descriptor table at `0x08553E70`. The same join now names 16
    bits total, adding Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and
@@ -286,7 +286,9 @@ behaviour mod needs to reach.
    type/race. Stats `0x0a..0x12` are neutral plus Fire/Wind/Earth/Water/Ice/
    Lightning/Holy/Dark resistance; executed damage proves all five affinity
    codes and the duplicated-Wind Earth source.
-4. Decompile the **capability setters** `0x080CE420`–`0x080CE480`.
+4. ~~Decompile the **capability setters** `0x080CE420`–`0x080CE480`.~~
+   **Corrected/closed 2026-08-25:** they are status-duration setters, paired
+   with getters at `0x080CE3A0..0x080CE410`; ten counters are named and tested.
 5. ~~Resolve whether resistance slot 2 is read by any path.~~ **Closed
    2026-08-25:** slots 1/2 are equal in all retail jobs, the accessor and unit
    initializer duplicate slot 1 for Wind/Earth, and battle damage consumes the
@@ -303,6 +305,11 @@ behaviour mod needs to reach.
    `+0xd0..+0xd6` are CT, Speed, CT carry, and Judge Points. The execution gate
    covers Speed's item join, a complete CT tick/normalization, and the 9/10 JP
    Totema boundary. This leaves 28 scalar loads at `+0xd8..+0xfb` numeric.
+9. **Duration block advanced 2026-08-25:** stat `0x27` is the status-duration
+   array; ten counters at `+0xda..+0xe2/+0xe5` are named Haste, Slow, Stop,
+   Shell, Protect, Sleep, Silence, Confuse, Charm, and Addle. Handler, live-bit,
+   reconciler, dedicated accessor, and generic-stat joins execute. Six bytes in
+   this block remain numeric rather than inheriting candidate names.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

@@ -28,6 +28,9 @@ STATUS_FLAGS = [
         "mask": 0x04,
         "case": 45,
         "handler": 0x081328E1,
+        "duration_offset": 0xDF,
+        "duration_getter": 0x080CE3D8,
+        "duration_setter": 0x080CE450,
     },
     {
         "name": "slow",
@@ -40,6 +43,9 @@ STATUS_FLAGS = [
         "mask": 0x40,
         "case": 51,
         "handler": 0x08132B45,
+        "duration_offset": 0xDB,
+        "duration_getter": 0x080CE3B8,
+        "duration_setter": 0x080CE430,
     },
     {
         "name": "haste",
@@ -52,6 +58,9 @@ STATUS_FLAGS = [
         "mask": 0x20,
         "case": 52,
         "handler": 0x08132BC5,
+        "duration_offset": 0xDA,
+        "duration_getter": 0x080CE3B0,
+        "duration_setter": 0x080CE428,
     },
     {
         "name": "poison",
@@ -100,6 +109,9 @@ STATUS_FLAGS = [
         "mask": 0x80,
         "case": 19,
         "handler": 0x081320E9,
+        "duration_offset": 0xDC,
+        "duration_getter": 0x080CE3C0,
+        "duration_setter": 0x080CE438,
     },
     {
         "name": "reflect",
@@ -137,6 +149,9 @@ STATUS_FLAGS = [
         "mask": 0x10,
         "case": 41,
         "handler": 0x081325FD,
+        "duration_offset": 0xE1,
+        "duration_getter": 0x080CE3E8,
+        "duration_setter": 0x080CE460,
     },
     {
         "name": "silence",
@@ -149,6 +164,9 @@ STATUS_FLAGS = [
         "mask": 0x08,
         "case": 56,
         "handler": 0x08132C39,
+        "duration_offset": 0xE0,
+        "duration_getter": 0x080CE3E0,
+        "duration_setter": 0x080CE458,
     },
     {
         "name": "addle",
@@ -161,6 +179,9 @@ STATUS_FLAGS = [
         "mask": 0x01,
         "case": 71,
         "handler": 0x081333DD,
+        "duration_offset": 0xE5,
+        "duration_getter": 0x080CE408,
+        "duration_setter": 0x080CE480,
     },
     {
         "name": "charm",
@@ -174,6 +195,9 @@ STATUS_FLAGS = [
         "mask": 0x20,
         "case": 80,
         "handler": 0x08133541,
+        "duration_offset": 0xE2,
+        "duration_getter": 0x080CE3F0,
+        "duration_setter": 0x080CE468,
     },
     {
         "name": "protect",
@@ -186,6 +210,9 @@ STATUS_FLAGS = [
         "mask": 0x02,
         "case": 82,
         "handler": 0x081335C1,
+        "duration_offset": 0xDE,
+        "duration_getter": 0x080CE3D0,
+        "duration_setter": 0x080CE448,
     },
     {
         "name": "shell",
@@ -198,6 +225,9 @@ STATUS_FLAGS = [
         "mask": 0x01,
         "case": 83,
         "handler": 0x081335ED,
+        "duration_offset": 0xDD,
+        "duration_getter": 0x080CE3C8,
+        "duration_setter": 0x080CE440,
     },
 ]
 

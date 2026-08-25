@@ -19,6 +19,7 @@ HIT_READER = 0x0812C8DC
 STAT_GETTER = 0x080C7EA4
 EFFECTIVE_ZOMBIE = 0x081308F4
 STATUS_INITIALIZER = 0x08133A58
+DURATION_RECONCILER = 0x08131C58
 YELLOW_CARD_HANDLER = 0x081337F4
 YELLOW_CLIP_HANDLER = 0x08133758
 ROM = 0x08000000
@@ -115,6 +116,30 @@ def main(argv=None):
     if not getter_ok:
         failures.append("getter/setter pairs")
 
+    duration_entries = [entry for entry in STATUS_FLAGS
+                        if "duration_offset" in entry]
+    duration_ok = True
+    reconciler_calls = calls_from(rom, DURATION_RECONCILER, 0x08131DA4)
+    for entry in duration_entries:
+        pointer = pointers[entry["case"] - 1]
+        start = pointer & ~1
+        extent = find_extent(rom, start - ROM, 512)
+        handler_calls = (calls_from(rom, start, ROM + extent[0])
+                         if extent else set())
+        duration_ok &= entry["duration_setter"] in handler_calls
+        duration_ok &= entry["getter"] in reconciler_calls
+        duration_ok &= entry["duration_setter"] in reconciler_calls
+        gba.reset_ram()
+        duration_ok &= gba.call(entry["duration_getter"], [unit]) == 0
+        gba.call(entry["duration_setter"], [unit, 7])
+        duration_ok &= gba.call(entry["duration_getter"], [unit]) == 7
+        stat = 0x28 + entry["duration_offset"] - 0xD8
+        duration_ok &= gba.call(STAT_GETTER, [unit, stat]) == 7
+    print(f"5. named status durations: {'OK' if duration_ok else 'FAIL'} "
+          f"({len(duration_entries)} handler/live-bit/counter joins)")
+    if not duration_ok:
+        failures.append("named status durations")
+
     def speed(ea=0, eb=0, ec=0):
         gba.reset_ram()
         gba.uc.mem_write(unit + 0xD2, struct.pack("<H", 100))
@@ -132,7 +157,7 @@ def main(argv=None):
                 "unidentified_ea_bit1": 50, "sleep": 100,
                 "slow": 50, "haste": 200, "haste_slow": 100}
     speed_ok = speeds == expected
-    print(f"5. effective speed: {'OK' if speed_ok else 'FAIL'} ({speeds})")
+    print(f"6. effective speed: {'OK' if speed_ok else 'FAIL'} ({speeds})")
     if not speed_ok:
         failures.append("effective speed")
 
@@ -146,7 +171,7 @@ def main(argv=None):
     gba.write8(target + 0xEB, 0x04)
     sleep_hit = gba.call(HIT_READER, [source, target, 0, 0])
     sleep_ok = ordinary_hit == 95 and sleep_hit == 100
-    print(f"6. Sleep vulnerability: {'OK' if sleep_ok else 'FAIL'} "
+    print(f"7. Sleep vulnerability: {'OK' if sleep_ok else 'FAIL'} "
           f"(hit chance {ordinary_hit} -> {sleep_hit})")
     if not sleep_ok:
         failures.append("Sleep vulnerability")
@@ -157,7 +182,7 @@ def main(argv=None):
                   rom[0x75AEE:0x75AFA] ==
                   bytes.fromhex("d0263602002801d0a0263602") and
                   STATUS_FLAGS[2]["case"] + 1 == STATUS_FLAGS[3]["case"])
-    print(f"7. independent naming anchors: {'OK' if display_ok else 'FAIL'} "
+    print(f"8. independent naming anchors: {'OK' if display_ok else 'FAIL'} "
           "(Speed Down display; adjacent Slow/Haste pair)")
     if not display_ok:
         failures.append("independent naming anchors")
@@ -180,7 +205,7 @@ def main(argv=None):
                  STAT_GETTER in effective_calls and
                  0x080CD9A4 in effective_calls and
                  0x080CDE80 in init_calls)
-    print(f"8. persistent Zombie bridge: {'OK' if persistent_ok else 'FAIL'} "
+    print(f"9. persistent Zombie bridge: {'OK' if persistent_ok else 'FAIL'} "
           f"(blank/live/persistent={blank_zombie}/{live_zombie}/{persistent_zombie})")
     if not persistent_ok:
         failures.append("persistent Zombie bridge")
@@ -215,7 +240,7 @@ def main(argv=None):
                  cancel_case == yellow["cancel_case"] and
                  cancel_pointer == yellow["cancel_handler"] and
                  cleared == 0)
-    print(f"9. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
+    print(f"10. Yellow Card persistent flag: {'OK' if yellow_ok else 'FAIL'} "
           f"(apply={persistent:#06x}, clip={cleared:#06x})")
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
@@ -224,7 +249,7 @@ def main(argv=None):
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 9/9 status checks")
+    print("PASS: 10/10 status checks")
     return 0
 
 
