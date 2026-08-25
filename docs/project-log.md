@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
 | Current work package | AI5.1 — expand unit-status and stat naming from behavioral readers |
-| Last closed package | AI5.3b — named unit type/race and elemental resistance array |
+| Last closed package | AI5.3c — named the five equipped-item fields |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses 9/9; matching ROM SHA1 |
 
@@ -80,6 +80,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.2e | 2026-08-25 | Confirmed Yellow Clip as the exact inverse and held eight other persistent masks numeric | Executed `0x0000 -> 0x0040 -> 0x0000`; complete caller sweep found no unique named joins for the remainder |
 | AI5.3a | 2026-08-25 | Named base job, active job, secondary job, level, and experience in the one-byte unit block | Direct accessor reads; executed job switch and EXP award; level-up cap at 50/99 |
 | AI5.3b | 2026-08-25 | Named unit type/race and nine damage-resistance fields; closed packed slot 2 | Constructor/job initialization; five executed Fire outcomes; retail Wind/Earth source proof |
+| AI5.3c | 2026-08-25 | Named stats `0x1d..0x21` as five equipped-item ids | Direct stat reads plus four combat-total helpers iterating all five slots |
 
 ## Decisions and evidence
 
@@ -327,6 +328,30 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-25 — Equipped-item stat fields
+
+Objective:
+
+- Close the final five direct-load halfwords after the status field.
+
+Completed:
+
+- Named stats `0x1d..0x21` / unit `+0x2a..+0x32` as equipped item ids 0–4.
+- Extended AI check 4 to read all five ids through the stat accessor before
+  executing the existing Attack/Defense/Magic Power/Resistance item totals.
+
+Evidence recorded during the batch:
+
+- Synthetic ids `1/3/7/10/0` read back unchanged through stats `0x1d..0x21`.
+- Each of the four retail total-stat helpers iterates the same five halfwords
+  and adds the independently named item property.
+
+Next action:
+
+- Isolate stat `0x08` / unit `+0x0b` from behavioral consumers. If no unique
+  meaning closes, leave it numeric and shift to the address-returning stat ids
+  that expose movement, abilities, and state/duration substructures.
 
 ### 2026-08-25 — Unit identity and elemental resistance array
 

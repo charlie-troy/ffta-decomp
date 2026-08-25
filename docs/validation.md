@@ -66,7 +66,8 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    negative result for absorb. The job-change fragment synchronizes
    base/active job and clears a duplicate secondary job; the EXP path changes
    40 to 45; and level-up enforces 50/99. HP/MP and the four combat bases still
-   read through stats `0x13..0x1a`, and all four equipped-item totals execute.
+   read through stats `0x13..0x1a`. Stats `0x1d..0x21` read the five equipped
+   item ids at `+0x2a..+0x32`, and all four item-derived combat totals execute.
 5. **The healthy-target rule.** Running the `ai_behaviour == 2` fragment against
    synthetic targets shows it rejects exactly when HP < MaxHP/2, including at
    the boundaries (50 of 100 passes, 49 rejects; 30 of 60 passes, 29 rejects).

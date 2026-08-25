@@ -38,6 +38,7 @@ counted address-returning cases as direct loads.
 | `0x19` | `+0x24` | u16 | **Magic Power** | `sub_080CA66C` adds equipped item property 12 (magic power) to this base |
 | `0x1a` | `+0x26` | u16 | **Resistance** | `sub_080CA6FC` adds equipped item property 13 (resistance) to this base |
 | `0x1b` | `+0x28` | u16 | **persistent status flags** *(partially decoded)* | bit `0x0040` is Yellow Card; bit `0x0800` is persistent Zombie |
+| `0x1d..0x21` | `+0x2A..+0x32` | u16 | **equipped item ids 0–4** | four combat-total helpers iterate all five ids and add matching item properties |
 
 ## Full table
 
@@ -105,4 +106,6 @@ and magical combat stats in Attack/Defense and Magic Power/Resistance pairs.
 The next field is a persistent-status bitfield. Yellow Card's application
 handler writes bit `0x0040`; bit `0x0800` satisfies the effective Zombie
 predicate and is copied into the live Zombie status during initialization.
-The remaining bits stay numeric.
+The remaining bits stay numeric. Five adjacent halfwords at `+0x2a..+0x32`
+are equipped item ids. Check 4 reads them through stats `0x1d..0x21`, then
+executes the four combat totals that iterate all five slots.

@@ -93,6 +93,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x18` | `ldrh` | `+0x22` | **Defense** |
 | `0x19` | `ldrh` | `+0x24` | **Magic Power** |
 | `0x1A` | `ldrh` | `+0x26` | **Resistance** |
+| `0x1D..0x21` | `ldrh` | `+0x2A..+0x32` | **equipped item ids 0–4** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain
@@ -122,6 +123,11 @@ RNG state produces `33, 24, 0, -19, 11` for those five states. The packed job
 table's nominal Earth slot is not read: the accessor duplicates Wind for the
 unit Earth byte, and the two packed slots happen to be equal in all retail
 jobs.
+
+The five trailing direct halfword loads are equipped item ids. The four retail
+combat-total helpers iterate unit `+0x2a..+0x32`, pass every nonzero id to the
+item property accessor, and add properties 10–13 to the matching combat base.
+Check 4 verifies both the stat-id reads and those executed totals.
 
 ## The AI is randomised
 

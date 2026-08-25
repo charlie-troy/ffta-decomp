@@ -47,6 +47,11 @@ KNOWN = {
     0x19: "magic_power",
     0x1A: "resistance",
     0x1B: "persistent_status_flags",
+    0x1D: "equipped_item_0",
+    0x1E: "equipped_item_1",
+    0x1F: "equipped_item_2",
+    0x20: "equipped_item_3",
+    0x21: "equipped_item_4",
 }
 
 

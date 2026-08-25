@@ -134,7 +134,7 @@ Anything reported outside a function you deliberately edited is a bug.
 ## What is known
 
 - `docs/ability-table.md` — all 28 bytes of an ability entry
-- `docs/unit-struct.md` — all 69 unit-stat ids mapped to direct loads or returned addresses, including unit type/race, base/active/secondary job, level/EXP, nine damage affinities, HP/MP, and the four combat stats
+- `docs/unit-struct.md` — all 69 unit-stat ids mapped to direct loads or returned addresses, including unit type/race, jobs, level/EXP, nine damage affinities, HP/MP, four combat stats, and five equipped-item ids
 - `docs/unit-flags.md` — 56 status/capability bits and the accessors for each
 - `docs/ai-findings.md` — the evaluator, its data tables and the rules read so far
 

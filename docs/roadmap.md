@@ -291,6 +291,9 @@ behaviour mod needs to reach.
    2026-08-25:** slots 1/2 are equal in all retail jobs, the accessor and unit
    initializer duplicate slot 1 for Wind/Earth, and battle damage consumes the
    unit array. Packed slot 2 has no combat effect.
+6. **Continued 2026-08-25:** stats `0x1d..0x21` / unit `+0x2a..+0x32` are the
+   five equipped item ids. Direct stat reads and all four item-derived combat
+   totals execute in the AI gate.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

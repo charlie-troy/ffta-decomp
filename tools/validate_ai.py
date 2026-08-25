@@ -286,6 +286,13 @@ def check_stat_ids(gba, rom):
         _put16(gba, UNIT + off, value)
     for n, item in enumerate(items):
         _put16(gba, UNIT + 0x2A + n * 2, item)
+    equipped = tuple(gba.call(STAT_GET, [UNIT, stat])
+                     for stat in range(0x1D, 0x22))
+    if equipped != items:
+        ok = False
+        print(f"   equipped-item stats read {equipped}, expected {items}")
+    print("   0x1D..0x21 == five equipped-item ids at +0x2A..+0x32 "
+          f"-> {'PASS' if equipped == items else 'FAIL'}")
 
     for (name, stat_id, _, item_off, total_fn), base in zip(COMBAT_TOTALS, bases):
         direct = gba.call(STAT_GET, [UNIT, stat_id])
