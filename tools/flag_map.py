@@ -23,6 +23,14 @@ MASK = re.compile(r"int (?:not)?mask = (~?)(0x[0-9a-fA-F]+|\d+)")
 FIELD = re.compile(r"^\s*(u8|u16) flags;", re.M)
 ISSET = re.compile(r"\*p = \*p & notmask|p->unk_|= a != 0 \?")
 
+# These two valid retail setters have no callers, so they are not part of the
+# matched/generated function set scanned below. Keep them explicit: omitting
+# them makes the structural map incorrectly claim the bits are read-only.
+DORMANT_SETTERS = {
+    (0xED, "u8", 0x20): "sub_080CE338",
+    (0xED, "u8", 0x40): "sub_080CE35C",
+}
+
 
 def parse(path):
     src = open(path).read()
@@ -53,6 +61,8 @@ def main(argv):
         if off is None or mask is None:
             continue
         by_bit[(off, width, mask)][kind] = name
+    for key, name in DORMANT_SETTERS.items():
+        by_bit[key]["set"] = name
 
     md = "--md" in argv
     keys = sorted(by_bit)

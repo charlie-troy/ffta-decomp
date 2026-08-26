@@ -109,7 +109,7 @@ role of `+0xd6c` and the `-100` is left open rather than guessed.
 |---|---|---|
 | `sub_080CD8B4` | `+0xe8` bit 1 | **Quicken**; Quicken/Smile set it, the priority list reads it, and the turn path clears it after consumption |
 | `sub_080CD92C` | `+0xe8` bit 6 | **Petrify**; Break/Rockseal/Blaster set it, Soft selects its cancel case, and the CT tick zeros CT/carry |
-| `sub_080CDCEC` | `+0xed` bit 6 | when **set**, the unit is skipped by both the tick and the actor scan — a second turn-suppressing status |
+| `sub_080CDCEC` | `+0xed` bit 6 | numeric inactive-like battle flag; set zeros CT/carry and blocks actor/target/result paths, but its retail setter has no callers and no unique named transition |
 | `sub_080CDA34` | `+0xec` bit 2 | **Speed Down**; halves effective speed |
 | `sub_080CDA64` | `+0xea` bit 1 | **Mow Down speed penalty**; Mow Down's secondary Self: Speed Down effect selects this bit, halves Speed, and makes the target easier to hit |
 | `sub_080CDAC4` | `+0xea` bit 6 | **Slow**; halves effective speed |
@@ -126,5 +126,6 @@ position.
 
 1. The `0x1000` carry preload and the `-100` secondary-list write — exact
    game meaning (this is what the live mGBA trace in Phase 1 is for).
-2. Which state sits on `+0xed` bit 6. Quicken at `+0xe8` bit 1 and Petrify at
-   bit 6 are closed by descriptor/application/turn execution.
+2. What lifecycle or imported state, if any, sets `+0xed` bit 6. Its dedicated
+   setter is retail-unreferenced, so the current ROM does not provide a unique
+   game-facing transition to name.

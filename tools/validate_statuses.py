@@ -45,6 +45,8 @@ PURGE_FORMULA_START, PURGE_FORMULA_END = 0x0812D3C6, 0x0812D420
 POSITION_SNAPSHOT_START, POSITION_SNAPSHOT_END = 0x08096E46, 0x08096E5E
 CT_TICK = 0x0809DF7C
 PETRIFY_SET_END = 0x08132982
+DORMANT_TURN_SUPPRESSOR_GETTER = 0x080CDCEC
+DORMANT_TURN_SUPPRESSOR_SETTER = 0x080CE35C
 ROM = 0x08000000
 
 
@@ -258,6 +260,24 @@ def main(argv=None):
                          for offset in (battle_unit + 0xD0,
                                         battle_unit + 0xD4))
 
+    dormant_suppressor_ct = []
+    for set_flag in (1, 0):
+        gba.reset_ram()
+        gba.uc.mem_write(battle, bytes(0x10C))
+        gba.write32(battle, 1)
+        gba.uc.mem_write(battle_unit + 0xD0, struct.pack("<H", 900))
+        gba.uc.mem_write(battle_unit + 0xD2, struct.pack("<H", 100))
+        gba.uc.mem_write(battle_unit + 0xD4, struct.pack("<H", 25))
+        gba.call(DORMANT_TURN_SUPPRESSOR_SETTER, [battle_unit, set_flag])
+        gba.call(CT_TICK, [battle])
+        dormant_suppressor_ct.append(tuple(
+            struct.unpack("<H", gba.uc.mem_read(offset, 2))[0]
+            for offset in (battle_unit + 0xD0, battle_unit + 0xD4)))
+    dormant_setter_unreferenced = (
+        not call_sites_to(rom, ROM, 0x08360000,
+                          DORMANT_TURN_SUPPRESSOR_SETTER) and
+        rom.count(struct.pack("<I", DORMANT_TURN_SUPPRESSOR_SETTER | 1)) == 0)
+
     quicken = next(entry for entry in STATUS_FLAGS
                    if entry["name"] == "quicken")
     gba.reset_ram()
@@ -273,12 +293,15 @@ def main(argv=None):
         "disable": (1, 3), "immobilize": (1, 3)
     } and movement_results == [5, 0] and disable["getter"] in usability_calls
         and astra_petrify_states == [(1, 0), (0, 0), (0, 1)]
-        and petrified_ct == (0, 0) and quicken_ok)
+        and petrified_ct == (0, 0) and quicken_ok
+        and dormant_suppressor_ct == [(0, 0), (1000, 25)]
+        and dormant_setter_unreferenced)
     print(f"7. action-restriction behavior: "
           f"{'OK' if restriction_ok else 'FAIL'} "
           f"(applied={applied_restrictions}; movement={movement_results}; "
           f"Astra/Petrify={astra_petrify_states}; "
-          f"Petrify CT/carry={petrified_ct}; Quicken={quicken_applied})")
+          f"Petrify CT/carry={petrified_ct}; Quicken={quicken_applied}; "
+          f"numeric suppressor set/clear={dormant_suppressor_ct})")
     if not restriction_ok:
         failures.append("action-restriction behavior")
 

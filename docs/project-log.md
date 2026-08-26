@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.6d — classify the remaining CT suppressor at `+0xed` bit 6 |
-| Last closed package | AI5.6c — corrected the active-list flag to Quicken |
+| Current work package | AI5.7a — sweep remaining direct raw-effect/status joins |
+| Last closed package | AI5.6d — classified the dormant-setter CT suppressor |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -97,6 +97,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.6a | 2026-08-26 | Named `+0xea` bit 1 as Mow Down's distinct self-speed penalty | Sole effect/descriptor/case/setter chain; executed Speed 100→50 and incoming hit 95→100; 20 live bits named |
 | AI5.6b | 2026-08-26 | Named `+0xe8` bits 4/6 as Astra/Petrify | Astra interception `(1,0)→(0,0)`; unprotected Petrify `(0,1)`; CT/carry 900/25→0/0; 22 live bits named |
 | AI5.6c | 2026-08-26 | Named `+0xe8` bit 1 as Quicken and corrected the active-list interpretation | Quicken/Smile effect `0x1d`→case 2→setter; executed apply; turn path clears consumed bit; 23 live bits named |
+| AI5.6d | 2026-08-26 | Retained `+0xed` bit 6 as a numeric inactive-like flag and corrected the setter map | 13 blocking readers; setter zero caller/pointer refs; set/clear CT `0/0` vs `1000/25`; dormant bit-5/6 setters surfaced |
 
 ## Decisions and evidence
 
@@ -481,6 +482,18 @@ status and backlog tables are living sections and should be kept current.
   the earlier “present/alive eligibility” interpretation; ordinary unmarked
   units still participate through the normal CT actor scan.
 
+### D-036 — Do not name the dormant-setter CT suppressor
+
+- `+0xed` bit 6 is read by thirteen battle sites. It zeros CT/carry and blocks
+  actor selection, targeting, and multiple result paths.
+- Dedicated setter `sub_080CE35C` is valid executable retail code, but has zero
+  direct BL callers, zero stored Thumb pointers, and no raw-effect descriptor
+  join. Bit 5 has the same omitted-setter pattern.
+- Executing bit-6 set/clear produces CT/carry `(0,0)` and `(1000,25)` from the
+  same starting state. Decision: document its inactive-like behavior but keep
+  it numeric; add both dormant setters to the structural generator instead of
+  inventing a lifecycle name.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -492,6 +505,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Dormant-setter CT suppressor classification
+
+Objective:
+
+- Either find a unique lifecycle transition for `+0xed` bit 6 or close it as
+  numeric behavior with a complete reference census.
+
+Completed:
+
+- Confirmed the bit suppresses CT, actor selection, targeting, and result
+  processing, but retained its numeric label.
+- Corrected `tools/flag_map.py` to include retail-unused setters
+  `sub_080CE338` / `sub_080CE35C` for `+0xed` bits 5/6.
+
+Evidence recorded during the batch:
+
+- The getter has thirteen callers; no raw-effect case selects it.
+- Setter `sub_080CE35C` has zero direct callers and zero stored Thumb-pointer
+  references. The neighboring bit-5 setter is equally unreferenced.
+- Setter execution followed by the retail CT tick gives set/clear CT/carry
+  outcomes `(0,0)` / `(1000,25)` from starting state `900/25` with Speed 100.
+- Status/state validation remains 20/20; the structural map now reports 46,
+  not 44, getter/setter pairs across 56 represented bits.
+
+Next action:
+
+- Enumerate every remaining raw effect whose descriptor selects an unnamed
+  mapped bit, then promote only direct named-effect joins with executable
+  setter paths.
 
 ### 2026-08-26 — Quicken priority-list correction
 

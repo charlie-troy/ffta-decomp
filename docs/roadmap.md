@@ -361,6 +361,12 @@ behaviour mod needs to reach.
    2 and `+0xe8` bit 1. Execution applies the bit; the turn manager builds its
    priority list from marked units and the consumed-turn path calls the same
    setter with zero. The former “present/alive” description was incorrect.
+22. **Remaining CT suppressor classified 2026-08-26:** `+0xed` bit 6 blocks
+   CT charging, actor selection, targeting, and result processing. Its retail
+   setter at `0x080CE35C` has zero direct or pointer callers and no raw-effect
+   join. Set/clear execution produces CT/carry `0/0` versus `1000/25`; the bit
+   stays numeric rather than receiving an unsupported lifecycle name. The
+   flag-map generator now includes this and adjacent dormant bit-5 setter.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

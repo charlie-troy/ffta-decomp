@@ -63,8 +63,8 @@ getter and setter belong to each bit.
 | 0xed | u8 | 0x4 | 2 | `sub_080CDC8C` | `sub_080CE2CC` |
 | 0xed | u8 | 0x8 | 3 | `sub_080CDCA4` | `sub_080CE2F0` |
 | 0xed | u8 | 0x10 | 4 | `sub_080CDCBC` | `sub_080CE314` |
-| 0xed | u8 | 0x20 | 5 | `sub_080CDCD4` | `-` |
-| 0xed | u8 | 0x40 | 6 | `sub_080CDCEC` | `-` |
+| 0xed | u8 | 0x20 | 5 | `sub_080CDCD4` | `sub_080CE338` *(retail-unused)* |
+| 0xed | u8 | 0x40 | 6 | `sub_080CDCEC` | `sub_080CE35C` *(retail-unused)* |
 | 0xed | u8 | 0x80 | 7 | `-` | `sub_080CE380` |
 
 ## Status bits gate capability bits
@@ -161,6 +161,17 @@ bridge and its three-turn revival counter, verifies the packed two-target
 history consumed by AI, plus Yellow Card's write to `+0x28`
 bit `0x0040`. Raw ability effects and internal cases are separate namespaces joined
 by descriptor byte `+0x01`.
+
+`+0xed` bit 6 remains deliberately numeric. Its getter has thirteen battle
+callers that reject the unit from CT charging, actor selection, targeting, and
+result processing. Retail setter `sub_080CE35C` exists and executes, but has
+zero direct callers and zero stored Thumb-pointer references; no raw-effect
+descriptor selects the getter. Setting it changes CT/carry `900/25→0/0`, while
+clearing it restores the ordinary `1000/25` tick. That proves an inactive-like
+battle role, but not a unique game-facing state name. The adjacent bit-5 setter
+`sub_080CE338` is likewise present but unreferenced. `tools/flag_map.py` lists
+both explicitly because a generated-function-only scan previously omitted
+them.
 
 ## Persistent status flags at `+0x28`
 

@@ -46,6 +46,9 @@ Immobilize zeros movement mode while Disable is checked by ability usability;
 execute Astra, consume it with an intercepted Petrify, then apply Petrify to
 an unprotected target and prove the CT tick zeros CT/carry 900/25→0/0;
 execute Quicken's handler and preserve the turn-path call that clears its bit;
+execute the otherwise-unreferenced `+0xed` bit-6 setter in both directions,
+proving set/clear CT outcomes `0/0` and `1000/25` while preserving its zero
+direct-call and zero pointer-reference census;
 execute Cover copying target id 42 into the actor's shared status link and
 read it through the dedicated and generic stat accessors;
 execute battle-status reset seeding the persistent Zombie revival countdown to
