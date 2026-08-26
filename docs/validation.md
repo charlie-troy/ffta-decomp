@@ -51,6 +51,9 @@ proving set/clear CT outcomes `0/0` and `1000/25` while preserving its zero
 direct-call and zero pointer-reference census;
 verify the direct Defending, Hibernate, Morphed, Cover, Expert Guard, and
 Controlled effect→case→handler→setter joins and bit round-trips;
+execute the physical/magic modifier with Dragon Force's two composite Up bits
+and paired Down bits, proving own-channel/cross-channel results `109/100` and
+`89/100` from base 100;
 execute Cover copying target id 42 into the actor's shared status link and
 read it through the dedicated and generic stat accessors;
 execute battle-status reset seeding the persistent Zombie revival countdown to

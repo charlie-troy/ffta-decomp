@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.7c — separate Dragon Force's Attack Up/Magic Up pair |
-| Last closed package | AI5.7b — promoted six handler-only direct joins |
+| Current work package | AI5.7d — classify the four lifecycle/presentation residues |
+| Last closed package | AI5.7c — separated Dragon Force's Attack Up/Magic Up pair |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -100,6 +100,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.6d | 2026-08-26 | Retained `+0xed` bit 6 as a numeric inactive-like flag and corrected the setter map | 13 blocking readers; setter zero caller/pointer refs; set/clear CT `0/0` vs `1000/25`; dormant bit-5/6 setters surfaced |
 | AI5.7a | 2026-08-26 | Named twelve direct effect/status bits from Advice through Resistance Up | 12 published effect→descriptor→handler→setter joins; 18 alternate abilities; 35 live bits named and round-tripped |
 | AI5.7b | 2026-08-26 | Named Defending, Hibernate, Morphed, Cover, Expert Guard, and Controlled | Six direct handler-only chains; 9 Morph and 13 Control race actions; Cover link execution; 41 live bits named |
+| AI5.7c | 2026-08-26 | Separated Dragon Force's composite setters as Attack Up and Magic Up | Physical/magic own-channel 100→109, cross-channel stays 100; paired Down gives 89; 43 live bits named |
 
 ## Decisions and evidence
 
@@ -517,6 +518,16 @@ status and backlog tables are living sections and should be kept current.
 - Decision: promote these six direct handler joins. Do not force them into the
   evaluator-case table, whose narrower purpose is documenting AI predicates.
 
+### D-039 — Use combat channels to split Dragon Force's Up pair
+
+- Dragon Force raw effect `0x1e` selects case 3, whose handler sets four bits.
+  Defense Up and Resistance Up were independently named, leaving two setters.
+- `sub_0812F528` checks `+0xec` bit 3 only for physical/Attack channel 0 and
+  bit 5 only for magic channel 1. Base 100 becomes 109 in the matching channel
+  and stays 100 in the other; paired Down bits produce 89.
+- Decision: name the remaining pair `attack_up` and `magic_up`. The result is
+  based on channel-selective arithmetic, not composite-effect ordering.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -528,6 +539,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Dragon Force combat-channel split
+
+Objective:
+
+- Distinguish the two unnamed setters inside Dragon Force's four-stat buff.
+
+Completed:
+
+- Named `+0xec` bit 3 as Attack Up and bit 5 as Magic Up.
+- Increased behavior-backed live-bit coverage from 41 to 43 of 47 represented
+  live bits.
+
+Evidence recorded during the batch:
+
+- Both setters are called by Dragon Force case 3 alongside known Defense Up
+  and Resistance Up setters.
+- Executing `sub_0812F528(unit, channel, 100)` yields Attack Up `(109,100)`
+  for physical/cross-channel and Magic Up `(109,100)` for magic/cross-channel.
+  Attack Down and Magic Down independently yield `(89,100)` in their own
+  channels.
+- All 43 named bits pass descriptor, handler, setter, and round-trip checks;
+  status/state validation remains 20/20.
+
+Next action:
+
+- Classify `+0xed` bits 4–7 as named state, dormant capability, or
+  presentation/lifecycle residue, then decide whether Phase 5 can close.
 
 ### 2026-08-26 — Handler-only status residue sweep
 

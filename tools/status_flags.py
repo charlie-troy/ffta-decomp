@@ -6,6 +6,30 @@ does something identifiable. Layout-only flags remain in flag_map.py.
 
 STATUS_FLAGS = [
     {
+        "name": "attack_up",
+        "ability_name": "Dragon Force",
+        "ability_id": 276,
+        "raw_effect": 30,
+        "getter": 0x080CDBE4,
+        "setter": 0x080CE1D4,
+        "offset": 0xEC,
+        "mask": 0x08,
+        "case": 3,
+        "handler": 0x08131E31,
+    },
+    {
+        "name": "magic_up",
+        "ability_name": "Dragon Force",
+        "ability_id": 276,
+        "raw_effect": 30,
+        "getter": 0x080CDC14,
+        "setter": 0x080CE21C,
+        "offset": 0xEC,
+        "mask": 0x20,
+        "case": 3,
+        "handler": 0x08131E31,
+    },
+    {
         "name": "defending",
         "ability_name": "Defense",
         "ability_id": 94,

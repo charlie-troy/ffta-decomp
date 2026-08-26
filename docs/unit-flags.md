@@ -122,6 +122,8 @@ the final history contains ids 5 and 7 but not 6.
 
 | getter | status | how |
 |---|---|---|
+| `sub_080CDBE4` | **Attack Up** | Dragon Force's four-stat raw effect `0x1e` selects case 3 and this setter; the combat modifier changes physical channel 100→109 while leaving magic at 100 |
+| `sub_080CDC14` | **Magic Up** | The same Dragon Force handler calls this distinct setter; the combat modifier changes magic channel 100→109 while leaving physical at 100 |
 | `sub_080CD9D4` | **Defending** | Defense and Mog Guard raw effect `0x87` (Add: Defending) selects case 84 and this setter |
 | `sub_080CDA04` | **Hibernate** | Hibernate raw effect `0x71` selects case 58 and this setter |
 | `sub_080CDA7C` | **Morphed** | All nine race-named Morph actions use raw effect `0xc8`, case 87, and this setter |
@@ -164,7 +166,7 @@ the final history contains ids 5 and 7 but not 6.
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 
-`tools/validate_statuses.py` protects all 41 joins independently: it
+`tools/validate_statuses.py` protects all 43 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
 pair, verifies thirteen named duration handlers and direct counter/stat reads,

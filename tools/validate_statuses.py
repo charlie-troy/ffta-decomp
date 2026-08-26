@@ -16,6 +16,7 @@ ABILITY_TABLE = 0x0855187C
 ABILITY_STRIDE = 0x1C
 SPEED_READER = 0x0812E368
 HIT_READER = 0x0812C8DC
+COMBAT_STAT_MODIFIER = 0x0812F528
 STAT_GETTER = 0x080C7EA4
 EFFECTIVE_ZOMBIE = 0x081308F4
 BATTLE_ZOMBIE_PREDICATE = 0x08131030
@@ -392,8 +393,24 @@ def main(argv=None):
                   rom[0x75AEE:0x75AFA] ==
                   bytes.fromhex("d0263602002801d0a0263602") and
                   slow_case + 1 == haste_case)
+    modifier_results = {}
+    for name, mask, channel in (("attack_up", 0x08, 0),
+                                ("attack_down", 0x10, 0),
+                                ("magic_up", 0x20, 1),
+                                ("magic_down", 0x40, 1)):
+        gba.reset_ram()
+        gba.write8(unit + 0xEC, mask)
+        modifier_results[name] = (
+            gba.call(COMBAT_STAT_MODIFIER, [unit, channel, 100]),
+            gba.call(COMBAT_STAT_MODIFIER, [unit, channel ^ 1, 100]),
+        )
+    modifiers_ok = modifier_results == {
+        "attack_up": (109, 100), "attack_down": (89, 100),
+        "magic_up": (109, 100), "magic_down": (89, 100),
+    }
+    display_ok &= modifiers_ok
     print(f"11. independent naming anchors: {'OK' if display_ok else 'FAIL'} "
-          "(Speed Down display; adjacent Slow/Haste pair)")
+          f"(Speed display; Slow/Haste pair; modifiers={modifier_results})")
     if not display_ok:
         failures.append("independent naming anchors")
 

@@ -264,7 +264,7 @@ behaviour mod needs to reach.
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
    `tools/validate_statuses.py` is the twenty-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
-   the four-byte descriptor table at `0x08553E70`. Forty-one live bits now have
+   the four-byte descriptor table at `0x08553E70`. Forty-three live bits now have
    behavior-backed names, including Frog, Stop, Blind, Confuse, Charm, Addle,
    Protect, Shell, Zombie, Silence, and Reflect.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
@@ -377,6 +377,11 @@ behaviour mod needs to reach.
    14/55/86 to six exact setters. The Morph and Control tables repeat across
    nine and thirteen race-named actions. Coverage reaches 41 of 47 represented
    live bits; the six residues are composite or lifecycle-only.
+25. **Dragon Force pair separated 2026-08-26:** its case-3 handler sets four
+   stat buffs. Independent combat execution identifies `+0xec` bits 3/5 as
+   Attack Up/Magic Up: base 100 becomes 109 only in the matching physical or
+   magic channel, while the paired Down bit yields 89. Coverage reaches 43 of
+   47 represented live bits.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a
