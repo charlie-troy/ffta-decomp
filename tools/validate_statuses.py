@@ -111,6 +111,16 @@ def main(argv=None):
         (161, "Rockseal", 0, 98, 46),
         (296, "Blaster", 0, 98, 46),
         (216, "Smile", 0, 29, 2),
+        (213, "Firebomb", 1, 76, 27),
+        (82, "Provoke", 0, 155, 27),
+        (99, "Aura", 1, 195, 31),
+        (99, "Aura", 0, 166, 33),
+        (309, "Angel Whisper", 1, 166, 33),
+        (303, "Circle", 0, 130, 69),
+        (337, "Logos", 0, 130, 69),
+        (121, "Cheer", 0, 131, 70),
+        (303, "Circle", 1, 136, 76),
+        (337, "Logos", 1, 136, 76),
     ]
     for ability_id, name, slot, raw_effect, case in alternates:
         effect = (ABILITY_TABLE - ROM + ability_id * ABILITY_STRIDE + 0x0C +
@@ -119,8 +129,8 @@ def main(argv=None):
         descriptor_ok &= rom[effect] == raw_effect
         descriptor_ok &= rom[EFFECT_TABLE - ROM + raw_effect * 4 + 1] == case
     print(f"2. named ability/effect joins: {'OK' if descriptor_ok else 'FAIL'} "
-          f"({len(STATUS_FLAGS)} named effects; eight independent alternate "
-          "ability joins)")
+          f"({len(STATUS_FLAGS)} named effects; {len(alternates)} independent "
+          "alternate ability joins)")
     if not descriptor_ok:
         failures.append("named ability/effect joins")
 

@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.7a — sweep remaining direct raw-effect/status joins |
-| Last closed package | AI5.6d — classified the dormant-setter CT suppressor |
+| Current work package | AI5.7b — resolve composite and cancel-only status residues |
+| Last closed package | AI5.7a — promoted twelve direct descriptor joins |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -98,6 +98,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.6b | 2026-08-26 | Named `+0xe8` bits 4/6 as Astra/Petrify | Astra interception `(1,0)→(0,0)`; unprotected Petrify `(0,1)`; CT/carry 900/25→0/0; 22 live bits named |
 | AI5.6c | 2026-08-26 | Named `+0xe8` bit 1 as Quicken and corrected the active-list interpretation | Quicken/Smile effect `0x1d`→case 2→setter; executed apply; turn path clears consumed bit; 23 live bits named |
 | AI5.6d | 2026-08-26 | Retained `+0xed` bit 6 as a numeric inactive-like flag and corrected the setter map | 13 blocking readers; setter zero caller/pointer refs; set/clear CT `0/0` vs `1000/25`; dormant bit-5/6 setters surfaced |
+| AI5.7a | 2026-08-26 | Named twelve direct effect/status bits from Advice through Resistance Up | 12 published effect→descriptor→handler→setter joins; 18 alternate abilities; 35 live bits named and round-tripped |
 
 ## Decisions and evidence
 
@@ -494,6 +495,17 @@ status and backlog tables are living sections and should be kept current.
   it numeric; add both dormant setters to the structural generator instead of
   inventing a lifecycle name.
 
+### D-037 — Batch only one-to-one direct effect joins
+
+- A complete residual descriptor sweep found twelve bits whose published raw
+  effect, internal case, application handler, and setter all agree.
+- Several are independently repeated by alternate abilities: three Berserk,
+  three Auto-Life, three Attack Down, and three Magic Down paths, plus paired
+  Regen and Boost paths.
+- Decision: promote the twelve direct roles together. Leave composite effects
+  and cancel-only cases for a separate pass so a compound ability cannot
+  silently assign the wrong member of a multi-status set.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -505,6 +517,35 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Direct status descriptor sweep
+
+Objective:
+
+- Exhaust all remaining one-to-one named raw-effect joins before analyzing
+  composite or cancel-only residues.
+
+Completed:
+
+- Named Advice, Berserk, Regen, Auto-Life, Conceal, Attack Down, Boost,
+  Defense Down, Defense Up, Magic Down, Resistance Down, and Resistance Up.
+- Increased behavior-backed live-bit coverage from 23 to 35 of 47 represented
+  live bits.
+
+Evidence recorded during the batch:
+
+- All twelve primary ability/effect ids select their documented internal case;
+  each case handler calls the corresponding bit setter.
+- Eighteen alternate ability/effect joins independently converge on the same
+  cases, including Firebomb/Provoke, Aura/Angel Whisper, Circle/Logos, and
+  Cheer.
+- All 35 getter/setter pairs execute clear/set round-trips in the status gate;
+  status/state validation remains 20/20.
+
+Next action:
+
+- Separate the remaining composite-effect, cancel-only, and lifecycle-only
+  cases. Promote a bit only where the individual component can be isolated.
 
 ### 2026-08-26 — Dormant-setter CT suppressor classification
 

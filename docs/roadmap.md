@@ -82,9 +82,9 @@ rules; it does not prove there is no further rule that dominates them.
    chain is `sub_0809E1E0` -> `sub_0809E05C` (turn manager) -> `sub_0809DF7C`
    (CT tick). CT accumulates by the slow/haste-adjusted speed, a unit acts at
    CT > 1000, and the advance subtracts `min(max_CT - 1000, 500)` from every
-   unit with a fractional carry. Six status/capability bits now have
-   behavioural handles: three eligibility/suppression bits plus Speed Down,
-   Slow, Haste, and one still-unidentified speed/accuracy state. The live turn
+   unit with a fractional carry. The relevant flags are now Quicken, Petrify,
+   Speed Down, Mow Down's distinct speed penalty, Slow, Haste, and one numeric
+   inactive-like suppressor whose retail setter is unreferenced. The live turn
    is captured in `docs/whole-battle-trace.md`.
 6. **Freeze the RNG — done.** `tools/mgba_replay_ai_turn.lua` writes
    `0x12345678` at `0x030034B0`; two traces reproduce exactly.
@@ -264,7 +264,7 @@ behaviour mod needs to reach.
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
    `tools/validate_statuses.py` is the twenty-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
-   the four-byte descriptor table at `0x08553E70`. Twenty-three live bits now have
+   the four-byte descriptor table at `0x08553E70`. Thirty-five live bits now have
    behavior-backed names, including Frog, Stop, Blind, Confuse, Charm, Addle,
    Protect, Shell, Zombie, Silence, and Reflect.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
@@ -367,6 +367,11 @@ behaviour mod needs to reach.
    join. Set/clear execution produces CT/carry `0/0` versus `1000/25`; the bit
    stays numeric rather than receiving an unsupported lifecycle name. The
    flag-map generator now includes this and adjacent dormant bit-5 setter.
+23. **Direct descriptor sweep 2026-08-26:** twelve additional bits now have
+   one-to-one published-effect, descriptor-case, handler-setter, and bit
+   round-trip joins: Advice, Berserk, Regen, Auto-Life, Conceal, Attack Down,
+   Boost, Defense Down/Up, Magic Down, and Resistance Down/Up. Coverage rises
+   from 23 to 35 named live bits, with eighteen alternate-ability joins.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

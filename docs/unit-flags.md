@@ -122,6 +122,18 @@ the final history contains ids 5 and 7 but not 6.
 
 | getter | status | how |
 |---|---|---|
+| `sub_080CDA1C` | **Advice** | Advice raw effect `0x2c` selects case 17 and this setter |
+| `sub_080CD944` | **Berserk** | Catnip `0x4d`, Firebomb `0x4c`, and Provoke `0x9b` all select case 27 and this setter |
+| `sub_080CD8E4` | **Regen** | Kirin effect `0xa5` and Aura effect `0xc3` both select case 31 and this setter |
+| `sub_080CD8CC` | **Auto-Life** | Auto-Life, Aura, and Angel Whisper all use effect `0xa6`, case 33, and this setter |
+| `sub_080CD9BC` | **Conceal** | Conceal raw effect `0x7b` (published as Add: Vanish) selects case 60 and this setter |
+| `sub_080CDBFC` | **Attack Down** | Powerbreak, Circle, and Logos effect `0x82` selects case 69 and this setter |
+| `sub_080CD9EC` | **Boost** | Boost and Cheer effect `0x83` selects case 70 and this setter |
+| `sub_080CDC5C` | **Defense Down** | LV3 Def-less effect `0x92` selects case 72 and this setter |
+| `sub_080CDC44` | **Defense Up** | Mighty Guard's second effect `0x85` selects case 73 and this setter |
+| `sub_080CDC2C` | **Magic Down** | Mindbreak `0x89` and Circle/Logos `0x88` select case 76 and this setter |
+| `sub_080CDC8C` | **Resistance Down** | LV3 Def-less's second effect `0x93` selects case 77 and this setter; Guard-Off's composite debuff selects case 48 and the same getter |
+| `sub_080CDC74` | **Resistance Up** | Mighty Guard effect `0x8a` selects case 78 and this setter; Dragon Force's four-stat buff selects case 3 and the same getter |
 | `sub_080CD8B4` | **Quicken** | Quicken raw effect 29 selects case 2 and this bit's setter; Smile independently uses the same effect. The turn manager queues units carrying this bit and clears it when consumed |
 | `sub_080CD8FC` | **Astra** | Astra raw effect 37 selects case 10 and this bit's setter; executing Petrify against it consumes the bit and prevents Petrify, matching Astra's one-time status immunity |
 | `sub_080CD92C` | **Petrify** | Break, Rockseal, and Blaster raw effect 98 selects case 46 and this setter; Soft effect 99 selects paired cancel case 47. Executing the CT tick with this bit set zeros CT/carry 900/25→0/0 |
@@ -146,7 +158,7 @@ the final history contains ids 5 and 7 but not 6.
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 
-`tools/validate_statuses.py` protects all 23 joins independently: it
+`tools/validate_statuses.py` protects all 35 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
 pair, verifies thirteen named duration handlers and direct counter/stat reads,
