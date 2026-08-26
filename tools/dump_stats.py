@@ -24,6 +24,7 @@ IMM = re.compile(r"#(0x[0-9a-fA-F]+|\d+)")
 
 WIDTH = {"ldrb": "u8", "ldrsb": "s8", "ldrh": "u16", "ldrsh": "s16", "ldr": "u32"}
 KNOWN = {
+    0x00: "name_text_pointer",
     0x01: "unit_type",
     0x02: "base_job_id",
     0x03: "race_id",
@@ -88,8 +89,10 @@ KNOWN = {
     0x43: "battle_list_index",
     0x09: "elemental_resistance_array",
     0x1C: "equipment_array",
+    0x22: "ability_state_array",
     0x27: "status_state_array",
     0x38: "live_status_flags",
+    0x44: "movement_profile",
 }
 
 

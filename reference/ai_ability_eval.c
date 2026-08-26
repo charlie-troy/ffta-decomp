@@ -17,7 +17,8 @@ typedef short s16;
 /* Only the fields this function touches. Offsets from docs/unit-struct.md. */
 struct Unit
 {
-    u8  filler_00[0x18];
+    const void *nameText; /* +0x00, encoded text rendered by sub_08025688 */
+    u8  filler_04[0x14];
     u16 hp;             /* +0x18, stat id 0x13 */
     u16 maxHp;          /* +0x1A, stat id 0x14 */
     u16 mp;             /* +0x1C, stat id 0x15 */

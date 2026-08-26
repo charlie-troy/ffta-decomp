@@ -262,7 +262,7 @@ behaviour mod needs to reach.
    descriptor and executed behavior name Speed Down (`+0xec` bit 2 / case
    20), Sleep (`+0xeb` bit 2 / case 45), Slow (`+0xea` bit 6 / case 51), Haste
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
-   `tools/validate_statuses.py` is the thirteen-check regression gate. Raw ability
+   `tools/validate_statuses.py` is the twenty-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
    the four-byte descriptor table at `0x08553E70`. The same join now names 16
    bits total, adding Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and
@@ -338,6 +338,15 @@ behaviour mod needs to reach.
    zero-based battle-list index assigned at battle-object insertion. Executed
    movement-origin and list-length paths cover both families. Five bytes in
    this late block remain numeric.
+17. **Late scalar block closed 2026-08-26:** stats `0x3b..0x3d` /
+   `+0xf3..+0xf5` count other, Parley, and Oust removals; stats `0x41/0x42`
+   are saved tile X/Y. Executed outcome accounting, purge rates, and placement
+   snapshots raise named load coverage to 62/63.
+18. **Unit-stat layout complete 2026-08-26:** stat `0x00` is the encoded-name
+   text pointer, stat `0x22` addresses the bounded ability-state array, and
+   stat `0x44` addresses the movement profile. All 63 load cases and six
+   address-return cases are now named and execution-gated. Phase 5 continues
+   only on the remaining unnamed live-status bits.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

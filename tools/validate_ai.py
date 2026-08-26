@@ -108,6 +108,10 @@ DAMAGE = 0x0812FE38
 BASE_SPEED_TOTAL = 0x080CA580
 CT_TICK = 0x0809DF7C
 TOTEMA_SELECT = 0x080260E0
+ABILITY_STATE_INIT_START = 0x080C9F96
+ABILITY_STATE_INIT_END = 0x080C9FB0
+MOVEMENT_PROFILE_WRITE_START = 0x080CA37E
+MOVEMENT_PROFILE_WRITE_END = 0x080CA38C
 JOB_TABLE = 0x08521A14 - 0x08000000
 JOB_STRIDE = 0x34
 # The ai_behaviour == 2 fragment of the evaluator, and its bail-out call.
@@ -180,6 +184,16 @@ def check_stat_ids(gba, rom):
     print("   0x02/0x04..0x07 == base job/active job/secondary job/level/EXP "
           f"-> {'PASS' if got == want else 'FAIL'}")
 
+    # Stat 0 is the stored encoded-name pointer. UI call sites pass it as the
+    # text argument to sub_08025688; here the accessor must preserve all bits.
+    name_text = 0x0855A64C
+    gba.write32(UNIT, name_text)
+    name_pointer = gba.call(STAT_GET, [UNIT, 0x00])
+    if name_pointer != name_text:
+        ok = False
+    print("   stat 0x00 returns the full encoded-name text pointer "
+          f"-> {'PASS' if name_pointer == name_text else 'FAIL'}")
+
     pointer_stats = ((0x09, 0x0C), (0x1C, 0x2A), (0x22, 0x34),
                      (0x27, 0xD8), (0x38, 0xE8), (0x44, 0xFC))
     pointer_values = tuple(gba.call(STAT_GET, [UNIT, stat])
@@ -190,6 +204,25 @@ def check_stat_ids(gba, rom):
         print(f"   pointer stats read {pointer_values}, expected {pointer_want}")
     print("   six address-returning stat ids point to their exact unit regions "
           f"-> {'PASS' if pointer_values == pointer_want else 'FAIL'}")
+
+    # +0x34 is a 12-byte ability header followed by one byte per ability. The
+    # retail initializer writes the race-specific count; Human race 1 has 142,
+    # which fits exactly before CT at +0xd0. +0xfc is populated as a movement
+    # mode/variant profile by the same family that builds unit tile state.
+    gba.uc.mem_write(UNIT, BLANK)
+    gba.write8(UNIT + 0x06, 1)
+    gba.run_range(ABILITY_STATE_INIT_START, ABILITY_STATE_INIT_END,
+                  {"r0": UNIT, "r7": UNIT})
+    ability_count = gba.uc.mem_read(UNIT + 0x34, 1)[0]
+    gba.run_range(MOVEMENT_PROFILE_WRITE_START, MOVEMENT_PROFILE_WRITE_END,
+                  {"r5": UNIT, "r7": 2, "r6": 3, "r4": 4})
+    movement_profile = tuple(gba.uc.mem_read(UNIT + 0xFC, 4))
+    regions_ok = ability_count == 142 and movement_profile == (2, 3, 4, 251)
+    if not regions_ok:
+        ok = False
+    print("   +0x34 ability state and +0xfc movement profile initialize "
+          f"-> {'PASS' if regions_ok else 'FAIL'} "
+          f"(count={ability_count}, profile={movement_profile})")
 
     # The unit constructor copies its record discriminator to +0x04 and the
     # selected job's race property to +0x06. Jelly (job 46) is race 7.

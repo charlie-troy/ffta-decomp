@@ -77,6 +77,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 
 | stat id | load | struct offset | meaning |
 |---|---|---|---|
+| `0x00` | `ldr` | `+0x00` | **encoded-name text pointer** |
 | `0x01` | `ldrb` | `+0x04` | **unit type** |
 | `0x02` | `ldrb` | `+0x05` | **base job id** |
 | `0x03` | `ldrb` | `+0x06` | **race id** |
@@ -95,6 +96,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x19` | `ldrh` | `+0x24` | **Magic Power** |
 | `0x1A` | `ldrh` | `+0x26` | **Resistance** |
 | `0x1D..0x21` | `ldrh` | `+0x2A..+0x32` | **equipped item ids 0–4** |
+| `0x22` | address | `+0x34` | **ability-state array** |
 | `0x23` | `ldrsh` | `+0xD0` | **charge time (CT)** |
 | `0x24` | `ldrsh` | `+0xD2` | **Speed** |
 | `0x25` | `ldrsh` | `+0xD4` | **CT carry** |
@@ -112,6 +114,7 @@ is a 4-byte stub that loads one field, so the mapping is exact:
 | `0x3a` | `ldrb` | `+0xF2` | **KOs suffered** |
 | `0x3e..0x40` | `ldrb` | `+0xF6..+0xF8` | **tile X, tile Y, tile height** |
 | `0x43` | `ldrb` | `+0xFB` | **battle list index** |
+| `0x44` | address | `+0xFC` | **movement profile** |
 
 The `0x13`/`0x14` pair being adjacent u16s at `+0x18`/`+0x1A`, with the AI
 comparing one against half the other, is what makes current/max HP certain
@@ -173,8 +176,10 @@ other two bytes in this block. The paired KO result path then names
 as its list index. Removal-result execution names `+0xf3..+0xf5` as the
 other/Parley/Oust counters; the Parley count also contributes to the shared
 purge hit formula. Placement paths copy live X/Y into saved position
-`+0xf9/+0xfa`. This names 62 of 63 scalar loads. Only stat `0x00` remains
-numeric; six stat ids return addresses.
+`+0xf9/+0xfa`. Finally, UI renderers identify stat `0x00` as the encoded-name
+text pointer, while bounded initializers/consumers identify `+0x34` as ability
+state and `+0xfc` as the movement profile. All 69 stat ids are now named: 63
+load cases and six address returns.
 
 ## The AI is randomised
 
@@ -278,7 +283,8 @@ re-applies the same gate while scoring.
 1. Decompile `sub_080C32C0` case by case; the switch makes it separable.
 2. Name the ability table fields by cross-referencing entries against known
    in-game ability stats.
-3. Decompile the remaining stat cases (69 in total) to finish the struct's
-   numeric fields, the same way `0x13`-`0x15` were resolved.
+3. Continue joining unnamed live-status bits to unique action restrictions,
+   per-turn behavior, or named ability descriptors; the 69-id stat layout is
+   complete.
 4. A running game is still useful for sanity-checking behaviour changes, but it
    is no longer needed to read the struct.

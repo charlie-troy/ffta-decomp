@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.5d — resolve stat `0x00` and classify address regions `+0x34/+0xfc` |
-| Last closed package | AI5.5c — named removal counters and saved tile position |
+| Current work package | AI5.6a — resume descriptor/behavior joins for unnamed live-status bits |
+| Last closed package | AI5.5d — completed the 69-id unit-stat layout |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -93,6 +93,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.5a | 2026-08-25 | Named stats `0x39/0x3a` / `+0xf1/+0xf2` as KOs inflicted/suffered | Forced-KO execution zeros target HP and increments actor/target counters 9/11→10/12 |
 | AI5.5b | 2026-08-25 | Named stats `0x3e..0x40` as tile X/Y/height and `0x43` as battle-list index | Executed movement-origin copy and two-node list insertion index; range/list consumers preserved |
 | AI5.5c | 2026-08-26 | Named stats `0x3b..0x3d` as removal counters and `0x41/0x42` as saved tile X/Y | Executed Wyrmtamer/Parley/Oust outcome accounting, shared purge formula, and live-to-saved X/Y copy; statuses 20/20 |
+| AI5.5d | 2026-08-26 | Completed the 69-id unit-stat layout: name pointer, ability state, and movement profile | Sixteen text-render joins; executed 142-entry Human ability header and four-byte movement-profile store; AI 8/8 |
 
 ## Decisions and evidence
 
@@ -429,6 +430,20 @@ status and backlog tables are living sections and should be kept current.
 - Decision: name stats `0x3e..0x40` `tile_x/tile_y/tile_height` and stat `0x43`
   `battle_list_index`. These are runtime placement/identity, not counters.
 
+### D-032 — Complete the unit layout with bounded region roles
+
+- Stat `0x00` returns the complete 32-bit value at unit `+0x00`; identified
+  callers pass it to the common text renderer as the unit's displayed name.
+- The `+0x34` address region begins with a 12-byte header and a race-sized
+  ability-state vector. Human initialization writes count 142, making the
+  occupied span `12 + 142 = 154` bytes through `+0xce`, immediately before CT.
+- The `+0xfc` address region is built and consumed by movement/pathfinding
+  code. Executing its final store with derived components `2/3/4` writes
+  `02 03 04 fb`, including the signed complement byte used by later readers.
+- Decision: name these `name_text_pointer`, `ability_state_array`, and
+  `movement_profile`. The names describe independently demonstrated roles
+  without projecting semantics onto individual internal bytes.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -440,6 +455,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Unit stat layout completion
+
+Objective:
+
+- Resolve the sole numeric scalar and both address-return regions to complete
+  the generic unit-stat API map.
+
+Completed:
+
+- Named stat `0x00` / unit `+0x00` as `name_text_pointer`.
+- Named stat `0x22` / unit `+0x34` as `ability_state_array`.
+- Named stat `0x44` / unit `+0xfc` as `movement_profile`.
+- Completed behavior-backed names for all 69 generic stat ids.
+
+Evidence recorded during the batch:
+
+- The stat getter preserves a synthetic 32-bit pointer exactly; sixteen
+  text-render joins include the common setup at
+  `0x08025688`.
+- Executed the ability-state initializer for race 1; it writes count 142. Its
+  12-byte header plus 142 per-ability bytes exactly occupies `+0x34..+0xce`.
+- Executed the movement-profile builder's final store; inputs `2/3/4` produce
+  bytes `02 03 04 fb`, and movement/path consumers read this same region.
+- AI validation remains 8/8 and now exercises all three completed regions.
+
+Next action:
+
+- Resume descriptor/behavior joins for unnamed live-status bits, prioritizing
+  bits with unique action restrictions or per-turn behavior.
 
 ### 2026-08-26 — Removal counters and saved tile position
 

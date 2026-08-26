@@ -14,6 +14,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 
 | stat | offset | width | meaning | how it is known |
 |---|---|---|---|---|
+| `0x00` | `+0x00` | ptr | **encoded-name text pointer** | sixteen UI paths pass the loaded value to the common text renderer; serialization preserves all four bytes |
 | `0x01` | `+0x04` | u8 | **unit type** | constructor copies the unit-definition discriminator; job changes use type 1 as the ordinary-unit path |
 | `0x02` | `+0x05` | u8 | **base job id** | ordinary job changes synchronize it with the active job; canonical-job checks read it |
 | `0x03` | `+0x06` | u8 | **race id** | constructor copies job property 1; Jelly job 46 produces race 7 |
@@ -41,6 +42,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x1a` | `+0x26` | u16 | **Resistance** | `sub_080CA6FC` adds equipped item property 13 (resistance) to this base |
 | `0x1b` | `+0x28` | u16 | **persistent status flags** *(partially decoded)* | bit `0x0040` is Yellow Card; bit `0x0800` is persistent Zombie |
 | `0x1d..0x21` | `+0x2A..+0x32` | u16 | **equipped item ids 0–4** | four combat-total helpers iterate all five ids and add matching item properties |
+| `0x22` | `+0x34` | ptr | **ability-state array** | initializer writes a 12-byte header plus one byte per race ability; Human's 142 entries end exactly before `+0xd0` |
 | `0x23` | `+0xD0` | s16 | **charge time (CT)** | the turn tick adds effective Speed and CT carry here; units become eligible at 1000 |
 | `0x24` | `+0xD2` | s16 | **Speed** | `sub_080CA580` adds signed item property 14; level-up grows this field from the job Speed growth property |
 | `0x25` | `+0xD4` | s16 | **CT carry** | consumed into CT and cleared during charging; normalization then stores either its common delta or the unit's smaller pre-subtraction CT here |
@@ -65,28 +67,35 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x41` | `+0xF9` | u8 | **saved tile X** | placement paths copy the unit's live tile X here as a paired position snapshot |
 | `0x42` | `+0xFA` | u8 | **saved tile Y** | placement paths copy the unit's live tile Y here as a paired position snapshot |
 | `0x43` | `+0xFB` | u8 | **battle list index** | battle-object creation stores the current unit-list length here before inserting the new object |
+| `0x44` | `+0xFC` | ptr | **movement profile** | movement builders populate its mode/variant bytes alongside tile position; path and movement predicates consume the region |
 
 ## Complete numeric layout
 
 | stat ids | offsets | result |
 |---|---|---|
-| `0x00` | `+0x00` | u32 |
+| `0x00` | `+0x00` | encoded-name text pointer |
 | `0x01..0x08` | `+0x04..+0x0b` | eight u8 loads |
 | `0x09` | `+0x0c` | address of elemental-resistance array |
 | `0x0a..0x12` | `+0x0c..+0x14` | nine u8 loads |
 | `0x13..0x1b` | `+0x18..+0x28` | nine u16 loads |
 | `0x1c` | `+0x2a` | address of equipment array |
 | `0x1d..0x21` | `+0x2a..+0x32` | five u16 loads |
-| `0x22` | `+0x34` | address |
+| `0x22` | `+0x34` | address of ability-state array |
 | `0x23..0x25` | `+0xd0/+0xd2/+0xd4` | CT, Speed, and CT carry (three s16 loads) |
 | `0x26` | `+0xd6` | Judge Points (u16) |
 | `0x27` | `+0xd8` | address of status-state array |
 | `0x28..0x37` | `+0xd8..+0xe7` | sixteen named u8 loads: fourteen countdowns/durations, one link id, and packed recent-target ids |
 | `0x38` | `+0xe8` | address of live-status flags |
 | `0x39..0x43` | `+0xf1..+0xfb` | eleven named u8 loads: KO pair, removal counters, live/saved tile position, and battle-list index |
-| `0x44` | `+0xfc` | address |
+| `0x44` | `+0xfc` | address of movement profile |
 
 ## Shape
+
+The first word is an encoded-name text pointer, not an opaque integer.
+Sixteen callers load stat `0x00` and feed it to `sub_08025688`, the shared
+text-render setup, while `sub_0812EBD8` copies all four pointer bytes into a
+serialized unit record. The execution gate writes a synthetic ROM text pointer
+and verifies the stat accessor preserves it exactly.
 
 Bytes `+0x04`-`+0x14` are a run of 17 u8 stats (ids `0x01`-`0x12`), then
 u16 stats run from `+0x18` upward in pairs. The HP pair sits at the start of
@@ -121,6 +130,12 @@ The remaining bits stay numeric. Five adjacent halfwords at `+0x2a..+0x32`
 are equipped item ids. Check 4 reads them through stats `0x1d..0x21`, then
 executes the four combat totals that iterate all five slots.
 
+The large gap from `+0x34` through `+0xcf` is ability state. Its initializer
+writes a 12-byte header and one byte per ability available to the unit's race.
+For Human race 1, executing the initializer writes count 142; `12 + 142 = 154`
+bytes, ending at `+0xce` with one pad byte before CT at `+0xd0`. Ability-menu
+and learned-ability consumers read the same region through stat `0x22`.
+
 The first four later battle values are also closed. Executing the one-unit turn
 tick changes CT 900 with Speed 100 and carry 25 into CT 1000 / carry 25. The
 Speed-total helper independently adds signed item property 14. At `+0xd6`,
@@ -145,9 +160,10 @@ target `+0x104` into the actor's `+0xe6`; both its dedicated getter and stat
 `0x36` return 42. Other consumers compare this byte to unit ids when resolving
 linked states, so the encompassing pointer is a status-state array.
 
-This names 62 of 63 scalar loads. Only stat `0x00` remains numeric. The two remaining unnamed address regions are
-`+0x34` and `+0xfc`; `+0xd8` is the status-state array and `+0xe8` the
-live-status array.
+All 69 stat ids are now structurally and behaviorally named: 63 load cases
+(including the encoded-name pointer at stat `0x00`) and six address returns.
+The address regions are elemental resistances, equipment, ability state,
+status state, live-status flags, and the movement profile.
 
 `+0xe7` closes the status-state block but is not itself a status. It is a
 two-entry most-recently-used target history: each nibble holds a unit's
@@ -184,3 +200,10 @@ paths copy live `tile_x/tile_y` into them; executing one path with live X/Y
 `12/9` makes stats `0x41/0x42` return `12/9`. The neutral `saved` label is
 intentional: no constant-id generic-stat caller establishes whether every
 snapshot represents deployment, movement origin, or another lifecycle point.
+
+Stat `0x44` returns the movement profile at `+0xfc`. The retail profile builder
+derives and writes its first four mode/variant bytes, movement and path
+predicates inspect them, and the map-placement family writes the same leading
+bytes immediately after tile X/Y/height. Executing the four-byte store with
+synthetic inputs produces `2,3,4,251`, preserving the final signed complement
+byte and the exact region returned by the stat accessor.
