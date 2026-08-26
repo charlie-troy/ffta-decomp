@@ -39,6 +39,9 @@ FORCED_KO_START, FORCED_KO_END = 0x08132AEA, 0x08132B34
 MOVEMENT_ORIGIN_START, MOVEMENT_ORIGIN_END = 0x080C537C, 0x080C5390
 BATTLE_LIST_SIZE = 0x080C7B08
 BATTLE_LIST_INDEX_READER = 0x08099CB8
+REMOVAL_COUNTER_START, REMOVAL_COUNTER_END = 0x080A3674, 0x080A36C2
+PURGE_FORMULA_START, PURGE_FORMULA_END = 0x0812D3C6, 0x0812D420
+POSITION_SNAPSHOT_START, POSITION_SNAPSHOT_END = 0x08096E46, 0x08096E5E
 ROM = 0x08000000
 
 
@@ -463,11 +466,78 @@ def main(argv=None):
     if not yellow_ok:
         failures.append("Yellow Card persistent flag")
 
+    # A removal-result branch saturating-increments one of three adjacent
+    # counters. Parley and Oust have dedicated ids; Wyrmtamer proves the
+    # default/other bucket. The shared purge hit formula then reads the Parley
+    # counter as a +10-point threshold modifier alongside KOs inflicted.
+    wrapper, inner, removal_unit = 0x02001000, 0x02001200, 0x02001400
+    action = 0x02001600
+    removal_states = []
+    for ability_id in (126, 91, 181):  # Wyrmtamer, Parley, Oust
+        gba.reset_ram()
+        gba.write32(wrapper, inner)
+        gba.write32(inner, removal_unit)
+        gba.uc.mem_write(action + 0x10, struct.pack("<H", ability_id))
+        gba.uc.mem_write(0x0200F390 + 0x86, struct.pack("<H", 0x40))
+        gba.write8(removal_unit + 0xF3, 9)
+        gba.write8(removal_unit + 0xF4, 11)
+        gba.write8(removal_unit + 0xF5, 13)
+        gba.run_range(REMOVAL_COUNTER_START, REMOVAL_COUNTER_END,
+                      {"r6": wrapper, "sb": action})
+        removal_states.append(tuple(gba.uc.mem_read(removal_unit + 0xF3, 3)))
+
+    caster, purge_target = 0x02001800, 0x02001A00
+    purge_rates = []
+    for parley_count in (0, 1, 5):
+        gba.reset_ram()
+        gba.write8(caster + 0xF1, 3)
+        gba.write8(caster + 0xF4, parley_count)
+        gba.uc.mem_write(purge_target + 0x18, struct.pack("<H", 10))
+        gba.uc.mem_write(purge_target + 0x1A, struct.pack("<H", 100))
+        purge_rates.append(gba.run_range(
+            PURGE_FORMULA_START, PURGE_FORMULA_END,
+            {"r6": caster, "r5": purge_target}))
+    purge_descriptor_ids = tuple(
+        rom[ABILITY_TABLE - ROM + ability_id * ABILITY_STRIDE + 0x0C]
+        for ability_id in (91, 126, 181))
+    purge_selectors = tuple(
+        rom[EFFECT_TABLE - ROM + effect_id * 4 + 2]
+        for effect_id in purge_descriptor_ids)
+    removal_ok = (removal_states == [(10, 11, 13), (9, 12, 13),
+                                     (9, 11, 14)] and
+                  purge_rates == [78, 82, 89] and
+                  purge_selectors == (8, 8, 8))
+    print(f"19. removal counters and purge formula: "
+          f"{'OK' if removal_ok else 'FAIL'} "
+          f"(states={removal_states}; rates={purge_rates})")
+    if not removal_ok:
+        failures.append("removal counters and purge formula")
+
+    # Several placement paths snapshot current X/Y into +0xf9/+0xfa. Execute
+    # one retail copy and read the result through generic stats 0x41/0x42.
+    holder, position_unit = 0x02001C00, 0x02001E00
+    gba.reset_ram()
+    gba.write32(holder, position_unit)
+    gba.write8(position_unit + 0xF6, 12)
+    gba.write8(position_unit + 0xF7, 9)
+    gba.run_range(POSITION_SNAPSHOT_START, POSITION_SNAPSHOT_END,
+                  {"r0": holder})
+    saved_position = tuple(gba.call(STAT_GETTER, [position_unit, stat])
+                           for stat in (0x41, 0x42))
+    snapshot_pattern = bytes.fromhex(
+        "2068011cf6310978f93001702068011cf7310978fa300170")
+    snapshot_sites = rom.count(snapshot_pattern)
+    position_ok = saved_position == (12, 9) and snapshot_sites >= 4
+    print(f"20. saved tile position: {'OK' if position_ok else 'FAIL'} "
+          f"(saved X/Y={saved_position}; copy anchors={snapshot_sites})")
+    if not position_ok:
+        failures.append("saved tile position")
+
     print()
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 18/18 status/state checks")
+    print("PASS: 20/20 status/state checks")
     return 0
 
 

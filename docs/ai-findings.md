@@ -170,8 +170,11 @@ it against other unit ids. Zombie revival and recent-target history close the
 other two bytes in this block. The paired KO result path then names
 `+0xf1/+0xf2` as KOs inflicted/suffered. Movement and range consumers name
 `+0xf6..+0xf8` as tile X/Y/height, while battle-object insertion names `+0xfb`
-as its list index. This names 57 of 63 scalar loads. Six remain numeric: stat
-`0x00` and `+0xf3/+0xf4/+0xf5/+0xf9/+0xfa`; six stat ids return addresses.
+as its list index. Removal-result execution names `+0xf3..+0xf5` as the
+other/Parley/Oust counters; the Parley count also contributes to the shared
+purge hit formula. Placement paths copy live X/Y into saved position
+`+0xf9/+0xfa`. This names 62 of 63 scalar loads. Only stat `0x00` remains
+numeric; six stat ids return addresses.
 
 ## The AI is randomised
 

@@ -26,11 +26,14 @@ struct Unit
     u8  filler_E8[0x09];
     u8  koInflictedCount; /* +0xF1 */
     u8  koSufferedCount;  /* +0xF2 */
-    u8  filler_F3[3];
+    u8  otherRemovalCount; /* +0xF3; Wyrmtamer and other removal outcomes */
+    u8  parleyRemovalCount; /* +0xF4; also modifies purge hit formulas */
+    u8  oustRemovalCount;   /* +0xF5 */
     u8  tileX;           /* +0xF6 */
     u8  tileY;           /* +0xF7 */
     u8  tileHeight;      /* +0xF8 */
-    u8  filler_F9[2];
+    u8  savedTileX;      /* +0xF9; snapshot copied from tileX */
+    u8  savedTileY;      /* +0xFA; snapshot copied from tileY */
     u8  battleListIndex; /* +0xFB */
 };
 struct Ability;   /* 28 bytes; see docs/ability-table.md                       */

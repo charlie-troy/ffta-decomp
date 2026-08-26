@@ -1,6 +1,6 @@
 # Project log
 
-Last updated: 2026-08-25
+Last updated: 2026-08-26
 
 This is the operational source of truth for resuming the project. `README.md`
 describes the product, `CLAUDE.md` describes the working method, and
@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.5c — resolve or classify `+0xf3/+0xf4/+0xf5/+0xf9/+0xfa` |
-| Last closed package | AI5.5b — named tile position and battle-list index |
+| Current work package | AI5.5d — resolve stat `0x00` and classify address regions `+0x34/+0xfc` |
+| Last closed package | AI5.5c — named removal counters and saved tile position |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 18/18; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -92,6 +92,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.4h | 2026-08-25 | Named stat `0x37` / `+0xe7` as packed recent target ids | Executed MRU insertion/promotion/eviction and membership; four action writers join to the AI reader |
 | AI5.5a | 2026-08-25 | Named stats `0x39/0x3a` / `+0xf1/+0xf2` as KOs inflicted/suffered | Forced-KO execution zeros target HP and increments actor/target counters 9/11→10/12 |
 | AI5.5b | 2026-08-25 | Named stats `0x3e..0x40` as tile X/Y/height and `0x43` as battle-list index | Executed movement-origin copy and two-node list insertion index; range/list consumers preserved |
+| AI5.5c | 2026-08-26 | Named stats `0x3b..0x3d` as removal counters and `0x41/0x42` as saved tile X/Y | Executed Wyrmtamer/Parley/Oust outcome accounting, shared purge formula, and live-to-saved X/Y copy; statuses 20/20 |
 
 ## Decisions and evidence
 
@@ -439,6 +440,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Removal counters and saved tile position
+
+Objective:
+
+- Resolve or explicitly classify the five remaining late scalar bytes.
+
+Completed:
+
+- Named stats `0x3b..0x3d` / `+0xf3..+0xf5` as other, Parley, and Oust
+  removal counters.
+- Named stats `0x41/0x42` / `+0xf9/+0xfa` as saved tile X/Y.
+- Increased behavior-backed scalar coverage from 57/63 to 62/63.
+
+Evidence recorded during the batch:
+
+- Executed the removal-result fragment with Wyrmtamer, Parley, and Oust;
+  seeded counters `9/11/13` became `10/11/13`, `9/12/13`, and `9/11/14`.
+- All three abilities' raw-effect descriptors select the same purge formula.
+  With 3 KOs and target HP 10/100, Parley counts 0/1/5 produce retail hit
+  rates 78/82/89, proving the `+10 * count` threshold contribution.
+- Executed a placement snapshot copying live X/Y `12/9` into `+0xf9/+0xfa`;
+  stats `0x41/0x42` return the saved pair, and four identical copy anchors
+  remain present in the ROM.
+- Status/state validation is 20/20.
+
+Next action:
+
+- Resolve stat `0x00` from its direct consumers, then classify the two unnamed
+  address-return regions at `+0x34` and `+0xfc` to close the unit layout pass.
 
 ### 2026-08-25 — Battle tile position and list index
 

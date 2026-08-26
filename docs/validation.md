@@ -34,7 +34,7 @@ reader anchors, force a live bit-3 price boundary, reproduce an unedited CSV
 byte for byte, and prove a two-field icon edit changes exactly two accessor-
 visible bytes.
 
-`validate_statuses.py` is the behavior-backed status/state-name gate. Its eighteen
+`validate_statuses.py` is the behavior-backed status/state-name gate. Its twenty
 checks join 19 named abilities through raw effects and the descriptor table;
 verify the 92-entry application-handler table; join Speed Down, Sleep, Slow,
 Haste, Poison, and eleven other named states to their setters; execute all 16
@@ -56,6 +56,10 @@ actor's inflicted-KO counter and target's suffered-KO counter;
 execute tile X/Y copying into a movement-search origin and verify the paired
 X/Y/height stat reads plus range-formula join; execute a two-node battle-list
 count and preserve the battle-object builder's matching `+0xfb` store;
+execute Wyrmtamer/Parley/Oust removal outcomes into their three saturating
+counters and measure the Parley counter's contribution to the shared purge
+formula; execute a retail live-X/Y to saved-X/Y snapshot and read it through
+stats `0x41/0x42`;
 measure the effective-speed shifts; exercise Sleep's hit-chance branch; and
 preserve the independent Speed Down display and Slow/Haste adjacency anchors.
 The eighth check proves unit `+0x28` bit `0x0800` and live status `+0xe9` bit 3
