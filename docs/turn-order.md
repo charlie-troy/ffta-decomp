@@ -48,7 +48,7 @@ For every slot, in order:
 1. If `sub_080CD92C(unit)` is set (`+0xe8` bit 6), the unit is skipped: CT and
    carry are both zeroed.
 2. Otherwise `speed = sub_0812E368(unit)` — the signed item speed, halved by
-   Speed Down, Slow, or one still-unidentified status and doubled by Haste.
+   Speed Down, Slow, or Mow Down's self-speed penalty and doubled by Haste.
    Slow and Haste both apply, so their shifts cancel. If speed is 0 the unit
    is also skipped.
 3. If `sub_080CDCEC(unit)` is set (`+0xed` bit 6), skip again.
@@ -111,12 +111,12 @@ role of `+0xd6c` and the `-100` is left open rather than guessed.
 | `sub_080CD92C` | `+0xe8` bit 6 | when **set**, the unit never charges (CT zeroed, never selected) — a turn-suppressing status |
 | `sub_080CDCEC` | `+0xed` bit 6 | when **set**, the unit is skipped by both the tick and the actor scan — a second turn-suppressing status |
 | `sub_080CDA34` | `+0xec` bit 2 | **Speed Down**; halves effective speed |
-| `sub_080CDA64` | `+0xea` bit 1 | unidentified; halves effective speed and makes the target easier to hit, but the effect-descriptor chain proves it is not Sleep |
+| `sub_080CDA64` | `+0xea` bit 1 | **Mow Down speed penalty**; Mow Down's secondary Self: Speed Down effect selects this bit, halves Speed, and makes the target easier to hit |
 | `sub_080CDAC4` | `+0xea` bit 6 | **Slow**; halves effective speed |
 | `sub_080CDAAC` | `+0xea` bit 5 | **Haste**; doubles effective speed |
 
-The first three and `sub_080CDA64` remain behavior descriptions rather than
-status names. Speed Down, Slow, and Haste have independent naming anchors and
+The first three remain behavior descriptions rather than status names. The
+Mow Down penalty, Speed Down, Slow, and Haste have independent naming anchors and
 are protected by `tools/validate_statuses.py`. This preserves the project
 rule: do not enshrine a semantic name without more than a plausible bit
 position.

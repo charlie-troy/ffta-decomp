@@ -126,6 +126,7 @@ the final history contains ids 5 and 7 but not 6.
 | `sub_080CDB84` | **Immobilize** | Aim: Legs raw effect 73 selects case 24 and applies this bit/count 3; executing the movement-mode reader changes its synthetic mode from 5 to 0 only when this bit is set |
 | `sub_080CDB9C` | **Disable** | Aim: Arm raw effect 69 selects case 22 and applies this bit/count 3; the ability-usability predicate rejects on this getter before its success path |
 | `sub_080CDA34` | **Speed Down** | `+0xec` bit 2. Status case 20 calls its setter; `sub_0812E368` halves effective speed, and the stat display changes the speed value from its ordinary palette to the red penalty palette |
+| `sub_080CDA64` | **Mow Down speed penalty** | `+0xea` bit 1. Mow Down's sole secondary raw effect `0x16` is published as Self: Speed Down; its descriptor selects case 37 and the handler sets this bit. Executing the handler halves Speed 100→50 and raises incoming hit chance 95→100 |
 | `sub_080CDB24` | **Sleep** | `+0xeb` bit 2. Sleep ability 32 stores raw effect 97; its descriptor selects internal case 45, whose handler calls this bit's setter. `sub_0812C8DC` forces an ordinary attack's hit chance from 95 to 100 against this state |
 | `sub_080CDAC4` | **Slow** | `+0xea` bit 6. Status case 51 calls its setter and `sub_0812E368` halves effective speed |
 | `sub_080CDAAC` | **Haste** | `+0xea` bit 5. Status case 52 calls its setter and `sub_0812E368` doubles effective speed; its handler is adjacent to Slow and the two effects cancel in execution |
@@ -142,13 +143,14 @@ the final history contains ids 5 and 7 but not 6.
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 
-`tools/validate_statuses.py` protects all 19 joins independently: it
+`tools/validate_statuses.py` protects all 20 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
 pair, verifies thirteen named duration handlers and direct counter/stat reads,
 executes Checkmate's Doom application and checks its expiry call chain, runs
 the Aim: Arm/Aim: Legs handlers and the movement/usability consumers, runs
-the speed arithmetic, exercises Sleep's hit-chance branch, preserves
+the Mow Down handler plus speed/hit arithmetic, exercises Sleep's hit-chance
+branch, preserves
 the separate display/adjacency anchors, executes the persistent/live Zombie
 bridge and its three-turn revival counter, verifies the packed two-target
 history consumed by AI, plus Yellow Card's write to `+0x28`

@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.6a — resume descriptor/behavior joins for unnamed live-status bits |
-| Last closed package | AI5.5d — completed the 69-id unit-stat layout |
+| Current work package | AI5.6b — resolve turn-suppressing live-status bits |
+| Last closed package | AI5.6a — named Mow Down's distinct speed penalty |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -94,6 +94,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.5b | 2026-08-25 | Named stats `0x3e..0x40` as tile X/Y/height and `0x43` as battle-list index | Executed movement-origin copy and two-node list insertion index; range/list consumers preserved |
 | AI5.5c | 2026-08-26 | Named stats `0x3b..0x3d` as removal counters and `0x41/0x42` as saved tile X/Y | Executed Wyrmtamer/Parley/Oust outcome accounting, shared purge formula, and live-to-saved X/Y copy; statuses 20/20 |
 | AI5.5d | 2026-08-26 | Completed the 69-id unit-stat layout: name pointer, ability state, and movement profile | Sixteen text-render joins; executed 142-entry Human ability header and four-byte movement-profile store; AI 8/8 |
+| AI5.6a | 2026-08-26 | Named `+0xea` bit 1 as Mow Down's distinct self-speed penalty | Sole effect/descriptor/case/setter chain; executed Speed 100→50 and incoming hit 95→100; 20 live bits named |
 
 ## Decisions and evidence
 
@@ -444,6 +445,17 @@ status and backlog tables are living sections and should be kept current.
   `movement_profile`. The names describe independently demonstrated roles
   without projecting semantics onto individual internal bytes.
 
+### D-033 — Keep Mow Down's penalty distinct from ordinary Speed Down
+
+- Mow Down is the only ability whose effects include raw id `0x16`; published
+  data identifies that id as Self: Speed Down. Its descriptor selects internal
+  case 37, and the case-37 handler calls the `+0xea` bit-1 setter.
+- Executing the handler sets the bit, halves effective Speed from 100 to 50,
+  and raises an ordinary incoming hit result from 95 to 100.
+- Ordinary Speed Down uses `+0xec` bit 2 and case 20. Because the retail engine
+  deliberately keeps separate flags, name the new bit
+  `mow_down_speed_penalty` rather than merging both states under one label.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -455,6 +467,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Mow Down speed-penalty join
+
+Objective:
+
+- Resume live-status naming with the highest-evidence unnamed behavior bit.
+
+Completed:
+
+- Named `+0xea` bit 1 / getter `sub_080CDA64` as
+  `mow_down_speed_penalty`.
+- Increased behavior-backed live-bit coverage from 19 to 20 of 47 represented
+  live bits, while preserving the distinct ordinary Speed Down bit.
+
+Evidence recorded during the batch:
+
+- Mow Down is the only retail ability using secondary raw effect `0x16`;
+  published effect data calls it Self: Speed Down.
+- Descriptor `06 25 01 00` selects internal case 37. Its handler calls setter
+  `sub_080CDF9C`, which round-trips `+0xea` bit 1.
+- Executing the handler produces live bit/speed `(1, 50)` from base Speed 100;
+  the hit formula changes the same target's incoming chance from 95 to 100.
+- Status/state validation remains 20/20 with 20 named effects and bits.
+
+Next action:
+
+- Resolve the two turn-suppressing bits observed in the CT tick/actor scan,
+  beginning with the one that has an inflict/cancel case pair.
 
 ### 2026-08-26 — Unit stat layout completion
 

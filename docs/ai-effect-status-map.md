@@ -77,7 +77,7 @@ and Poison.
 | 33 | 10, 49 | `sub_080CD8CC` | `+0xe8` bit 2 |
 | 35 | 10, 49 | `sub_080CD98C` | `+0xe9` bit 2 — **Blind** |
 | 36 | - | `sub_080CD98C` | `+0xe9` bit 2 — **Blind** |
-| 37 | 10, 49 | `sub_080CDA64` | `+0xea` bit 1 (unidentified; not Sleep) |
+| 37 | 10, 49 | `sub_080CDA64` | `+0xea` bit 1 — **Mow Down speed penalty** |
 | 41 | 10, 49 | `sub_080CDB54` | `+0xeb` bit 4 — **Confuse** |
 | 42 | 10, 49 | `sub_080CDA94` | `+0xea` bit 4 |
 | 43 | 10, 49 | `sub_080CDB24` | `+0xeb` bit 2 |

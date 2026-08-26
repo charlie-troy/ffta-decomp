@@ -60,7 +60,8 @@ execute Wyrmtamer/Parley/Oust removal outcomes into their three saturating
 counters and measure the Parley counter's contribution to the shared purge
 formula; execute a retail live-X/Y to saved-X/Y snapshot and read it through
 stats `0x41/0x42`;
-measure the effective-speed shifts; exercise Sleep's hit-chance branch; and
+execute Mow Down's secondary handler, verify its dedicated penalty bit halves
+Speed and raises incoming hit chance, exercise Sleep's hit-chance branch; and
 preserve the independent Speed Down display and Slow/Haste adjacency anchors.
 The eighth check proves unit `+0x28` bit `0x0800` and live status `+0xe9` bit 3
 both satisfy the effective Zombie predicate, and that initialization calls the

@@ -250,15 +250,24 @@ def main(argv=None):
         return gba.call(SPEED_READER, [unit])
 
     speeds = {"base": speed(), "speed_down": speed(ec=0x04),
-              "unidentified_ea_bit1": speed(ea=0x02),
+              "mow_down_penalty": speed(ea=0x02),
               "sleep": speed(eb=0x04), "slow": speed(ea=0x40),
               "haste": speed(ea=0x20),
               "haste_slow": speed(ea=0x60)}
     expected = {"base": 100, "speed_down": 50,
-                "unidentified_ea_bit1": 50, "sleep": 100,
+                "mow_down_penalty": 50, "sleep": 100,
                 "slow": 50, "haste": 200, "haste_slow": 100}
-    speed_ok = speeds == expected
-    print(f"9. effective speed: {'OK' if speed_ok else 'FAIL'} ({speeds})")
+    mow_down = next(entry for entry in STATUS_FLAGS
+                    if entry["name"] == "mow_down_speed_penalty")
+    gba.reset_ram()
+    gba.write32(context + 8, unit)
+    gba.uc.mem_write(unit + 0xD2, struct.pack("<H", 100))
+    gba.call(mow_down["handler"] & ~1, [context])
+    mow_down_applied = (gba.call(mow_down["getter"], [unit]),
+                        gba.call(SPEED_READER, [unit]))
+    speed_ok = speeds == expected and mow_down_applied == (1, 50)
+    print(f"9. effective speed: {'OK' if speed_ok else 'FAIL'} "
+          f"({speeds}; Mow Down apply={mow_down_applied})")
     if not speed_ok:
         failures.append("effective speed")
 
@@ -269,11 +278,15 @@ def main(argv=None):
         gba.uc.mem_write(actor + 0x18, struct.pack("<HHH", 100, 100, 20))
         gba.uc.mem_write(actor + 0xD2, struct.pack("<H", 50))
     ordinary_hit = gba.call(HIT_READER, [source, target, 0, 0])
+    gba.write8(target + 0xEA, 0x02)
+    mow_down_hit = gba.call(HIT_READER, [source, target, 0, 0])
+    gba.write8(target + 0xEA, 0)
     gba.write8(target + 0xEB, 0x04)
     sleep_hit = gba.call(HIT_READER, [source, target, 0, 0])
-    sleep_ok = ordinary_hit == 95 and sleep_hit == 100
+    sleep_ok = ordinary_hit == 95 and mow_down_hit == 100 and sleep_hit == 100
     print(f"10. Sleep vulnerability: {'OK' if sleep_ok else 'FAIL'} "
-          f"(hit chance {ordinary_hit} -> {sleep_hit})")
+          f"(base/Mow Down/Sleep hit chance "
+          f"{ordinary_hit}/{mow_down_hit}/{sleep_hit})")
     if not sleep_ok:
         failures.append("Sleep vulnerability")
 

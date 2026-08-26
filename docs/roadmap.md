@@ -264,9 +264,9 @@ behaviour mod needs to reach.
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
    `tools/validate_statuses.py` is the twenty-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
-   the four-byte descriptor table at `0x08553E70`. The same join now names 16
-   bits total, adding Frog, Stop, Blind, Confuse, Charm, Addle, Protect, and
-   Shell and Zombie while independently reconfirming Silence and Reflect.
+   the four-byte descriptor table at `0x08553E70`. Twenty live bits now have
+   behavior-backed names, including Frog, Stop, Blind, Confuse, Charm, Addle,
+   Protect, Shell, Zombie, Silence, and Reflect.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
    (`+0x04`–`+0x14`) and the unnamed `u16`s — by finding code that reads a stat
    and does something identifiable, exactly as the HP pair was pinned. **In
@@ -347,6 +347,11 @@ behaviour mod needs to reach.
    stat `0x44` addresses the movement profile. All 63 load cases and six
    address-return cases are now named and execution-gated. Phase 5 continues
    only on the remaining unnamed live-status bits.
+19. **Mow Down penalty closed 2026-08-26:** the ability's sole secondary raw
+   effect `0x16` selects internal case 37, whose handler sets `+0xea` bit 1.
+   Executing the handler halves Speed 100→50 and raises incoming hit chance
+   95→100. It is named separately from ordinary Speed Down because the retail
+   implementation uses distinct bits.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a
