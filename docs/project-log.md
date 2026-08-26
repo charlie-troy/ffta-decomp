@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.6b — resolve turn-suppressing live-status bits |
-| Last closed package | AI5.6a — named Mow Down's distinct speed penalty |
+| Current work package | AI5.6c — resolve remaining CT eligibility flags |
+| Last closed package | AI5.6b — named Astra and turn-suppressing Petrify |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -95,6 +95,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.5c | 2026-08-26 | Named stats `0x3b..0x3d` as removal counters and `0x41/0x42` as saved tile X/Y | Executed Wyrmtamer/Parley/Oust outcome accounting, shared purge formula, and live-to-saved X/Y copy; statuses 20/20 |
 | AI5.5d | 2026-08-26 | Completed the 69-id unit-stat layout: name pointer, ability state, and movement profile | Sixteen text-render joins; executed 142-entry Human ability header and four-byte movement-profile store; AI 8/8 |
 | AI5.6a | 2026-08-26 | Named `+0xea` bit 1 as Mow Down's distinct self-speed penalty | Sole effect/descriptor/case/setter chain; executed Speed 100→50 and incoming hit 95→100; 20 live bits named |
+| AI5.6b | 2026-08-26 | Named `+0xe8` bits 4/6 as Astra/Petrify | Astra interception `(1,0)→(0,0)`; unprotected Petrify `(0,1)`; CT/carry 900/25→0/0; 22 live bits named |
 
 ## Decisions and evidence
 
@@ -456,6 +457,18 @@ status and backlog tables are living sections and should be kept current.
   deliberately keeps separate flags, name the new bit
   `mow_down_speed_penalty` rather than merging both states under one label.
 
+### D-034 — Name Petrify through both application and turn suppression
+
+- Break, Rockseal, and Blaster are the complete retail users of raw effect
+  `0x62` (Add: Petrify). Its descriptor selects case 46, whose handler sets
+  `+0xe8` bit 6. Soft's `0x63` effect selects paired cancel case 47.
+- Astra/Mog Shield effect `0x25` selects case 10 and sets `+0xe8` bit 4.
+  Applying Petrify while this bit is present clears Astra and does not set
+  Petrify; a second unprotected application sets Petrify.
+- The CT tick independently checks the Petrify getter and zeros both CT and
+  carry. Decision: promote `astra` and `petrify`; the ability join and the
+  executed battle behavior agree.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -467,6 +480,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Astra and Petrify lifecycle
+
+Objective:
+
+- Resolve the first turn-suppressing flag through named effects and CT behavior.
+
+Completed:
+
+- Named `+0xe8` bit 4 as Astra and bit 6 as Petrify.
+- Increased behavior-backed live-bit coverage from 20 to 22 of 47 represented
+  live bits.
+
+Evidence recorded during the batch:
+
+- Astra and Mog Shield converge on raw effect `0x25`, case 10, and the bit-4
+  setter. Break, Rockseal, and Blaster converge on effect `0x62`, case 46, and
+  the bit-6 setter; Soft effect `0x63` selects cancel case 47.
+- Execution transitions `(Astra,Petrify)` through
+  `(1,0) → (0,0) → (0,1)`, proving one-time interception then application.
+- A one-unit CT tick with Petrify changes CT/carry `900/25 → 0/0` rather than
+  charging, independently confirming the turn-suppression role.
+- Status/state validation remains 20/20 with 22 named effects and bits.
+
+Next action:
+
+- Resolve `+0xed` bit 6, the remaining CT/actor-scan suppressor, then classify
+  the `+0xe8` bit-1 active-list eligibility flag.
 
 ### 2026-08-26 — Mow Down speed-penalty join
 

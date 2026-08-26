@@ -43,6 +43,8 @@ joins and execute their dedicated and generic stat accessors; execute
 Checkmate applying live Doom/count 3 and verify the expiry call chain;
 execute Aim: Arm/Aim: Legs applying Disable/Immobilize count 3, then prove
 Immobilize zeros movement mode while Disable is checked by ability usability;
+execute Astra, consume it with an intercepted Petrify, then apply Petrify to
+an unprotected target and prove the CT tick zeros CT/carry 900/25→0/0;
 execute Cover copying target id 42 into the actor's shared status link and
 read it through the dedicated and generic stat accessors;
 execute battle-status reset seeding the persistent Zombie revival countdown to

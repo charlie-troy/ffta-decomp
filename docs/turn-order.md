@@ -45,8 +45,8 @@ is CT carry at `+0xd4`. AI validation executes a one-unit tick and observes
 
 For every slot, in order:
 
-1. If `sub_080CD92C(unit)` is set (`+0xe8` bit 6), the unit is skipped: CT and
-   carry are both zeroed.
+1. If the unit is **Petrified** (`sub_080CD92C`, `+0xe8` bit 6), it is skipped:
+   CT and carry are both zeroed.
 2. Otherwise `speed = sub_0812E368(unit)` — the signed item speed, halved by
    Speed Down, Slow, or Mow Down's self-speed penalty and doubled by Haste.
    Slow and Haste both apply, so their shifts cancel. If speed is 0 the unit
@@ -89,8 +89,8 @@ sentinel) and `0xFFFFFC18 = -1000` (the threshold subtraction).
 2. **Preload the just-acted unit.** If the current-turn marker at `+0xe15`
    (read as a signed byte) is nonzero, write `0x1000` to that slot's carry
    (`+0xd4`). This gives the actor its head start for the next cycle.
-3. **Find the next actor.** Scan the slots for one whose `sub_080CD92C` is
-   clear, speed is nonzero, `sub_080CDCEC` is clear, and CT > 999. If none
+3. **Find the next actor.** Scan the slots for one whose Petrify bit is clear,
+   speed is nonzero, `sub_080CDCEC` is clear, and CT > 999. If none
    qualifies, call `sub_0809DF7C` to charge one tick and rescan.
 4. **Advance the rest.** For every slot that fails the eligibility checks,
    read the pointer at `+0xd6c` and store `-100` into `[that + 0x24]`.
@@ -108,7 +108,7 @@ role of `+0xd6c` and the `-100` is left open rather than guessed.
 | getter | bit | role in the turn loop |
 |---|---|---|
 | `sub_080CD8B4` | `+0xe8` bit 1 | must be **set** to be in the active list — the "present/alive" eligibility flag |
-| `sub_080CD92C` | `+0xe8` bit 6 | when **set**, the unit never charges (CT zeroed, never selected) — a turn-suppressing status |
+| `sub_080CD92C` | `+0xe8` bit 6 | **Petrify**; Break/Rockseal/Blaster set it, Soft selects its cancel case, and the CT tick zeros CT/carry |
 | `sub_080CDCEC` | `+0xed` bit 6 | when **set**, the unit is skipped by both the tick and the actor scan — a second turn-suppressing status |
 | `sub_080CDA34` | `+0xec` bit 2 | **Speed Down**; halves effective speed |
 | `sub_080CDA64` | `+0xea` bit 1 | **Mow Down speed penalty**; Mow Down's secondary Self: Speed Down effect selects this bit, halves Speed, and makes the target easier to hit |
@@ -125,6 +125,5 @@ position.
 
 1. The `0x1000` carry preload and the `-100` secondary-list write — exact
    game meaning (this is what the live mGBA trace in Phase 1 is for).
-2. Which states sit on `+0xe8` bits 1/6 and `+0xed` bit 6 — resolvable by
-   freezing each status in the game and watching whether the unit still takes
-   turns.
+2. Which states sit on `+0xe8` bit 1 and `+0xed` bit 6. Petrify at `+0xe8`
+   bit 6 is now closed by descriptor/application/CT execution.

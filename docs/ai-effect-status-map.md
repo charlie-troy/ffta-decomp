@@ -59,7 +59,7 @@ and Poison.
 | case ids | gate | accessor | status bit |
 |---|---|---|---|
 | 3 | 10, 49 | `sub_080CDC74` | `+0xed` bit 1 |
-| 10 | 10, 49 | `sub_080CD8FC` | `+0xe8` bit 4 |
+| 10 | 10, 49 | `sub_080CD8FC` | `+0xe8` bit 4 — **Astra** |
 | 12 | 10, 49 | `sub_080CD95C` | `+0xe9` bit 0 — **Frog** |
 | 13 | - | `sub_080CD95C` | `+0xe9` bit 0 |
 | 17 | 10, 49 | `sub_080CDA1C` | `+0xea` bit 0 |
@@ -82,8 +82,8 @@ and Poison.
 | 42 | 10, 49 | `sub_080CDA94` | `+0xea` bit 4 |
 | 43 | 10, 49 | `sub_080CDB24` | `+0xeb` bit 2 |
 | 45 | 10, 49 | `sub_080CDB24` | `+0xeb` bit 2 — **Sleep** |
-| 46 | 10, 49 | `sub_080CD92C` | `+0xe8` bit 6 |
-| 47 | - | `sub_080CD92C` | `+0xe8` bit 6 |
+| 46 | 10, 49 | `sub_080CD92C` | `+0xe8` bit 6 — **Petrify** |
+| 47 | - | `sub_080CD92C` | `+0xe8` bit 6 — **Petrify cancel** |
 | 48 | 10, 49 | `sub_080CDC8C` | `+0xed` bit 2 |
 | 51 | 10, 49 | `sub_080CDAC4` | `+0xea` bit 6 |
 | 52 | 10, 49 | `sub_080CDAAC` | `+0xea` bit 5 |

@@ -6,6 +6,30 @@ does something identifiable. Layout-only flags remain in flag_map.py.
 
 STATUS_FLAGS = [
     {
+        "name": "astra",
+        "ability_name": "Astra",
+        "ability_id": 59,
+        "raw_effect": 37,
+        "getter": 0x080CD8FC,
+        "setter": 0x080CDD88,
+        "offset": 0xE8,
+        "mask": 0x10,
+        "case": 10,
+        "handler": 0x08131EC9,
+    },
+    {
+        "name": "petrify",
+        "ability_name": "Break",
+        "ability_id": 14,
+        "raw_effect": 98,
+        "getter": 0x080CD92C,
+        "setter": 0x080CDDD0,
+        "offset": 0xE8,
+        "mask": 0x40,
+        "case": 46,
+        "handler": 0x08132939,
+    },
+    {
         "name": "doom",
         "ability_name": "Checkmate",
         "ability_id": 142,

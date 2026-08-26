@@ -42,6 +42,8 @@ BATTLE_LIST_INDEX_READER = 0x08099CB8
 REMOVAL_COUNTER_START, REMOVAL_COUNTER_END = 0x080A3674, 0x080A36C2
 PURGE_FORMULA_START, PURGE_FORMULA_END = 0x0812D3C6, 0x0812D420
 POSITION_SNAPSHOT_START, POSITION_SNAPSHOT_END = 0x08096E46, 0x08096E5E
+CT_TICK = 0x0809DF7C
+PETRIFY_SET_END = 0x08132982
 ROM = 0x08000000
 
 
@@ -102,6 +104,9 @@ def main(argv=None):
         (293, "Poison Claw", 1, 124, 61),
         (240, "Blindshot", 1, 85, 35),
         (242, "Stopshot", 1, 47, 19),
+        (136, "Mog Shield", 0, 37, 10),
+        (161, "Rockseal", 0, 98, 46),
+        (296, "Blaster", 0, 98, 46),
     ]
     for ability_id, name, slot, raw_effect, case in alternates:
         effect = (ABILITY_TABLE - ROM + ability_id * ABILITY_STRIDE + 0x0C +
@@ -110,8 +115,8 @@ def main(argv=None):
         descriptor_ok &= rom[effect] == raw_effect
         descriptor_ok &= rom[EFFECT_TABLE - ROM + raw_effect * 4 + 1] == case
     print(f"2. named ability/effect joins: {'OK' if descriptor_ok else 'FAIL'} "
-          f"({len(STATUS_FLAGS)} named effects; Frog/Stop/Blind/Poison have "
-          "independent alternate abilities)")
+          f"({len(STATUS_FLAGS)} named effects; seven independent alternate "
+          "ability joins)")
     if not descriptor_ok:
         failures.append("named ability/effect joins")
 
@@ -216,15 +221,53 @@ def main(argv=None):
                       {"r0": movement_obj})
         movement_results.append(gba.uc.mem_read(movement_obj + 0x1C, 1)[0])
     usability_calls = calls_from(rom, ABILITY_USABILITY, 0x08133F42)
+    astra = next(entry for entry in STATUS_FLAGS if entry["name"] == "astra")
+    petrify = next(entry for entry in STATUS_FLAGS
+                   if entry["name"] == "petrify")
+    gba.reset_ram()
+    gba.write32(context + 8, doom_target)
+    gba.call(astra["handler"] & ~1, [context])
+    astra_petrify_states = [(gba.call(astra["getter"], [doom_target]),
+                             gba.call(petrify["getter"], [doom_target]))]
+    # Astra intercepts Petrify and is consumed. A second unprotected
+    # application reaches the Petrify setter; stop before unrelated battle
+    # presentation/global-list work later in that handler.
+    gba.call(petrify["handler"] & ~1, [context])
+    astra_petrify_states.append(
+        (gba.call(astra["getter"], [doom_target]),
+         gba.call(petrify["getter"], [doom_target])))
+    gba.run_range(petrify["handler"] & ~1, PETRIFY_SET_END,
+                  {"r0": context})
+    astra_petrify_states.append(
+        (gba.call(astra["getter"], [doom_target]),
+         gba.call(petrify["getter"], [doom_target])))
+
+    battle = 0x02002000
+    battle_unit = battle + 4
+    gba.reset_ram()
+    gba.uc.mem_write(battle, bytes(0x10C))
+    gba.write32(battle, 1)
+    gba.uc.mem_write(battle_unit + 0xD0, struct.pack("<H", 900))
+    gba.uc.mem_write(battle_unit + 0xD2, struct.pack("<H", 100))
+    gba.uc.mem_write(battle_unit + 0xD4, struct.pack("<H", 25))
+    gba.write8(battle_unit + petrify["offset"], petrify["mask"])
+    gba.call(CT_TICK, [battle])
+    petrified_ct = tuple(struct.unpack("<H", gba.uc.mem_read(offset, 2))[0]
+                         for offset in (battle_unit + 0xD0,
+                                        battle_unit + 0xD4))
+
     restriction_ok = (applied_restrictions == {
         "disable": (1, 3), "immobilize": (1, 3)
-    } and movement_results == [5, 0] and disable["getter"] in usability_calls)
-    print(f"7. Disable/Immobilize behavior: "
+    } and movement_results == [5, 0] and disable["getter"] in usability_calls
+        and astra_petrify_states == [(1, 0), (0, 0), (0, 1)]
+        and petrified_ct == (0, 0))
+    print(f"7. action-restriction behavior: "
           f"{'OK' if restriction_ok else 'FAIL'} "
           f"(applied={applied_restrictions}; movement={movement_results}; "
-          "Disable checked by ability usability)")
+          f"Astra/Petrify={astra_petrify_states}; "
+          f"Petrify CT/carry={petrified_ct})")
     if not restriction_ok:
-        failures.append("Disable/Immobilize behavior")
+        failures.append("action-restriction behavior")
 
     cover_actor, cover_target = 0x02001800, 0x02001A00
     gba.reset_ram()

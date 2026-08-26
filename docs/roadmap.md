@@ -352,6 +352,11 @@ behaviour mod needs to reach.
    Executing the handler halves Speed 100→50 and raises incoming hit chance
    95→100. It is named separately from ordinary Speed Down because the retail
    implementation uses distinct bits.
+20. **Astra/Petrify closed 2026-08-26:** Astra and Mog Shield effect `0x25`
+   select case 10 / `+0xe8` bit 4. Break, Rockseal, and Blaster effect `0x62`
+   select case 46 / `+0xe8` bit 6, while Soft selects paired cancel case 47.
+   Execution proves Astra is consumed while blocking Petrify; unprotected
+   Petrify then zeros CT/carry `900/25→0/0` in the retail tick.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a
