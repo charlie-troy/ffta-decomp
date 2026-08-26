@@ -49,6 +49,8 @@ execute Quicken's handler and preserve the turn-path call that clears its bit;
 execute the otherwise-unreferenced `+0xed` bit-6 setter in both directions,
 proving set/clear CT outcomes `0/0` and `1000/25` while preserving its zero
 direct-call and zero pointer-reference census;
+verify the direct Defending, Hibernate, Morphed, Cover, Expert Guard, and
+Controlled effect→case→handler→setter joins and bit round-trips;
 execute Cover copying target id 42 into the actor's shared status link and
 read it through the dedicated and generic stat accessors;
 execute battle-status reset seeding the persistent Zombie revival countdown to

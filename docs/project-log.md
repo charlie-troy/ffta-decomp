@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.7b — resolve composite and cancel-only status residues |
-| Last closed package | AI5.7a — promoted twelve direct descriptor joins |
+| Current work package | AI5.7c — separate Dragon Force's Attack Up/Magic Up pair |
+| Last closed package | AI5.7b — promoted six handler-only direct joins |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -99,6 +99,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.6c | 2026-08-26 | Named `+0xe8` bit 1 as Quicken and corrected the active-list interpretation | Quicken/Smile effect `0x1d`→case 2→setter; executed apply; turn path clears consumed bit; 23 live bits named |
 | AI5.6d | 2026-08-26 | Retained `+0xed` bit 6 as a numeric inactive-like flag and corrected the setter map | 13 blocking readers; setter zero caller/pointer refs; set/clear CT `0/0` vs `1000/25`; dormant bit-5/6 setters surfaced |
 | AI5.7a | 2026-08-26 | Named twelve direct effect/status bits from Advice through Resistance Up | 12 published effect→descriptor→handler→setter joins; 18 alternate abilities; 35 live bits named and round-tripped |
+| AI5.7b | 2026-08-26 | Named Defending, Hibernate, Morphed, Cover, Expert Guard, and Controlled | Six direct handler-only chains; 9 Morph and 13 Control race actions; Cover link execution; 41 live bits named |
 
 ## Decisions and evidence
 
@@ -506,6 +507,16 @@ status and backlog tables are living sections and should be kept current.
   and cancel-only cases for a separate pass so a compound ability cannot
   silently assign the wrong member of a multi-status set.
 
+### D-038 — Separate handler-only cases from evaluator cases
+
+- Six remaining named effects do not appear in the 46-case AI accessor map,
+  but their descriptor cases still select application handlers with exact bit
+  setters.
+- Morph and Control are population-backed across nine and thirteen race-named
+  action entries; Cover also has the independently executed shared-link write.
+- Decision: promote these six direct handler joins. Do not force them into the
+  evaluator-case table, whose narrower purpose is documenting AI predicates.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -517,6 +528,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Handler-only status residue sweep
+
+Objective:
+
+- Resolve direct named application handlers omitted from the evaluator's
+  status-case map.
+
+Completed:
+
+- Named Defending, Hibernate, Morphed, Cover, Expert Guard, and Controlled.
+- Increased behavior-backed live-bit coverage from 35 to 41 of 47 represented
+  live bits.
+
+Evidence recorded during the batch:
+
+- Effects `0x87/0x71/0xc8/0x2a/0x6c/0xc1` select cases
+  `84/58/87/14/55/86`; every handler calls the exact promoted setter.
+- Nine race-named Morph actions and thirteen race-named Control actions share
+  their respective effect ids. Defense/Mog Guard independently converge on
+  Defending.
+- All 41 getter/setter pairs execute clear/set round-trips; Cover's handler
+  still executes the protected-unit link copy. Status validation is 20/20.
+
+Next action:
+
+- Distinguish Dragon Force's two remaining composite-only setters as Attack Up
+  versus Magic Up using their independent combat-stat consumers.
 
 ### 2026-08-26 — Direct status descriptor sweep
 

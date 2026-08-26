@@ -121,6 +121,9 @@ def main(argv=None):
         (121, "Cheer", 0, 131, 70),
         (303, "Circle", 1, 136, 76),
         (337, "Logos", 1, 136, 76),
+        (133, "Mog Guard", 0, 135, 84),
+        (203, "Flan", 0, 200, 87),
+        (190, "Flan", 0, 193, 86),
     ]
     for ability_id, name, slot, raw_effect, case in alternates:
         effect = (ABILITY_TABLE - ROM + ability_id * ABILITY_STRIDE + 0x0C +

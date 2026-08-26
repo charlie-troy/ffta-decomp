@@ -51,8 +51,10 @@ space. Named single-effect abilities therefore join directly to cases: Sleep
 raw effect 97 selects case 45, while Poison raw effect 125 selects case 61.
 The corresponding application handlers and executed getter/setter pairs then
 pin the unit bits without relying on list order. This route now contributes to
-35 named live bits, with eighteen alternate-ability joins independently
-converging on the same internal cases.
+41 named live bits, with 21 alternate-ability joins independently converging
+on the same internal cases. Six direct application cases sit outside the
+evaluator map below: Cover (14), Expert Guard (55), Hibernate (58), Defending
+(84), Controlled (86), and Morphed (87).
 
 ## Full map
 

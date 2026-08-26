@@ -122,6 +122,12 @@ the final history contains ids 5 and 7 but not 6.
 
 | getter | status | how |
 |---|---|---|
+| `sub_080CD9D4` | **Defending** | Defense and Mog Guard raw effect `0x87` (Add: Defending) selects case 84 and this setter |
+| `sub_080CDA04` | **Hibernate** | Hibernate raw effect `0x71` selects case 58 and this setter |
+| `sub_080CDA7C` | **Morphed** | All nine race-named Morph actions use raw effect `0xc8`, case 87, and this setter |
+| `sub_080CDBCC` | **Cover** | Cover raw effect `0x2a` selects case 14 and this setter; executing the handler also copies the protected unit id into the shared status link |
+| `sub_080CDA4C` | **Expert Guard** | Expert Guard raw effect `0x6c` selects case 55 and this setter |
+| `sub_080CDCA4` | **Controlled** | All thirteen race-named Control actions use raw effect `0xc1`, case 86, and this setter |
 | `sub_080CDA1C` | **Advice** | Advice raw effect `0x2c` selects case 17 and this setter |
 | `sub_080CD944` | **Berserk** | Catnip `0x4d`, Firebomb `0x4c`, and Provoke `0x9b` all select case 27 and this setter |
 | `sub_080CD8E4` | **Regen** | Kirin effect `0xa5` and Aura effect `0xc3` both select case 31 and this setter |
@@ -158,7 +164,7 @@ the final history contains ids 5 and 7 but not 6.
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 
-`tools/validate_statuses.py` protects all 35 joins independently: it
+`tools/validate_statuses.py` protects all 41 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
 pair, verifies thirteen named duration handlers and direct counter/stat reads,
