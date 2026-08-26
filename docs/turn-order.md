@@ -29,7 +29,7 @@ system rather than as more AI logic.
 | `+0x04 + i*0x108` | ptr | unit struct for slot `i` (stride `0x108` = 264) |
 | `+0xd0` (per slot) | u16 | **CT** — charge-time accumulator |
 | `+0xd4` (per slot) | u16 | **CT carry** — leftover charge carried into the next tick |
-| `+0xe08` | bytes | active-unit index list (built each turn) |
+| `+0xe08` | bytes | Quicken-marked unit index list (built each turn) |
 | `+0xe15` | u8 | length of that list / current-turn marker |
 | `+0xd6c` | ptr | secondary list written during the advance (see below) |
 
@@ -83,9 +83,9 @@ sentinel) and `0xFFFFFC18 = -1000` (the threshold subtraction).
 
 ## The turn manager (`sub_0809E05C`)
 
-1. **Build the active list.** For each slot where `sub_080CD8B4(unit)` is set
-   (`+0xe8` bit 1) *and* speed is nonzero, append the slot index to the list
-   at `+0xe08` and increment the count at `+0xe15`.
+1. **Build the Quicken list.** For each slot carrying Quicken
+   (`sub_080CD8B4`, `+0xe8` bit 1) with nonzero speed, append the slot index to
+   the list at `+0xe08` and increment the count at `+0xe15`.
 2. **Preload the just-acted unit.** If the current-turn marker at `+0xe15`
    (read as a signed byte) is nonzero, write `0x1000` to that slot's carry
    (`+0xd4`). This gives the actor its head start for the next cycle.
@@ -107,7 +107,7 @@ role of `+0xd6c` and the `-100` is left open rather than guessed.
 
 | getter | bit | role in the turn loop |
 |---|---|---|
-| `sub_080CD8B4` | `+0xe8` bit 1 | must be **set** to be in the active list — the "present/alive" eligibility flag |
+| `sub_080CD8B4` | `+0xe8` bit 1 | **Quicken**; Quicken/Smile set it, the priority list reads it, and the turn path clears it after consumption |
 | `sub_080CD92C` | `+0xe8` bit 6 | **Petrify**; Break/Rockseal/Blaster set it, Soft selects its cancel case, and the CT tick zeros CT/carry |
 | `sub_080CDCEC` | `+0xed` bit 6 | when **set**, the unit is skipped by both the tick and the actor scan — a second turn-suppressing status |
 | `sub_080CDA34` | `+0xec` bit 2 | **Speed Down**; halves effective speed |
@@ -115,8 +115,9 @@ role of `+0xd6c` and the `-100` is left open rather than guessed.
 | `sub_080CDAC4` | `+0xea` bit 6 | **Slow**; halves effective speed |
 | `sub_080CDAAC` | `+0xea` bit 5 | **Haste**; doubles effective speed |
 
-The first three remain behavior descriptions rather than status names. The
-Mow Down penalty, Speed Down, Slow, and Haste have independent naming anchors and
+The remaining `+0xed` suppressor stays a behavior description rather than a
+status name. Quicken, Petrify, the Mow Down penalty, Speed Down, Slow, and
+Haste have independent naming anchors and
 are protected by `tools/validate_statuses.py`. This preserves the project
 rule: do not enshrine a semantic name without more than a plausible bit
 position.
@@ -125,5 +126,5 @@ position.
 
 1. The `0x1000` carry preload and the `-100` secondary-list write — exact
    game meaning (this is what the live mGBA trace in Phase 1 is for).
-2. Which states sit on `+0xe8` bit 1 and `+0xed` bit 6. Petrify at `+0xe8`
-   bit 6 is now closed by descriptor/application/CT execution.
+2. Which state sits on `+0xed` bit 6. Quicken at `+0xe8` bit 1 and Petrify at
+   bit 6 are closed by descriptor/application/turn execution.

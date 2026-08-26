@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.6c — resolve remaining CT eligibility flags |
-| Last closed package | AI5.6b — named Astra and turn-suppressing Petrify |
+| Current work package | AI5.6d — classify the remaining CT suppressor at `+0xed` bit 6 |
+| Last closed package | AI5.6c — corrected the active-list flag to Quicken |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
 
@@ -96,6 +96,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.5d | 2026-08-26 | Completed the 69-id unit-stat layout: name pointer, ability state, and movement profile | Sixteen text-render joins; executed 142-entry Human ability header and four-byte movement-profile store; AI 8/8 |
 | AI5.6a | 2026-08-26 | Named `+0xea` bit 1 as Mow Down's distinct self-speed penalty | Sole effect/descriptor/case/setter chain; executed Speed 100→50 and incoming hit 95→100; 20 live bits named |
 | AI5.6b | 2026-08-26 | Named `+0xe8` bits 4/6 as Astra/Petrify | Astra interception `(1,0)→(0,0)`; unprotected Petrify `(0,1)`; CT/carry 900/25→0/0; 22 live bits named |
+| AI5.6c | 2026-08-26 | Named `+0xe8` bit 1 as Quicken and corrected the active-list interpretation | Quicken/Smile effect `0x1d`→case 2→setter; executed apply; turn path clears consumed bit; 23 live bits named |
 
 ## Decisions and evidence
 
@@ -469,6 +470,17 @@ status and backlog tables are living sections and should be kept current.
   carry. Decision: promote `astra` and `petrify`; the ability join and the
   executed battle behavior agree.
 
+### D-035 — Correct the active-list flag to Quicken
+
+- Quicken and Smile are the complete retail users of raw effect `0x1d`
+  (Add: Quick). Its descriptor selects internal case 2, whose handler sets
+  `+0xe8` bit 1.
+- The turn manager builds its priority list from units with this bit and
+  nonzero Speed. The consumed-turn path calls the same setter with zero.
+- Decision: name the bit `quicken` and the structure a Quicken list. Retract
+  the earlier “present/alive eligibility” interpretation; ordinary unmarked
+  units still participate through the normal CT actor scan.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -480,6 +492,35 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-26 — Quicken priority-list correction
+
+Objective:
+
+- Resolve the remaining named-effect flag in the turn manager before tackling
+  the setter-less CT suppressor.
+
+Completed:
+
+- Named `+0xe8` bit 1 / getter `sub_080CD8B4` as Quicken.
+- Corrected the `+0xe08` structure from a generic active-unit list to the
+  Quicken-marked priority list.
+- Increased behavior-backed live-bit coverage from 22 to 23 of 47 represented
+  live bits.
+
+Evidence recorded during the batch:
+
+- Quicken and Smile both use raw effect `0x1d`; its descriptor selects case 2
+  and that handler calls setter `sub_080CDD1C` with one.
+- Executing Quicken's handler sets the getter to one. The consumed-turn path at
+  `0x0809E380..0x0809E3AC` calls the same setter with zero.
+- Status/state validation remains 20/20 with 23 named effects and bits.
+
+Next action:
+
+- Complete the writer/value census for `+0xed` bit 6. Promote a lifecycle name
+  only if a unique creation/removal transition exists; otherwise retain the
+  numeric bit with its proven CT/targeting behavior.
 
 ### 2026-08-26 — Astra and Petrify lifecycle
 

@@ -264,7 +264,7 @@ behaviour mod needs to reach.
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
    `tools/validate_statuses.py` is the twenty-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
-   the four-byte descriptor table at `0x08553E70`. Twenty live bits now have
+   the four-byte descriptor table at `0x08553E70`. Twenty-three live bits now have
    behavior-backed names, including Frog, Stop, Blind, Confuse, Charm, Addle,
    Protect, Shell, Zombie, Silence, and Reflect.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
@@ -357,6 +357,10 @@ behaviour mod needs to reach.
    select case 46 / `+0xe8` bit 6, while Soft selects paired cancel case 47.
    Execution proves Astra is consumed while blocking Petrify; unprotected
    Petrify then zeros CT/carry `900/25→0/0` in the retail tick.
+21. **Quicken closed 2026-08-26:** Quicken and Smile effect `0x1d` select case
+   2 and `+0xe8` bit 1. Execution applies the bit; the turn manager builds its
+   priority list from marked units and the consumed-turn path calls the same
+   setter with zero. The former “present/alive” description was incorrect.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a

@@ -6,6 +6,18 @@ does something identifiable. Layout-only flags remain in flag_map.py.
 
 STATUS_FLAGS = [
     {
+        "name": "quicken",
+        "ability_name": "Quicken",
+        "ability_id": 34,
+        "raw_effect": 29,
+        "getter": 0x080CD8B4,
+        "setter": 0x080CDD1C,
+        "offset": 0xE8,
+        "mask": 0x02,
+        "case": 2,
+        "handler": 0x08131E0D,
+    },
+    {
         "name": "astra",
         "ability_name": "Astra",
         "ability_id": 59,

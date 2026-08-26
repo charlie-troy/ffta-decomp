@@ -21,6 +21,7 @@ EFFECTIVE_ZOMBIE = 0x081308F4
 BATTLE_ZOMBIE_PREDICATE = 0x08131030
 STATUS_INITIALIZER = 0x08133A58
 DURATION_RECONCILER = 0x08131C58
+QUICKEN_CONSUME_START, QUICKEN_CONSUME_END = 0x0809E380, 0x0809E3AC
 YELLOW_CARD_HANDLER = 0x081337F4
 YELLOW_CLIP_HANDLER = 0x08133758
 DOOM_TICK_START, DOOM_TICK_END = 0x0809E328, 0x0809E398
@@ -107,6 +108,7 @@ def main(argv=None):
         (136, "Mog Shield", 0, 37, 10),
         (161, "Rockseal", 0, 98, 46),
         (296, "Blaster", 0, 98, 46),
+        (216, "Smile", 0, 29, 2),
     ]
     for ability_id, name, slot, raw_effect, case in alternates:
         effect = (ABILITY_TABLE - ROM + ability_id * ABILITY_STRIDE + 0x0C +
@@ -115,7 +117,7 @@ def main(argv=None):
         descriptor_ok &= rom[effect] == raw_effect
         descriptor_ok &= rom[EFFECT_TABLE - ROM + raw_effect * 4 + 1] == case
     print(f"2. named ability/effect joins: {'OK' if descriptor_ok else 'FAIL'} "
-          f"({len(STATUS_FLAGS)} named effects; seven independent alternate "
+          f"({len(STATUS_FLAGS)} named effects; eight independent alternate "
           "ability joins)")
     if not descriptor_ok:
         failures.append("named ability/effect joins")
@@ -256,16 +258,27 @@ def main(argv=None):
                          for offset in (battle_unit + 0xD0,
                                         battle_unit + 0xD4))
 
+    quicken = next(entry for entry in STATUS_FLAGS
+                   if entry["name"] == "quicken")
+    gba.reset_ram()
+    gba.write32(context + 8, doom_target)
+    gba.call(quicken["handler"] & ~1, [context])
+    quicken_applied = gba.call(quicken["getter"], [doom_target])
+    quicken_consume_calls = calls_from(
+        rom, QUICKEN_CONSUME_START, QUICKEN_CONSUME_END)
+    quicken_ok = (quicken_applied == 1 and
+                  quicken["setter"] in quicken_consume_calls)
+
     restriction_ok = (applied_restrictions == {
         "disable": (1, 3), "immobilize": (1, 3)
     } and movement_results == [5, 0] and disable["getter"] in usability_calls
         and astra_petrify_states == [(1, 0), (0, 0), (0, 1)]
-        and petrified_ct == (0, 0))
+        and petrified_ct == (0, 0) and quicken_ok)
     print(f"7. action-restriction behavior: "
           f"{'OK' if restriction_ok else 'FAIL'} "
           f"(applied={applied_restrictions}; movement={movement_results}; "
           f"Astra/Petrify={astra_petrify_states}; "
-          f"Petrify CT/carry={petrified_ct})")
+          f"Petrify CT/carry={petrified_ct}; Quicken={quicken_applied})")
     if not restriction_ok:
         failures.append("action-restriction behavior")
 
