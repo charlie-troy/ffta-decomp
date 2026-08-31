@@ -284,6 +284,20 @@ STATUS_FLAGS = [
         "handler": 0x08132939,
     },
     {
+        # Petrify freezes the battle object's pre-existing critical-HP class.
+        # Later classification uses this bit instead of the unit's live HP.
+        "name": "petrify_critical_snapshot",
+        "ability_name": "Break",
+        "ability_id": 14,
+        "raw_effect": 98,
+        "getter": 0x080CDCBC,
+        "setter": 0x080CE314,
+        "offset": 0xED,
+        "mask": 0x10,
+        "case": 46,
+        "handler": 0x08132939,
+    },
+    {
         "name": "doom",
         "ability_name": "Checkmate",
         "ability_id": 142,

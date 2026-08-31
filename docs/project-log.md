@@ -1,6 +1,6 @@
 # Project log
 
-Last updated: 2026-08-26
+Last updated: 2026-08-31
 
 This is the operational source of truth for resuming the project. `README.md`
 describes the product, `CLAUDE.md` describes the working method, and
@@ -30,11 +30,11 @@ status and backlog tables are living sections and should be kept current.
 | Item | State |
 |---|---|
 | Branch | `master`, tracking `origin/master` |
-| Active phase | Phase 5 — AI condition space |
-| Current work package | AI5.7d — classify the four lifecycle/presentation residues |
-| Last closed package | AI5.7c — separated Dragon Force's Attack Up/Magic Up pair |
+| Active phase | Phase 6 — job-table computed fields |
+| Current work package | AI6.1 — inventory and execute the 22 conditional job fields |
+| Last closed package | AI5.7d — closed all lifecycle/presentation residues |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 20/20; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -47,7 +47,8 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.3 | P1 | Complete | Decode custom-LZSS map graphics | All 50 unique streams match the retail decoder and malformed data is rejected |
 | MAP3.4 | P1 | Complete | Characterize animation blocks and mode bytes | Readers name the controls and reproducible exports cover all present blocks |
 | ITEM4.1 | P2 | Complete | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Icon paths execute end to end; behavioral flags have readers; hand bits have explicit population evidence; CSV round-trips |
-| AI5.1 | P2 | Active | Expand unit-status and stat naming | Each new name has a behavioral or execution anchor |
+| AI5.1 | P2 | Complete | Expand unit-status and stat naming | All 69 stat cases named; all 47 represented live bits named or explicitly classified numeric; 21/21 gate |
+| AI6.1 | P2 | Active | Decode the 22 conditional job fields | Every field has a formula executed across all 116 jobs |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -101,6 +102,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.7a | 2026-08-26 | Named twelve direct effect/status bits from Advice through Resistance Up | 12 published effect→descriptor→handler→setter joins; 18 alternate abilities; 35 live bits named and round-tripped |
 | AI5.7b | 2026-08-26 | Named Defending, Hibernate, Morphed, Cover, Expert Guard, and Controlled | Six direct handler-only chains; 9 Morph and 13 Control race actions; Cover link execution; 41 live bits named |
 | AI5.7c | 2026-08-26 | Separated Dragon Force's composite setters as Attack Up and Magic Up | Physical/magic own-channel 100→109, cross-channel stays 100; paired Down gives 89; 43 live bits named |
+| AI5.7d | 2026-08-31 | Closed the final four lifecycle/presentation residues and Phase 5 | Petrify critical snapshot executes at the 25/26 HP boundary; bit-5/6/7 caller census and setter round-trips; statuses 21/21; 44/47 named |
 
 ## Decisions and evidence
 
@@ -528,6 +530,18 @@ status and backlog tables are living sections and should be kept current.
 - Decision: name the remaining pair `attack_up` and `magic_up`. The result is
   based on channel-selective arithmetic, not composite-effect ordering.
 
+### D-040 — Close fully classified residues without inventing public names
+
+- Petrify case 46 copies a battle-object flag into `+0xed` bit 4. The battle
+  classifier uses it only while Petrified, in place of live HP; execution maps
+  clear/set to ordinary/critical and matches the ordinary 25/26% boundary.
+- The other three bits expose no unique public state: bit 5 has three
+  presentation readers but a dormant setter, bit 6 has thirteen inactive-like
+  battle readers but a dormant setter, and setter-only bit 7 has two placement
+  writers.
+- Decision: promote bit 4 as `petrify_critical_snapshot`; retain bits 5–7 as
+  numeric, protect their exact census and setter behavior, and close Phase 5.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -539,6 +553,35 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-31 — Phase 5 lifecycle/presentation closure
+
+Objective:
+
+- Resolve the four remaining represented live bits without upgrading weak
+  presentation or lifecycle evidence into unsupported game-facing names.
+
+Completed:
+
+- Named `+0xed` bit 4 `petrify_critical_snapshot`.
+- Classified bits 5–7 as explicit numeric residues and added an executable
+  caller/pointer/setter census.
+- Closed Phase 5 and promoted Phase 6's 22 computed job fields to active work.
+
+Evidence recorded during the batch:
+
+- The battle-state classifier returns critical class 2 for an ordinary unit at
+  HP 25/100 and class 3 at 26/100. While Petrified it ignores live HP and
+  returns class 2/3 solely from the snapshot bit.
+- Bit 5 has 3 getter calls / 0 setter calls, bit 6 has 13 / 0, and bit 7 has
+  2 setter calls; all three setters have zero stored Thumb-pointer references.
+- Exact set/clear masks `0x20/0x40/0x80` round-trip and status/state validation
+  is 21/21 with 44 of 47 represented live bits behavior-named.
+
+Next action:
+
+- Inventory the 22 conditional cases in `sub_080C8570`, group shared formula
+  shapes, and execute each across all 116 retail jobs.
 
 ### 2026-08-26 — Dragon Force combat-channel split
 

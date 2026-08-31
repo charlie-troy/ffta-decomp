@@ -48,6 +48,11 @@ CT_TICK = 0x0809DF7C
 PETRIFY_SET_END = 0x08132982
 DORMANT_TURN_SUPPRESSOR_GETTER = 0x080CDCEC
 DORMANT_TURN_SUPPRESSOR_SETTER = 0x080CE35C
+DORMANT_PRESENTATION_GETTER = 0x080CDCD4
+DORMANT_PRESENTATION_SETTER = 0x080CE338
+PLACEMENT_MARKER_SETTER = 0x080CE380
+BATTLE_STATE_CLASSIFY_START = 0x080A2218
+BATTLE_STATE_CLASSIFY_END = 0x080A225E
 ROM = 0x08000000
 
 
@@ -242,6 +247,9 @@ def main(argv=None):
     astra = next(entry for entry in STATUS_FLAGS if entry["name"] == "astra")
     petrify = next(entry for entry in STATUS_FLAGS
                    if entry["name"] == "petrify")
+    petrify_critical = next(
+        entry for entry in STATUS_FLAGS
+        if entry["name"] == "petrify_critical_snapshot")
     gba.reset_ram()
     gba.write32(context + 8, doom_target)
     gba.call(astra["handler"] & ~1, [context])
@@ -254,6 +262,30 @@ def main(argv=None):
     astra_petrify_states.append(
         (gba.call(astra["getter"], [doom_target]),
          gba.call(petrify["getter"], [doom_target])))
+
+    def battle_state_class(petrified, critical_snapshot, hp, max_hp):
+        # A fresh emulator keeps this deliberately truncated function fragment
+        # independent from prior stopped ranges.
+        classifier = Gba(args.rom)
+        classifier.uc.mem_write(doom_target, bytes(0x200))
+        classifier.write8(doom_target + petrify["offset"],
+                          petrify["mask"] if petrified else 0)
+        classifier.call(petrify_critical["setter"],
+                        [doom_target, critical_snapshot])
+        classifier.uc.mem_write(doom_target + 0x18,
+                                struct.pack("<H", hp))
+        classifier.uc.mem_write(doom_target + 0x1A,
+                                struct.pack("<H", max_hp))
+        return classifier.run_range(BATTLE_STATE_CLASSIFY_START,
+                                    BATTLE_STATE_CLASSIFY_END,
+                                    {"r0": doom_target, "r6": doom_target})
+
+    petrify_critical_classes = {
+        "petrify_clear": battle_state_class(1, 0, 100, 100),
+        "petrify_set": battle_state_class(1, 1, 100, 100),
+        "ordinary_quarter": battle_state_class(0, 0, 25, 100),
+        "ordinary_above": battle_state_class(0, 0, 26, 100),
+    }
     gba.run_range(petrify["handler"] & ~1, PETRIFY_SET_END,
                   {"r0": context})
     astra_petrify_states.append(
@@ -307,6 +339,9 @@ def main(argv=None):
         "disable": (1, 3), "immobilize": (1, 3)
     } and movement_results == [5, 0] and disable["getter"] in usability_calls
         and astra_petrify_states == [(1, 0), (0, 0), (0, 1)]
+        and petrify_critical_classes == {
+            "petrify_clear": 3, "petrify_set": 2,
+            "ordinary_quarter": 2, "ordinary_above": 3}
         and petrified_ct == (0, 0) and quicken_ok
         and dormant_suppressor_ct == [(0, 0), (1000, 25)]
         and dormant_setter_unreferenced)
@@ -314,6 +349,7 @@ def main(argv=None):
           f"{'OK' if restriction_ok else 'FAIL'} "
           f"(applied={applied_restrictions}; movement={movement_results}; "
           f"Astra/Petrify={astra_petrify_states}; "
+          f"Petrify critical snapshot={petrify_critical_classes}; "
           f"Petrify CT/carry={petrified_ct}; Quicken={quicken_applied}; "
           f"numeric suppressor set/clear={dormant_suppressor_ct})")
     if not restriction_ok:
@@ -655,11 +691,53 @@ def main(argv=None):
     if not position_ok:
         failures.append("saved tile position")
 
+    # Close the three remaining +0xed residues without assigning speculative
+    # game-facing names. Bit 5 is read only by presentation/UI paths but its
+    # setter is dormant; bit 6 is the separately exercised dormant CT
+    # suppressor; bit 7 is set by two placement paths and has no accessor.
+    residue_calls = {
+        "bit5_get": len(call_sites_to(
+            rom, ROM, 0x08360000, DORMANT_PRESENTATION_GETTER)),
+        "bit5_set": len(call_sites_to(
+            rom, ROM, 0x08360000, DORMANT_PRESENTATION_SETTER)),
+        "bit6_get": len(call_sites_to(
+            rom, ROM, 0x08360000, DORMANT_TURN_SUPPRESSOR_GETTER)),
+        "bit6_set": len(call_sites_to(
+            rom, ROM, 0x08360000, DORMANT_TURN_SUPPRESSOR_SETTER)),
+        "bit7_set": len(call_sites_to(
+            rom, ROM, 0x08360000, PLACEMENT_MARKER_SETTER)),
+    }
+    residue_pointer_refs = sum(
+        rom.count(struct.pack("<I", address | 1)) for address in (
+            DORMANT_PRESENTATION_SETTER, DORMANT_TURN_SUPPRESSOR_SETTER,
+            PLACEMENT_MARKER_SETTER))
+    gba.reset_ram()
+    residue_roundtrips = []
+    for setter, mask in ((DORMANT_PRESENTATION_SETTER, 0x20),
+                         (DORMANT_TURN_SUPPRESSOR_SETTER, 0x40),
+                         (PLACEMENT_MARKER_SETTER, 0x80)):
+        gba.call(setter, [unit, 1])
+        set_value = gba.uc.mem_read(unit + 0xED, 1)[0]
+        gba.call(setter, [unit, 0])
+        clear_value = gba.uc.mem_read(unit + 0xED, 1)[0]
+        residue_roundtrips.append((set_value & mask, clear_value & mask))
+    residues_ok = (residue_calls == {
+        "bit5_get": 3, "bit5_set": 0, "bit6_get": 13,
+        "bit6_set": 0, "bit7_set": 2} and
+        residue_pointer_refs == 0 and
+        residue_roundtrips == [(0x20, 0), (0x40, 0), (0x80, 0)])
+    print(f"21. numeric lifecycle/presentation residues: "
+          f"{'OK' if residues_ok else 'FAIL'} "
+          f"(calls={residue_calls}; pointer refs={residue_pointer_refs}; "
+          f"set/clear={residue_roundtrips})")
+    if not residues_ok:
+        failures.append("numeric lifecycle/presentation residues")
+
     print()
     if failures:
         print(f"FAILED: {len(failures)} — {', '.join(failures)}")
         return 1
-    print("PASS: 20/20 status/state checks")
+    print("PASS: 21/21 status/state checks")
     return 0
 
 

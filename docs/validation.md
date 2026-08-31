@@ -34,8 +34,9 @@ reader anchors, force a live bit-3 price boundary, reproduce an unedited CSV
 byte for byte, and prove a two-field icon edit changes exactly two accessor-
 visible bytes.
 
-`validate_statuses.py` is the behavior-backed status/state-name gate. Its twenty
-checks join 19 named abilities through raw effects and the descriptor table;
+`validate_statuses.py` is the behavior-backed status/state-name gate. Its
+twenty-one checks join 44 named live bits through raw effects and the
+descriptor table;
 verify the 92-entry application-handler table; join Speed Down, Sleep, Slow,
 Haste, Poison, and eleven other named states to their setters; execute all 16
 getter/setter pairs; verify thirteen application-handler/live-bit/duration-counter
@@ -45,10 +46,15 @@ execute Aim: Arm/Aim: Legs applying Disable/Immobilize count 3, then prove
 Immobilize zeros movement mode while Disable is checked by ability usability;
 execute Astra, consume it with an intercepted Petrify, then apply Petrify to
 an unprotected target and prove the CT tick zeros CT/carry 900/25→0/0;
+execute Petrify's frozen critical-HP snapshot and reproduce the ordinary
+critical boundary at 25/26 HP out of 100;
 execute Quicken's handler and preserve the turn-path call that clears its bit;
 execute the otherwise-unreferenced `+0xed` bit-6 setter in both directions,
 proving set/clear CT outcomes `0/0` and `1000/25` while preserving its zero
 direct-call and zero pointer-reference census;
+lock the final `+0xed` bit-5/6/7 residue census at 3/13 readers and two
+placement writers, verify zero stored setter pointers, and round-trip all
+three exact masks without assigning speculative public names;
 verify the direct Defending, Hibernate, Morphed, Cover, Expert Guard, and
 Controlled effect→case→handler→setter joins and bit round-trips;
 execute the physical/magic modifier with Dragon Force's two composite Up bits

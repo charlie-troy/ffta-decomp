@@ -5,8 +5,9 @@ each encode the struct byte and bit they touch. Behavior-backed names are kept
 in `tools/status_flags.py`. Regenerate both views with
 `python tools/flag_map.py --md`.
 
-Bit *meanings* are not yet known. What is known is the layout, and which
-getter and setter belong to each bit.
+The layout and accessor pairs are complete. Forty-four live bits have
+behavior-backed names; three lifecycle/presentation residues remain numeric
+because retail code does not expose a unique game-facing meaning.
 
 | byte | width | mask | bit | getter | setter |
 |---|---|---|---|---|---|
@@ -145,6 +146,7 @@ the final history contains ids 5 and 7 but not 6.
 | `sub_080CD8B4` | **Quicken** | Quicken raw effect 29 selects case 2 and this bit's setter; Smile independently uses the same effect. The turn manager queues units carrying this bit and clears it when consumed |
 | `sub_080CD8FC` | **Astra** | Astra raw effect 37 selects case 10 and this bit's setter; executing Petrify against it consumes the bit and prevents Petrify, matching Astra's one-time status immunity |
 | `sub_080CD92C` | **Petrify** | Break, Rockseal, and Blaster raw effect 98 selects case 46 and this setter; Soft effect 99 selects paired cancel case 47. Executing the CT tick with this bit set zeros CT/carry 900/25→0/0 |
+| `sub_080CDCBC` | **Petrify critical snapshot** | Petrify case 46 copies the battle object's critical-state marker into `+0xed` bit 4. While Petrified, the battle-state classifier uses this bit instead of live HP: clear/set classify as ordinary/critical, matching the ordinary HP boundary at 26/25 of 100 |
 | `sub_080CDA94` | **Doom** | Checkmate raw effect 170 selects case 42; its handler sets this bit and countdown 3. The per-turn path decrements `+0xd9`, then clears the bit and all battle statuses when it expires |
 | `sub_080CDB84` | **Immobilize** | Aim: Legs raw effect 73 selects case 24 and applies this bit/count 3; executing the movement-mode reader changes its synthetic mode from 5 to 0 only when this bit is set |
 | `sub_080CDB9C` | **Disable** | Aim: Arm raw effect 69 selects case 22 and applies this bit/count 3; the ability-usability predicate rejects on this getter before its success path |
@@ -166,32 +168,37 @@ the final history contains ids 5 and 7 but not 6.
 | `sub_080CDB3C` | **Silence** | `+0xeb` bit 3. `sub_08133E18` blocks the ability when this is set unless the ability has property `0x14`, the documented Ignore Silence flag |
 | `sub_080CD914` | **Reflect** | `+0xe8` bit 5. `sub_0812F154` returns true when this bit is set (barring a global override), and the AI evaluator calls it precisely where it has already checked the ability's Reflectable flag, to avoid casting reflectable magic at a reflecting target |
 
-`tools/validate_statuses.py` protects all 43 joins independently: it
+`tools/validate_statuses.py` protects all 44 joins independently: it
 checks each named ability's raw effect against the descriptor table at
 `0x08553E70`, checks the 92-entry handler table, executes every getter/setter
 pair, verifies thirteen named duration handlers and direct counter/stat reads,
 executes Checkmate's Doom application and checks its expiry call chain, runs
 the Quicken application/consume lifecycle, Astra→Petrify interception, and
-Petrify CT suppression,
+Petrify CT suppression and its frozen critical-HP classification,
 the Aim: Arm/Aim: Legs handlers and the movement/usability consumers, runs
 the Mow Down handler plus speed/hit arithmetic, exercises Sleep's hit-chance
 branch, preserves
 the separate display/adjacency anchors, executes the persistent/live Zombie
 bridge and its three-turn revival counter, verifies the packed two-target
 history consumed by AI, plus Yellow Card's write to `+0x28`
-bit `0x0040`. Raw ability effects and internal cases are separate namespaces joined
-by descriptor byte `+0x01`.
+bit `0x0040`. Its twenty-first check also locks the exact call census and
+set/clear behavior of the three deliberately numeric residues. Raw ability
+effects and internal cases are separate namespaces joined by descriptor byte
+`+0x01`.
 
-`+0xed` bit 6 remains deliberately numeric. Its getter has thirteen battle
+`+0xed` bits 5–7 remain deliberately numeric. Bit 5 has three presentation/UI
+readers, but its retail setter has no callers or stored pointer references.
+Bit 6 has thirteen battle
 callers that reject the unit from CT charging, actor selection, targeting, and
 result processing. Retail setter `sub_080CE35C` exists and executes, but has
 zero direct callers and zero stored Thumb-pointer references; no raw-effect
 descriptor selects the getter. Setting it changes CT/carry `900/25→0/0`, while
 clearing it restores the ordinary `1000/25` tick. That proves an inactive-like
-battle role, but not a unique game-facing state name. The adjacent bit-5 setter
-`sub_080CE338` is likewise present but unreferenced. `tools/flag_map.py` lists
-both explicitly because a generated-function-only scan previously omitted
-them.
+battle role, but not a unique game-facing state name. Bit 7 has no dedicated
+getter; two placement paths set it after unit setup, and no path calls the
+setter to clear it. All three setters round-trip their exact bits in the
+validator. `tools/flag_map.py` lists the dormant bit-5/6 setters explicitly
+because a generated-function-only scan previously omitted them.
 
 ## Persistent status flags at `+0x28`
 

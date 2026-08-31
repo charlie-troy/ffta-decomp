@@ -51,7 +51,7 @@ space. Named single-effect abilities therefore join directly to cases: Sleep
 raw effect 97 selects case 45, while Poison raw effect 125 selects case 61.
 The corresponding application handlers and executed getter/setter pairs then
 pin the unit bits without relying on list order. This route now contributes to
-43 named live bits, with 21 alternate-ability joins independently converging
+44 named live bits, with 21 alternate-ability joins independently converging
 on the same internal cases. Six direct application cases sit outside the
 evaluator map below: Cover (14), Expert Guard (55), Hibernate (58), Defending
 (84), Controlled (86), and Morphed (87).
@@ -60,6 +60,11 @@ Dragon Force case 3 is intentionally composite. Its handler sets Attack Up,
 Magic Up, Defense Up, and Resistance Up; the map row shows the Resistance Up
 predicate used by that AI case. Independent combat-channel execution separates
 the two formerly ambiguous `+0xec` bits as Attack Up and Magic Up.
+
+Petrify case 46 also writes `+0xed` bit 4 after the main Petrify bit. This is
+not a second visible status: the battle-state classifier substitutes it for
+the live HP test while Petrify is active, preserving whether the unit was in
+the ≤25% critical-HP class when petrified.
 
 ## Full map
 

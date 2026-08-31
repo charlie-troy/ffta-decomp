@@ -262,9 +262,9 @@ behaviour mod needs to reach.
    descriptor and executed behavior name Speed Down (`+0xec` bit 2 / case
    20), Sleep (`+0xeb` bit 2 / case 45), Slow (`+0xea` bit 6 / case 51), Haste
    (`+0xea` bit 5 / case 52), and Poison (`+0xe9` bit 1 / case 61).
-   `tools/validate_statuses.py` is the twenty-check regression gate. Raw ability
+   `tools/validate_statuses.py` is the twenty-one-check regression gate. Raw ability
    effect ids remain a separate numeric namespace joined to internal cases by
-   the four-byte descriptor table at `0x08553E70`. Forty-three live bits now have
+   the four-byte descriptor table at `0x08553E70`. Forty-four live bits now have
    behavior-backed names, including Frog, Stop, Blind, Confuse, Charm, Addle,
    Protect, Shell, Zombie, Silence, and Reflect.
 3. Name the remaining **unit struct** stats — the 17 `u8` stats
@@ -345,8 +345,7 @@ behaviour mod needs to reach.
 18. **Unit-stat layout complete 2026-08-26:** stat `0x00` is the encoded-name
    text pointer, stat `0x22` addresses the bounded ability-state array, and
    stat `0x44` addresses the movement profile. All 63 load cases and six
-   address-return cases are now named and execution-gated. Phase 5 continues
-   only on the remaining unnamed live-status bits.
+   address-return cases are now named and execution-gated.
 19. **Mow Down penalty closed 2026-08-26:** the ability's sole secondary raw
    effect `0x16` selects internal case 37, whose handler sets `+0xea` bit 1.
    Executing the handler halves Speed 100→50 and raises incoming hit chance
@@ -382,6 +381,19 @@ behaviour mod needs to reach.
    Attack Up/Magic Up: base 100 becomes 109 only in the matching physical or
    magic channel, while the paired Down bit yields 89. Coverage reaches 43 of
    47 represented live bits.
+26. **Lifecycle/presentation residue sweep closed 2026-08-31:** Petrify's
+   companion `+0xed` bit 4 is a frozen critical-HP snapshot: Petrified units
+   classify from the bit, while ordinary units use the exact 25/26-of-100 HP
+   boundary. The final three bits stay numeric with an executable census:
+   bit 5 has three presentation readers and a dormant setter, bit 6 has
+   thirteen inactive-like battle readers and a dormant setter, and setter-only
+   bit 7 has two placement writers. Coverage is 44 named of 47 represented
+   live bits; every remaining bit has an explicit non-semantic classification.
+
+**Phase 5 status:** complete 2026-08-31. All 69 generic unit-stat cases are
+named, all 47 represented live bits are either behavior-backed or explicitly
+classified numeric, and the 21/21 status/state gate reproduces the boundary
+and residue evidence.
 
 **Done when:** each new name is backed by execution or an identifiable reader,
 and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a
