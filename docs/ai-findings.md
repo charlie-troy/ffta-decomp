@@ -141,9 +141,9 @@ job-to-unit elemental initialization, and the damage consumer. The element
 order is neutral, Fire, Wind, Earth, Water, Ice, Lightning, Holy, Dark; codes
 0–4 mean weak, normal, nullify, absorb, and resist. Fire damage under a fixed
 RNG state produces `33, 24, 0, -19, 11` for those five states. The packed job
-table's nominal Earth slot is not read: the accessor duplicates Wind for the
-unit Earth byte, and the two packed slots happen to be equal in all retail
-jobs.
+table's Wind and Earth slots happen to be equal in all retail jobs, which once
+hid a field-map error. A distinct synthetic packing proves the accessor and
+unit initializer read all eight slots independently; Earth uses slot 2.
 
 Stat `0x08` completes the direct byte block as innate element id. The job
 initializer copies property `0x0d` to unit `+0x0b` immediately before the

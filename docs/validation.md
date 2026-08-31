@@ -10,6 +10,7 @@ python tools/validate_missions.py baserom.gba
 python tools/validate_maps.py baserom.gba
 python tools/validate_items.py baserom.gba
 python tools/validate_statuses.py baserom.gba
+python tools/validate_job_fields.py baserom.gba
 ```
 
 No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
@@ -104,7 +105,8 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    and the movement-profile store writes `2,3,4,251` at `+0xfc`. Job
    initialization fills stat `0x08` as innate element and stats `0x0a..0x12`
    as neutral, Fire, Wind, Earth, Water, Ice, Lightning, Holy, and Dark
-   resistance, including the retail duplicate-Wind Earth source. Executing
+   resistance. A synthetic 0–7 packing proves all eight sources remain
+   independent through unit initialization; Earth uses slot 2. Executing
    Fire damage produces positive
    weak/normal/resist results in descending order, zero for nullify, and a
    negative result for absorb. The job-change fragment synchronizes
@@ -122,9 +124,9 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
 6. **The status-effect gate.** Running one case body's gate 1200 times per
    branch gives 11.2% when the AI would target itself and 50.8% otherwise,
    against the 10 and 49 thresholds read out of the code.
-7. **Packed resistance slots.** All 812 accessor reads (seven reachable slots
-   across 116 jobs) match the packed 3-bit layout, and the unused third bit of
-   every slot is clear.
+7. **Packed resistance slots.** All 928 accessor reads (eight slots across 116
+   jobs) match the packed 3-bit layout. Retail leaves every slot's high bit
+   clear; a separate synthetic test exercises the full 0–7 encoding.
 8. **Unarmed attack power.** `sub_08130820` returns job-table `+0x33` for all
    116 jobs, and changing that byte changes the executed result.
 
@@ -151,20 +153,22 @@ This also settles the direction question by measurement rather than by reading:
 published documentation describes the field as "high = less likely"; 0 keeps
 nothing and 100 keeps everything.
 
+## Job-field accessor gate
+
+`validate_job_fields.py` separately executes all 48 accessor formulas across
+all 116 records (5,568 reads), including the four `0xff` proxy records. It then
+patches eight distinct resistance values and a non-retail direct redirect to
+prove the mapping causally. A fourth check executes `+0x31` bit 0 through the
+twenty-entry morph-family index. The result is 4/4 checks; there are no
+remaining conditional job-field formulas.
+
 ## What is still unvalidated
 
-- **Four job fields are dead data**, not merely unnamed: `+0x02`, `+0x0c`,
-  `+0x2c` and `+0x31`. No code in the ROM reads them, and that is established
-  by enumeration rather than by failing to find a reader -- see
-  [job-table.md](job-table.md). Nothing further is knowable about them from
-  this ROM, dynamically or statically.
-- **Most of the job field accessor.** Execution confirms 16 of its 45 in-range
-  offsets as plain byte loads. Seven are the packed resistances, now solved.
-  The remaining 22 match on some entries and not others, so they compute a
-  value rather than fetch one, and what they compute is not established.
-- **Resistance slot 2.** It is a real slot with the same value distribution as
-  the other seven, but no field id in the accessor reaches it, so nothing here
-  shows the game reading it.
+- **Four raw job bytes remain semantically unnamed.** Offsets `+0x02/+0x27`
+  have no accessor field; `+0x0c/+0x2c` have fields but no constant call site.
+  Complete table-base reachability keeps these numeric rather than assigning
+  speculative meanings. `+0x31` is no longer in this set: bit 0 gates the
+  morph-family index.
 - **Whole-battle behaviour beyond the traced case.** The opening snowball
   engagement is now execution-traced: one enemy actor evaluates four distinct
   targets through `sub_080C32C0`, and two frozen-RNG replays match exactly (see

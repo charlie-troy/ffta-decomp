@@ -26,7 +26,7 @@ all six pointer cases and verifies their exact unit-relative addresses.
 | `0x0A` | `+0x0C` | u8 | **neutral resistance** | damage routine loads stats `0x0a..0x12` and indexes them by element id |
 | `0x0B` | `+0x0D` | u8 | **Fire resistance** | element 1; executed Fire damage covers all five resistance codes |
 | `0x0C` | `+0x0E` | u8 | **Wind resistance** | element 2; initialized from packed resistance slot 1 |
-| `0x0D` | `+0x0F` | u8 | **Earth resistance** | element 3; retail initializer duplicates the Wind accessor instead of reading packed slot 2 |
+| `0x0D` | `+0x0F` | u8 | **Earth resistance** | element 3; initialized from independent packed resistance slot 2 |
 | `0x0E` | `+0x10` | u8 | **Water resistance** | element 4; initialized from packed resistance slot 3 |
 | `0x0F` | `+0x11` | u8 | **Ice resistance** | element 5; initialized from packed resistance slot 4 |
 | `0x10` | `+0x12` | u8 | **Lightning resistance** | element 6; initialized from packed resistance slot 5 |
@@ -114,12 +114,11 @@ Earth, Water, Ice, Lightning, Holy, and Dark. The damage routine indexes this
 array by an ability's element id. Executed Fire damage proves the stored codes:
 0 is weak, 1 normal, 2 nullify, 3 absorb, and 4 resist/half damage.
 
-The Earth source has a retail quirk. The packed job table contains eight
-three-bit element slots, but its Wind and Earth slots are equal in all 116
-entries. The job accessor and unit initializer read packed Wind twice, filling
-both unit Wind and Earth, and never read packed slot 2. Editing packed slot 2
-therefore has no combat effect. Divergent Wind/Earth affinities require a code
-change to the accessor or initializer rather than a table-only edit.
+The packed job table contains eight independent three-bit element slots.
+Retail Wind and Earth happen to be equal in all 116 records, which previously
+hid a field-map error and made Earth look like a duplicate Wind read. A causal
+patch to distinct values 0–7 proves field ids `0x0e..0x15` and unit
+initialization preserve every slot; Earth reads slot 2.
 The executed restoration clamp makes the first four fields two complete pairs:
 current/max HP, then current/max MP. The next four are the unit's base physical
 and magical combat stats in Attack/Defense and Magic Power/Resistance pairs.

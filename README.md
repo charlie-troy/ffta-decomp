@@ -87,13 +87,16 @@ the stat-id mapping, the healthy-target rule at its exact boundaries, the
 Whole-battle behaviour is now traced through a real enemy turn: one actor calls
 `sub_080C32C0` for four distinct targets, and a frozen-RNG replay reproduces the
 registers and stack exactly. See [docs/whole-battle-trace.md](docs/whole-battle-trace.md).
-What remains unvalidated is 22 computed job-accessor properties and resistance
-slot 2. The four still-unnamed job-table offsets are
-not an open validation task: exhaustive reachability analysis proves the retail
-ROM never reads them. The job table itself is written up in
+The job accessor is now complete: all 48 formulas execute across all 116
+records, including its fallback/direct redirect protocol, and all eight
+resistance slots are independently reachable. `+0x31` bit 0 gates the supported
+twenty-entry morph-family index. Four still-unnamed raw bytes are
+not an open naming task: exhaustive reachability shows no retail consumer. The
+job table itself is written up in
 [docs/job-table.md](docs/job-table.md), including two corrections to the
 published layout: the elemental resistances are eight packed 3-bit slots rather
-than four bytes, and `+0x27` is an exact duplicate of `+0x26` in every entry.
+than four bytes, and `+0x27` is an exact duplicate of `+0x26` in every retail
+entry but is not read by the accessor.
 
 ## Decompilation status
 

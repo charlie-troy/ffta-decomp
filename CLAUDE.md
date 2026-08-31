@@ -62,8 +62,9 @@ check when you establish something new, so it cannot silently rot.
   3-bit slots not four bytes, the item table base is one entry earlier than
   documented, and there are 162 maps not 163. Look it up, then verify it.
 - **A self-check written against the same assumptions as the tool confirms the
-  assumptions, not the result.** `tools/dump_unit_fields.py` passed its own
-  cross-check while being substantially wrong.
+  assumptions, not the result.** The former instruction-pattern version of
+  `tools/dump_unit_fields.py` passed its own cross-check while being
+  substantially wrong; it has been replaced by the 5,568-read formula gate.
 - **Name ids do not all point at the same string table.** Abilities index the
   UI table, items and jobs the main one. The wrong table yields plausible but
   incorrect text rather than an error.

@@ -10,6 +10,8 @@ State snapshot: 172 functions matched (4,536 bytes) · full 16 MB ROM rebuilds
 byte-identical · CI hash gate on every function · 3,594 functions discovered ·
 abilities, jobs, items, missions and map terrain mapped and editable · text
 decodes at 99.7% · 8/8 execution checks pass (`tools/validate_ai.py`).
+The separate job-field gate passes 4/4, covering 5,568 retail formula reads,
+causal redirect/resistance patches, and the morph-family flag.
 
 Phase 0 was re-verified on 2026-08-24: `make check` verified 172/172 function
 hashes, `tools/validate_ai.py` passed 8/8 checks, and `make rom` reproduced the
@@ -33,7 +35,7 @@ turns.
    - `docs/matching-notes.md` says "113 functions, 3,044 bytes"; the README and
      `data/functions.json` say **172 / 4,536**.
    - `docs/unit-ai-table.md` is superseded by `docs/job-table.md` (123 vs 116
-     entries; "b04 unknown" vs race confirmed; four dead offsets now closed).
+     entries; "b04 unknown" vs race confirmed; four dead/raw offsets now closed).
      Mark it superseded.
    - `docs/ai-findings.md` still guesses ability `+0x1A` is "accuracy";
      `docs/ability-table.md` proved it is `ai_priority`. Fix the stale table.
@@ -285,14 +287,16 @@ behaviour mod needs to reach.
    level-50 / EXP-99 ceiling. Stats `0x01/0x03` are now constructor-backed unit
    type/race. Stats `0x0a..0x12` are neutral plus Fire/Wind/Earth/Water/Ice/
    Lightning/Holy/Dark resistance; executed damage proves all five affinity
-   codes and the duplicated-Wind Earth source.
+   codes. **Corrected 2026-08-31:** a distinct synthetic packing proves Earth
+   reads independent job resistance slot 2; retail Wind/Earth equality hid the
+   former field-map error.
 4. ~~Decompile the **capability setters** `0x080CE420`–`0x080CE480`.~~
    **Corrected/closed 2026-08-25:** they are status-duration setters, paired
    with getters at `0x080CE3A0..0x080CE410`; ten counters are named and tested.
-5. ~~Resolve whether resistance slot 2 is read by any path.~~ **Closed
-   2026-08-25:** slots 1/2 are equal in all retail jobs, the accessor and unit
-   initializer duplicate slot 1 for Wind/Earth, and battle damage consumes the
-   unit array. Packed slot 2 has no combat effect.
+5. ~~Resolve whether resistance slot 2 is read by any path.~~ **Corrected and
+   closed 2026-08-31:** field `0x10` reads slot 2 and unit initialization copies
+   it to Earth. Slots 1/2 are equal in retail, but distinct synthetic values
+   0–7 survive the accessor and initializer independently.
 6. **Continued 2026-08-25:** stats `0x1d..0x21` / unit `+0x2a..+0x32` are the
    five equipped item ids. Direct stat reads and all four item-derived combat
    totals execute in the AI gate.
@@ -401,25 +405,29 @@ and reflected in `tools/flag_map.py` / `tools/dump_stats.py` plus a
 
 ---
 
-## Phase 6 — Job table: the 22 computed fields
+## Phase 6 — Job table accessor formulas
 
-**Objective:** determine what the accessor's 22 conditional fields compute.
+**Objective:** determine why the old raw-offset audit reported partial matches
+and map all 48 accessor fields exactly.
 
-**Why:** closes the last genuinely-unknown *live* job fields (the four dead
-offsets are already closed by enumeration; these 22 are reachable but
-computed).
+**Result:** complete 2026-08-31. The audit premise was wrong: there are 23, not
+22, partial matches, and none is a stat-at-level computation. Byte `+0x05`
+redirects 47 fields to the caller fallback (`0xff`) or a direct job index
+(other nonzero values); field `0x02` returns the marker itself. Packed fields
+account for the other guessed-offset mismatches.
 
 **Steps:**
 
-1. Decompile the conditional branches of `sub_080C8570` that fall in the
-   "matches on some entries" group.
-2. Test the hypothesis the docs already name: most sit on growth rates and look
-   like a **stat-at-level** computation.
-3. Execution-verify each formula against all 116 entries (the same audit
-   technique as `tools/audit_field_map.py`).
+1. ~~Decompile the partial-match branches.~~ All 48 jump-table cases mapped.
+2. ~~Test stat-at-level computation.~~ Rejected by control flow and execution;
+   the behavior is record redirection plus direct packed/load formulas.
+3. ~~Execute every formula across all 116 entries.~~ 5,568/5,568 reads match;
+   synthetic `+0x05=7` and resistance values 0–7 prove both causal paths.
+   Field `0x28` / `+0x31` bit 0 additionally executes through the supported
+   twenty-entry morph-family index.
 
-**Done when:** each of the 22 has a stated formula verified across all 116
-entries.
+**Done:** `tools/job_fields.py`, `tools/audit_field_map.py`, and
+`tools/validate_job_fields.py` are the reproducible source of truth.
 
 ---
 
@@ -482,8 +490,9 @@ via `make mod` with `verify_mod` reporting exactly that one function changed.
 
 - **No formation table** — battle setups are scripted, one Place Character
   opcode per unit.
-- **No re-opening the four dead job offsets** (`+0x02`, `+0x0c`, `+0x2c`,
-  `+0x31`) — proven unreachable by enumeration.
+- **No speculative naming of four dead/raw job offsets** (`+0x02`, `+0x0c`,
+  `+0x27`, `+0x2c`) — two lack accessor fields and two have no constant call
+  site or direct reader.
 - **No full 3,594-function decomp** — it was tracking under 1%, would take
   years, and conflicts with the stated goal.
 - **No trusting published docs unverified** — Data Crystal has already been

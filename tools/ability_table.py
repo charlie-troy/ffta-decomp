@@ -12,9 +12,9 @@ tune the game.
 
 The "units" table at 0x08521A14 is the fallback the AI consults when an action
 carries no ability id. sub_0813413C reads its +0x32 on that path, and the byte
-uses the same 0-100 priority scale as the ability table. Only that byte is
-written back; the rest of each 0x34-byte entry is left alone, because its
-layout is not established.
+uses the same 0-100 priority scale as the ability table. The raw 0x34-byte job
+CSV is fully round-trippable; `tools/job_fields.py` defines the exact accessor
+formulas for packed or redirected values.
 
 `apply` rewrites only the bytes that differ and reports each change, so an
 accidental edit is visible rather than silent.
@@ -171,8 +171,8 @@ UNIT_NAMED = {
     0x0F: "portrait_graphic",
     0x10: "a_ability_index",
     # +0x12..+0x15 are not four byte-sized resistances. They carry eight
-    # 3-bit slots on a 3-bit stride starting at +0x12 bit 3, each holding
-    # 0-3. See docs/job-table.md and the resist subcommands.
+    # 3-bit slots on a 3-bit stride starting at +0x12 bit 3. Retail values
+    # happen to stay in 0-3, but the accessor exposes the full 0-7 range.
     0x12: "resist_packed_0", 0x13: "resist_packed_1",
     0x14: "resist_packed_2", 0x15: "resist_packed_3",
     # Read by field id 0x0d as the low nibble; values 0-8.
@@ -192,6 +192,9 @@ UNIT_NAMED = {
     0x2D: "equip_index",
     0x2E: "ability_start", 0x2F: "ability_end",
     0x30: "job_requirement",
+    # Bit 0 gates the compact 20-family monster/morph index. Bits 1/2 occur in
+    # retail data but the only accessor consumer masks them off.
+    0x31: "morph_family_flags",
     # Not in the published layout, which marks 0x31-0x33 unknown. Established
     # here from sub_0813413C, which reads it as the AI priority percentage.
     0x32: "ai_priority",
@@ -246,9 +249,9 @@ def cmd_apply_units(rom_path, csv_path, out_path):
 
 
 # Eight resistance slots live in +0x12..+0x15, on a 3-bit stride starting at
-# +0x12 bit 3. Each holds 0-3 and every entry's third bit is clear, so two bits
-# are used of the three allotted. Value 1 dominates (108-113 of 116 entries per
-# slot), which is what a neutral default looks like.
+# +0x12 bit 3. The accessor reads all three bits. Retail values use 0-3 and
+# leave every slot's high bit clear; preserving 0-7 here keeps edited records
+# bit-exact with the actual field format.
 RESIST_BASE_BIT = 11          # counted from +0x11 bit 0
 RESIST_STRIDE = 3
 RESIST_SLOTS = 8
@@ -259,14 +262,14 @@ RESIST_LEN = 5
 def resist_get(rom, i, slot):
     o = UNIT_BASE + i * UNIT_STRIDE + RESIST_REGION
     w = int.from_bytes(rom[o:o + RESIST_LEN], "little")
-    return (w >> (RESIST_BASE_BIT + slot * RESIST_STRIDE)) & 3
+    return (w >> (RESIST_BASE_BIT + slot * RESIST_STRIDE)) & 7
 
 
 def resist_set(rom, i, slot, val):
     o = UNIT_BASE + i * UNIT_STRIDE + RESIST_REGION
     w = int.from_bytes(rom[o:o + RESIST_LEN], "little")
     sh = RESIST_BASE_BIT + slot * RESIST_STRIDE
-    w = (w & ~(3 << sh)) | ((val & 3) << sh)
+    w = (w & ~(7 << sh)) | ((val & 7) << sh)
     rom[o:o + RESIST_LEN] = w.to_bytes(RESIST_LEN, "little")
 
 
@@ -279,8 +282,7 @@ def cmd_dump_resist(rom_path, out_path):
         for i in range(UNIT_COUNT):
             w.writerow([i] + [resist_get(rom, i, n) for n in range(RESIST_SLOTS)])
     print(f"wrote {out_path}: {UNIT_COUNT} entries x {RESIST_SLOTS} slots")
-    print("slot 2 is not reachable through the job field accessor; see "
-          "docs/job-table.md")
+    print("all eight 3-bit slots are reachable through field ids 0x0e..0x15")
     return 0
 
 
@@ -298,8 +300,8 @@ def cmd_apply_resist(rom_path, csv_path, out_path):
                 if key not in row or row[key] == "":
                     continue
                 new = int(row[key], 0)
-                if not 0 <= new <= 3:
-                    print(f"  index {i} {key}: {new} is outside 0-3, skipped")
+                if not 0 <= new <= 7:
+                    print(f"  index {i} {key}: {new} is outside 0-7, skipped")
                     continue
                 if resist_get(rom, i, n) != new:
                     print(f"  index {i:>3} {key}: "

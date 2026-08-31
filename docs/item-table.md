@@ -14,8 +14,8 @@ the ids used here and by `tools/item_table.py`.
 `sub_080CA7A4(itemId, propId)` multiplies by the 0x20 stride and bounds-checks
 the property id against 19. Running all 19 ids over the whole table shows
 **every one is a plain byte or halfword load** -- no computed values, no packed
-fields. That is the opposite of the job table, where only 16 of 45 offsets
-survived the same test, and it means the static offsets can be trusted here.
+fields. The job accessor is also fully mapped now, but includes record
+redirection plus nibble, 12-bit-stat, and 3-bit-resistance unpacking.
 
 ```bash
 python tools/map_table.py --base 0x0851D180 --stride 0x20 \

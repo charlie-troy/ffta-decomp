@@ -242,15 +242,15 @@ def check_stat_ids(gba, rom):
           f"-> {'PASS' if unit_identity == (1, 7) and identity_getters == unit_identity else 'FAIL'}")
 
     # Job initialization writes the neutral element plus eight elemental
-    # resistance codes to +0x0C..+0x14. The retail field accessor duplicates
-    # packed slot 1 for Earth; packed slot 2 is never copied.
+    # resistance codes to +0x0C..+0x14. All eight packed slots are independent;
+    # retail slots 1/2 merely happen to contain equal values in every record.
     gba.run_range(JOB_DERIVED_START, JOB_DERIVED_END,
                   {"r4": UNIT, "r6": 1, "r7": 0})
     packed = int.from_bytes(
         rom[JOB_TABLE + 46 * JOB_STRIDE + 0x11:
             JOB_TABLE + 46 * JOB_STRIDE + 0x16], "little")
-    slots = tuple((packed >> (11 + n * 3)) & 3 for n in range(8))
-    want_resist = (1, slots[0], slots[1], slots[1], *slots[3:])
+    slots = tuple((packed >> (11 + n * 3)) & 7 for n in range(8))
+    want_resist = (1, *slots)
     got_resist = tuple(gba.call(STAT_GET, [UNIT, stat])
                        for stat in range(0x0A, 0x13))
     innate_element = gba.call(STAT_GET, [UNIT, 0x08])
@@ -265,6 +265,23 @@ def check_stat_ids(gba, rom):
           f"-> {'PASS' if innate_element == want_element == 1 else 'FAIL'}")
     print("   neutral/Fire/Wind/Earth/Water/Ice/Lightning/Holy/Dark fields "
           f"-> {'PASS' if got_resist == want_resist else 'FAIL'}")
+
+    synthetic_packed = sum(value << (3 + value * 3) for value in range(8))
+    packed_addr = 0x08521A14 + 46 * JOB_STRIDE + 0x12
+    original_packed = rom[JOB_TABLE + 46 * JOB_STRIDE + 0x12:
+                          JOB_TABLE + 46 * JOB_STRIDE + 0x16]
+    gba.uc.mem_write(packed_addr, synthetic_packed.to_bytes(4, "little"))
+    gba.run_range(JOB_DERIVED_START, JOB_DERIVED_END,
+                  {"r4": UNIT, "r6": 1, "r7": 0})
+    synthetic_resist = tuple(gba.call(STAT_GET, [UNIT, stat])
+                             for stat in range(0x0A, 0x13))
+    gba.uc.mem_write(packed_addr, original_packed)
+    if synthetic_resist != (1, *range(8)):
+        ok = False
+        print(f"   distinct packed resistance copy {synthetic_resist}, "
+              "expected (1,0,1,2,3,4,5,6,7)")
+    print("   synthetic 0..7 slots remain distinct through unit initialization "
+          f"-> {'PASS' if synthetic_resist == (1, *range(8)) else 'FAIL'}")
 
     # Fire is element 1, so the damage routine indexes target +0x0D. Execute
     # all five retail resistance meanings under the same RNG state.
@@ -479,21 +496,20 @@ def check_gate(gba, n):
 def check_resist_slots(gba, rom):
     """The eight resistance slots must reproduce the accessor exactly.
 
-    Solved as a 3-bit stride from +0x12 bit 3 over +0x11..+0x15. Slot 2 is
-    excluded because no field id reaches it, so there is nothing to compare
-    against.
+    Solved as a 3-bit stride from +0x12 bit 3. Every slot is reachable through
+    consecutive field ids 0x0e..0x15.
     """
     print("")
     print("7. packed resistance slots vs the job field accessor")
     base = 0x08521A14 - 0x08000000
     stride, count = 0x34, 116
     acc = 0x080C8570
-    slot_field = {0: 0x0e, 1: 0x0f, 3: 0x11, 4: 0x12, 5: 0x13, 6: 0x14, 7: 0x15}
+    slot_field = {slot: 0x0E + slot for slot in range(8)}
 
     def slot(i, n):
         o = base + i * stride + 0x11
         w = int.from_bytes(rom[o:o + 5], "little")
-        return (w >> (11 + n * 3)) & 3
+        return (w >> (11 + n * 3)) & 7
 
     bad = total = 0
     wide = 0

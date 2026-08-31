@@ -30,11 +30,11 @@ status and backlog tables are living sections and should be kept current.
 | Item | State |
 |---|---|
 | Branch | `master`, tracking `origin/master` |
-| Active phase | Phase 6 — job-table computed fields |
-| Current work package | AI6.1 — inventory and execute the 22 conditional job fields |
-| Last closed package | AI5.7d — closed all lifecycle/presentation residues |
+| Active phase | Phase 7 — editable evaluator rules |
+| Current work package | AI7.1 — partition `sub_080C32C0` into matchable rule blocks |
+| Last closed package | AI6.1 — mapped all 48 job-accessor formulas |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 8/8; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -48,7 +48,8 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.4 | P1 | Complete | Characterize animation blocks and mode bytes | Readers name the controls and reproducible exports cover all present blocks |
 | ITEM4.1 | P2 | Complete | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Icon paths execute end to end; behavioral flags have readers; hand bits have explicit population evidence; CSV round-trips |
 | AI5.1 | P2 | Complete | Expand unit-status and stat naming | All 69 stat cases named; all 47 represented live bits named or explicitly classified numeric; 21/21 gate |
-| AI6.1 | P2 | Active | Decode the 22 conditional job fields | Every field has a formula executed across all 116 jobs |
+| AI6.1 | P2 | Complete | Decode the job accessor | All 48 fields execute across 116 jobs; redirect, resistance, and morph-family checks pass |
+| AI7.1 | P3 | Active | Match evaluator rule blocks | First independently matchable block lands without changing ROM bytes |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -103,6 +104,7 @@ status and backlog tables are living sections and should be kept current.
 | AI5.7b | 2026-08-26 | Named Defending, Hibernate, Morphed, Cover, Expert Guard, and Controlled | Six direct handler-only chains; 9 Morph and 13 Control race actions; Cover link execution; 41 live bits named |
 | AI5.7c | 2026-08-26 | Separated Dragon Force's composite setters as Attack Up and Magic Up | Physical/magic own-channel 100→109, cross-channel stays 100; paired Down gives 89; 43 live bits named |
 | AI5.7d | 2026-08-31 | Closed the final four lifecycle/presentation residues and Phase 5 | Petrify critical snapshot executes at the 25/26 HP boundary; bit-5/6/7 caller census and setter round-trips; statuses 21/21; 44/47 named |
+| AI6.1 | 2026-08-31 | Replaced the false computed-field model with the exact 48-field job accessor | 5,568/5,568 formula reads; redirect; resistance 0–7; `+0x31` bit-0 morph-family index; jobs 4/4 |
 
 ## Decisions and evidence
 
@@ -332,12 +334,13 @@ status and backlog tables are living sections and should be kept current.
   array by the ability's element id, and applies codes 0–4. Executed Fire
   outcomes are weak 33, normal 24, nullify 0, absorb -19, resist 11 under the
   same RNG seed.
-- Slot-2 boundary: packed job slots 1 and 2 are equal in all 116 entries, but
-  the accessor and initializer explicitly read slot 1 twice for unit Wind and
-  Earth. No battle path reads packed slot 2 directly.
-- Decision: expose the nine unit fields by element and document packed slot 2
-  as combat-inert. Do not silently reroute Earth to slot 2 in modding tools;
-  that would change retail behavior.
+- **Corrected 2026-08-31:** packed job slots 1 and 2 are equal in all 116
+  retail entries, but field `0x10` and the initializer do read slot 2 for
+  Earth. A synthetic 0–7 packing keeps all eight values distinct through both
+  paths. The previous duplicated-Wind conclusion came from an off-by-one field
+  map and coincidental retail equality.
+- Decision: expose the nine unit fields by element and preserve all eight
+  independent job slots.
 
 ### D-022 — Separate innate element from resistance behavior
 
@@ -542,6 +545,20 @@ status and backlog tables are living sections and should be kept current.
 - Decision: promote bit 4 as `petrify_critical_snapshot`; retain bits 5–7 as
   numeric, protect their exact census and setter behavior, and close Phase 5.
 
+### D-041 — Replace guessed raw offsets with the accessor's real protocol
+
+- The old audit reported 23 partial matches (not 22) because it compared
+  accessor returns with guessed offsets. Disassembly shows byte `+0x05`
+  redirects every field except its own id `0x02`; several other fields unpack
+  nibbles, 12-bit stats, or 3-bit resistances.
+- All 48 formulas match 5,568 retail executions. Synthetic `+0x05=7` selects
+  record 7 for 47 fields, and resistance values 0–7 remain independent through
+  both the accessor and unit initializer.
+- Correct field `0x28` exposes `+0x31`; its only consumer tests bit 0 before
+  returning the supported monster/morph-family index 0–19.
+- Decision: reject the stat-at-level hypothesis, make `tools/job_fields.py`
+  canonical, correct the Earth-slot claim, and close Phase 6.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -553,6 +570,42 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-31 — Complete job-accessor reconstruction
+
+Objective:
+
+- Determine the formulas behind the roadmap's alleged 22 conditional job
+  fields and execute them across all 116 records.
+
+Completed:
+
+- Corrected the inventory to 48 total fields: 23 old partial matches, not 22.
+- Reconstructed the `+0x05` current/fallback/direct redirect protocol and every
+  direct, nibble, 12-bit, and 3-bit field formula.
+- Added `job_fields.py`, a 5,568-read audit, and a 4/4 causal validator.
+- Named `+0x31` bit 0 as the morph-family enable flag; its twenty supported
+  monster jobs map exactly to compact indices 0–19.
+- Corrected the resistance editor to preserve all three bits and retracted the
+  stale duplicated-Wind Earth claim.
+- Closed Phase 6 and promoted evaluator matching to active work.
+
+Evidence recorded during the batch:
+
+- Retail marker population is 112 zero / four `0xff` proxy records. Every
+  formula matches with fallback job 5.
+- A synthetic direct marker 7 routes all 47 ordinary fields to record 7 while
+  field `0x02` returns 7.
+- Synthetic resistance values 0–7 return in order through fields `0x0e..0x15`
+  and remain distinct in the unit's Fire-through-Dark array.
+- `+0x31` bit 0 accepts Goblin/Red Panther as morph families and rejects
+  Toughskin/New Kid, matching the full twenty-family population.
+- An unedited resistance CSV still round-trips to the retail SHA1.
+
+Next action:
+
+- Partition `sub_080C32C0` around its 66 existing case bodies and identify the
+  smallest independently matchable evaluator rule block.
 
 ### 2026-08-31 — Phase 5 lifecycle/presentation closure
 
@@ -1193,8 +1246,8 @@ Completed:
   race id.
 - Named stats `0x0a..0x12` / unit `+0x0c..+0x14` as neutral, Fire, Wind,
   Earth, Water, Ice, Lightning, Holy, and Dark resistance.
-- Closed the packed job-table slot-2 question and documented the retail
-  duplicated-Wind Earth source.
+- Closed the packed job-table slot-2 question. **Corrected 2026-08-31:** Earth
+  reads independent slot 2; retail slot equality hid the original map error.
 - Extended AI check 4 through constructor, job initialization, direct stat
   reads, and the full damage consumer.
 
@@ -1204,7 +1257,8 @@ Evidence recorded during the batch:
 - Jelly's packed Fire absorb and Ice weakness reach the expected unit bytes.
 - Fire under resistance codes 0/1/2/3/4 produces `33/24/0/-19/11` with fixed
   RNG, proving weak/normal/nullify/absorb/resist semantics.
-- Packed Wind and Earth slots match in 116/116 jobs; only Wind is copied, twice.
+- Packed Wind and Earth slots match in 116/116 retail jobs; a later distinct
+  synthetic packing proves both are copied independently.
 - AI validation remains 8/8.
 
 Next action:

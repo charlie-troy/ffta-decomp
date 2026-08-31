@@ -1,6 +1,7 @@
 > **Superseded by [`docs/job-table.md`](job-table.md).** That document solves the
-> packed resistance block, closes four dead offsets by enumeration, names the
-> race field, and corrects the entry count to 116. This file is kept for
+> packed resistance block, closes four dead/raw offsets by enumeration, maps
+> all 48 accessor formulas, names the race field, and corrects the entry count
+> to 116. This file is kept for
 > provenance but is not the current source of truth.
 
 # Job table (0x08521A14)
@@ -68,8 +69,9 @@ everything else keeps a `bNN` label.
 
 ## Field accessor
 
-`sub_080C8570(index, ?, fieldId)` dispatches through a 48-entry jump table,
-the same shape as the unit stat getter and the ability property getter. The
-field-id to offset map is produced by `python tools/dump_unit_fields.py <rom>`;
-45 of 48 ids land inside the entry and three resolve past its end and are
-reported as suspect.
+`sub_080C8570(index, fallback, fieldId)` dispatches through a 48-entry jump
+table. All 48 formulas are executed across all 116 records by
+`tools/validate_job_fields.py`. Byte `+0x05` is a redirect marker: zero selects
+the current record, `0xff` selects the caller's fallback, and any other value
+selects that job index. Field `0x02` returns the marker itself. The exact
+packed/load formulas are in `docs/job-table.md` and `tools/job_fields.py`.
