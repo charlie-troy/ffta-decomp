@@ -743,6 +743,12 @@ Completed:
   2,961 / 3,728 comparable bytes equal, with 767 mismatches in 170 runs and
   1,624 relocation bytes masked. The first run is the known prologue-order
   difference at `+0x0C..+0x15`; equal root sizes are not byte identity.
+- Changed the incoming cost-check parameter to an ABI-equivalent `int` copied
+  into a local `u8`. This moved truncation after the saved arguments and made
+  the entire prologue through `+0x15` byte-exact. The MP-cost path now narrows
+  the helper's wide return through `u16 currentMp`, and the healthy-target path
+  halves Max HP with retail's unsigned `lsr #1`. The relocation-aware result
+  improved to 2,979 / 3,728 comparable bytes equal (749 mismatches).
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -758,10 +764,10 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Align the prologue and early gauntlet in offset order using the relocation-
-  aware mismatch report, beginning at `+0x0C`. Preserve the exact table and
-  case CFG; revisit the retry tail's final pointer copy and case-92 pool after
-  earlier mismatch runs stop shifting call sites. Keep the candidate in
+- Align the early gauntlet in offset order using the relocation-aware mismatch
+  report, beginning with retail's action reload at `+0x30`. Preserve the exact
+  table and case CFG; revisit the retry tail's final pointer copy and case-92
+  pool after earlier mismatch runs stop shifting call sites. Keep the candidate in
   `reference/` until all 5,352 retail bytes match after relocation.
 
 ### 2026-08-31 — Complete job-accessor reconstruction

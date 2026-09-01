@@ -472,9 +472,10 @@ the repo explicitly ranks it below widening the table surface.
    RNG/modulo sites remain. Remaining work is outside the case CFG: remove one
    two-byte action-pointer copy in the retry tail, reproduce retail's
    post-epilogue placement of the case-92 literal pool, then perform a full
-   byte comparison. The relocation-aware baseline currently has 2,961 / 3,728
-   comparable bytes equal (767 mismatches in 170 runs); work proceeds in offset
-   order from the prologue at `+0x0C`, not from size alone.
+   byte comparison. The relocation-aware baseline currently has 2,979 / 3,728
+   comparable bytes equal (749 mismatches in 170 runs); the prologue is exact,
+   and work proceeds in offset order from the action reload at `+0x30`, not
+   from size alone.
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).

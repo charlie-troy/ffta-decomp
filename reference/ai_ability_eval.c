@@ -78,6 +78,8 @@ extern u8 gEwram[];                          /* 0x02000000 */
 
 extern int  AbilityProp(u16 abilityId, u8 propId);        /* sub_080CCD50 */
 extern u16  AbilityMpCost(struct Unit *u, u16 abilityId); /* sub_0812ED98 */
+extern int  AbilityMpCostWide(struct Unit *u, u16 abilityId)
+    __asm__("AbilityMpCost");
 extern int  UnitStat(struct Unit *u, u8 statId);          /* sub_080C7EA4 */
 extern int  sub_0812E368(struct Unit *u);                 /* effective Speed */
 
@@ -180,8 +182,9 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
 }
 
 int AiEvaluateAbility(struct Unit *user, struct Unit *target,
-                      struct Action *act, u8 checkCost)
+                      struct Action *act, int checkCostArg)
 {
+    u8 checkCost;
     u16 mode;
     u16 currentMp;
     s16 mpThreshold;
@@ -207,6 +210,7 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     int candidateIndex;
 
     frame.action = act;
+    checkCost = checkCostArg;
 
 #define user actor
 #define target subject
@@ -234,7 +238,8 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
 
         /* Reject when the user cannot afford it. The subtraction is done in
          * 16 bits and tested for sign, so it is an unsigned MP < cost test. */
-        if ((s16)(user->mp - AbilityMpCost(user, act->abilityId)) < 0)
+        currentMp = AbilityMpCostWide(user, act->abilityId);
+        if ((s16)(user->mp - currentMp) < 0)
             Reject();
     }
 
@@ -243,7 +248,8 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
      * See docs/ability-table.md; this is the rule most worth tuning. */
     if (act->abilityId != 0
         && gAbilityTable[act->abilityId].aiBehaviour == 2
-        && UnitStat(target, STAT_HP) < UnitStat(target, STAT_MAX_HP) / 2)
+        && UnitStat(target, STAT_HP) <
+           ((u32)UnitStat(target, STAT_MAX_HP) >> 1))
         Reject();
 
     /* Self-targeting has its own vetoes. */
