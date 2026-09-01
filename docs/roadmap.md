@@ -434,7 +434,7 @@ account for the other guessed-offset mismatches.
 
 ## Phase 7 — Make the evaluator's *rules* editable (the long-horizon decomp)
 
-**Objective:** byte-match `sub_080C32C0` (5,350 bytes) so rule changes ship via
+**Objective:** byte-match `sub_080C32C0` (5,352 bytes) so rule changes ship via
 `make mod`.
 
 **Why last:** it is *the* function for AI behaviour, and today only its
@@ -465,7 +465,7 @@ the repo explicitly ranks it below widening the table surface.
    polarity by test kind).
    **Current compiler baseline:** explicit return/redispatch control, direct
    state calls, duplicated self/other RNG arms, and the restored signed-action
-   gate produce one 5,356-byte agbcc function versus retail's 5,350 (+6). Its
+   gate produce one 5,356-byte agbcc function versus retail's 5,352 (+4). Its
    20-byte frame, `sp+12`/`sp+16` action/index slots, and effect table at
    `+0x364` match retail. All 66 case roots match their retail owned-byte sizes
    (3,958 / 3,958), all shared owner groups match at 88 / 88 bytes, and all 85

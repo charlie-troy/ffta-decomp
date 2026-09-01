@@ -1,4 +1,4 @@
-/* AI ability evaluator - sub_080C32C0, 0x080C32C0, 5350 bytes.
+/* AI ability evaluator - sub_080C32C0, 0x080C32C0, 5352 bytes.
  *
  * READABLE RECONSTRUCTION, NOT BYTE-MATCHING. This lives in reference/ rather
  * than src/ precisely so it is never fed to the build: everything under src/

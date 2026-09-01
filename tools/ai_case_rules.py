@@ -21,7 +21,7 @@ import thumb
 BASE = 0x08000000
 TABLE = 0x0C3624
 COUNT = 92
-FEND = 0x0C47A6
+FEND = 0x0C47A8
 RNG = 0x002804
 MOD = 0x142950
 IMM = re.compile(r"#(0x[0-9a-fA-F]+|\d+)\s*$")

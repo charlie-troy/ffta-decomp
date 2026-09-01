@@ -635,7 +635,7 @@ Completed:
   accepted effect returns one. This also explains retail's `sp+16` loop index.
 - Replaced function-pointer state helpers with direct per-case calls and kept
   RNG inside both self/other arms. The structurally correct candidate is now
-  4,954 bytes versus retail's 5,350 (396 bytes short), with 82 then-emitted
+  4,954 bytes versus retail's 5,352 (398 bytes short), with 82 then-emitted
   RNG call sites and the exact 20-byte frame, `sp+12` action pointer, and
   `sp+16` candidate index.
 - Added a candidate-side CFG comparator instead of treating total size as the
@@ -648,7 +648,7 @@ Completed:
   and case 92's split EWRAM base-plus-offset load, recovering another 24. The
   action layout now also models `+0x10` as the signed byte retail reads and
   places the two veto flags at their actual `+0x11` offset.
-- The current candidate is 5,092 / 5,350 bytes (258 short). Its case-owned CFG
+- The current candidate is 5,092 / 5,352 bytes (260 short). Its case-owned CFG
   is already 3,982 versus retail's 3,958 (+24); the dominant remaining gap is
   the pre-switch gauntlet, where the candidate table starts at `+0x268` versus
   retail `+0x364` (-252 bytes). Total size is no longer a useful proxy for
@@ -659,14 +659,14 @@ Completed:
   the `sub_0812EED0` result rules, target-side MP comparison, signed halving,
   and the Reflect/final joins visible in retail.
 - Reshaping the shared range tail reproduces retail's `0xFFF30000` literal and
-  backward mode-9 join. The candidate is now 5,338 / 5,350 bytes (12 short),
+  backward mode-9 join. The candidate is now 5,338 / 5,352 bytes (14 short),
   and its effect switch table starts at `+0x35c` versus retail `+0x364`.
 - Separated the two compiler-collapsed root groups. Cases 41 and 80 use opposite
   Confuse/Charm predicate order, while cases 15/50 reuse only case 59's self
   arm and boolean tails. An empty compiler barrier preserves the otherwise-
   merged other-target arm without emitting an instruction. Candidate and
   retail now both have 66 distinct roots and 85 RNG/modulo call sites.
-- The more faithful layout exposes 5,432 candidate bytes versus 5,350 retail
+- The more faithful layout exposes 5,432 candidate bytes versus 5,352 retail
   (+82), with 4,038 versus 3,958 case-owned bytes (+80). Next reductions must
   reproduce retail's shared final-state tails; shrinking arbitrary code would
   destroy the newly correct root and call topology.
@@ -674,7 +674,7 @@ Completed:
   family plus cases 3/30/41/43/63/80 through it where retail does the same.
   Cases 41 and 80 now drop out of the largest-delta list. Case 48 deliberately
   remains separate because retail duplicates its second predicate handling.
-- Current baseline is 5,396 / 5,350 bytes (+46), 3,996 / 3,958 case-owned
+- Current baseline is 5,396 / 5,352 bytes (+44), 3,996 / 3,958 case-owned
   bytes (+38), 66 roots, and 85 RNG/modulo sites. Several remaining +6/+8 root
   deltas are branch-range artifacts tied to the still-shifting accept block.
 - Extended the comparator with total reachable bytes per root and candidate
@@ -693,7 +693,7 @@ Completed:
   eliminating helper-induced boolean materialization and 20 bytes of long
   accept transfers. Restored case 30's self-contained four-state predicate
   after the reachable metric disproved its earlier shared-tail assignment.
-- Current baseline is 5,352 / 5,350 bytes (+2), 3,976 / 3,958 case-owned bytes
+- Current baseline is 5,352 / 5,352 bytes (size aligned), 3,976 / 3,958 case-owned bytes
   (+18), 82 candidate shared bytes, 66 roots, and 85 RNG/modulo sites. This is
   a size checkpoint only: the table remains at `+0x35c` versus retail `+0x364`,
   and byte identity has not been claimed.
@@ -712,7 +712,7 @@ Completed:
   reconstructing its shifted five-slot loop and separate range comparisons,
   and cases 38/55 by evaluating current HP before Max HP / 3. Case 92 now owns
   its result test while the ordinary absent and present tails remain exact.
-- Latest baseline remains 5,352 / 5,350 bytes (+2), but its CFG accounting is
+- Latest baseline remains 5,352 / 5,352 bytes (size aligned), but its CFG accounting is
   now 3,962 / 3,958 owned bytes (+4) and 88 / 88 shared bytes. Total-size
   equality is still not the goal: the table prefix is eight bytes short and
   the remaining owned deltas offset one another.
@@ -721,12 +721,17 @@ Completed:
   duplicates its two branch-specific state-result transfers, and case 43 uses
   range-aware named assembler joins for the two ordinary accept branches and
   its retry branch.
-- Current baseline is 5,356 / 5,350 bytes (+6). All 66/66 roots now match
+- Current baseline is 5,356 / 5,352 bytes (+4). All 66/66 roots now match
   their retail owned-byte sizes (3,958 / 3,958), and every shared owner group
   remains exact at 88 / 88 bytes. This is still not byte identity: the common
-  retry tail is four bytes long because it reloads the candidate index and
+  retry tail is four bytes longer because it reloads the candidate index and
   moves the action pointer, while the case-92 literal pool is emitted before
   that tail instead of after retail's epilogue.
+- Corrected the retail endpoint from `0x080C47A6` to `0x080C47A8`. The old
+  boundary cut the case-92 `0x00003C33` literal in half; its final two zero
+  bytes occupy `0x080C47A6..47A7`, and the next function's `push` begins at
+  `0x080C47A8`. The authoritative retail span is therefore 5,352 bytes, and
+  all historical size deltas in this log have been recalculated.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -745,7 +750,7 @@ Next action:
 - Reproduce retail's common retry-tail register lifetime without changing the
   already-exact case CFG, then move or naturally defer the case-92 literal
   pool past the epilogue. Keep the candidate in `reference/` until a full byte
-  comparison—not size or CFG counts alone—matches all 5,350 retail bytes.
+  comparison—not size or CFG counts alone—matches all 5,352 retail bytes.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 

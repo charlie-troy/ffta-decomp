@@ -596,6 +596,8 @@ def check_evaluator_partitions(rom):
         int(value) for value in re.findall(
             r"(?:ABSENT|PRESENT)_STATE_CASE\((\d+),", reference_source)
     )
+    final_literal = int.from_bytes(rom[0x0C47A4:0x0C47A8], "little")
+    next_prologue = rom[0x0C47A8:0x0C47AA]
     ok = (
         len(entries) == 66
         and sum(len(ids) for ids in entries.values()) == 92
@@ -614,6 +616,8 @@ def check_evaluator_partitions(rom):
         and entries[0x080C477A] == [14, 34, 74, 84, 85, 86, 87, 88, 89,
                                    90, 91]
         and reference_ids == set(range(1, 93))
+        and final_literal == 0x3C33
+        and next_prologue == bytes.fromhex("70 b5")
     )
     print(f"   92 ids / {len(entries)} distinct roots; "
           f"{owned_bytes} owned + {shared_bytes} shared code bytes")
@@ -622,6 +626,7 @@ def check_evaluator_partitions(rom):
     print(f"   dominant probability/status shape: {dominant_roots}/31 roots")
     print("   direct exits: 8 unconditional accept / 11 reject-next ids")
     print(f"   readable reference switch: {len(reference_ids)}/92 ids")
+    print("   endpoint: final literal 0x00003C33; next push at 0x080C47A8")
     print(f"   -> {'PASS' if ok else 'FAIL'}")
     return ok
 

@@ -23,7 +23,7 @@ python tools/compare_ai_evaluator_candidate.py
 
 The report also gates the known retail frame slots and all 85 retail
 self/other probability call sites. It does not claim a match until the reported
-size and subsequent byte comparison both reach the 5,350-byte retail target.
+size and subsequent byte comparison both reach the 5,352-byte retail target.
 The CFG comparison ranks both owned-byte and adjusted total-reachable-byte
 differences across the retail 66-root partition. It discovers the candidate's
 four evaluator exits, excludes them like the retail partition, and therefore

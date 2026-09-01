@@ -8,7 +8,7 @@ inferred from how the AI uses them and are not yet confirmed by running the game
 
 ## The central function
 
-`sub_080C32C0` — 5,350 bytes, reads 39 distinct unit flags, writes 1.
+`sub_080C32C0` — 5,352 bytes, reads 39 distinct unit flags, writes 1.
 
 Signature (from Ghidra): `(int user, int target, u16 *ability, char flag)`.
 

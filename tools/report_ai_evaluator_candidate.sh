@@ -5,7 +5,7 @@ set -euo pipefail
 
 SRC="${1:-reference/ai_ability_eval.c}"
 OUT="${2:-build/ai_eval_probe}"
-TARGET_SIZE=5350
+TARGET_SIZE=5352
 NM="$HOME/ffta-toolchain/local/usr/bin/arm-none-eabi-nm"
 
 mkdir -p "$OUT"

@@ -13,7 +13,7 @@ Regenerate with:
 
 ```bash
 python tools/analyze_switch.py <rom> build/functions_all.json \
-    0x080C3624 92 0x080C32C0 0x080C47A6
+    0x080C3624 92 0x080C32C0 0x080C47A8
 ```
 
 66 distinct bodies cover the 92 ids; several ids share a body.

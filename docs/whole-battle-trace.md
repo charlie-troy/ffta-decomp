@@ -17,7 +17,7 @@ A real enemy turn in the opening snowball engagement enters
 
 This confirms that the candidate-list/evaluator model is on the live battle
 path: the actor is held constant while every candidate target is passed through
-the 5,350-byte evaluator. No upstream rule bypassed the evaluator or collapsed
+the 5,352-byte evaluator. No upstream rule bypassed the evaluator or collapsed
 the four targets in this turn. This one tutorial turn cannot prove that no
 mission-, law-, or effect-specific rule dominates in every later battle; that
 broader claim remains deliberately out of scope.
