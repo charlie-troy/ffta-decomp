@@ -749,6 +749,11 @@ Completed:
   the helper's wide return through `u16 currentMp`, and the healthy-target path
   halves Max HP with retail's unsigned `lsr #1`. The relocation-aware result
   improved to 2,979 / 3,728 comparable bytes equal (749 mismatches).
+- Wrapped the MP helper with a fixed-`r0` inline narrowing tail. The cost path
+  now exactly retains the normalized helper result in `r0`, loads user MP into
+  `r1`, and subtracts in retail's register order. Comparable equality is now
+  2,981 / 3,728 bytes (747 mismatches); size, table, roots, and joins are
+  unchanged.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:

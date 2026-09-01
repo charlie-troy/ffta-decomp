@@ -181,6 +181,18 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
     return pass;
 }
 
+static __inline__ int AbilityMpCostForAi(struct Unit *user, u16 abilityId)
+{
+    register int cost __asm__("r0");
+
+    AbilityMpCostWide(user, abilityId);
+    __asm__ volatile (
+        "lsl %0, %0, #16\n"
+        "lsr %0, %0, #16"
+        : "=r" (cost));
+    return cost;
+}
+
 int AiEvaluateAbility(struct Unit *user, struct Unit *target,
                       struct Action *act, int checkCostArg)
 {
@@ -238,8 +250,7 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
 
         /* Reject when the user cannot afford it. The subtraction is done in
          * 16 bits and tested for sign, so it is an unsigned MP < cost test. */
-        currentMp = AbilityMpCostWide(user, act->abilityId);
-        if ((s16)(user->mp - currentMp) < 0)
+        if ((s16)(user->mp - AbilityMpCostForAi(user, act->abilityId)) < 0)
             Reject();
     }
 
