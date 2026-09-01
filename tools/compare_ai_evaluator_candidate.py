@@ -74,10 +74,14 @@ def successors(insn, size, external_calls):
 
 def find_candidate_stops(data):
     """Locate the candidate equivalents of retail's four evaluator exits."""
-    reject_pattern = bytes.fromhex("04 98 01 30 04 90")
+    reject_patterns = (
+        bytes.fromhex("04 9a 01 32 04 92"),  # nonvolatile index retained in r2
+        bytes.fromhex("04 98 01 30 04 90"),  # volatile index reloaded below
+    )
     false_pattern = bytes.fromhex("00 20 05 b0 38 bc")
     epilogue_pattern = bytes.fromhex("05 b0 38 bc")
-    reject = data.find(reject_pattern)
+    rejects = [data.find(pattern) for pattern in reject_patterns]
+    reject = next((address for address in rejects if address >= 0), -1)
     false_exit = data.find(false_pattern)
     epilogue = data.find(epilogue_pattern)
     if min(reject, false_exit, epilogue) < 0:

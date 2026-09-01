@@ -465,13 +465,14 @@ the repo explicitly ranks it below widening the table surface.
    polarity by test kind).
    **Current compiler baseline:** explicit return/redispatch control, direct
    state calls, duplicated self/other RNG arms, and the restored signed-action
-   gate produce one 5,356-byte agbcc function versus retail's 5,352 (+4). Its
+   gate produce one 5,354-byte agbcc function versus retail's 5,352 (+2). Its
    20-byte frame, `sp+12`/`sp+16` action/index slots, and effect table at
    `+0x364` match retail. All 66 case roots match their retail owned-byte sizes
    (3,958 / 3,958), all shared owner groups match at 88 / 88 bytes, and all 85
-   RNG/modulo sites remain. Remaining work is outside the case CFG: reproduce
-   the common retry tail's register lifetime and retail's post-epilogue
-   placement of the case-92 literal pool, then perform a full byte comparison.
+   RNG/modulo sites remain. Remaining work is outside the case CFG: remove one
+   two-byte action-pointer copy in the retry tail, reproduce retail's
+   post-epilogue placement of the case-92 literal pool, then perform a full
+   byte comparison.
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).

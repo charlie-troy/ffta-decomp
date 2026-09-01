@@ -732,6 +732,11 @@ Completed:
   bytes occupy `0x080C47A6..47A7`, and the next function's `push` begins at
   `0x080C47A8`. The authoritative retail span is therefore 5,352 bytes, and
   all historical size deltas in this log have been recalculated.
+- Split the candidate index out of the synthetic scratch/action struct and
+  removed its artificial `volatile` qualifier. It still occupies retail's
+  `sp+16` slot, but agbcc now retains the incremented value in `r2` instead of
+  reloading it. The candidate is 5,354 / 5,352 bytes (+2); the sole measured
+  tail excess is an `adds r1, r0, #0` before loading `action + 0x0A`.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -747,8 +752,8 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Reproduce retail's common retry-tail register lifetime without changing the
-  already-exact case CFG, then move or naturally defer the case-92 literal
+- Remove the retry tail's final two-byte action-pointer copy without changing
+  the already-exact case CFG, then move or naturally defer the case-92 literal
   pool past the epilogue. Keep the candidate in `reference/` until a full byte
   comparison—not size or CFG counts alone—matches all 5,352 retail bytes.
 

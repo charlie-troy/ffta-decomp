@@ -62,16 +62,15 @@ struct Action
     u8  flags_11;       /* byte +0x11, bits 0 and 1 reject            */
 };
 
-/* Retail reserves this exact 20-byte frame: a two-short helper result at
- * sp+0, eight bytes of compiler-era scratch, the action at sp+12, and the
- * candidate index at sp+16. */
+/* Retail reserves a 20-byte frame. This grouped 16-byte prefix places the
+ * three helper results at sp+0/+4/+8 and the action at sp+12; the separate
+ * candidateIndex local below naturally occupies sp+16. */
 struct AiEvaluatorFrame
 {
     s16 effectEstimate[2];
     s16 effectEstimateAlt[2];
     s16 effectEstimateMode[2];
     struct Action *action;
-    volatile int candidateIndex;
 };
 
 extern struct Ability gAbilityTable[];       /* 0x0855187C, 347 entries */
@@ -205,13 +204,13 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     register struct Unit *actor __asm__("r10") = user;
     register struct Unit *subject __asm__("r8") = target;
     struct AiEvaluatorFrame frame;
+    int candidateIndex;
 
     frame.action = act;
 
 #define user actor
 #define target subject
 #define act frame.action
-#define candidateIndex frame.candidateIndex
 #define effectEstimate frame.effectEstimate
 #define effectEstimateAlt frame.effectEstimateAlt
 #define effectEstimateMode frame.effectEstimateMode
@@ -720,7 +719,6 @@ reject_all:
 #undef effectEstimateMode
 #undef effectEstimateAlt
 #undef effectEstimate
-#undef candidateIndex
 #undef act
 #undef target
 #undef user
