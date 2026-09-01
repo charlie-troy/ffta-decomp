@@ -737,6 +737,12 @@ Completed:
   `sp+16` slot, but agbcc now retains the incremented value in `r2` instead of
   reloading it. The candidate is 5,354 / 5,352 bytes (+2); the sole measured
   tail excess is an `adds r1, r0, #0` before loading `action + 0x0A`.
+- Added `tools/compare_ai_evaluator_bytes.py`, which masks only the candidate
+  object's unresolved calls/pointers/table relocations and compares every
+  remaining byte at the same function offset. The first honest baseline is
+  2,961 / 3,728 comparable bytes equal, with 767 mismatches in 170 runs and
+  1,624 relocation bytes masked. The first run is the known prologue-order
+  difference at `+0x0C..+0x15`; equal root sizes are not byte identity.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -752,10 +758,11 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Remove the retry tail's final two-byte action-pointer copy without changing
-  the already-exact case CFG, then move or naturally defer the case-92 literal
-  pool past the epilogue. Keep the candidate in `reference/` until a full byte
-  comparison—not size or CFG counts alone—matches all 5,352 retail bytes.
+- Align the prologue and early gauntlet in offset order using the relocation-
+  aware mismatch report, beginning at `+0x0C`. Preserve the exact table and
+  case CFG; revisit the retry tail's final pointer copy and case-92 pool after
+  earlier mismatch runs stop shifting call sites. Keep the candidate in
+  `reference/` until all 5,352 retail bytes match after relocation.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 
