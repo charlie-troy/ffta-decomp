@@ -29,8 +29,8 @@ MOD_CALLS=$(grep -c $'\tbl\tsub_08142950' "$ASM" || true)
 grep -q $'\tadd\tsp, sp, #-20' "$ASM"
 grep -q $'\tstr\tr2, \[sp, #12\]' "$ASM"
 grep -q $'\tstr\t.*\[sp, #16\]' "$ASM"
-test "$RNG_CALLS" -eq 82
-test "$MOD_CALLS" -eq 82
+test "$RNG_CALLS" -eq 85
+test "$MOD_CALLS" -eq 85
 
 printf 'AiEvaluateAbility: %d / %d bytes (%+d)\n' "$SIZE" "$TARGET_SIZE" "$((SIZE - TARGET_SIZE))"
 printf 'frame: 20 bytes; action sp+12; candidate index sp+16\n'

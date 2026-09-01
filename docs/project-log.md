@@ -635,7 +635,7 @@ Completed:
   accepted effect returns one. This also explains retail's `sp+16` loop index.
 - Replaced function-pointer state helpers with direct per-case calls and kept
   RNG inside both self/other arms. The structurally correct candidate is now
-  4,954 bytes versus retail's 5,350 (396 bytes short), with all 82 retail-style
+  4,954 bytes versus retail's 5,350 (396 bytes short), with 82 then-emitted
   RNG call sites and the exact 20-byte frame, `sp+12` action pointer, and
   `sp+16` candidate index.
 - Added a candidate-side CFG comparator instead of treating total size as the
@@ -661,6 +661,15 @@ Completed:
 - Reshaping the shared range tail reproduces retail's `0xFFF30000` literal and
   backward mode-9 join. The candidate is now 5,338 / 5,350 bytes (12 short),
   and its effect switch table starts at `+0x35c` versus retail `+0x364`.
+- Separated the two compiler-collapsed root groups. Cases 41 and 80 use opposite
+  Confuse/Charm predicate order, while cases 15/50 reuse only case 59's self
+  arm and boolean tails. An empty compiler barrier preserves the otherwise-
+  merged other-target arm without emitting an instruction. Candidate and
+  retail now both have 66 distinct roots and 85 RNG/modulo call sites.
+- The more faithful layout exposes 5,432 candidate bytes versus 5,350 retail
+  (+82), with 4,038 versus 3,958 case-owned bytes (+80). Next reductions must
+  reproduce retail's shared final-state tails; shrinking arbitrary code would
+  destroy the newly correct root and call topology.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -676,12 +685,12 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Resolve the remaining layout differences rather than tuning total size:
-  separate the retail 15/50/59 and 41/80 roots while preserving their shared
-  tails, then work the root 43 (-14), root 3 (+12), root 16 (-8), and root 29
-  (+8) ownership deltas. Revisit the eight-byte pre-switch table offset only
-  after those downstream branch distances stabilize. Keep the candidate in
-  `reference/` until all 5,350 bytes match.
+- Reproduce retail's shared final-state result tail so cases 41/80 and the
+  composite/status families stop duplicating their last predicate handling.
+  Then work root 43 (-14), 15/50 (-12), root 3 (+10), roots 16/59 (-8), and
+  root 29 (+8). Revisit the pre-switch table offset only after downstream
+  branch distances stabilize. Keep the candidate in `reference/` until all
+  5,350 bytes match.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 

@@ -161,12 +161,16 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
     {
         roll = (s16)sub_08002804();
         roll = (s16)sub_08142950(roll, 101);
-        return roll <= 10;
+        if (roll > 10)
+            return 0;
+        return 1;
     }
 
     roll = (s16)sub_08002804();
     roll = (s16)sub_08142950(roll, 101);
-    return roll <= 49;
+    if (roll > 49)
+        return 0;
+    return 1;
 }
 
 /* First two switch rules, reconstructed from the case-owned CFG partitions.
@@ -199,6 +203,8 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     u32 adjustedRange;
     int isNegative;
     u16 abilityId;
+    s16 probabilityRoll;
+    int probabilityPass;
     u16 *abilityList;
     u16 *effectEntry;
     struct Unit *unitCopy;
@@ -405,10 +411,14 @@ next_effect:
         return 1;
     case 15:
     case 50:
-    case 59:
-        if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        return 1;
+        if (user == target)
+            goto probability_self;
+        probabilityRoll = (s16)sub_08002804();
+        probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
+        __asm__ volatile (""); /* keep retail's separate other-target arm */
+        if (probabilityRoll > 49)
+            goto probability_fail;
+        goto probability_pass;
     case 16:
         if (user != target || (u16)sub_080C13C8(target) == 0)
             RejectLate();
@@ -512,6 +522,11 @@ next_effect:
             RejectLate();
         return 1;
     case 41:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (sub_080CDB6C(target) && sub_080CDB54(target))
+            RejectLate(); /* do not combine Charm and Confuse */
+        return 1;
     case 80:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -625,6 +640,29 @@ next_effect:
             RejectLate();
         mode = (u16)sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3);
         if (UnitStat(target, STAT_HP) > mode)
+            RejectLate();
+        return 1;
+    case 59:
+        if (user != target)
+            goto probability_other;
+probability_self:
+        probabilityRoll = (s16)sub_08002804();
+        probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
+        if (probabilityRoll > 10)
+            goto probability_fail;
+        goto probability_pass;
+probability_other:
+        probabilityRoll = (s16)sub_08002804();
+        probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
+        if (probabilityRoll <= 49)
+            goto probability_pass;
+probability_fail:
+        probabilityPass = 0;
+        goto probability_done;
+probability_pass:
+        probabilityPass = 1;
+probability_done:
+        if (!probabilityPass)
             RejectLate();
         return 1;
     default:

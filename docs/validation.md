@@ -21,7 +21,7 @@ bash tools/report_ai_evaluator_candidate.sh
 python tools/compare_ai_evaluator_candidate.py
 ```
 
-The report also gates the known retail frame slots and all 82 duplicated
+The report also gates the known retail frame slots and all 85 retail
 self/other probability call sites. It does not claim a match until the reported
 size and subsequent byte comparison both reach the 5,350-byte retail target.
 The CFG comparison ranks owned-byte differences across the retail 66-root
