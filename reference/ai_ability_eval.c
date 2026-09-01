@@ -13,6 +13,7 @@
 typedef unsigned char u8;
 typedef signed char s8;
 typedef unsigned short u16;
+typedef unsigned int u32;
 typedef short s16;
 
 /* Only the fields this function touches. Offsets from docs/unit-struct.md. */
@@ -67,8 +68,9 @@ struct Action
 struct AiEvaluatorFrame
 {
     s16 effectEstimate[2];
-    u8 filler_04[8];
-    struct Action * volatile action;
+    s16 effectEstimateAlt[2];
+    s16 effectEstimateMode[2];
+    struct Action *action;
     volatile int candidateIndex;
 };
 
@@ -132,10 +134,11 @@ extern u8 sub_08133A58(struct Unit *u, u16 effectId);
 extern u8 sub_08131030(struct Unit *u);
 extern void sub_080CDD88(struct Unit *u, u8 v);
 
-extern void (*gSubHandlers[8])(void);       /* 0x080C347C              */
 extern int sub_08002804(void);              /* battle RNG               */
 extern int sub_08142950(int value, int divisor); /* signed remainder       */
 extern int sub_0812F0D8(struct Unit *u, s16 outPair[2]);
+extern u8 sub_0812EE98(struct Unit *u, u16 value);
+extern u8 sub_0812EED0(struct Unit *u, u16 value);
 extern int sub_080C13C8(struct Unit *u);
 extern int sub_08142AB0(int value, int divisor); /* signed division */
 extern int sub_080CA7A4(u16 itemId, u8 propertyId);
@@ -190,8 +193,12 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     u16 mode;
     u16 currentMp;
     s16 mpThreshold;
-    s8 e;
+    int e;
+    u8 rangeCode;
+    u16 estimateValue;
+    u32 adjustedRange;
     int isNegative;
+    u16 abilityId;
     u16 *abilityList;
     u16 *effectEntry;
     struct Unit *unitCopy;
@@ -208,6 +215,8 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
 #define act frame.action
 #define candidateIndex frame.candidateIndex
 #define effectEstimate frame.effectEstimate
+#define effectEstimateAlt frame.effectEstimateAlt
+#define effectEstimateMode frame.effectEstimateMode
 #define Reject() goto reject_all
 #define RejectLate() goto reject_current
 
@@ -272,17 +281,75 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
         if (act->abilityId != 0 && AbilityProp(act->abilityId, 0x11))
             mode = 0;                                /* flag bit 6 */
 
-        if (mode - 4 < 8)
+        switch (mode)
         {
-            gSubHandlers[mode - 4]();
-            return 0;
+        case 4:
+            if (act->abilityId == 0)
+                goto check_final_value;
+            if (!AbilityProp(act->abilityId, 0x1B))
+                goto check_reflect;
+            Reject();
+        case 5:
+            abilityId = act->abilityId;
+            if (abilityId != 0)
+                goto check_reflect;
+            Reject();
+        case 6:
+            if (act->abilityId != 0 && !AbilityProp(act->abilityId, 3))
+                goto check_reflect;
+            sub_0812F0D8(user, effectEstimate);
+            estimateValue = (u16)effectEstimate[0];
+check_range_code:
+            rangeCode = sub_0812EE98(user, estimateValue);
+            adjustedRange = ((u32)rangeCode << 24) >> 8;
+            adjustedRange += 0xFFF30000;
+            if ((u16)(adjustedRange >> 16) > 1)
+                goto check_reflect;
+            Reject();
+        case 9:
+            abilityId = act->abilityId;
+            if (abilityId != 0)
+                goto check_reflect;
+            sub_0812F0D8(user, effectEstimateAlt);
+            estimateValue = (u16)effectEstimateAlt[0];
+            goto check_range_code;
+        case 7:
+        case 8:
+        case 10:
+            abilityId = act->abilityId;
+            if (abilityId != 0)
+                goto check_reflect;
+            sub_0812F0D8(user, effectEstimateMode);
+            rangeCode = sub_0812EED0(user, (u16)effectEstimateMode[0]);
+            if (mode == 7 && rangeCode <= 1)
+                Reject();
+            if (rangeCode <= 2)
+                e >>= 1;
+            if (isNegative == 1)
+                Reject();
+            goto check_reflect;
+        case 11:
+            abilityId = act->abilityId;
+            if (abilityId == 0)
+                goto check_final_value;
+            if (AbilityProp(abilityId, 0x1A))
+            {
+                s16 cost = (s16)AbilityMpCost(target, abilityId);
+                if (cost <= UnitStat(target, 0x15))
+                    e >>= 1;
+            }
+            goto check_reflect;
+        default:
+            break;
         }
 
+check_reflect:
         if (act->abilityId != 0 && sub_0812F154(target)
             && AbilityProp(act->abilityId, 0x12))
             Reject();
     }
 
+check_final_value:
     if (!sub_0812F1DC(e))
         Reject();
     candidateIndex = 0;
@@ -307,7 +374,7 @@ next_effect:
     }
     sub_080CDD88(user, saved);
 
-    if (*effectEntry - 1 > 0x5B)
+    if ((u16)(*effectEntry - 1) > 0x5B)
         RejectLate();
 
     /* All 92 ids / 66 internal roots are represented below. The readable
@@ -572,6 +639,8 @@ reject_all:
     return 0;
 #undef RejectLate
 #undef Reject
+#undef effectEstimateMode
+#undef effectEstimateAlt
 #undef effectEstimate
 #undef candidateIndex
 #undef act

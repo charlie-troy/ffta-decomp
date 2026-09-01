@@ -1,6 +1,6 @@
 # Project log
 
-Last updated: 2026-08-31
+Last updated: 2026-09-01
 
 This is the operational source of truth for resuming the project. `README.md`
 describes the product, `CLAUDE.md` describes the working method, and
@@ -653,6 +653,14 @@ Completed:
   the pre-switch gauntlet, where the candidate table starts at `+0x268` versus
   retail `+0x364` (-252 bytes). Total size is no longer a useful proxy for
   case-body progress until that prefix is reconstructed.
+- Reconstructed the eight-way pre-switch mode dispatch instead of treating it
+  as an external callback table. Modes 4–11 now preserve property 27/3/26
+  gates, scratch pairs at `sp+0/+4/+8`, shared `sub_0812EE98` range mapping,
+  the `sub_0812EED0` result rules, target-side MP comparison, signed halving,
+  and the Reflect/final joins visible in retail.
+- Reshaping the shared range tail reproduces retail's `0xFFF30000` literal and
+  backward mode-9 join. The candidate is now 5,338 / 5,350 bytes (12 short),
+  and its effect switch table starts at `+0x35c` versus retail `+0x364`.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -668,12 +676,12 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Reconstruct the 252-byte pre-switch deficit first, comparing candidate
-  `+0x000..+0x268` with retail `+0x000..+0x364`. Preserve the exact frame while
-  restoring the early signed-byte/sign-flag lifetimes, handler paths, and source
-  statement order. Then resolve the 15/50/59 and 41/80 tail-sharing layouts and
-  the small per-root deltas. Keep the candidate in `reference/` until all 5,350
-  bytes match.
+- Resolve the remaining layout differences rather than tuning total size:
+  separate the retail 15/50/59 and 41/80 roots while preserving their shared
+  tails, then work the root 43 (-14), root 3 (+12), root 16 (-8), and root 29
+  (+8) ownership deltas. Revisit the eight-byte pre-switch table offset only
+  after those downstream branch distances stabilize. Keep the candidate in
+  `reference/` until all 5,350 bytes match.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 

@@ -38,6 +38,27 @@ constants shifts the AI's willingness to use status effects as a whole.
 They live in code, not data, so that needs `make mod` rather than the CSV
 editor.
 
+## Pre-switch mode dispatch
+
+Before the 92 effect cases, the evaluator derives a target mode with
+`sub_0812E6A4`. An invalid target tile or ability property 17 clears it to
+zero. Modes 4 through 11 then enter a second local jump table:
+
+| Mode | Rule before the shared Reflect/final checks |
+|---:|---|
+| 4 | Ability zero skips Reflect; otherwise property 27 rejects and its absence continues |
+| 5 | Ability zero rejects; nonzero continues |
+| 6 | A nonzero ability without property 3 continues; otherwise estimate into `sp+0`, map it with `sub_0812EE98`, and reject mapped codes 13–14 |
+| 7 | For ability zero, estimate into `sp+8` and map with `sub_0812EED0`; codes 0–1 reject, codes 0–2 halve the signed action value, and the negative-action flag rejects |
+| 8,10 | Same `sp+8` estimate; codes 0–2 halve the signed action value and the negative-action flag rejects |
+| 9 | A nonzero ability continues; ability zero estimates into `sp+4` and shares mode 6's `sub_0812EE98` / code 13–14 rejection tail |
+| 11 | Ability zero skips Reflect; property 26 halves the signed action value when its target-side MP cost is no greater than target MP |
+
+The shared Reflect path rejects a nonzero ability when the target has the
+Reflect predicate and ability property 18. All paths then require
+`sub_0812F1DC(signedActionValue)` to succeed. The helper names remain numeric
+where their broader meaning is not yet established.
+
 ## All case bodies
 
 | effect ids | divisor | thresholds | applies |
