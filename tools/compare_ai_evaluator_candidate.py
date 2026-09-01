@@ -141,12 +141,18 @@ def candidate_rows(data, roots, external_calls, stop_addrs):
         insns[address].size for address, owners in reachers.items()
         if len(owners) > 1 and address in insns
     )
+    shared_groups = collections.defaultdict(int)
+    for address, owners in reachers.items():
+        if len(owners) <= 1 or address not in insns:
+            continue
+        owner_ids = tuple(sorted(tuple(entries[root]) for root in owners))
+        shared_groups[owner_ids] += insns[address].size
     all_roots = set(entries)
     universal = sum(
         insns[address].size for address, owners in reachers.items()
         if owners == all_roots and address in insns
     )
-    return rows, reachable_rows, shared, universal
+    return rows, reachable_rows, shared, universal, shared_groups
 
 
 def main():
@@ -161,15 +167,25 @@ def main():
     candidate = open(args.bin, "rb").read()
     table_offset, roots = find_case_table(candidate)
     (candidate_by_ids, candidate_reachable, candidate_shared,
-     candidate_universal) = candidate_rows(
+     candidate_universal, candidate_shared_groups) = candidate_rows(
         candidate, roots, external_call_offsets(args.obj),
         find_candidate_stops(candidate)
     )
-    _, retail_insns, retail_reachers, retail_rows, _, _ = retail.analyze(rom)
+    (_, retail_insns, retail_reachers, retail_rows,
+     retail_shared_groups, _) = retail.analyze(rom)
 
     comparisons = []
     reachable_comparisons = []
     retail_by_ids = {tuple(row["case_ids"]): row for row in retail_rows}
+    retail_ids_by_root = {
+        row["root"]: tuple(row["case_ids"]) for row in retail_rows
+    }
+    retail_shared_by_ids = collections.defaultdict(int)
+    for owner_roots, addresses in retail_shared_groups.items():
+        owner_ids = tuple(sorted(retail_ids_by_root[root] for root in owner_roots))
+        retail_shared_by_ids[owner_ids] += sum(
+            retail_insns[address].size for address in addresses
+        )
     candidate_groups = set(candidate_by_ids)
     retail_groups = set(retail_by_ids)
     if candidate_groups != retail_groups:
@@ -220,6 +236,23 @@ def main():
         label = ",".join(str(value) for value in ids)
         print(f"  {label:>23}: {candidate_bytes:4} - {retail_bytes:4} = {delta:+4}")
     print(f"sum of 66 owned deltas: {sum(item[0] for item in comparisons):+d}")
+    shared_keys = set(candidate_shared_groups) | set(retail_shared_by_ids)
+    shared_differences = []
+    for owner_ids in shared_keys:
+        candidate_bytes = candidate_shared_groups.get(owner_ids, 0)
+        retail_bytes = retail_shared_by_ids.get(owner_ids, 0)
+        if candidate_bytes != retail_bytes:
+            shared_differences.append(
+                (candidate_bytes - retail_bytes, owner_ids,
+                 retail_bytes, candidate_bytes)
+            )
+    shared_differences.sort(key=lambda item: (-abs(item[0]), item[1]))
+    print("shared-join group deltas (candidate - retail):")
+    for delta, owner_ids, retail_bytes, candidate_bytes in shared_differences:
+        label = ";".join(
+            ",".join(str(value) for value in ids) for ids in owner_ids
+        )
+        print(f"  {label:>23}: {candidate_bytes:4} - {retail_bytes:4} = {delta:+4}")
     print("largest adjusted-reachable-byte deltas (candidate - retail):")
     for delta, ids, retail_bytes, candidate_bytes in reachable_comparisons[:args.limit]:
         label = ",".join(str(value) for value in ids)

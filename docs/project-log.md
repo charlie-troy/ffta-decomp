@@ -697,6 +697,25 @@ Completed:
   (+18), 82 candidate shared bytes, 66 roots, and 85 RNG/modulo sites. This is
   a size checkpoint only: the table remains at `+0x35c` versus retail `+0x364`,
   and byte identity has not been claimed.
+- Reordered the readable switch into retail's physical root sequence instead
+  of grouping cases by helper family. Owned sizes now match for 64/66 roots;
+  only case 43 (+6) and case 28 (-2) remain nonzero.
+- Extended the comparator to key shared joins by their complete reaching case
+  sets. Candidate and retail now have the same shared groups and exactly 88
+  shared bytes; this closes the earlier ownership ambiguity rather than merely
+  balancing its total.
+- Corrected two behaviors revealed by the shared-group comparison. The
+  11/53/54/58/79 simulated-status family returns its changed/not-changed value
+  directly instead of trying the next candidate, and case 62 passes the status
+  probability gate before joining the present-state result tail.
+- Matched cases 1/2 by correcting the effective-Speed return type, case 49 by
+  reconstructing its shifted five-slot loop and separate range comparisons,
+  and cases 38/55 by evaluating current HP before Max HP / 3. Case 92 now owns
+  its result test while the ordinary absent and present tails remain exact.
+- Latest baseline remains 5,352 / 5,350 bytes (+2), but its CFG accounting is
+  now 3,962 / 3,958 owned bytes (+4) and 88 / 88 shared bytes. Total-size
+  equality is still not the goal: the table prefix is eight bytes short and
+  the remaining owned deltas offset one another.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -712,12 +731,10 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Use adjusted reachable deltas, not owned deltas alone, to work roots 29 (+8),
-  the ordinary absent-state cluster (+8), and the short present-state roots
-  (-6). Reorder cases toward retail's physical sequence where that converts
-  long transfers to short branches. Revisit the table's eight-byte prefix gap
-  only after case layout stabilizes, and keep the candidate in `reference/`
-  until all 5,350 bytes match exactly.
+- Close case 43's six-byte long-branch excess and case 28's two-byte deficit,
+  then reconcile the table's eight-byte prefix gap against the remaining
+  non-case control flow. Keep the candidate in `reference/` until full byte
+  comparison—not size alone—matches all 5,350 retail bytes.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 

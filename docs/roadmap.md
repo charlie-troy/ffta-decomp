@@ -469,10 +469,10 @@ the repo explicitly ranks it below widening the table surface.
    20-byte frame and `sp+12`/`sp+16` action/index slots match retail. The inline
    modes 4–11 dispatch now retains all three scratch-pair paths and shared
    joins; all 66 case roots and 85 RNG/modulo sites now exist. Remaining work
-   is shared-tail and instruction layout; the comparator now removes evaluator
-   exits and reports per-root adjusted reachable bytes so shared ownership does
-   not masquerade as missing logic. Cases 15/50/16/59 have exact owned sizes,
-   while the table remains eight bytes earlier than retail.
+   is instruction layout: the switch now follows retail's physical root order,
+   64/66 roots have exact owned sizes, and all shared owner groups match at
+   88/88 bytes. Only case 43 (+6) and case 28 (-2) remain nonzero, while the
+   table remains eight bytes earlier than retail.
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).

@@ -80,7 +80,7 @@ extern u8 gEwram[];                          /* 0x02000000 */
 extern int  AbilityProp(u16 abilityId, u8 propId);        /* sub_080CCD50 */
 extern u16  AbilityMpCost(struct Unit *u, u16 abilityId); /* sub_0812ED98 */
 extern int  UnitStat(struct Unit *u, u8 statId);          /* sub_080C7EA4 */
-extern s16  sub_0812E368(struct Unit *u);                 /* effective Speed */
+extern int  sub_0812E368(struct Unit *u);                 /* effective Speed */
 
 #define STAT_HP      0x13    /* unit +0x18 */
 #define STAT_MAX_HP  0x14    /* unit +0x1A */
@@ -154,7 +154,7 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
                                                  struct Unit *target)
 {
     s16 roll;
-    int pass;
+    register int pass __asm__("r0");
 
     /* Keep the RNG call inside each arm. Retail duplicates these instruction
      * sequences instead of rolling once and selecting only the threshold. */
@@ -195,6 +195,7 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     s16 probabilityRoll;
     int probabilityPass;
     int stateResult;
+    register int rawStateResult __asm__("r0");
     u16 *abilityList;
     u16 *effectEntry;
     struct Unit *unitCopy;
@@ -373,8 +374,18 @@ next_effect:
     if ((u16)(*effectEntry - 1) > 0x5B)
         RejectLate();
 
-    /* All 92 ids / 66 internal roots are represented below. The readable
-     * families deliberately share helpers even though retail inlines them. */
+#define ABSENT_STATE_CASE(id, test) \
+    case id: \
+        if (!AiPassesStatusProbability(user, target)) \
+            RejectLate(); \
+        test(target); \
+        __asm__ volatile ("" : "=r" (rawStateResult)); \
+        goto absent_state_result
+#define PRESENT_STATE_CASE(id, test) \
+    case id: \
+        stateResult = test(target); \
+        goto present_state_result
+    /* Keep case bodies in retail's physical root order. */
     switch (*effectEntry)
     {
     case 1:
@@ -382,65 +393,6 @@ next_effect:
             RejectLate();
         if ((s16)target->chargeTime <= 499)
             RejectLate();
-        return 1;
-    case 2: /* Quicken / Smile */
-        if (sub_0812E368(target) == 0)
-            RejectLate();
-        if ((s16)target->chargeTime > 699)
-            RejectLate();
-        return 1;
-    case 3:
-        if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        if (!sub_080CDBE4(target) || !sub_080CDC14(target) ||
-            !sub_080CDC44(target))
-            return 1;
-        stateResult = sub_080CDC74(target);
-        goto absent_state_result;
-    case 7:
-        if (UnitStat(target, 0x26) <= 1) /* Judge Points */
-            RejectLate();
-        return 1;
-    case 75:
-        if (UnitStat(target, STAT_HP) <= 1)
-            RejectLate();
-        return 1;
-    case 4:
-    case 6:
-    case 21:
-        if (act->unk_0C <= 0)
-            RejectLate();
-        return 1;
-    case 15:
-    case 50:
-        if (user == target)
-            goto probability_self;
-        probabilityRoll = (s16)sub_08002804();
-        probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
-        __asm__ volatile (""); /* keep retail's separate other-target arm */
-        if (probabilityRoll > 49)
-            goto probability_fail;
-        goto probability_pass;
-    case 16:
-        if (user != target)
-            goto probability_fail;
-        if ((u16)sub_080C13C8(target) == 0)
-            goto probability_fail;
-        goto probability_pass;
-    case 9:
-        currentMp = (u16)UnitStat(target, 0x15);
-        mpThreshold = (s16)sub_08142AB0(UnitStat(target, 0x16), 3);
-        if (mpThreshold == 0)
-            RejectLate();
-        if ((s16)currentMp > mpThreshold)
-            RejectLate();
-        return 1;
-    case 38:
-        if (act->unk_0C >= 0)
-            Reject();
-        mode = (u16)sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3);
-        if (UnitStat(target, STAT_HP) > mode)
-            Reject();
         return 1;
     case 5:
     case 18:
@@ -450,142 +402,24 @@ next_effect:
     case 44:
     case 68:
     case 81:
-        return 1; /* jump-table entry is the common accept exit */
-    case 14:
-    case 34:
-    case 74:
-    case 84:
-    case 85:
-    case 86:
-    case 87:
-    case 88:
-    case 89:
-    case 90:
-    case 91:
-        RejectLate(); /* jump-table entry is the reject-next exit */
-        break;
-#define ABSENT_STATE_CASE(id, test) \
-    case id: \
-        if (!AiPassesStatusProbability(user, target)) \
-            RejectLate(); \
-        stateResult = test(target); \
-        goto absent_state_result
-    ABSENT_STATE_CASE(10, sub_080CD8FC); /* Astra */
-    ABSENT_STATE_CASE(12, sub_080CD95C); /* Frog */
-    ABSENT_STATE_CASE(17, sub_080CDA1C); /* Advice */
-    ABSENT_STATE_CASE(19, sub_080CDADC); /* Stop */
-    ABSENT_STATE_CASE(20, sub_080CDA34); /* Speed Down */
-    ABSENT_STATE_CASE(22, sub_080CDB9C); /* Disable */
-    ABSENT_STATE_CASE(24, sub_080CDB84); /* Immobilize */
-    ABSENT_STATE_CASE(27, sub_080CD944); /* Berserk */
-    ABSENT_STATE_CASE(31, sub_080CD8E4);
-    ABSENT_STATE_CASE(32, sub_080CD914);
-    ABSENT_STATE_CASE(33, sub_080CD8CC);
-    ABSENT_STATE_CASE(35, sub_080CD98C); /* Blind */
-    ABSENT_STATE_CASE(37, sub_080CDA64); /* Mow Down speed penalty */
-    ABSENT_STATE_CASE(42, sub_080CDA94); /* Doom */
-    ABSENT_STATE_CASE(45, sub_080CDB24); /* Sleep */
-    ABSENT_STATE_CASE(46, sub_080CD92C); /* Petrify */
-    ABSENT_STATE_CASE(51, sub_080CDAC4); /* Slow */
-    ABSENT_STATE_CASE(52, sub_080CDAAC); /* Haste */
-    ABSENT_STATE_CASE(56, sub_080CDB3C); /* Silence */
-    ABSENT_STATE_CASE(60, sub_080CD9BC); /* Conceal */
-    ABSENT_STATE_CASE(61, sub_080CD974); /* Poison */
-    ABSENT_STATE_CASE(62, sub_080CD974); /* Poison secondary */
-    ABSENT_STATE_CASE(69, sub_080CDBFC);
-    ABSENT_STATE_CASE(70, sub_080CD9EC);
-    ABSENT_STATE_CASE(71, sub_080CDBB4); /* Addle */
-    ABSENT_STATE_CASE(72, sub_080CDC5C);
-    ABSENT_STATE_CASE(73, sub_080CDC44);
-    ABSENT_STATE_CASE(76, sub_080CDC2C);
-    ABSENT_STATE_CASE(77, sub_080CDC8C);
-    ABSENT_STATE_CASE(78, sub_080CDC74);
-    ABSENT_STATE_CASE(82, sub_080CDB0C); /* Protect */
-    ABSENT_STATE_CASE(83, sub_080CDAF4); /* Shell */
-#undef ABSENT_STATE_CASE
-#define PRESENT_STATE_CASE(id, test) \
-    case id: \
-        if (!test(target)) \
-            RejectLate(); \
-        return 1
-    PRESENT_STATE_CASE(13, sub_080CD95C); /* remove Frog */
-    PRESENT_STATE_CASE(23, sub_080CDB9C); /* remove Disable */
-    PRESENT_STATE_CASE(25, sub_080CDB84); /* remove Immobilize */
-    PRESENT_STATE_CASE(36, sub_080CD98C); /* remove Blind */
-    PRESENT_STATE_CASE(47, sub_080CD92C); /* Soft / remove Petrify */
-    PRESENT_STATE_CASE(57, sub_080CDB3C); /* remove Silence */
-    PRESENT_STATE_CASE(64, sub_08131030);
-#undef PRESENT_STATE_CASE
-    case 65:
-    case 66:
-    case 67:
-        if (!AiPassesStatusProbability(user, target))
+        return 1;
+    case 2:
+        if (sub_0812E368(target) == 0)
             RejectLate();
-        if (sub_0812F0D8(target, effectEstimate) <= 0)
+        if ((s16)target->chargeTime > 699)
             RejectLate();
         return 1;
-    case 41:
+    case 3:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        if (!sub_080CDB6C(target))
-            return 1;
-        stateResult = sub_080CDB54(target);
-        goto absent_state_result; /* do not combine Charm and Confuse */
-    case 80:
-        if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        if (!sub_080CDB54(target))
-            return 1;
-        stateResult = sub_080CDB6C(target);
-        goto absent_state_result; /* do not combine Confuse and Charm */
-    case 29:
-        if (sub_080CDB9C(target) && sub_080CDB84(target) &&
-            sub_080CD98C(target) && sub_080CD944(target) &&
-            UnitStat(target, STAT_HP) == 1)
+        if (sub_080CDBE4(target) && sub_080CDC14(target) &&
+            sub_080CDC44(target) && sub_080CDC74(target))
             RejectLate();
         return 1;
-    case 30:
-        if (sub_080CDB9C(target) && sub_080CDB84(target) &&
-            sub_080CDAC4(target) && sub_080CDADC(target))
+    case 7:
+        if (UnitStat(target, 0x26) <= 1)
             RejectLate();
         return 1;
-    case 49:
-        for (mode = 0x1D; mode <= 0x21; mode++)
-        {
-            int itemType = sub_080CA7A4((u16)UnitStat(target, (u8)mode), 3);
-            if (itemType >= 0x18 && itemType <= 0x1A)
-                break;
-        }
-        if (mode > 0x21)
-            RejectLate();
-        return 1;
-    case 92:
-        if (gEwram[0x3C33] == 0 || sub_080C832C(target) != 0)
-            RejectLate();
-        return 1;
-    case 28:
-        if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        if (sub_080CDAAC(target) == 1)
-        {
-            stateResult = sub_080CDADC(target);
-            goto absent_state_result;
-        }
-        stateResult = sub_080CDAC4(target);
-        goto absent_state_result;
-    case 48:
-        if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        if (sub_080CDC5C(target) && sub_080CDC8C(target))
-            RejectLate();
-        return 1;
-    case 63:
-        if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        if (UnitStat(target, 0x1B) & 0x0800)
-            RejectLate();
-        stateResult = sub_08131030(target);
-        goto absent_state_result;
     case 8:
         abilityList = (u16 *)sub_08022840(0x50);
         count = sub_081342A8(abilityList, target);
@@ -604,6 +438,13 @@ next_effect:
         if (!found || UnitStat(target, 0x15) == 0)
             RejectLate();
         return 1;
+    case 9:
+        currentMp = (u16)UnitStat(target, 0x15);
+        mpThreshold = (s16)sub_08142AB0(UnitStat(target, 0x16), 3);
+        if (mpThreshold == 0 || (s16)currentMp > mpThreshold)
+            RejectLate();
+        return 1;
+    ABSENT_STATE_CASE(10, sub_080CD8FC);
     case 11:
     case 53:
     case 54:
@@ -619,27 +460,129 @@ next_effect:
             changed = (*(unsigned int *)((u8 *)target + 0xEC) !=
                        *(unsigned int *)((u8 *)unitCopy + 0xEC));
         sub_08022854(unitCopy);
-        if (!changed)
+        return changed;
+    ABSENT_STATE_CASE(12, sub_080CD95C);
+    PRESENT_STATE_CASE(13, sub_080CD95C);
+    case 15:
+    case 50:
+        if (user == target)
+            goto probability_self;
+        probabilityRoll = (s16)sub_08002804();
+        probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
+        __asm__ volatile ("");
+        if (probabilityRoll > 49)
+            goto probability_fail;
+        goto probability_pass;
+    case 16:
+        if (user != target || (u16)sub_080C13C8(target) == 0)
+            goto probability_fail;
+        goto probability_pass;
+    ABSENT_STATE_CASE(17, sub_080CDA1C);
+    ABSENT_STATE_CASE(19, sub_080CDADC);
+    ABSENT_STATE_CASE(20, sub_080CDA34);
+    case 4:
+    case 6:
+    case 21:
+        if (act->unk_0C <= 0)
             RejectLate();
         return 1;
+    ABSENT_STATE_CASE(22, sub_080CDB9C);
+    PRESENT_STATE_CASE(23, sub_080CDB9C);
+    ABSENT_STATE_CASE(24, sub_080CDB84);
+    PRESENT_STATE_CASE(25, sub_080CDB84);
+    ABSENT_STATE_CASE(27, sub_080CD944);
+    case 28:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (sub_080CDAAC(target) == 1)
+            sub_080CDADC(target);
+        else
+            sub_080CDAC4(target);
+        __asm__ volatile ("" : "=r" (rawStateResult));
+        goto absent_state_result;
+    case 29:
+        if (sub_080CDB9C(target) && sub_080CDB84(target) &&
+            sub_080CD98C(target) && sub_080CD944(target) &&
+            UnitStat(target, STAT_HP) == 1)
+            RejectLate();
+        return 1;
+    case 30:
+        if (sub_080CDB9C(target) && sub_080CDB84(target) &&
+            sub_080CDAC4(target) && sub_080CDADC(target))
+            RejectLate();
+        return 1;
+    ABSENT_STATE_CASE(31, sub_080CD8E4);
+    ABSENT_STATE_CASE(32, sub_080CD914);
+    ABSENT_STATE_CASE(33, sub_080CD8CC);
+    ABSENT_STATE_CASE(35, sub_080CD98C);
+    PRESENT_STATE_CASE(36, sub_080CD98C);
+    ABSENT_STATE_CASE(37, sub_080CDA64);
+    case 38:
+        if (act->unk_0C >= 0)
+            Reject();
+        e = UnitStat(target, STAT_HP);
+        if (e > sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3))
+            Reject();
+        return 1;
+    case 41:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (!sub_080CDB6C(target))
+            return 1;
+        sub_080CDB54(target);
+        __asm__ volatile ("" : "=r" (rawStateResult));
+        goto absent_state_result;
+    ABSENT_STATE_CASE(42, sub_080CDA94);
     case 43:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        if (!sub_080CDAC4(target) || !sub_080CD98C(target) ||
-            !sub_080CDB54(target) || !sub_080CDB3C(target) ||
-            !sub_080CD95C(target) || !sub_080CD974(target))
-            return 1;
-        stateResult = sub_080CDB24(target);
-        goto absent_state_result;
+        if (sub_080CDAC4(target) && sub_080CD98C(target) &&
+            sub_080CDB54(target) && sub_080CDB3C(target) &&
+            sub_080CD95C(target) && sub_080CD974(target) &&
+            sub_080CDB24(target))
+            RejectLate();
+        return 1;
+    ABSENT_STATE_CASE(45, sub_080CDB24);
+    ABSENT_STATE_CASE(46, sub_080CD92C);
+    PRESENT_STATE_CASE(47, sub_080CD92C);
+    case 48:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (sub_080CDC5C(target) && sub_080CDC8C(target))
+            RejectLate();
+        return 1;
+    case 49:
+        i = 0;
+        adjustedRange = 0x1D000000;
+        do
+        {
+            int itemType = sub_080CA7A4(
+                (u16)UnitStat(target, (u8)(adjustedRange >> 24)), 3);
+            if (itemType <= 0x1A)
+            {
+                __asm__ volatile ("");
+                if (itemType >= 0x18)
+                    return 1;
+            }
+            adjustedRange += 0x01000000;
+            i++;
+        }
+        while (i <= 4);
+        RejectLate();
+        break;
+    ABSENT_STATE_CASE(51, sub_080CDAC4);
+    ABSENT_STATE_CASE(52, sub_080CDAAC);
     case 55:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if (sub_080CDA4C(target))
             RejectLate();
-        mode = (u16)sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3);
-        if (UnitStat(target, STAT_HP) > mode)
+        e = UnitStat(target, STAT_HP);
+        if (e > sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3))
             RejectLate();
         return 1;
+    ABSENT_STATE_CASE(56, sub_080CDB3C);
+    PRESENT_STATE_CASE(57, sub_080CDB3C);
     case 59:
         if (user != target)
             goto probability_other;
@@ -664,14 +607,89 @@ probability_done:
         if (!probabilityPass)
             RejectLate();
         return 1;
-absent_state_result:
-        if (stateResult)
+    ABSENT_STATE_CASE(60, sub_080CD9BC);
+    ABSENT_STATE_CASE(61, sub_080CD974);
+    case 62:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        stateResult = sub_080CD974(target);
+        goto present_state_result;
+    case 63:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (UnitStat(target, 0x1B) & 0x0800)
+            RejectLate();
+        sub_08131030(target);
+        __asm__ volatile ("" : "=r" (rawStateResult));
+        goto absent_state_result;
+    PRESENT_STATE_CASE(64, sub_08131030);
+present_state_result:
+        if (stateResult != 1)
             RejectLate();
         return 1;
+    case 65:
+    case 66:
+    case 67:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (sub_0812F0D8(target, effectEstimate) <= 0)
+            RejectLate();
+        return 1;
+    ABSENT_STATE_CASE(69, sub_080CDBFC);
+    ABSENT_STATE_CASE(70, sub_080CD9EC);
+    ABSENT_STATE_CASE(71, sub_080CDBB4);
+    ABSENT_STATE_CASE(72, sub_080CDC5C);
+    ABSENT_STATE_CASE(73, sub_080CDC44);
+    case 75:
+        if (UnitStat(target, STAT_HP) <= 1)
+            RejectLate();
+        return 1;
+    ABSENT_STATE_CASE(76, sub_080CDC2C);
+    ABSENT_STATE_CASE(77, sub_080CDC8C);
+    ABSENT_STATE_CASE(78, sub_080CDC74);
+    case 80:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (!sub_080CDB54(target))
+            return 1;
+        sub_080CDB6C(target);
+        __asm__ volatile ("" : "=r" (rawStateResult));
+        goto absent_state_result;
+    ABSENT_STATE_CASE(82, sub_080CDB0C);
+    ABSENT_STATE_CASE(83, sub_080CDAF4);
+absent_state_result:
+        __asm__ volatile ("lsl %0, %0, #24" : "+r" (rawStateResult));
+        if (rawStateResult)
+            RejectLate();
+        return 1;
+    case 92:
+        if (gEwram[0x3C33] == 0)
+            RejectLate();
+        sub_080C832C(target);
+        __asm__ volatile ("lsl %0, %0, #24" : "=r" (rawStateResult));
+        if (rawStateResult)
+            RejectLate();
+        __asm__ volatile ("" ::: "memory");
+        return 1;
+    case 14:
+    case 34:
+    case 74:
+    case 84:
+    case 85:
+    case 86:
+    case 87:
+    case 88:
+    case 89:
+    case 90:
+    case 91:
+        RejectLate();
+        break;
     default:
         RejectLate(); /* unreachable after the 1..92 range check */
         return 1;
     }
+#undef PRESENT_STATE_CASE
+#undef ABSENT_STATE_CASE
 reject_current:
     candidateIndex++;
     if (candidateIndex < act->unk_0A)
