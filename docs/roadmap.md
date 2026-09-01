@@ -463,8 +463,12 @@ the repo explicitly ranks it below widening the table surface.
    (ternary vs if/else for shared stores; globals as extern symbols, never cast
    literal addresses; literal-vs-`int`-variable register allocation; branch
    polarity by test kind).
-   **Current compiler baseline:** inline helpers produce one 4,976-byte agbcc
-   function versus retail's 5,350 bytes (374 bytes short).
+   **Current compiler baseline:** explicit return/redispatch control, direct
+   state calls, duplicated self/other RNG arms, and corrected cases 9/92 produce
+   one 5,092-byte agbcc function versus retail's 5,350 (258 bytes short). Its
+   20-byte frame and `sp+12`/`sp+16` action/index slots match retail. Case-owned
+   CFG bytes are already +24; 252 missing bytes are concentrated before the
+   switch table (`+0x268` candidate versus `+0x364` retail).
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).

@@ -11,6 +11,7 @@
  */
 
 typedef unsigned char u8;
+typedef signed char s8;
 typedef unsigned short u16;
 typedef short s16;
 
@@ -56,11 +57,23 @@ struct Action
     u16 unk_0A;         /* [5]  must be non-zero                      */
     s16 unk_0C;         /* [6]  sign is tested repeatedly             */
     s16 unk_0E;         /* [7]  compared against 0x1E                 */
-    u16 unk_10;         /* [8]  passed to sub_0812F1DC                */
-    u8  flags_11;       /* byte at +0x11, bits 0 and 1 reject         */
+    s8  unk_10;         /* byte +0x10, passed signed to sub_0812F1DC  */
+    u8  flags_11;       /* byte +0x11, bits 0 and 1 reject            */
+};
+
+/* Retail reserves this exact 20-byte frame: a two-short helper result at
+ * sp+0, eight bytes of compiler-era scratch, the action at sp+12, and the
+ * candidate index at sp+16. */
+struct AiEvaluatorFrame
+{
+    s16 effectEstimate[2];
+    u8 filler_04[8];
+    struct Action * volatile action;
+    volatile int candidateIndex;
 };
 
 extern struct Ability gAbilityTable[];       /* 0x0855187C, 347 entries */
+extern u8 gEwram[];                          /* 0x02000000 */
 
 extern int  AbilityProp(u16 abilityId, u8 propId);        /* sub_080CCD50 */
 extern u16  AbilityMpCost(struct Unit *u, u16 abilityId); /* sub_0812ED98 */
@@ -69,9 +82,6 @@ extern s16  sub_0812E368(struct Unit *u);                 /* effective Speed */
 
 #define STAT_HP      0x13    /* unit +0x18 */
 #define STAT_MAX_HP  0x14    /* unit +0x1A */
-
-extern void Reject(void);            /* sub_080C478C, the common bail-out */
-extern void RejectLate(void);        /* sub_080C477A                      */
 
 /* Unit status/capability getters; see docs/unit-flags.md. */
 extern u8 sub_080C8240(struct Unit *u);
@@ -137,29 +147,23 @@ extern int sub_081342C0(u16 *out, struct Unit *target);
 extern void sub_08142250(void *dst, const void *src, int size, const void *mode);
 extern void sub_08133BB4(struct Unit *copy, u16 effectId);
 
-typedef u8 (*EffectStateTest)(struct Unit *u);
-
 static __inline__ int AiPassesStatusProbability(struct Unit *user,
                                                  struct Unit *target)
 {
-    s16 roll = (s16)sub_08002804();
+    s16 roll;
+
+    /* Keep the RNG call inside each arm. Retail duplicates these instruction
+     * sequences instead of rolling once and selecting only the threshold. */
+    if (user == target)
+    {
+        roll = (s16)sub_08002804();
+        roll = (s16)sub_08142950(roll, 101);
+        return roll <= 10;
+    }
+
+    roll = (s16)sub_08002804();
     roll = (s16)sub_08142950(roll, 101);
-    return user == target ? roll <= 10 : roll <= 49;
-}
-
-static __inline__ int AiAllowsAbsentState(struct Unit *user,
-                                          struct Unit *target,
-                                          EffectStateTest stateTest)
-{
-    if (!AiPassesStatusProbability(user, target))
-        return 0;
-    return stateTest(target) == 0;
-}
-
-static __inline__ int AiAllowsPresentState(struct Unit *target,
-                                           EffectStateTest stateTest)
-{
-    return stateTest(target) == 1;
+    return roll <= 49;
 }
 
 /* First two switch rules, reconstructed from the case-owned CFG partitions.
@@ -180,16 +184,32 @@ static __inline__ int AiAllowsCtThrough699(struct Unit *target)
     return (s16)target->chargeTime <= 699;
 }
 
-void AiEvaluateAbility(struct Unit *user, struct Unit *target,
-                       struct Action *act, u8 checkCost)
+int AiEvaluateAbility(struct Unit *user, struct Unit *target,
+                      struct Action *act, u8 checkCost)
 {
     u16 mode;
-    s16 c, e;
-    s16 effectEstimate[2];
+    u16 currentMp;
+    s16 mpThreshold;
+    s8 e;
+    int isNegative;
     u16 *abilityList;
+    u16 *effectEntry;
     struct Unit *unitCopy;
     int count, i, found, changed;
     u8 saved;
+    register struct Unit *actor __asm__("r10") = user;
+    register struct Unit *subject __asm__("r8") = target;
+    struct AiEvaluatorFrame frame;
+
+    frame.action = act;
+
+#define user actor
+#define target subject
+#define act frame.action
+#define candidateIndex frame.candidateIndex
+#define effectEstimate frame.effectEstimate
+#define Reject() goto reject_all
+#define RejectLate() goto reject_current
 
     /* Two action flags veto outright. */
     if (act->flags_11 & 1)
@@ -238,13 +258,11 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         Reject();
 
     e = act->unk_10;
-    c = act->unk_0C;
+    isNegative = act->unk_0C < 0;
 
-    /* The outer test is vacuous as written (c >= 0 || c < 0), which is how
-     * the original compiles; the meaningful part is the inner pair. */
-    if (sub_081341BC(user, target) || c < 0)
+    if (sub_081341BC(user, target) || isNegative)
     {
-        if (c >= 0 && act->unk_0E < 0x1E)
+        if (!isNegative && act->unk_0E < 0x1E)
             Reject();
 
         mode = sub_0812E6A4(target) & 0xFFFF;
@@ -257,7 +275,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         if (mode - 4 < 8)
         {
             gSubHandlers[mode - 4]();
-            return;
+            return 0;
         }
 
         if (act->abilityId != 0 && sub_0812F154(target)
@@ -265,79 +283,84 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
             Reject();
     }
 
-    if (!sub_0812F1DC((s16)(char)e))
+    if (!sub_0812F1DC(e))
         Reject();
-    if (act->unk_0A == 0)
+    candidateIndex = 0;
+    if (candidateIndex >= act->unk_0A)
         Reject();
 
-    /* From here the action pointer advances two u16s and the effect id drives
-     * the 92-case switch. */
-    act = (struct Action *)((u16 *)act + 2);
-    if (act->abilityId == 0)
+next_effect:
+    /* The candidate effects are the u16 list at action +4. Failed entries
+     * advance through the list; successful entries return immediately. */
+    effectEntry = (u16 *)((u8 *)act + 4) + candidateIndex;
+    if (*effectEntry == 0)
         RejectLate();
 
     /* A status bit is briefly cleared around the reachability test, then put
      * back, so the test is done as though the unit did not have it. */
     saved = sub_080CD8FC(user);
     sub_080CDD88(user, 0);
-    if (!sub_08133A58(target, act->abilityId))
+    if (!sub_08133A58(target, *effectEntry))
     {
         sub_080CDD88(user, saved);
         RejectLate();
     }
     sub_080CDD88(user, saved);
 
-    if (act->abilityId - 1 > 0x5B)
+    if (*effectEntry - 1 > 0x5B)
         RejectLate();
 
     /* All 92 ids / 66 internal roots are represented below. The readable
      * families deliberately share helpers even though retail inlines them. */
-    switch (act->abilityId)
+    switch (*effectEntry)
     {
     case 1:
         if (!AiAllowsCtAbove499(target))
             RejectLate();
-        break;
+        return 1;
     case 2: /* Quicken / Smile */
         if (!AiAllowsCtThrough699(target))
             RejectLate();
-        break;
+        return 1;
     case 7:
         if (UnitStat(target, 0x26) <= 1) /* Judge Points */
             RejectLate();
-        break;
+        return 1;
     case 75:
         if (UnitStat(target, STAT_HP) <= 1)
             RejectLate();
-        break;
+        return 1;
     case 4:
     case 6:
     case 21:
-        if (c <= 0)
+        if (act->unk_0C <= 0)
             RejectLate();
-        break;
+        return 1;
     case 15:
     case 50:
     case 59:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        break;
+        return 1;
     case 16:
         if (user != target || (u16)sub_080C13C8(target) == 0)
             RejectLate();
-        break;
+        return 1;
     case 9:
-        mode = (u16)sub_08142AB0(UnitStat(target, 0x16), 3); /* max MP / 3 */
-        if (mode == 0 || UnitStat(target, 0x15) > mode)
+        currentMp = (u16)UnitStat(target, 0x15);
+        mpThreshold = (s16)sub_08142AB0(UnitStat(target, 0x16), 3);
+        if (mpThreshold == 0)
             RejectLate();
-        break;
+        if ((s16)currentMp > mpThreshold)
+            RejectLate();
+        return 1;
     case 38:
-        if (c >= 0)
+        if (act->unk_0C >= 0)
             Reject();
         mode = (u16)sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3);
         if (UnitStat(target, STAT_HP) > mode)
             Reject();
-        break;
+        return 1;
     case 5:
     case 18:
     case 26:
@@ -346,7 +369,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
     case 44:
     case 68:
     case 81:
-        break; /* jump-table entry is the common accept exit */
+        return 1; /* jump-table entry is the common accept exit */
     case 14:
     case 34:
     case 74:
@@ -362,9 +385,11 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         break;
 #define ABSENT_STATE_CASE(id, test) \
     case id: \
-        if (!AiAllowsAbsentState(user, target, test)) \
+        if (!AiPassesStatusProbability(user, target)) \
             RejectLate(); \
-        break
+        if (test(target)) \
+            RejectLate(); \
+        return 1
     ABSENT_STATE_CASE(10, sub_080CD8FC); /* Astra */
     ABSENT_STATE_CASE(12, sub_080CD95C); /* Frog */
     ABSENT_STATE_CASE(17, sub_080CDA1C); /* Advice */
@@ -400,9 +425,9 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
 #undef ABSENT_STATE_CASE
 #define PRESENT_STATE_CASE(id, test) \
     case id: \
-        if (!AiAllowsPresentState(target, test)) \
+        if (!test(target)) \
             RejectLate(); \
-        break
+        return 1
     PRESENT_STATE_CASE(13, sub_080CD95C); /* remove Frog */
     PRESENT_STATE_CASE(23, sub_080CDB9C); /* remove Disable */
     PRESENT_STATE_CASE(25, sub_080CDB84); /* remove Immobilize */
@@ -418,25 +443,25 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
             RejectLate();
         if (sub_0812F0D8(target, effectEstimate) <= 0)
             RejectLate();
-        break;
+        return 1;
     case 41:
     case 80:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if (sub_080CDB54(target) && sub_080CDB6C(target))
             RejectLate(); /* do not combine Confuse and Charm */
-        break;
+        return 1;
     case 29:
         if (sub_080CDB9C(target) && sub_080CDB84(target) &&
             sub_080CD98C(target) && sub_080CD944(target) &&
             UnitStat(target, STAT_HP) == 1)
             RejectLate();
-        break;
+        return 1;
     case 30:
         if (sub_080CDB9C(target) && sub_080CDB84(target) &&
             sub_080CDAC4(target) && sub_080CDADC(target))
             RejectLate();
-        break;
+        return 1;
     case 49:
         for (mode = 0x1D; mode <= 0x21; mode++)
         {
@@ -446,18 +471,18 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         }
         if (mode > 0x21)
             RejectLate();
-        break;
+        return 1;
     case 92:
-        if (*(u8 *)0x02003C33 == 0 || sub_080C832C(target) != 0)
+        if (gEwram[0x3C33] == 0 || sub_080C832C(target) != 0)
             RejectLate();
-        break;
+        return 1;
     case 3:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if (sub_080CDBE4(target) && sub_080CDC14(target) &&
             sub_080CDC44(target) && sub_080CDC74(target))
             RejectLate();
-        break;
+        return 1;
     case 28:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -468,19 +493,19 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         }
         else if (sub_080CDAC4(target))
             RejectLate();
-        break;
+        return 1;
     case 48:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if (sub_080CDC5C(target) && sub_080CDC8C(target))
             RejectLate();
-        break;
+        return 1;
     case 63:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if ((UnitStat(target, 0x1B) & 0x0800) || sub_08131030(target))
             RejectLate();
-        break;
+        return 1;
     case 8:
         abilityList = (u16 *)sub_08022840(0x50);
         count = sub_081342A8(abilityList, target);
@@ -498,7 +523,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         sub_08022854(abilityList);
         if (!found || UnitStat(target, 0x15) == 0)
             RejectLate();
-        break;
+        return 1;
     case 11:
     case 53:
     case 54:
@@ -507,7 +532,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         unitCopy = (struct Unit *)sub_08022840(0x108);
         sub_08142250(unitCopy, target, 0x108,
                      *(const void **)0x0836D4BC);
-        sub_08133BB4(unitCopy, act->abilityId);
+        sub_08133BB4(unitCopy, *effectEntry);
         changed = (*(unsigned int *)((u8 *)target + 0xE8) !=
                    *(unsigned int *)((u8 *)unitCopy + 0xE8));
         if (!changed)
@@ -516,7 +541,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         sub_08022854(unitCopy);
         if (!changed)
             RejectLate();
-        break;
+        return 1;
     case 43:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -525,7 +550,7 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
             sub_080CD95C(target) && sub_080CD974(target) &&
             sub_080CDB24(target))
             RejectLate();
-        break;
+        return 1;
     case 55:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -534,9 +559,22 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
         mode = (u16)sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3);
         if (UnitStat(target, STAT_HP) > mode)
             RejectLate();
-        break;
+        return 1;
     default:
         RejectLate(); /* unreachable after the 1..92 range check */
-        break;
+        return 1;
     }
+reject_current:
+    candidateIndex++;
+    if (candidateIndex < act->unk_0A)
+        goto next_effect;
+reject_all:
+    return 0;
+#undef RejectLate
+#undef Reject
+#undef effectEstimate
+#undef candidateIndex
+#undef act
+#undef target
+#undef user
 }

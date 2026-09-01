@@ -13,6 +13,20 @@ python tools/validate_statuses.py baserom.gba
 python tools/validate_job_fields.py baserom.gba
 ```
 
+Compile and summarize the current whole-evaluator matching candidate without
+printing its full generated assembly:
+
+```bash
+bash tools/report_ai_evaluator_candidate.sh
+python tools/compare_ai_evaluator_candidate.py
+```
+
+The report also gates the known retail frame slots and all 82 duplicated
+self/other probability call sites. It does not claim a match until the reported
+size and subsequent byte comparison both reach the 5,350-byte retail target.
+The CFG comparison ranks owned-byte differences across the retail 66-root
+partition and calls out case groups that agbcc has merged differently.
+
 No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
 ROM and blank RAM under Unicorn, then calls functions with chosen arguments and
 synthetic units built in RAM.

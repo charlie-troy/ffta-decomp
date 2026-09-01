@@ -628,9 +628,31 @@ Completed:
   cases 11/53/54/58/79's simulated status-word delta; case 43's seven-state
   exclusion; and case 55's Expert-Guard-absent plus one-third-HP rule.
 - Marked the shared readable helpers `__inline__` and compiled the complete
-  evaluator with agbcc. The first whole-function candidate is 4,976 bytes
-  against retail's 5,350, a concrete 374-byte shaping gap; no helper functions
-  remain out of line.
+  evaluator with agbcc. The first whole-function candidate was 4,976 bytes,
+  but still modeled retail's internal accept/reject joins as returning calls.
+- Reconstructed the true whole-function control flow: early rejection returns
+  zero, late rejection advances the `action + 4` u16 candidate list, and any
+  accepted effect returns one. This also explains retail's `sp+16` loop index.
+- Replaced function-pointer state helpers with direct per-case calls and kept
+  RNG inside both self/other arms. The structurally correct candidate is now
+  4,954 bytes versus retail's 5,350 (396 bytes short), with all 82 retail-style
+  RNG call sites and the exact 20-byte frame, `sp+12` action pointer, and
+  `sp+16` candidate index.
+- Added a candidate-side CFG comparator instead of treating total size as the
+  matching signal. It exposes two layout
+  merges: candidate case 59 folds into 15/50, and case 80 folds into case 41,
+  while retail preserves distinct entry roots and shares only selected tails.
+- Replaced successful switch `break`s with explicit `return 1`, moving the
+  shared accept block toward retail's post-case-1 layout and recovering 114
+  bytes. Corrected case 9's evaluation order (current MP before Max MP / 3)
+  and case 92's split EWRAM base-plus-offset load, recovering another 24. The
+  action layout now also models `+0x10` as the signed byte retail reads and
+  places the two veto flags at their actual `+0x11` offset.
+- The current candidate is 5,092 / 5,350 bytes (258 short). Its case-owned CFG
+  is already 3,982 versus retail's 3,958 (+24); the dominant remaining gap is
+  the pre-switch gauntlet, where the candidate table starts at `+0x268` versus
+  retail `+0x364` (-252 bytes). Total size is no longer a useful proxy for
+  case-body progress until that prefix is reconstructed.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -646,10 +668,12 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Replace the reference-only placeholder with a whole-function matching source
-  candidate, then close the 374-byte compiler-shaping gap starting at the
-  prologue/local-stack layout without changing ROM bytes.
-  reconstruct the largest exceptional family without duplicating shared joins.
+- Reconstruct the 252-byte pre-switch deficit first, comparing candidate
+  `+0x000..+0x268` with retail `+0x000..+0x364`. Preserve the exact frame while
+  restoring the early signed-byte/sign-flag lifetimes, handler paths, and source
+  statement order. Then resolve the 15/50/59 and 41/80 tail-sharing layouts and
+  the small per-root deltas. Keep the candidate in `reference/` until all 5,350
+  bytes match.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 
