@@ -465,11 +465,12 @@ the repo explicitly ranks it below widening the table surface.
    polarity by test kind).
    **Current compiler baseline:** explicit return/redispatch control, direct
    state calls, duplicated self/other RNG arms, and corrected cases 9/92 produce
-   one 5,432-byte agbcc function versus retail's 5,350 (82 bytes over). Its
+   one 5,396-byte agbcc function versus retail's 5,350 (46 bytes over). Its
    20-byte frame and `sp+12`/`sp+16` action/index slots match retail. The inline
    modes 4–11 dispatch now retains all three scratch-pair paths and shared
    joins; all 66 case roots and 85 RNG/modulo sites now exist. Remaining work
-   is shared-tail and instruction layout, not missing high-level rule families.
+   is shared-tail and instruction layout; one explicit final-state join now
+   covers the dominant absent family and eligible composites.
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).

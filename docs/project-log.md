@@ -670,6 +670,13 @@ Completed:
   (+82), with 4,038 versus 3,958 case-owned bytes (+80). Next reductions must
   reproduce retail's shared final-state tails; shrinking arbitrary code would
   destroy the newly correct root and call topology.
+- Added one explicit final-state result join and routed the dominant absent
+  family plus cases 3/30/41/43/63/80 through it where retail does the same.
+  Cases 41 and 80 now drop out of the largest-delta list. Case 48 deliberately
+  remains separate because retail duplicates its second predicate handling.
+- Current baseline is 5,396 / 5,350 bytes (+46), 3,996 / 3,958 case-owned
+  bytes (+38), 66 roots, and 85 RNG/modulo sites. Several remaining +6/+8 root
+  deltas are branch-range artifacts tied to the still-shifting accept block.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -686,9 +693,9 @@ Evidence recorded during the batch:
 Next action:
 
 - Reproduce retail's shared final-state result tail so cases 41/80 and the
-  composite/status families stop duplicating their last predicate handling.
-  Then work root 43 (-14), 15/50 (-12), root 3 (+10), roots 16/59 (-8), and
-  root 29 (+8). Revisit the pre-switch table offset only after downstream
+  remaining eligible composite/status families stop duplicating their last
+  predicate handling. Then work root 43 (-14), 15/50 (-12), roots 16/59 (-8),
+  and root 29 (+8). Revisit the pre-switch table offset only after downstream
   branch distances stabilize. Keep the candidate in `reference/` until all
   5,350 bytes match.
 

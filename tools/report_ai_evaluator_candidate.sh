@@ -22,7 +22,7 @@ if [ -z "$SIZE_HEX" ]; then
 fi
 
 SIZE=$((16#$SIZE_HEX))
-DELTA=$((TARGET_SIZE - SIZE))
+DELTA=$((SIZE - TARGET_SIZE))
 RNG_CALLS=$(grep -c $'\tbl\tsub_08002804' "$ASM" || true)
 MOD_CALLS=$(grep -c $'\tbl\tsub_08142950' "$ASM" || true)
 
@@ -35,4 +35,10 @@ test "$MOD_CALLS" -eq 85
 printf 'AiEvaluateAbility: %d / %d bytes (%+d)\n' "$SIZE" "$TARGET_SIZE" "$((SIZE - TARGET_SIZE))"
 printf 'frame: 20 bytes; action sp+12; candidate index sp+16\n'
 printf 'probability calls: RNG %d / modulo %d\n' "$RNG_CALLS" "$MOD_CALLS"
-printf 'remaining shaping delta: %d bytes\n' "$DELTA"
+if [ "$DELTA" -gt 0 ]; then
+    printf 'remaining shaping delta: remove %d bytes\n' "$DELTA"
+elif [ "$DELTA" -lt 0 ]; then
+    printf 'remaining shaping delta: add %d bytes\n' "$((-DELTA))"
+else
+    printf 'remaining shaping delta: size aligned; byte comparison still required\n'
+fi

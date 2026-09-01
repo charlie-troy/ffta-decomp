@@ -205,6 +205,7 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     u16 abilityId;
     s16 probabilityRoll;
     int probabilityPass;
+    int stateResult;
     u16 *abilityList;
     u16 *effectEntry;
     struct Unit *unitCopy;
@@ -464,9 +465,8 @@ next_effect:
     case id: \
         if (!AiPassesStatusProbability(user, target)) \
             RejectLate(); \
-        if (test(target)) \
-            RejectLate(); \
-        return 1
+        stateResult = test(target); \
+        goto absent_state_result
     ABSENT_STATE_CASE(10, sub_080CD8FC); /* Astra */
     ABSENT_STATE_CASE(12, sub_080CD95C); /* Frog */
     ABSENT_STATE_CASE(17, sub_080CDA1C); /* Advice */
@@ -524,15 +524,17 @@ next_effect:
     case 41:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        if (sub_080CDB6C(target) && sub_080CDB54(target))
-            RejectLate(); /* do not combine Charm and Confuse */
-        return 1;
+        if (!sub_080CDB6C(target))
+            return 1;
+        stateResult = sub_080CDB54(target);
+        goto absent_state_result; /* do not combine Charm and Confuse */
     case 80:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        if (sub_080CDB54(target) && sub_080CDB6C(target))
-            RejectLate(); /* do not combine Confuse and Charm */
-        return 1;
+        if (!sub_080CDB54(target))
+            return 1;
+        stateResult = sub_080CDB6C(target);
+        goto absent_state_result; /* do not combine Confuse and Charm */
     case 29:
         if (sub_080CDB9C(target) && sub_080CDB84(target) &&
             sub_080CD98C(target) && sub_080CD944(target) &&
@@ -540,10 +542,11 @@ next_effect:
             RejectLate();
         return 1;
     case 30:
-        if (sub_080CDB9C(target) && sub_080CDB84(target) &&
-            sub_080CDAC4(target) && sub_080CDADC(target))
-            RejectLate();
-        return 1;
+        if (!sub_080CDB9C(target) || !sub_080CDB84(target) ||
+            !sub_080CDAC4(target))
+            return 1;
+        stateResult = sub_080CDADC(target);
+        goto absent_state_result;
     case 49:
         for (mode = 0x1D; mode <= 0x21; mode++)
         {
@@ -561,21 +564,21 @@ next_effect:
     case 3:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        if (sub_080CDBE4(target) && sub_080CDC14(target) &&
-            sub_080CDC44(target) && sub_080CDC74(target))
-            RejectLate();
-        return 1;
+        if (!sub_080CDBE4(target) || !sub_080CDC14(target) ||
+            !sub_080CDC44(target))
+            return 1;
+        stateResult = sub_080CDC74(target);
+        goto absent_state_result;
     case 28:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if (sub_080CDAAC(target) == 1)
         {
-            if (sub_080CDADC(target))
-                RejectLate();
+            stateResult = sub_080CDADC(target);
+            goto absent_state_result;
         }
-        else if (sub_080CDAC4(target))
-            RejectLate();
-        return 1;
+        stateResult = sub_080CDAC4(target);
+        goto absent_state_result;
     case 48:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -585,9 +588,10 @@ next_effect:
     case 63:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        if ((UnitStat(target, 0x1B) & 0x0800) || sub_08131030(target))
+        if (UnitStat(target, 0x1B) & 0x0800)
             RejectLate();
-        return 1;
+        stateResult = sub_08131030(target);
+        goto absent_state_result;
     case 8:
         abilityList = (u16 *)sub_08022840(0x50);
         count = sub_081342A8(abilityList, target);
@@ -627,12 +631,12 @@ next_effect:
     case 43:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
-        if (sub_080CDAC4(target) && sub_080CD98C(target) &&
-            sub_080CDB54(target) && sub_080CDB3C(target) &&
-            sub_080CD95C(target) && sub_080CD974(target) &&
-            sub_080CDB24(target))
-            RejectLate();
-        return 1;
+        if (!sub_080CDAC4(target) || !sub_080CD98C(target) ||
+            !sub_080CDB54(target) || !sub_080CDB3C(target) ||
+            !sub_080CD95C(target) || !sub_080CD974(target))
+            return 1;
+        stateResult = sub_080CDB24(target);
+        goto absent_state_result;
     case 55:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -663,6 +667,10 @@ probability_pass:
         probabilityPass = 1;
 probability_done:
         if (!probabilityPass)
+            RejectLate();
+        return 1;
+absent_state_result:
+        if (stateResult)
             RejectLate();
         return 1;
     default:
