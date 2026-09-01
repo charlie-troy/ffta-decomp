@@ -17,6 +17,11 @@ No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
 ROM and blank RAM under Unicorn, then calls functions with chosen arguments and
 synthetic units built in RAM.
 
+The AI gate now has ten checks. Checks 9 and 10 protect the Phase 7 evaluator
+work: the switch remains partitioned into 92 ids / 66 roots / 3,958 owned plus
+88 shared code bytes, and executing case 1 and Quicken case 2 proves their
+effective-Speed and CT boundaries at 499/500 and 699/700.
+
 `validate_missions.py` is the equivalent gate for mission data. Its thirteen
 checks cover all 512 mission ids; all 4,608 clan-reward reads and nine executed
 application paths; required/blocked dispatch jobs and safe packed edits; all
@@ -87,7 +92,7 @@ Zombie setter. The final check executes Yellow Card's handler through its write 
 Yellow Clip through its inverse store, confirming target `+0x28` changes
 `0x0000 -> 0x0040 -> 0x0000`.
 
-## The eight checks
+## The ten checks
 
 1. **Ability priority filter.** Measured keep-rate against a model of the
    predicate, across the range. See the modulo-bias note below.
@@ -129,6 +134,14 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    clear; a separate synthetic test exercises the full 0–7 encoding.
 8. **Unarmed attack power.** `sub_08130820` returns job-table `+0x33` for all
    116 jobs, and changing that byte changes the executed result.
+9. **Evaluator control-flow partition.** All 92 effect ids resolve to 66 roots.
+   Recursive ARMv4T traversal keeps 3,958 case-owned and 88 shared code bytes
+   disjoint, excludes embedded tables/pools, and preserves all four exit joins.
+10. **First reconstructed rule families.** Direct fragment execution proves case 1 accepts
+    only nonzero-effective-Speed targets above CT 499. Quicken/Smile case 2
+    accepts only nonzero-effective-Speed targets through CT 699. Remove-Frog
+    case 13 rejects when Frog is absent and accepts when it is present, anchoring
+    the seven-root present-state cancellation family.
 
 ## The priority field is not exactly a percentage
 

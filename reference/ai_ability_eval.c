@@ -22,7 +22,9 @@ struct Unit
     u16 hp;             /* +0x18, stat id 0x13 */
     u16 maxHp;          /* +0x1A, stat id 0x14 */
     u16 mp;             /* +0x1C, stat id 0x15 */
-    u8  filler_1E[0xC9];
+    u8  filler_1E[0xB2];
+    s16 chargeTime;       /* +0xD0, stat id 0x23 */
+    u8  filler_D2[0x15];
     u8  recentTargetIds; /* +0xE7, two 4-bit unit ids; newest in low nibble */
     u8  filler_E8[0x09];
     u8  koInflictedCount; /* +0xF1 */
@@ -37,7 +39,12 @@ struct Unit
     u8  savedTileY;      /* +0xFA; snapshot copied from tileY */
     u8  battleListIndex; /* +0xFB */
 };
-struct Ability;   /* 28 bytes; see docs/ability-table.md                       */
+struct Ability
+{
+    u8 filler_00[0x19];
+    u8 aiBehaviour;    /* +0x19 */
+    u8 filler_1A[2];
+};                    /* 28 bytes; see docs/ability-table.md */
 
 /* An in-progress action. u16[] in the original; only some fields are known. */
 struct Action
@@ -58,6 +65,7 @@ extern struct Ability gAbilityTable[];       /* 0x0855187C, 347 entries */
 extern int  AbilityProp(u16 abilityId, u8 propId);        /* sub_080CCD50 */
 extern u16  AbilityMpCost(struct Unit *u, u16 abilityId); /* sub_0812ED98 */
 extern int  UnitStat(struct Unit *u, u8 statId);          /* sub_080C7EA4 */
+extern s16  sub_0812E368(struct Unit *u);                 /* effective Speed */
 
 #define STAT_HP      0x13    /* unit +0x18 */
 #define STAT_MAX_HP  0x14    /* unit +0x1A */
@@ -71,16 +79,88 @@ extern u8 sub_080C8260(struct Unit *u);
 extern u8 sub_080CDB54(struct Unit *u);
 extern u8 sub_080CDB6C(struct Unit *u);
 extern u8 sub_080CD8FC(struct Unit *u);
+extern u8 sub_080CD8E4(struct Unit *u);
+extern u8 sub_080CD8CC(struct Unit *u);
+extern u8 sub_080CD914(struct Unit *u);
+extern u8 sub_080CD92C(struct Unit *u);
+extern u8 sub_080CD944(struct Unit *u);
+extern u8 sub_080CD95C(struct Unit *u);
+extern u8 sub_080CD974(struct Unit *u);
+extern u8 sub_080CD98C(struct Unit *u);
+extern u8 sub_080CD9BC(struct Unit *u);
+extern u8 sub_080CD9EC(struct Unit *u);
+extern u8 sub_080CDA1C(struct Unit *u);
+extern u8 sub_080CDA34(struct Unit *u);
+extern u8 sub_080CDA64(struct Unit *u);
+extern u8 sub_080CDA94(struct Unit *u);
+extern u8 sub_080CDAAC(struct Unit *u);
+extern u8 sub_080CDAC4(struct Unit *u);
+extern u8 sub_080CDADC(struct Unit *u);
+extern u8 sub_080CDB24(struct Unit *u);
+extern u8 sub_080CDB3C(struct Unit *u);
+extern u8 sub_080CDB84(struct Unit *u);
+extern u8 sub_080CDB9C(struct Unit *u);
+extern u8 sub_080CDBB4(struct Unit *u);
+extern u8 sub_080CDBFC(struct Unit *u);
+extern u8 sub_080CDC2C(struct Unit *u);
+extern u8 sub_080CDC44(struct Unit *u);
+extern u8 sub_080CDC5C(struct Unit *u);
+extern u8 sub_080CDC74(struct Unit *u);
+extern u8 sub_080CDC8C(struct Unit *u);
 extern u8 sub_0812F154(struct Unit *u);
 extern u8 sub_081341BC(struct Unit *a, struct Unit *b); /* recent-target membership */
 extern u8 sub_0812F1DC(s16 v);
 extern u8 sub_0812F0E4(struct Unit *u, int a, int b);
 extern u16 sub_0812E6A4(struct Unit *u);
 extern u8 sub_08133A58(struct Unit *u, u16 effectId);
+extern u8 sub_08131030(struct Unit *u);
 extern void sub_080CDD88(struct Unit *u, u8 v);
 
 extern void (*gEffectHandlers[92])(void);   /* 0x080C3624, all internal */
 extern void (*gSubHandlers[8])(void);       /* 0x080C347C              */
+extern int sub_08002804(void);              /* battle RNG               */
+extern int sub_08142950(int value, int divisor); /* signed remainder       */
+
+typedef u8 (*EffectStateTest)(struct Unit *u);
+
+static int AiPassesStatusProbability(struct Unit *user, struct Unit *target)
+{
+    s16 roll = (s16)sub_08002804();
+    roll = (s16)sub_08142950(roll, 101);
+    return user == target ? roll <= 10 : roll <= 49;
+}
+
+static int AiAllowsAbsentState(struct Unit *user, struct Unit *target,
+                               EffectStateTest stateTest)
+{
+    if (!AiPassesStatusProbability(user, target))
+        return 0;
+    return stateTest(target) == 0;
+}
+
+static int AiAllowsPresentState(struct Unit *target,
+                                EffectStateTest stateTest)
+{
+    return stateTest(target) == 1;
+}
+
+/* First two switch rules, reconstructed from the case-owned CFG partitions.
+ * These helpers document the intended C boundary; they are folded into the
+ * giant evaluator in retail rather than emitted as standalone functions.
+ * Case 2 is Quicken/Smile. Case 1 is used by several secondary CT effects. */
+static int AiAllowsCtAbove499(struct Unit *target)
+{
+    if (sub_0812E368(target) == 0)
+        return 0;
+    return (s16)target->chargeTime > 499;
+}
+
+static int AiAllowsCtThrough699(struct Unit *target)
+{
+    if (sub_0812E368(target) == 0)
+        return 0;
+    return (s16)target->chargeTime <= 699;
+}
 
 void AiEvaluateAbility(struct Unit *user, struct Unit *target,
                        struct Action *act, u8 checkCost)
@@ -188,8 +268,70 @@ void AiEvaluateAbility(struct Unit *user, struct Unit *target,
     if (act->abilityId - 1 > 0x5B)
         RejectLate();
 
-    /* 92 cases, all bodies internal to this function. Most follow the same
-     * shape: a scoring helper, a status getter for the effect in question,
-     * then a shared tail. See docs/ai-evaluator-cases.md. */
-    gEffectHandlers[act->abilityId - 1]();
+    /* 92 cases, all bodies internal to this function. Cases 1/2, the dominant
+     * 30-root absent-state family, and seven present-state cancellation roots
+     * are reconstructed; the default preserves the untranslated remainder. */
+    switch (act->abilityId)
+    {
+    case 1:
+        if (!AiAllowsCtAbove499(target))
+            RejectLate();
+        break;
+    case 2: /* Quicken / Smile */
+        if (!AiAllowsCtThrough699(target))
+            RejectLate();
+        break;
+#define ABSENT_STATE_CASE(id, test) \
+    case id: \
+        if (!AiAllowsAbsentState(user, target, test)) \
+            RejectLate(); \
+        break
+    ABSENT_STATE_CASE(10, sub_080CD8FC); /* Astra */
+    ABSENT_STATE_CASE(12, sub_080CD95C); /* Frog */
+    ABSENT_STATE_CASE(17, sub_080CDA1C); /* Advice */
+    ABSENT_STATE_CASE(19, sub_080CDADC); /* Stop */
+    ABSENT_STATE_CASE(20, sub_080CDA34); /* Speed Down */
+    ABSENT_STATE_CASE(22, sub_080CDB9C); /* Disable */
+    ABSENT_STATE_CASE(24, sub_080CDB84); /* Immobilize */
+    ABSENT_STATE_CASE(27, sub_080CD944); /* Berserk */
+    ABSENT_STATE_CASE(31, sub_080CD8E4);
+    ABSENT_STATE_CASE(32, sub_080CD914);
+    ABSENT_STATE_CASE(33, sub_080CD8CC);
+    ABSENT_STATE_CASE(35, sub_080CD98C); /* Blind */
+    ABSENT_STATE_CASE(37, sub_080CDA64); /* Mow Down speed penalty */
+    ABSENT_STATE_CASE(42, sub_080CDA94); /* Doom */
+    ABSENT_STATE_CASE(45, sub_080CDB24); /* Sleep */
+    ABSENT_STATE_CASE(46, sub_080CD92C); /* Petrify */
+    ABSENT_STATE_CASE(51, sub_080CDAC4); /* Slow */
+    ABSENT_STATE_CASE(52, sub_080CDAAC); /* Haste */
+    ABSENT_STATE_CASE(56, sub_080CDB3C); /* Silence */
+    ABSENT_STATE_CASE(60, sub_080CD9BC); /* Conceal */
+    ABSENT_STATE_CASE(61, sub_080CD974); /* Poison */
+    ABSENT_STATE_CASE(62, sub_080CD974); /* Poison secondary */
+    ABSENT_STATE_CASE(69, sub_080CDBFC);
+    ABSENT_STATE_CASE(70, sub_080CD9EC);
+    ABSENT_STATE_CASE(71, sub_080CDBB4); /* Addle */
+    ABSENT_STATE_CASE(72, sub_080CDC5C);
+    ABSENT_STATE_CASE(73, sub_080CDC44);
+    ABSENT_STATE_CASE(76, sub_080CDC2C);
+    ABSENT_STATE_CASE(77, sub_080CDC8C);
+    ABSENT_STATE_CASE(78, sub_080CDC74);
+#undef ABSENT_STATE_CASE
+#define PRESENT_STATE_CASE(id, test) \
+    case id: \
+        if (!AiAllowsPresentState(target, test)) \
+            RejectLate(); \
+        break
+    PRESENT_STATE_CASE(13, sub_080CD95C); /* remove Frog */
+    PRESENT_STATE_CASE(23, sub_080CDB9C); /* remove Disable */
+    PRESENT_STATE_CASE(25, sub_080CDB84); /* remove Immobilize */
+    PRESENT_STATE_CASE(36, sub_080CD98C); /* remove Blind */
+    PRESENT_STATE_CASE(47, sub_080CD92C); /* Soft / remove Petrify */
+    PRESENT_STATE_CASE(57, sub_080CDB3C); /* remove Silence */
+    PRESENT_STATE_CASE(64, sub_08131030);
+#undef PRESENT_STATE_CASE
+    default:
+        gEffectHandlers[act->abilityId - 1]();
+        break;
+    }
 }

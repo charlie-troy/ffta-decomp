@@ -1,5 +1,9 @@
 # AI evaluator: the 92 effect cases
 
+> Historical linear report. For reconstruction boundaries use the generated,
+> control-flow-aware [AI evaluator partitions](ai-evaluator-cfg.md). This file
+> can include shared tails and literal-pool bytes in a case's apparent length.
+
 `sub_080C32C0` ends in a 92-way switch on the action's effect id, dispatching
 through the table at `0x080C3624`. Every target is inside the function, so it
 is one switch rather than a table of handlers, which is why Ghidra reports

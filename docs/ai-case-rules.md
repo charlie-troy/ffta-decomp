@@ -42,9 +42,9 @@ editor.
 
 | effect ids | divisor | thresholds | applies |
 |---|---|---|---|
-| 1 | - | - | `sub_0812E368` |
+| 1 | - | effective Speed nonzero; CT > 499 | accept candidate |
 | 5,18,26,39,40,44,68,81 | - | - | - |
-| 2 | - | - | `sub_0812E368` |
+| 2 | - | effective Speed nonzero; CT <= 699 | accept Quicken/Smile candidate |
 | 3 | 101 | 10, 49 | `sub_080CDC74` |
 | 7 | - | - | - |
 | 8 | - | - | `sub_080C7EA4` |

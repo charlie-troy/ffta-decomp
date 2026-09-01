@@ -45,7 +45,7 @@ This is not a nicety. Running the job table's accessor over every entry cut its
 not wrong about the instructions it reads; it is wrong about what they mean,
 and only execution catches that.
 
-`tools/validate_ai.py` is the regression suite — 8 checks, all passing. Add a
+`tools/validate_ai.py` is the regression suite — 10 checks, all passing. Add a
 check when you establish something new, so it cannot silently rot.
 
 ## Traps that have already cost time
@@ -113,7 +113,7 @@ Genuinely open, with the reason:
 ## Before you commit
 
 ```bash
-python tools/validate_ai.py "<rom>"      # must stay 8/8
+python tools/validate_ai.py "<rom>"      # must stay 10/10
 python tools/validate_missions.py "<rom>" # must stay 13/13 when missions change
 python tools/validate_maps.py "<rom>"     # must stay 14/14 when maps change
 ```

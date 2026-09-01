@@ -9,12 +9,13 @@ tools that already exist, and a definition of done. The reusable loop for any
 State snapshot: 172 functions matched (4,536 bytes) · full 16 MB ROM rebuilds
 byte-identical · CI hash gate on every function · 3,594 functions discovered ·
 abilities, jobs, items, missions and map terrain mapped and editable · text
-decodes at 99.7% · 8/8 execution checks pass (`tools/validate_ai.py`).
+decodes at 99.7% · 10/10 execution checks pass (`tools/validate_ai.py`).
 The separate job-field gate passes 4/4, covering 5,568 retail formula reads,
 causal redirect/resistance patches, and the morph-family flag.
 
 Phase 0 was re-verified on 2026-08-24: `make check` verified 172/172 function
-hashes, `tools/validate_ai.py` passed 8/8 checks, and `make rom` reproduced the
+hashes, `tools/validate_ai.py` passed 8/8 checks at that checkpoint (10/10 as
+of 2026-08-31), and `make rom` reproduced the
 expected 16 MB ROM SHA1. The documentation inconsistencies listed below were
 reconciled in the same batch.
 
@@ -42,7 +43,7 @@ turns.
 2. Run the full gate and record a green baseline:
    ```bash
    make check                              # CI gate, no ROM needed
-   python tools/validate_ai.py baserom.gba # must stay 8/8
+   python tools/validate_ai.py baserom.gba # must stay 10/10
    make rom                                # byte-identical rebuild (WSL + ROM)
    ```
 3. Add a "superseded by" header to any partially-wrong doc rather than editing
@@ -443,17 +444,25 @@ the repo explicitly ranks it below widening the table surface.
 
 **Steps:**
 
-1. Convert the already-readable `reference/ai_ability_eval.c` gauntlet into
+1. **Partition complete 2026-08-31.** `tools/partition_ai_evaluator.py`
+   recursively follows ARMv4T control flow from all 66 roots, separating 3,958
+   case-owned bytes, 88 shared bytes, four evaluator exits, and embedded data.
+2. **Dominant family complete 2026-08-31.** Cases 1/2 and the 30-root
+   probability-plus-absent-state shape are readable in
+   `reference/ai_ability_eval.c`; CT boundaries execute and the shape census is
+   locked by validation. The seven-root inverse/present-state cancellation
+   family is also translated, with remove-Frog executed absent and present.
+3. Convert the remaining `reference/ai_ability_eval.c` gauntlet into
    matching C under `src/`, applying the lessons in `docs/matching-notes.md`
    (ternary vs if/else for shared stores; globals as extern symbols, never cast
    literal addresses; literal-vs-`int`-variable register allocation; branch
    polarity by test kind).
-2. Match the **66 distinct case bodies** one at a time — each is small and
+4. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).
-3. Iterate with `make match SRC=... AT=... LEN=...` → `make index` → `make
+5. Iterate with `make match SRC=... AT=... LEN=...` → `make index` → `make
    check` → `make rom` after each batch.
-4. Ship the first **rule mod** (e.g., make the AI play its best option every
+6. Ship the first **rule mod** (e.g., make the AI play its best option every
    time by removing the randomness) as proof the pipeline works end to end.
 
 **Done when:** `sub_080C32C0` compiles byte-identical, and a rule edit builds

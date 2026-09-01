@@ -20,8 +20,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import struct
 import collections
 
-from emulate import Gba
+from emulate import Gba, STOP
 from ffta_names import Names
+from partition_ai_evaluator import analyze as analyze_evaluator
 from unicorn import UC_HOOK_CODE
 
 PRIO_FILTER = 0x0812F1DC
@@ -562,6 +563,116 @@ def check_unarmed(gba, rom):
     return ok
 
 
+def check_evaluator_partitions(rom):
+    """The evaluator switch must retain a complete, disjoint CFG partition."""
+    print("")
+    print("9. AI evaluator control-flow partitions")
+    entries, insns, reachers, rows, shared_groups, stop_reachers = \
+        analyze_evaluator(rom)
+    owned = [addr for row in rows for addr in row["owned"]]
+    owned_bytes = sum(row["owned_bytes"] for row in rows)
+    shared_bytes = sum(
+        insns[addr].size for addresses in shared_groups.values()
+        for addr in addresses
+    )
+    exits = {addr: len(roots) for addr, roots in stop_reachers.items()}
+    probability_rows = [
+        row for row in rows
+        if 0x08002804 in row["external_calls"]
+        and 0x08142950 in row["external_calls"]
+        and row["owned_bytes"] in (70, 74)
+    ]
+    shape_counts = collections.Counter(row["shape"] for row in probability_rows)
+    dominant_roots = max(shape_counts.values())
+    ok = (
+        len(entries) == 66
+        and sum(len(ids) for ids in entries.values()) == 92
+        and len(owned) == len(set(owned))
+        and owned_bytes == 3958
+        and shared_bytes == 88
+        and exits == {
+            0x080C37B4: 64,
+            0x080C477A: 63,
+            0x080C478C: 1,
+            0x080C478E: 1,
+        }
+        and len(probability_rows) == 31
+        and dominant_roots == 30
+    )
+    print(f"   92 ids / {len(entries)} distinct roots; "
+          f"{owned_bytes} owned + {shared_bytes} shared code bytes")
+    exit_text = {f"{addr:#010x}": count for addr, count in exits.items()}
+    print(f"   evaluator exit reach counts: {exit_text}")
+    print(f"   dominant probability/status shape: {dominant_roots}/31 roots")
+    print(f"   -> {'PASS' if ok else 'FAIL'}")
+    return ok
+
+
+def check_ct_case_rules(gba):
+    """Execute early evaluator families up to their accept/reject exits."""
+    print("")
+    print("10. evaluator CT-window rules, executed")
+    unit = 0x02001000
+    accept, reject = 0x080C37B4, 0x080C477A
+
+    def run(root, speed, ct):
+        gba.reset_ram()
+        gba.uc.mem_write(unit, bytes(0x108))
+        _put16(gba, unit + 0xD0, ct)
+        _put16(gba, unit + 0xD2, speed)
+        reached = []
+
+        def stop_at_exit(uc, address, size, _):
+            if address in (accept, reject):
+                reached.append(address)
+                uc.emu_stop()
+
+        hook = gba.uc.hook_add(UC_HOOK_CODE, stop_at_exit)
+        try:
+            gba.run_range(root, STOP, {"r8": unit})
+        finally:
+            gba.uc.hook_del(hook)
+        return reached[0] if reached else None
+
+    case1 = {(speed, ct): run(0x080C3794, speed, ct)
+             for speed, ct in ((0, 500), (100, 499), (100, 500))}
+    case2 = {(speed, ct): run(0x080C37C0, speed, ct)
+             for speed, ct in ((0, 699), (100, 699), (100, 700))}
+    cancel_frog = {}
+    for present in (0, 1):
+        gba.reset_ram()
+        gba.uc.mem_write(unit, bytes(0x108))
+        gba.write8(unit + 0xE9, present)
+        reached = []
+
+        def stop_cancel(uc, address, size, _):
+            if address in (accept, reject):
+                reached.append(address)
+                uc.emu_stop()
+
+        hook = gba.uc.hook_add(UC_HOOK_CODE, stop_cancel)
+        try:
+            gba.run_range(0x080C39F2, STOP, {"r8": unit})
+        finally:
+            gba.uc.hook_del(hook)
+        cancel_frog[present] = reached[0] if reached else None
+    ok = (
+        case1 == {(0, 500): reject, (100, 499): reject, (100, 500): accept}
+        and case2 == {(0, 699): reject, (100, 699): accept,
+                      (100, 700): reject}
+        and cancel_frog == {0: reject, 1: accept}
+    )
+    show = lambda values: {
+        key: "accept" if value == accept else "reject" if value == reject else None
+        for key, value in values.items()
+    }
+    print(f"   case 1 speed/CT outcomes: {show(case1)}")
+    print(f"   case 2 (Quicken) speed/CT outcomes: {show(case2)}")
+    print(f"   case 13 remove-Frog absent/present: {show(cancel_frog)}")
+    print(f"   -> {'PASS' if ok else 'FAIL'}")
+    return ok
+
+
 def main(argv):
     ap = argparse.ArgumentParser()
     ap.add_argument("rom")
@@ -578,7 +689,9 @@ def main(argv):
                check_healthy_rule(gba),
                check_gate(gba, args.samples),
                check_resist_slots(gba, rom),
-               check_unarmed(gba, rom)]
+               check_unarmed(gba, rom),
+               check_evaluator_partitions(rom),
+               check_ct_case_rules(gba)]
     print(f"\n{sum(results)}/{len(results)} checks passed")
     return 0 if all(results) else 1
 

@@ -31,10 +31,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 7 — editable evaluator rules |
-| Current work package | AI7.1 — partition `sub_080C32C0` into matchable rule blocks |
-| Last closed package | AI6.1 — mapped all 48 job-accessor formulas |
+| Current work package | AI7.3 — reconstruct exceptional evaluator rule families |
+| Last closed package | AI7.2 — reconstructed CT, absent-state, and cancellation families |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 8/8; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
+| Core gates | `make check` 172/172; AI 10/10; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -49,7 +49,9 @@ status and backlog tables are living sections and should be kept current.
 | ITEM4.1 | P2 | Complete | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Icon paths execute end to end; behavioral flags have readers; hand bits have explicit population evidence; CSV round-trips |
 | AI5.1 | P2 | Complete | Expand unit-status and stat naming | All 69 stat cases named; all 47 represented live bits named or explicitly classified numeric; 21/21 gate |
 | AI6.1 | P2 | Complete | Decode the job accessor | All 48 fields execute across 116 jobs; redirect, resistance, and morph-family checks pass |
-| AI7.1 | P3 | Active | Match evaluator rule blocks | First independently matchable block lands without changing ROM bytes |
+| AI7.1 | P3 | Complete | Partition evaluator rule blocks | All 92 ids have reproducible owned/shared CFG boundaries and embedded data is excluded |
+| AI7.2 | P3 | Complete | Reconstruct dominant evaluator cases | CT, 30-root absent-state, and seven-root cancellation families land in readable reference C |
+| AI7.3 | P3 | Active | Reconstruct exceptional evaluator cases | Remaining roots are grouped by normalized shape and translated family by family |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -105,6 +107,8 @@ status and backlog tables are living sections and should be kept current.
 | AI5.7c | 2026-08-26 | Separated Dragon Force's composite setters as Attack Up and Magic Up | Physical/magic own-channel 100→109, cross-channel stays 100; paired Down gives 89; 43 live bits named |
 | AI5.7d | 2026-08-31 | Closed the final four lifecycle/presentation residues and Phase 5 | Petrify critical snapshot executes at the 25/26 HP boundary; bit-5/6/7 caller census and setter round-trips; statuses 21/21; 44/47 named |
 | AI6.1 | 2026-08-31 | Replaced the false computed-field model with the exact 48-field job accessor | 5,568/5,568 formula reads; redirect; resistance 0–7; `+0x31` bit-0 morph-family index; jobs 4/4 |
+| AI7.1 | 2026-08-31 | Replaced linear case slicing with a control-flow-owned evaluator partition | 92 ids / 66 roots; 3,958 owned + 88 shared bytes; four explicit exits; AI 10/10 |
+| AI7.2 | 2026-08-31 | Reconstructed CT, absent-state, and cancellation rule families | 39 roots in readable C; 30/31 probability roots share one normalized shape; CT and remove-Frog boundaries execute |
 
 ## Decisions and evidence
 
@@ -559,6 +563,16 @@ status and backlog tables are living sections and should be kept current.
 - Decision: reject the stat-at-level hypothesis, make `tools/job_fields.py`
   canonical, correct the Earth-slot claim, and close Phase 6.
 
+### D-042 — Partition evaluator cases by reachable control flow
+
+- Linear slicing at the next jump-table target includes literal pools and
+  misses case-to-case shared tails. Following the reject-next tail is also
+  wrong because it redispatches the whole switch and contaminates ownership.
+- Decision: a rule block owns only instructions reached exclusively from its
+  case root. Multi-root instructions are shared joins; four evaluator exits
+  terminate traversal. Generated CFG evidence, not address adjacency, defines
+  the reconstruction boundary.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -570,6 +584,42 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-08-31 — AI evaluator control-flow partition
+
+Objective:
+
+- Replace the 66-body linear report with safe reconstruction boundaries and
+  close the first executable rule slice.
+
+Completed:
+
+- Added `partition_ai_evaluator.py` and generated the complete 92-id case map.
+- Separated case-owned code, seven shared joins, four evaluator exits, jump
+  table data, and literal pools.
+- Added the partition invariants to the AI regression suite.
+- Reconstructed and executed cases 1 and 2: both require nonzero effective
+  Speed; case 1 requires CT above 499, while Quicken/Smile case 2 requires CT
+  at most 699.
+- Proved one normalized shape covers 30 roots: the 10/49 probability gate,
+  followed by one effect-state test and acceptance only when that test is zero.
+- Added all 30 bindings to readable reference C and syntax-checked it.
+- Reconstructed the inverse present-state family for cases 13/23/25/36/47/57
+  and case 64; executed remove-Frog with the state absent and present.
+- Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
+
+Evidence recorded during the batch:
+
+- 92 jump-table ids / 66 distinct roots.
+- 3,958 case-owned bytes / 88 shared bytes with no ownership overlap.
+- Accept/reject/return exit reach counts are stable in validation.
+- Exact case outcomes pass at Speed 0/100 and CT 499/500/699/700.
+- AI validation is 10/10; 39/66 roots now have readable C bindings.
+
+Next action:
+
+- Cluster the remaining 27 roots by normalized control-flow shape, then
+  reconstruct the largest exceptional family without duplicating shared joins.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 

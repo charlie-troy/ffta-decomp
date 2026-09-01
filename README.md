@@ -78,10 +78,11 @@ shown in each case: `ai_priority` runs the opposite direction, and the job
 table's `+0x32` is not unknown.
 
 **The AI's rules are validated by execution.** `tools/validate_ai.py` runs the
-ROM's own functions on an emulated CPU against synthetic units, and all eight
+ROM's own functions on an emulated CPU against synthetic units, and all ten
 checks pass: the priority filter, the ability property accessor, flag decoding,
 the stat-id mapping, the healthy-target rule at its exact boundaries, the
-11%/50% status gate, packed resistance decoding, and unarmed attack power. See
+11%/50% status gate, packed resistance decoding, unarmed attack power, the
+92-case control-flow partition, and the first two CT-window rules. See
 [docs/validation.md](docs/validation.md).
 
 Whole-battle behaviour is now traced through a real enemy turn: one actor calls
