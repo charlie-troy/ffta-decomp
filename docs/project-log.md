@@ -677,6 +677,26 @@ Completed:
 - Current baseline is 5,396 / 5,350 bytes (+46), 3,996 / 3,958 case-owned
   bytes (+38), 66 roots, and 85 RNG/modulo sites. Several remaining +6/+8 root
   deltas are branch-range artifacts tied to the still-shifting accept block.
+- Extended the comparator with total reachable bytes per root and candidate
+  exit discovery. Stopping at the candidate's accept, reject-next, final-false,
+  and epilogue equivalents reduced falsely reported shared code from 256 to
+  102 bytes and separated real path differences from ownership reassignment.
+- Forced the inline probability helper through retail's register-valued
+  false/true join. This retained all 85 independent RNG/modulo pairs while
+  shrinking the candidate by 64 bytes and bringing owned CFG bytes within six
+  of retail at that stage.
+- Reconstructed cases 15/50, 16, and 59 through their shared probability-result
+  tail; their owned sizes now exactly match retail at 38, 28, and 26 bytes.
+  Root 43's apparent -14 owned delta is now proven to be shared-tail accounting:
+  its complete reachable path is six bytes longer, not fourteen bytes shorter.
+- Inlined cases 1/2 directly and moved case 3 beside retail's early CT cluster,
+  eliminating helper-induced boolean materialization and 20 bytes of long
+  accept transfers. Restored case 30's self-contained four-state predicate
+  after the reachable metric disproved its earlier shared-tail assignment.
+- Current baseline is 5,352 / 5,350 bytes (+2), 3,976 / 3,958 case-owned bytes
+  (+18), 82 candidate shared bytes, 66 roots, and 85 RNG/modulo sites. This is
+  a size checkpoint only: the table remains at `+0x35c` versus retail `+0x364`,
+  and byte identity has not been claimed.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -692,12 +712,12 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Reproduce retail's shared final-state result tail so cases 41/80 and the
-  remaining eligible composite/status families stop duplicating their last
-  predicate handling. Then work root 43 (-14), 15/50 (-12), roots 16/59 (-8),
-  and root 29 (+8). Revisit the pre-switch table offset only after downstream
-  branch distances stabilize. Keep the candidate in `reference/` until all
-  5,350 bytes match.
+- Use adjusted reachable deltas, not owned deltas alone, to work roots 29 (+8),
+  the ordinary absent-state cluster (+8), and the short present-state roots
+  (-6). Reorder cases toward retail's physical sequence where that converts
+  long transfers to short branches. Revisit the table's eight-byte prefix gap
+  only after case layout stabilizes, and keep the candidate in `reference/`
+  until all 5,350 bytes match exactly.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 

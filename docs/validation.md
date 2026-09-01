@@ -24,8 +24,11 @@ python tools/compare_ai_evaluator_candidate.py
 The report also gates the known retail frame slots and all 85 retail
 self/other probability call sites. It does not claim a match until the reported
 size and subsequent byte comparison both reach the 5,350-byte retail target.
-The CFG comparison ranks owned-byte differences across the retail 66-root
-partition and calls out case groups that agbcc has merged differently.
+The CFG comparison ranks both owned-byte and adjusted total-reachable-byte
+differences across the retail 66-root partition. It discovers the candidate's
+four evaluator exits, excludes them like the retail partition, and therefore
+distinguishes genuinely different paths from bytes merely reassigned to a
+shared join. It also calls out case groups that agbcc has merged differently.
 
 No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
 ROM and blank RAM under Unicorn, then calls functions with chosen arguments and

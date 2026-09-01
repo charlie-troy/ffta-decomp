@@ -154,6 +154,7 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
                                                  struct Unit *target)
 {
     s16 roll;
+    int pass;
 
     /* Keep the RNG call inside each arm. Retail duplicates these instruction
      * sequences instead of rolling once and selecting only the threshold. */
@@ -162,33 +163,21 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
         roll = (s16)sub_08002804();
         roll = (s16)sub_08142950(roll, 101);
         if (roll > 10)
-            return 0;
-        return 1;
+            pass = 0;
+        else
+            pass = 1;
     }
-
-    roll = (s16)sub_08002804();
-    roll = (s16)sub_08142950(roll, 101);
-    if (roll > 49)
-        return 0;
-    return 1;
-}
-
-/* First two switch rules, reconstructed from the case-owned CFG partitions.
- * These helpers document the intended C boundary; they are folded into the
- * giant evaluator in retail rather than emitted as standalone functions.
- * Case 2 is Quicken/Smile. Case 1 is used by several secondary CT effects. */
-static __inline__ int AiAllowsCtAbove499(struct Unit *target)
-{
-    if (sub_0812E368(target) == 0)
-        return 0;
-    return (s16)target->chargeTime > 499;
-}
-
-static __inline__ int AiAllowsCtThrough699(struct Unit *target)
-{
-    if (sub_0812E368(target) == 0)
-        return 0;
-    return (s16)target->chargeTime <= 699;
+    else
+    {
+        roll = (s16)sub_08002804();
+        roll = (s16)sub_08142950(roll, 101);
+        if (roll > 49)
+            pass = 0;
+        else
+            pass = 1;
+    }
+    __asm__ volatile ("" : "+r" (pass));
+    return pass;
 }
 
 int AiEvaluateAbility(struct Unit *user, struct Unit *target,
@@ -389,13 +378,25 @@ next_effect:
     switch (*effectEntry)
     {
     case 1:
-        if (!AiAllowsCtAbove499(target))
+        if (sub_0812E368(target) == 0)
+            RejectLate();
+        if ((s16)target->chargeTime <= 499)
             RejectLate();
         return 1;
     case 2: /* Quicken / Smile */
-        if (!AiAllowsCtThrough699(target))
+        if (sub_0812E368(target) == 0)
+            RejectLate();
+        if ((s16)target->chargeTime > 699)
             RejectLate();
         return 1;
+    case 3:
+        if (!AiPassesStatusProbability(user, target))
+            RejectLate();
+        if (!sub_080CDBE4(target) || !sub_080CDC14(target) ||
+            !sub_080CDC44(target))
+            return 1;
+        stateResult = sub_080CDC74(target);
+        goto absent_state_result;
     case 7:
         if (UnitStat(target, 0x26) <= 1) /* Judge Points */
             RejectLate();
@@ -421,9 +422,11 @@ next_effect:
             goto probability_fail;
         goto probability_pass;
     case 16:
-        if (user != target || (u16)sub_080C13C8(target) == 0)
-            RejectLate();
-        return 1;
+        if (user != target)
+            goto probability_fail;
+        if ((u16)sub_080C13C8(target) == 0)
+            goto probability_fail;
+        goto probability_pass;
     case 9:
         currentMp = (u16)UnitStat(target, 0x15);
         mpThreshold = (s16)sub_08142AB0(UnitStat(target, 0x16), 3);
@@ -542,11 +545,10 @@ next_effect:
             RejectLate();
         return 1;
     case 30:
-        if (!sub_080CDB9C(target) || !sub_080CDB84(target) ||
-            !sub_080CDAC4(target))
-            return 1;
-        stateResult = sub_080CDADC(target);
-        goto absent_state_result;
+        if (sub_080CDB9C(target) && sub_080CDB84(target) &&
+            sub_080CDAC4(target) && sub_080CDADC(target))
+            RejectLate();
+        return 1;
     case 49:
         for (mode = 0x1D; mode <= 0x21; mode++)
         {
@@ -561,14 +563,6 @@ next_effect:
         if (gEwram[0x3C33] == 0 || sub_080C832C(target) != 0)
             RejectLate();
         return 1;
-    case 3:
-        if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        if (!sub_080CDBE4(target) || !sub_080CDC14(target) ||
-            !sub_080CDC44(target))
-            return 1;
-        stateResult = sub_080CDC74(target);
-        goto absent_state_result;
     case 28:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -666,6 +660,7 @@ probability_fail:
 probability_pass:
         probabilityPass = 1;
 probability_done:
+        __asm__ volatile ("" : "+r" (probabilityPass));
         if (!probabilityPass)
             RejectLate();
         return 1;
