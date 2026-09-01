@@ -136,12 +136,16 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
    116 jobs, and changing that byte changes the executed result.
 9. **Evaluator control-flow partition.** All 92 effect ids resolve to 66 roots.
    Recursive ARMv4T traversal keeps 3,958 case-owned and 88 shared code bytes
-   disjoint, excludes embedded tables/pools, and preserves all four exit joins.
+   disjoint, excludes embedded tables/pools, preserves all four exit joins,
+   and requires readable reference-C coverage for every id 1..92.
 10. **First reconstructed rule families.** Direct fragment execution proves case 1 accepts
     only nonzero-effective-Speed targets above CT 499. Quicken/Smile case 2
     accepts only nonzero-effective-Speed targets through CT 699. Remove-Frog
     case 13 rejects when Frog is absent and accepts when it is present, anchoring
-    the seven-root present-state cancellation family.
+    the seven-root present-state cancellation family. Cases 7 and 75 share a
+    stat-above-one tail; execution proves the 1/2 boundary for Judge Points and
+    HP respectively. Case 9 additionally rejects when Max MP / 3 is zero,
+    accepts MP 2 of 6, and rejects MP 3 of 6.
 
 ## The priority field is not exactly a percentage
 

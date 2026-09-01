@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 7 — editable evaluator rules |
-| Current work package | AI7.3 — reconstruct exceptional evaluator rule families |
-| Last closed package | AI7.2 — reconstructed CT, absent-state, and cancellation families |
+| Current work package | AI7.4 — turn the readable evaluator into matching source |
+| Last closed package | AI7.3 — reconstructed all 92 effect ids / 66 roots |
 | Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 172/172; AI 10/10; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
 
@@ -51,7 +51,8 @@ status and backlog tables are living sections and should be kept current.
 | AI6.1 | P2 | Complete | Decode the job accessor | All 48 fields execute across 116 jobs; redirect, resistance, and morph-family checks pass |
 | AI7.1 | P3 | Complete | Partition evaluator rule blocks | All 92 ids have reproducible owned/shared CFG boundaries and embedded data is excluded |
 | AI7.2 | P3 | Complete | Reconstruct dominant evaluator cases | CT, 30-root absent-state, and seven-root cancellation families land in readable reference C |
-| AI7.3 | P3 | Active | Reconstruct exceptional evaluator cases | Remaining roots are grouped by normalized shape and translated family by family |
+| AI7.3 | P3 | Complete | Reconstruct exceptional evaluator cases | All 92 effect ids / 66 roots are represented in readable reference C |
+| AI7.4 | P3 | Active | Match the whole evaluator | Matching source replaces the reference without changing retail ROM bytes |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -109,6 +110,7 @@ status and backlog tables are living sections and should be kept current.
 | AI6.1 | 2026-08-31 | Replaced the false computed-field model with the exact 48-field job accessor | 5,568/5,568 formula reads; redirect; resistance 0–7; `+0x31` bit-0 morph-family index; jobs 4/4 |
 | AI7.1 | 2026-08-31 | Replaced linear case slicing with a control-flow-owned evaluator partition | 92 ids / 66 roots; 3,958 owned + 88 shared bytes; four explicit exits; AI 10/10 |
 | AI7.2 | 2026-08-31 | Reconstructed CT, absent-state, and cancellation rule families | 39 roots in readable C; 30/31 probability roots share one normalized shape; CT and remove-Frog boundaries execute |
+| AI7.3 | 2026-08-31 | Completed readable reconstruction of all evaluator dispatch roots | 92/92 ids and 66/66 roots represented; reference syntax check; AI 10/10 |
 
 ## Decisions and evidence
 
@@ -606,6 +608,29 @@ Completed:
 - Added all 30 bindings to readable reference C and syntax-checked it.
 - Reconstructed the inverse present-state family for cases 13/23/25/36/47/57
   and case 64; executed remove-Frog with the state absent and present.
+- Made both zero-byte dispatch families explicit in C: eight effect ids jump
+  directly to accept and eleven jump directly to reject-next.
+- Reconstructed cases 65-67 as the 10/49 probability gate followed by a
+  positive `sub_0812F0D8(target, s16[2])` estimate requirement.
+- Joined cases 7 and 75 through their shared stat tail: Judge Points and HP
+  respectively must be above 1; both 1/2 boundaries execute.
+- Reconstructed the probability-only cases 15/50/59, signed-positive action
+  cases 4/6/21, and case 16's self-target plus nonzero helper rule.
+- Folded cases 82/83 into the semantic absent-state family despite shorter
+  branch encodings; reconstructed cases 41/80's Confuse+Charm exclusion and
+  the all-present composite gates in cases 29/30.
+- Reconstructed case 9's one-third Max MP window, case 38's negative-action
+  one-third Max HP rule, case 49's five-slot item-type scan, and case 92's
+  global-enabled plus Yellow-Card-absent rule.
+- Reconstructed probability/composite cases 3, 28, 48, and 63, preserving
+  their all-present, Haste-branch, paired-state, and persistent-Zombie gates.
+- Translated the final four roots: case 8's generated ability-list/MP gate;
+  cases 11/53/54/58/79's simulated status-word delta; case 43's seven-state
+  exclusion; and case 55's Expert-Guard-absent plus one-third-HP rule.
+- Marked the shared readable helpers `__inline__` and compiled the complete
+  evaluator with agbcc. The first whole-function candidate is 4,976 bytes
+  against retail's 5,350, a concrete 374-byte shaping gap; no helper functions
+  remain out of line.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -614,11 +639,16 @@ Evidence recorded during the batch:
 - 3,958 case-owned bytes / 88 shared bytes with no ownership overlap.
 - Accept/reject/return exit reach counts are stable in validation.
 - Exact case outcomes pass at Speed 0/100 and CT 499/500/699/700.
-- AI validation is 10/10; 39/66 roots now have readable C bindings.
+- AI validation is 10/10; all 66/66 roots now have readable C bindings and 19
+  direct-exit ids no longer hide behind the placeholder.
+- Reference coverage parser finds all 92 ids with none missing; C89 and agbcc
+  compilation both pass.
 
 Next action:
 
-- Cluster the remaining 27 roots by normalized control-flow shape, then
+- Replace the reference-only placeholder with a whole-function matching source
+  candidate, then close the 374-byte compiler-shaping gap starting at the
+  prologue/local-stack layout without changing ROM bytes.
   reconstruct the largest exceptional family without duplicating shared joins.
 
 ### 2026-08-31 — Complete job-accessor reconstruction

@@ -45,53 +45,53 @@ editor.
 | 1 | - | effective Speed nonzero; CT > 499 | accept candidate |
 | 5,18,26,39,40,44,68,81 | - | - | - |
 | 2 | - | effective Speed nonzero; CT <= 699 | accept Quicken/Smile candidate |
-| 3 | 101 | 10, 49 | `sub_080CDC74` |
-| 7 | - | - | - |
-| 8 | - | - | `sub_080C7EA4` |
-| 9 | - | - | `sub_080C7EA4` |
+| 3 | 101 | 10, 49; reject only when all four tested Up states present | composite gate |
+| 7 | - | Judge Points > 1 | accept candidate |
+| 8 | - | generated ability list contains property 2; MP nonzero | accept candidate |
+| 9 | - | Max MP / 3 nonzero; MP <= Max MP / 3 | accept candidate |
 | 10 | 101 | 10, 49 | `sub_080CD8FC` |
-| 11,53,54,58,79 | - | - | `sub_08022854` |
+| 11,53,54,58,79 | - | simulated effect changes status words `+0xe8/+0xec` | accept candidate |
 | 12 | 101 | 10, 49 | `sub_080CD95C` |
 | 13 | - | - | `sub_080CD95C` |
-| 15,50 | 101 | 49 | - |
-| 16 | - | - | `sub_080C13C8` |
+| 15,50 | 101 | 10, 49 | probability gate only |
+| 16 | - | self-target; `sub_080C13C8(target)` nonzero | accept candidate |
 | 17 | 101 | 10, 49 | `sub_080CDA1C` |
 | 19 | 101 | 10, 49 | `sub_080CDADC` |
 | 20 | 101 | 10, 49 | `sub_080CDA34` |
-| 4,6,21 | - | - | - |
+| 4,6,21 | - | signed action value > 0 | accept candidate |
 | 22 | 101 | 10, 49 | `sub_080CDB9C` |
 | 23 | - | - | `sub_080CDB9C` |
 | 24 | 101 | 10, 49 | `sub_080CDB84` |
 | 25 | - | - | `sub_080CDB84` |
 | 27 | 101 | 10, 49 | `sub_080CD944` |
-| 28 | 101 | 10, 49 | `sub_080CDAC4` |
-| 29 | - | - | `sub_080C7EA4` |
-| 30 | - | - | `sub_080CDADC` |
+| 28 | 101 | 10, 49; Haste branch requires Stop absent, otherwise Slow absent | composite gate |
+| 29 | - | reject only when Disable, Immobilize, Blind, Berserk, and HP == 1 | composite gate |
+| 30 | - | reject only when Disable, Immobilize, Slow, and Stop are all present | composite gate |
 | 31 | 101 | 10, 49 | `sub_080CD8E4` |
 | 32 | 101 | 10, 49 | `sub_080CD914` |
 | 33 | 101 | 10, 49 | `sub_080CD8CC` |
 | 35 | 101 | 10, 49 | `sub_080CD98C` |
 | 36 | - | - | `sub_080CD98C` |
 | 37 | 101 | 10, 49 | `sub_080CDA64` |
-| 38 | - | - | `sub_080C7EA4` |
-| 41 | 101 | 10, 49 | `sub_080CDB54` |
+| 38 | - | signed action negative; HP <= Max HP / 3 | accept candidate |
+| 41 | 101 | 10, 49; reject Confuse+Charm combination | composite gate |
 | 42 | 101 | 10, 49 | `sub_080CDA94` |
-| 43 | 101 | 10, 49 | `sub_080CDB24` |
+| 43 | 101 | 10, 49; reject only when all seven tested states present | composite gate |
 | 45 | 101 | 10, 49 | `sub_080CDB24` |
 | 46 | 101 | 10, 49 | `sub_080CD92C` |
 | 47 | - | - | `sub_080CD92C` |
-| 48 | 101 | 10, 49 | `sub_080CDC8C` |
-| 49 | - | 26, 24 | `sub_080CA7A4` |
+| 48 | 101 | 10, 49; reject only when both tested states present | composite gate |
+| 49 | - | any equipped item property 3 in 24..26 | accept candidate |
 | 51 | 101 | 10, 49 | `sub_080CDAC4` |
 | 52 | 101 | 10, 49 | `sub_080CDAAC` |
-| 55 | 101 | 10, 49 | `sub_080C7EA4` |
+| 55 | 101 | 10, 49; Expert Guard absent; HP <= Max HP / 3 | composite gate |
 | 56 | 101 | 10, 49 | `sub_080CDB3C` |
 | 57 | - | - | `sub_080CDB3C` |
-| 59 | 101 | 10, 49 | - |
+| 59 | 101 | 10, 49 | probability gate only |
 | 60 | 101 | 10, 49 | `sub_080CD9BC` |
 | 61 | 101 | 10, 49 | `sub_080CD974` |
 | 62 | 101 | 10, 49 | `sub_080CD974` |
-| 63 | 101 | 10, 49 | `sub_08131030` |
+| 63 | 101 | 10, 49; persistent Zombie and effective state absent | composite gate |
 | 64 | - | - | `sub_08131030` |
 | 65,66,67 | 101 | 10, 49 | `sub_0812F0D8` |
 | 69 | 101 | 10, 49 | `sub_080CDBFC` |
@@ -99,12 +99,12 @@ editor.
 | 71 | 101 | 10, 49 | `sub_080CDBB4` |
 | 72 | 101 | 10, 49 | `sub_080CDC5C` |
 | 73 | 101 | 10, 49 | `sub_080CDC44` |
-| 75 | - | - | `sub_080C7EA4` |
+| 75 | - | HP > 1 | accept candidate |
 | 76 | 101 | 10, 49 | `sub_080CDC2C` |
 | 77 | 101 | 10, 49 | `sub_080CDC8C` |
 | 78 | 101 | 10, 49 | `sub_080CDC74` |
-| 80 | 101 | 10, 49 | `sub_080CDB6C` |
-| 82 | 101 | 10, 49 | `sub_080CDB0C` |
-| 83 | 101 | 10, 49 | `sub_080CDAF4` |
-| 92 | - | - | `sub_080C832C` |
+| 80 | 101 | 10, 49; reject Confuse+Charm combination | composite gate |
+| 82 | 101 | 10, 49 | require Protect absent |
+| 83 | 101 | 10, 49 | require Shell absent |
+| 92 | - | global `0x02003C33` enabled; Yellow Card absent | accept candidate |
 | 14,34,74,84,85,86,87,88, | - | - | - |

@@ -19,6 +19,7 @@ import argparse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import struct
 import collections
+import re
 
 from emulate import Gba, STOP
 from ffta_names import Names
@@ -584,6 +585,17 @@ def check_evaluator_partitions(rom):
     ]
     shape_counts = collections.Counter(row["shape"] for row in probability_rows)
     dominant_roots = max(shape_counts.values())
+    reference_path = os.path.join(os.path.dirname(__file__), "..", "reference",
+                                  "ai_ability_eval.c")
+    reference_source = open(reference_path, encoding="utf-8").read()
+    reference_ids = {
+        int(value) for value in re.findall(r"\bcase\s+(\d+)\s*:",
+                                           reference_source)
+    }
+    reference_ids.update(
+        int(value) for value in re.findall(
+            r"(?:ABSENT|PRESENT)_STATE_CASE\((\d+),", reference_source)
+    )
     ok = (
         len(entries) == 66
         and sum(len(ids) for ids in entries.values()) == 92
@@ -598,12 +610,18 @@ def check_evaluator_partitions(rom):
         }
         and len(probability_rows) == 31
         and dominant_roots == 30
+        and entries[0x080C37B4] == [5, 18, 26, 39, 40, 44, 68, 81]
+        and entries[0x080C477A] == [14, 34, 74, 84, 85, 86, 87, 88, 89,
+                                   90, 91]
+        and reference_ids == set(range(1, 93))
     )
     print(f"   92 ids / {len(entries)} distinct roots; "
           f"{owned_bytes} owned + {shared_bytes} shared code bytes")
     exit_text = {f"{addr:#010x}": count for addr, count in exits.items()}
     print(f"   evaluator exit reach counts: {exit_text}")
     print(f"   dominant probability/status shape: {dominant_roots}/31 roots")
+    print("   direct exits: 8 unconditional accept / 11 reject-next ids")
+    print(f"   readable reference switch: {len(reference_ids)}/92 ids")
     print(f"   -> {'PASS' if ok else 'FAIL'}")
     return ok
 
@@ -656,11 +674,53 @@ def check_ct_case_rules(gba):
         finally:
             gba.uc.hook_del(hook)
         cancel_frog[present] = reached[0] if reached else None
+    stat_cases = {}
+    for root, offset, label in ((0x080C385E, 0xD6, "JP"),
+                                (0x080C4596, 0x18, "HP")):
+        for value in (1, 2):
+            gba.reset_ram()
+            gba.uc.mem_write(unit, bytes(0x108))
+            _put16(gba, unit + offset, value)
+            reached = []
+
+            def stop_stat(uc, address, size, _):
+                if address in (accept, reject):
+                    reached.append(address)
+                    uc.emu_stop()
+
+            hook = gba.uc.hook_add(UC_HOOK_CODE, stop_stat)
+            try:
+                gba.run_range(root, STOP, {"r8": unit})
+            finally:
+                gba.uc.hook_del(hook)
+            stat_cases[(label, value)] = reached[0] if reached else None
+    mp_cases = {}
+    for mp, max_mp in ((0, 2), (2, 6), (3, 6)):
+        gba.reset_ram()
+        gba.uc.mem_write(unit, bytes(0x108))
+        _put16(gba, unit + 0x1C, mp)
+        _put16(gba, unit + 0x1E, max_mp)
+        reached = []
+
+        def stop_mp(uc, address, size, _):
+            if address in (accept, reject):
+                reached.append(address)
+                uc.emu_stop()
+
+        hook = gba.uc.hook_add(UC_HOOK_CODE, stop_mp)
+        try:
+            gba.run_range(0x080C38CC, STOP, {"r8": unit})
+        finally:
+            gba.uc.hook_del(hook)
+        mp_cases[(mp, max_mp)] = reached[0] if reached else None
     ok = (
         case1 == {(0, 500): reject, (100, 499): reject, (100, 500): accept}
         and case2 == {(0, 699): reject, (100, 699): accept,
                       (100, 700): reject}
         and cancel_frog == {0: reject, 1: accept}
+        and stat_cases == {("JP", 1): reject, ("JP", 2): accept,
+                           ("HP", 1): reject, ("HP", 2): accept}
+        and mp_cases == {(0, 2): reject, (2, 6): accept, (3, 6): reject}
     )
     show = lambda values: {
         key: "accept" if value == accept else "reject" if value == reject else None
@@ -669,6 +729,8 @@ def check_ct_case_rules(gba):
     print(f"   case 1 speed/CT outcomes: {show(case1)}")
     print(f"   case 2 (Quicken) speed/CT outcomes: {show(case2)}")
     print(f"   case 13 remove-Frog absent/present: {show(cancel_frog)}")
+    print(f"   cases 7/75 JP/HP boundary: {show(stat_cases)}")
+    print(f"   case 9 MP/MaxMP window: {show(mp_cases)}")
     print(f"   -> {'PASS' if ok else 'FAIL'}")
     return ok
 

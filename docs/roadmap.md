@@ -452,17 +452,25 @@ the repo explicitly ranks it below widening the table surface.
    `reference/ai_ability_eval.c`; CT boundaries execute and the shape census is
    locked by validation. The seven-root inverse/present-state cancellation
    family is also translated, with remove-Frog executed absent and present.
-3. Convert the remaining `reference/ai_ability_eval.c` gauntlet into
+   Both zero-byte dispatch roots are explicit: eight ids accept immediately
+   and eleven reject-next immediately. Cases 65-67 retain the same probability
+   gate but require a positive two-short effect estimate.
+3. **Readable reconstruction complete 2026-08-31.** All 92 ids / 66 roots are
+   represented, including the four final calculation-heavy roots. The AI gate
+   asserts complete switch coverage and the file passes a C89 syntax check.
+4. Convert the readable `reference/ai_ability_eval.c` gauntlet into
    matching C under `src/`, applying the lessons in `docs/matching-notes.md`
    (ternary vs if/else for shared stores; globals as extern symbols, never cast
    literal addresses; literal-vs-`int`-variable register allocation; branch
    polarity by test kind).
-4. Match the **66 distinct case bodies** one at a time — each is small and
+   **Current compiler baseline:** inline helpers produce one 4,976-byte agbcc
+   function versus retail's 5,350 bytes (374 bytes short).
+5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).
-5. Iterate with `make match SRC=... AT=... LEN=...` → `make index` → `make
+6. Iterate with `make match SRC=... AT=... LEN=...` → `make index` → `make
    check` → `make rom` after each batch.
-6. Ship the first **rule mod** (e.g., make the AI play its best option every
+7. Ship the first **rule mod** (e.g., make the AI play its best option every
    time by removing the randomness) as proof the pipeline works end to end.
 
 **Done when:** `sub_080C32C0` compiles byte-identical, and a rule edit builds
