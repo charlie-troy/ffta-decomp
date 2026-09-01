@@ -186,6 +186,7 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     u16 mode;
     u16 currentMp;
     s16 mpThreshold;
+    s16 actionValue;
     int e;
     u8 rangeCode;
     u16 estimateValue;
@@ -264,10 +265,14 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
         Reject();
 
     e = act->unk_10;
-    isNegative = act->unk_0C < 0;
+    actionValue = act->unk_0C;
+    isNegative = actionValue < 0;
 
-    if (sub_081341BC(user, target) || isNegative)
+    if (actionValue >= 0 || isNegative)
     {
+        if (!(sub_081341BC(user, target) || isNegative))
+            goto check_final_value;
+
         if (!isNegative && act->unk_0E < 0x1E)
             Reject();
 
@@ -393,6 +398,7 @@ next_effect:
             RejectLate();
         if ((s16)target->chargeTime <= 499)
             RejectLate();
+        __asm__ volatile ("AiEvaluateAbility_accept_current:");
         return 1;
     case 5:
     case 18:
@@ -495,11 +501,17 @@ next_effect:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if (sub_080CDAAC(target) == 1)
+        {
             sub_080CDADC(target);
+            __asm__ volatile ("" : "=r" (rawStateResult));
+            goto absent_state_result;
+        }
         else
+        {
             sub_080CDAC4(target);
-        __asm__ volatile ("" : "=r" (rawStateResult));
-        goto absent_state_result;
+            __asm__ volatile ("" : "=r" (rawStateResult));
+            goto absent_state_result;
+        }
     case 29:
         if (sub_080CDB9C(target) && sub_080CDB84(target) &&
             sub_080CD98C(target) && sub_080CD944(target) &&
@@ -535,12 +547,18 @@ next_effect:
     ABSENT_STATE_CASE(42, sub_080CDA94);
     case 43:
         if (!AiPassesStatusProbability(user, target))
-            RejectLate();
-        if (sub_080CDAC4(target) && sub_080CD98C(target) &&
-            sub_080CDB54(target) && sub_080CDB3C(target) &&
-            sub_080CD95C(target) && sub_080CD974(target) &&
-            sub_080CDB24(target))
-            RejectLate();
+            __asm__ volatile ("b AiEvaluateAbility_reject_current");
+        if (!sub_080CDAC4(target))
+            __asm__ volatile ("b AiEvaluateAbility_accept_current");
+        if (!sub_080CD98C(target))
+            __asm__ volatile ("b AiEvaluateAbility_accept_current");
+        if (!sub_080CDB54(target) || !sub_080CDB3C(target) ||
+            !sub_080CD95C(target) || !sub_080CD974(target) ||
+            !sub_080CDB24(target))
+            return 1;
+case43_reject:
+        __asm__ volatile ("" ::: "memory");
+        RejectLate();
         return 1;
     ABSENT_STATE_CASE(45, sub_080CDB24);
     ABSENT_STATE_CASE(46, sub_080CD92C);
@@ -691,6 +709,7 @@ absent_state_result:
 #undef PRESENT_STATE_CASE
 #undef ABSENT_STATE_CASE
 reject_current:
+    __asm__ volatile ("AiEvaluateAbility_reject_current:");
     candidateIndex++;
     if (candidateIndex < act->unk_0A)
         goto next_effect;

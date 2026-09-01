@@ -716,6 +716,17 @@ Completed:
   now 3,962 / 3,958 owned bytes (+4) and 88 / 88 shared bytes. Total-size
   equality is still not the goal: the table prefix is eight bytes short and
   the remaining owned deltas offset one another.
+- Restored the omitted signed-action gate before `sub_081341BC`, which places
+  the 92-entry effect table at retail's exact `+0x364` offset. Case 28 now
+  duplicates its two branch-specific state-result transfers, and case 43 uses
+  range-aware named assembler joins for the two ordinary accept branches and
+  its retry branch.
+- Current baseline is 5,356 / 5,350 bytes (+6). All 66/66 roots now match
+  their retail owned-byte sizes (3,958 / 3,958), and every shared owner group
+  remains exact at 88 / 88 bytes. This is still not byte identity: the common
+  retry tail is four bytes long because it reloads the candidate index and
+  moves the action pointer, while the case-92 literal pool is emitted before
+  that tail instead of after retail's epilogue.
 - Closed AI7.1 and AI7.2; opened AI7.3 for exceptional rule families.
 
 Evidence recorded during the batch:
@@ -731,10 +742,10 @@ Evidence recorded during the batch:
 
 Next action:
 
-- Close case 43's six-byte long-branch excess and case 28's two-byte deficit,
-  then reconcile the table's eight-byte prefix gap against the remaining
-  non-case control flow. Keep the candidate in `reference/` until full byte
-  comparison—not size alone—matches all 5,350 retail bytes.
+- Reproduce retail's common retry-tail register lifetime without changing the
+  already-exact case CFG, then move or naturally defer the case-92 literal
+  pool past the epilogue. Keep the candidate in `reference/` until a full byte
+  comparison—not size or CFG counts alone—matches all 5,350 retail bytes.
 
 ### 2026-08-31 — Complete job-accessor reconstruction
 

@@ -464,15 +464,14 @@ the repo explicitly ranks it below widening the table surface.
    literal addresses; literal-vs-`int`-variable register allocation; branch
    polarity by test kind).
    **Current compiler baseline:** explicit return/redispatch control, direct
-   state calls, duplicated self/other RNG arms, and corrected cases 9/92 produce
-   one 5,352-byte agbcc function versus retail's 5,350 (2 bytes over). Its
-   20-byte frame and `sp+12`/`sp+16` action/index slots match retail. The inline
-   modes 4–11 dispatch now retains all three scratch-pair paths and shared
-   joins; all 66 case roots and 85 RNG/modulo sites now exist. Remaining work
-   is instruction layout: the switch now follows retail's physical root order,
-   64/66 roots have exact owned sizes, and all shared owner groups match at
-   88/88 bytes. Only case 43 (+6) and case 28 (-2) remain nonzero, while the
-   table remains eight bytes earlier than retail.
+   state calls, duplicated self/other RNG arms, and the restored signed-action
+   gate produce one 5,356-byte agbcc function versus retail's 5,350 (+6). Its
+   20-byte frame, `sp+12`/`sp+16` action/index slots, and effect table at
+   `+0x364` match retail. All 66 case roots match their retail owned-byte sizes
+   (3,958 / 3,958), all shared owner groups match at 88 / 88 bytes, and all 85
+   RNG/modulo sites remain. Remaining work is outside the case CFG: reproduce
+   the common retry tail's register lifetime and retail's post-epilogue
+   placement of the case-92 literal pool, then perform a full byte comparison.
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).
