@@ -127,6 +127,14 @@ class Elf:
             if rtype not in (R_ARM_ABS32, R_ARM_THM_CALL):
                 continue
             name = names[sym] if sym < len(names) else ""
+            # Local pointers in jump tables and literal pools relocate against
+            # the unnamed .text section symbol. Its final address is the
+            # function placement supplied by the verifier.
+            if name == "" and rtype == R_ARM_ABS32 and base_addr is not None:
+                addend = struct.unpack_from("<I", out, r_offset)[0]
+                value = (addend + base_addr) & 0xFFFFFFFF
+                struct.pack_into("<I", out, r_offset, value)
+                continue
             if name not in symaddrs:
                 unresolved.append(name)
                 continue

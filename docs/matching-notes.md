@@ -2,7 +2,7 @@
 
 ## Where things stand
 
-**Matched: 172 functions, 4,536 bytes.** Everything under `src/` is verified
+**Matched: 173 functions, 9,888 bytes.** Everything under `src/` is verified
 byte-identical; non-matching work lives in `nonmatching/`.
 
 | Group | Count | Status |

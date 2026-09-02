@@ -17,7 +17,7 @@ PY  ?= python3
 
 BUILD := build
 
-.PHONY: all rom mod check index setup verify verify-mod funcs match progress clean
+.PHONY: all rom mod mod-ai-always-pass check index setup verify verify-mod funcs match progress clean
 
 all: rom
 
@@ -30,6 +30,12 @@ rom:
 ## Build with deliberate changes. Does not require a SHA1 match; reports which
 ## functions differ from the base ROM so unintended changes stand out.
 mod:
+	MOD_BUILD=1 bash tools/build_rom.sh "$(ROM)"
+
+## Source-driven proof mod: make every AI status-effect eligibility roll pass.
+## The two 0..100 thresholds become 100, preserving the evaluator's layout.
+mod-ai-always-pass:
+	FFTA_CPPFLAGS="-DFFTA_AI_SELF_STATUS_THRESHOLD=100 -DFFTA_AI_OTHER_STATUS_THRESHOLD=101" \
 	MOD_BUILD=1 bash tools/build_rom.sh "$(ROM)"
 
 ## What CI runs: compile everything and check each function's bytes against

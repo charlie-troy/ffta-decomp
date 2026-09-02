@@ -13,9 +13,9 @@ import os
 import sys
 import argparse
 import collections
+import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from emulate import Gba
 from ffta_names import Names
 import ability_table as A
 
@@ -29,6 +29,16 @@ JOB_UNARMED = 0x08130820
 RNG_STATE = 0x030034B0
 SEED = 0x12345678
 UNIT = 0x02000400
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FUNCTIONS = json.load(open(os.path.join(REPO, "data", "functions.json")))["functions"]
+
+
+def containing_function(off):
+    for func in FUNCTIONS:
+        if func["offset"] <= off < func["offset"] + func["size"]:
+            return func["name"]
+    return None
 
 
 # Offset -> column name, built from the same table the CSV dump uses so the
@@ -78,11 +88,16 @@ def main(argv):
         return 0
 
     groups = collections.defaultdict(list)
+    changed_functions = collections.defaultdict(list)
     other = []
     for off in diff:
         kind, idx, o, name = classify(off)
         if kind is None:
-            other.append(off)
+            function_name = containing_function(off)
+            if function_name:
+                changed_functions[function_name].append(off)
+            else:
+                other.append(off)
         else:
             groups[(kind, idx)].append((o, name, base[off], mod[off]))
 
@@ -90,9 +105,12 @@ def main(argv):
           f"{sum(1 for k in groups if k[0] == 'ability')} entr(ies)")
     print(f"  in the job table     : "
           f"{sum(1 for k in groups if k[0] == 'job')} entr(ies)")
-    print(f"  outside both tables  : {len(other)} byte(s)")
+    print(f"  in matched functions : {sum(map(len, changed_functions.values()))} byte(s)")
+    for function_name, offsets in sorted(changed_functions.items()):
+        print(f"    {function_name}: {len(offsets)} byte(s)")
+    print(f"  unattributed         : {len(other)} byte(s)")
     if other:
-        print("    (code or another table; behaviour is not measured here)")
+        print("    (outside known tables and matched functions)")
         for off in other[:8]:
             print(f"    {0x08000000 + off:#010x}: "
                   f"{base[off]:#04x} -> {mod[off]:#04x}")
@@ -106,8 +124,6 @@ def main(argv):
             print(f"  {kind:<7} {idx:>3} {who[:16]:<17} {name:<22} "
                   f"{b:>3} -> {m:>3}")
 
-    gb, gm = Gba(args.base), Gba(args.modded)
-
     # Ability priority is the field whose effect is measurable end to end.
     rows = []
     for (kind, idx), fields in sorted(groups.items()):
@@ -115,6 +131,8 @@ def main(argv):
             if kind == "ability" and o == 0x1A:
                 rows.append((idx, b, m))
     if rows:
+        from emulate import Gba
+        gb, gm = Gba(args.base), Gba(args.modded)
         print()
         print("measured effect on the AI's decision, run on both ROMs")
         print(f"{'ability':>15} {'id':>4} {'priority':>12} "
@@ -160,6 +178,9 @@ def main(argv):
     jobs = [(idx, o, b, m) for (kind, idx), fs in sorted(groups.items())
             for o, _, b, m in fs if kind == "job" and o in (0x32, 0x33)]
     if jobs:
+        if not rows:
+            from emulate import Gba
+            gb, gm = Gba(args.base), Gba(args.modded)
         print()
         print("job fields, read back through the game's own getters")
         for idx, o, b, m in jobs:

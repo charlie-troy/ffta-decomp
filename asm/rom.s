@@ -8,7 +8,11 @@
 	.incbin "baserom.gba", 0x1cf0, 0x6e0
 
 	.section .rom_000023ea, "ax", %progbits
-	.incbin "baserom.gba", 0x23ea, 0x1572
+	.incbin "baserom.gba", 0x23ea, 0x41a
+	.globl sub_08002804
+	.thumb_func
+sub_08002804:
+	.incbin "baserom.gba", 0x2804, 0x1158
 
 	.section .rom_0000397c, "ax", %progbits
 	.incbin "baserom.gba", 0x397c, 0x21dc
@@ -115,7 +119,15 @@ sub_08021E3C:
 	.incbin "baserom.gba", 0x21e3c, 0x1f0
 
 	.section .rom_00022044, "ax", %progbits
-	.incbin "baserom.gba", 0x22044, 0x2a78
+	.incbin "baserom.gba", 0x22044, 0x7fc
+	.globl sub_08022840
+	.thumb_func
+sub_08022840:
+	.incbin "baserom.gba", 0x22840, 0x14
+	.globl sub_08022854
+	.thumb_func
+sub_08022854:
+	.incbin "baserom.gba", 0x22854, 0x2268
 
 	.section .rom_00024ad6, "ax", %progbits
 	.incbin "baserom.gba", 0x24ad6, 0x27cb2
@@ -162,13 +174,24 @@ sub_080A8DB8:
 	.incbin "baserom.gba", 0xa9476, 0x11386
 
 	.section .rom_000ba816, "ax", %progbits
-	.incbin "baserom.gba", 0xba816, 0xd2f2
+	.incbin "baserom.gba", 0xba816, 0x6bb2
+	.globl sub_080C13C8
+	.thumb_func
+sub_080C13C8:
+	.incbin "baserom.gba", 0xc13c8, 0x1ef8
+
+	.section .rom_000c47a8, "ax", %progbits
+	.incbin "baserom.gba", 0xc47a8, 0x3360
 
 	.section .rom_000c7b1e, "ax", %progbits
 	.incbin "baserom.gba", 0xc7b1e, 0xd6
 
 	.section .rom_000c7c12, "ax", %progbits
-	.incbin "baserom.gba", 0xc7c12, 0x56a
+	.incbin "baserom.gba", 0xc7c12, 0x292
+	.globl UnitStat
+	.thumb_func
+UnitStat:
+	.incbin "baserom.gba", 0xc7ea4, 0x2d8
 
 	.section .rom_000c8192, "ax", %progbits
 	.incbin "baserom.gba", 0xc8192, 0x2
@@ -201,10 +224,18 @@ sub_080A8DB8:
 	.incbin "baserom.gba", 0xc8382, 0x2
 
 	.section .rom_000c83a4, "ax", %progbits
-	.incbin "baserom.gba", 0xc83a4, 0x3100
+	.incbin "baserom.gba", 0xc83a4, 0x2400
+	.globl sub_080CA7A4
+	.thumb_func
+sub_080CA7A4:
+	.incbin "baserom.gba", 0xca7a4, 0xd00
 
 	.section .rom_000cb4c0, "ax", %progbits
-	.incbin "baserom.gba", 0xcb4c0, 0x2084
+	.incbin "baserom.gba", 0xcb4c0, 0x1890
+	.globl AbilityProp
+	.thumb_func
+AbilityProp:
+	.incbin "baserom.gba", 0xccd50, 0x7f4
 
 	.section .rom_000cd55e, "ax", %progbits
 	.incbin "baserom.gba", 0xcd55e, 0x2
@@ -363,7 +394,11 @@ sub_080A8DB8:
 	.incbin "baserom.gba", 0xe06a4, 0x4ae3c
 
 	.section .rom_0012b502, "ax", %progbits
-	.incbin "baserom.gba", 0x12b502, 0x2ff2
+	.incbin "baserom.gba", 0x12b502, 0x2e66
+	.globl sub_0812E368
+	.thumb_func
+sub_0812E368:
+	.incbin "baserom.gba", 0x12e368, 0x18c
 	.globl sub_0812E4F4
 	.thumb_func
 sub_0812E4F4:
@@ -371,13 +406,81 @@ sub_0812E4F4:
 	.globl sub_0812E55C
 	.thumb_func
 sub_0812E55C:
-	.incbin "baserom.gba", 0x12e55c, 0xb70
+	.incbin "baserom.gba", 0x12e55c, 0x148
+	.globl sub_0812E6A4
+	.thumb_func
+sub_0812E6A4:
+	.incbin "baserom.gba", 0x12e6a4, 0x6f4
+	.globl AbilityMpCost
+	.thumb_func
+AbilityMpCost:
+	.incbin "baserom.gba", 0x12ed98, 0x100
+	.globl sub_0812EE98
+	.thumb_func
+sub_0812EE98:
+	.incbin "baserom.gba", 0x12ee98, 0x38
+	.globl sub_0812EED0
+	.thumb_func
+sub_0812EED0:
+	.incbin "baserom.gba", 0x12eed0, 0x1fc
 
 	.section .rom_0012f0d6, "ax", %progbits
 	.incbin "baserom.gba", 0x12f0d6, 0x2
 
 	.section .rom_0012f0e2, "ax", %progbits
-	.incbin "baserom.gba", 0x12f0e2, 0x194f2
+	.incbin "baserom.gba", 0x12f0e2, 0x2
+	.globl sub_0812F0E4
+	.thumb_func
+sub_0812F0E4:
+	.incbin "baserom.gba", 0x12f0e4, 0x70
+	.globl sub_0812F154
+	.thumb_func
+sub_0812F154:
+	.incbin "baserom.gba", 0x12f154, 0x88
+	.globl sub_0812F1DC
+	.thumb_func
+sub_0812F1DC:
+	.incbin "baserom.gba", 0x12f1dc, 0x1e54
+	.globl sub_08131030
+	.thumb_func
+sub_08131030:
+	.incbin "baserom.gba", 0x131030, 0x2a28
+	.globl sub_08133A58
+	.thumb_func
+sub_08133A58:
+	.incbin "baserom.gba", 0x133a58, 0x15c
+	.globl sub_08133BB4
+	.thumb_func
+sub_08133BB4:
+	.incbin "baserom.gba", 0x133bb4, 0x608
+	.globl sub_081341BC
+	.thumb_func
+sub_081341BC:
+	.incbin "baserom.gba", 0x1341bc, 0xec
+	.globl sub_081342A8
+	.thumb_func
+sub_081342A8:
+	.incbin "baserom.gba", 0x1342a8, 0xc
+	.globl sub_081342B4
+	.thumb_func
+sub_081342B4:
+	.incbin "baserom.gba", 0x1342b4, 0xc
+	.globl sub_081342C0
+	.thumb_func
+sub_081342C0:
+	.incbin "baserom.gba", 0x1342c0, 0xdf90
+	.globl sub_08142250
+	.thumb_func
+sub_08142250:
+	.incbin "baserom.gba", 0x142250, 0x700
+	.globl sub_08142950
+	.thumb_func
+sub_08142950:
+	.incbin "baserom.gba", 0x142950, 0x160
+	.globl sub_08142AB0
+	.thumb_func
+sub_08142AB0:
+	.incbin "baserom.gba", 0x142ab0, 0x5b24
 
 	.section .rom_001485e6, "ax", %progbits
 	.incbin "baserom.gba", 0x1485e6, 0xd82

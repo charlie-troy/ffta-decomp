@@ -3,7 +3,7 @@
 # matching baseline without flooding the terminal with generated assembly.
 set -euo pipefail
 
-SRC="${1:-reference/ai_ability_eval.c}"
+SRC="${1:-src/batch13/sub_080C32C0.c}"
 OUT="${2:-build/ai_eval_probe}"
 TARGET_SIZE=5352
 NM="$HOME/ffta-toolchain/local/usr/bin/arm-none-eabi-nm"

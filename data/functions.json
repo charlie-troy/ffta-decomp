@@ -386,6 +386,14 @@
    "sha256": "fb5687663322ceb53850f0fd3f56801282455a7eff497a434b12674901372b60"
   },
   {
+   "name": "sub_080C32C0",
+   "object": "sub_080C32C0",
+   "address": 135017152,
+   "offset": 799424,
+   "size": 5352,
+   "sha256": "08f3a9736cde36c260483db59890bf62eaa8344e55f70a2465393dd77825baec"
+  },
+  {
    "name": "sub_080C7B08",
    "object": "sub_080C7B08",
    "address": 135035656,

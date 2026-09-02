@@ -66,8 +66,8 @@ def mismatch_runs(candidate, retail, masked):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("rom", nargs="?", default="baserom.gba")
-    parser.add_argument("--bin", default="build/ai_eval_probe/ai_ability_eval.bin")
-    parser.add_argument("--obj", default="build/ai_eval_probe/ai_ability_eval.o")
+    parser.add_argument("--bin", default="build/ai_eval_probe/sub_080C32C0.bin")
+    parser.add_argument("--obj", default="build/ai_eval_probe/sub_080C32C0.o")
     parser.add_argument("--limit", type=int, default=20)
     args = parser.parse_args()
 

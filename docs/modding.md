@@ -117,9 +117,8 @@ current MP.
 
 Everything above reaches the AI's tuning without a compiler. Going further,
 changing the *rules* rather than their constants, does need the evaluator
-decompiled and matching, which it is not: `reference/ai_ability_eval.c` is
-readable but deliberately not byte-matching, and lives outside `src/` so the
-build never sees it.
+decompiled and matching. That source now lives at
+`src/batch13/sub_080C32C0.c` and is part of the normal build.
 
 Doing that means writing C that matches, then editing it and building with
 `make mod`, which does not require a SHA1 match and reports which functions
@@ -128,6 +127,19 @@ changed:
 ```bash
 make mod
 ```
+
+The first source-driven rule preset makes every AI status-effect eligibility
+roll pass while preserving the evaluator's layout:
+
+```bash
+make mod-ai-always-pass
+make verify-mod MOD=build/ffta-mod.gba
+```
+
+This changes the self-target and other-target thresholds from 10/49 to 100/101
+at compile time. Both exceed every possible 0..100 roll; keeping the constants
+distinct also preserves retail's shared-block layout. The default build remains
+byte-identical.
 
 Anything reported outside a function you deliberately edited is a bug.
 

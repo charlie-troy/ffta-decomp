@@ -154,7 +154,7 @@ Yellow Clip through its inverse store, confirming target `+0x28` changes
 9. **Evaluator control-flow partition.** All 92 effect ids resolve to 66 roots.
    Recursive ARMv4T traversal keeps 3,958 case-owned and 88 shared code bytes
    disjoint, excludes embedded tables/pools, preserves all four exit joins,
-   and requires readable reference-C coverage for every id 1..92.
+   and requires matched source coverage for every id 1..92.
 10. **First reconstructed rule families.** Direct fragment execution proves case 1 accepts
     only nonzero-effective-Speed targets above CT 499. Quicken/Smile case 2
     accepts only nonzero-effective-Speed targets through CT 699. Remove-Frog

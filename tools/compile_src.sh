@@ -12,6 +12,7 @@ AGBCC="$TC/agbcc/agbcc"
 AS="${ARM_AS:-$TC/local/usr/bin/arm-none-eabi-as}"
 CFLAGS="-mthumb-interwork -Wimplicit -Wparentheses -O2"
 ASFLAGS="-mcpu=arm7tdmi -mthumb-interwork"
+PROJECT_CPPFLAGS="${FFTA_CPPFLAGS:-}"
 
 cd "$(dirname "$0")/.." || exit 1
 OBJ="${1:-build/obj}"
@@ -39,7 +40,7 @@ for src in src/*/*.c src/*.c; do
   # Where a pool forces alignment 4 anyway, GAS fills the section tail with a
   # Thumb nop (0xC046) while the ROM has zeros there, so an explicit
   # zero-filled align is appended to exactly those objects.
-  if cpp -undef -nostdinc -P -o "$OBJ/$name.i" "$src" 2>"$OBJ/$name.err" \
+  if cpp -undef -nostdinc -P $PROJECT_CPPFLAGS -o "$OBJ/$name.i" "$src" 2>"$OBJ/$name.err" \
      && "$AGBCC" $CFLAGS -o "$OBJ/$name.raw.s" "$OBJ/$name.i" 2>>"$OBJ/$name.err" \
      && awk '!d && /^\t\.align\t2, 0$/ { d=1; next } { print }' \
           "$OBJ/$name.raw.s" > "$OBJ/$name.s" \

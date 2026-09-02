@@ -16,6 +16,13 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef short s16;
 
+#ifndef FFTA_AI_SELF_STATUS_THRESHOLD
+#define FFTA_AI_SELF_STATUS_THRESHOLD 10
+#endif
+#ifndef FFTA_AI_OTHER_STATUS_THRESHOLD
+#define FFTA_AI_OTHER_STATUS_THRESHOLD 49
+#endif
+
 /* Only the fields this function touches. Offsets from docs/unit-struct.md. */
 struct Unit
 {
@@ -168,7 +175,7 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
     {
         roll = (s16)sub_08002804();
         roll = (s16)sub_08142950(roll, 101);
-        if (roll > 10)
+        if (roll > FFTA_AI_SELF_STATUS_THRESHOLD)
             pass = 0;
         else
             pass = 1;
@@ -177,7 +184,7 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
     {
         roll = (s16)sub_08002804();
         roll = (s16)sub_08142950(roll, 101);
-        if (roll > 49)
+        if (roll > FFTA_AI_OTHER_STATUS_THRESHOLD)
             pass = 0;
         else
             pass = 1;
@@ -436,12 +443,15 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
             sub_0812F0D8(user, effectEstimate);
             estimateValue = (u16)effectEstimate[0];
 check_range_code:
+        {
+            u32 normalizedRange;
             rangeCode = sub_0812EE98(user, estimateValue);
-            adjustedRange = ((u32)rangeCode << 24) >> 8;
-            adjustedRange += 0xFFF30000;
-            if ((u16)(adjustedRange >> 16) > 1)
+            normalizedRange = ((u32)rangeCode << 24) >> 8;
+            normalizedRange += 0xFFF30000;
+            if ((u16)(normalizedRange >> 16) > 1)
                 goto check_reflect;
             Reject();
+        }
         case 9:
         {
             register int modeAbilityId __asm__("r0");
@@ -630,7 +640,7 @@ next_effect:
             RejectLate();
         return 1;
     case 7:
-        if (UnitStat(target, 0x26) <= 1)
+        if ((u32)UnitStat(target, 0x26) <= 1)
             RejectLate();
         return 1;
     case 8:
@@ -713,7 +723,7 @@ next_effect:
         probabilityRoll = (s16)sub_08002804();
         probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
         __asm__ volatile ("");
-        if (probabilityRoll > 49)
+        if (probabilityRoll > FFTA_AI_OTHER_STATUS_THRESHOLD)
             goto probability_fail;
         goto probability_pass;
     case 16:
@@ -897,13 +907,13 @@ next_effect:
 probability_self:
         probabilityRoll = (s16)sub_08002804();
         probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
-        if (probabilityRoll > 10)
+        if (probabilityRoll > FFTA_AI_SELF_STATUS_THRESHOLD)
             goto probability_fail;
         goto probability_pass;
 probability_other:
         probabilityRoll = (s16)sub_08002804();
         probabilityRoll = (s16)sub_08142950(probabilityRoll, 101);
-        if (probabilityRoll <= 49)
+        if (probabilityRoll <= FFTA_AI_OTHER_STATUS_THRESHOLD)
             goto probability_pass;
 probability_fail:
         probabilityPass = 0;
@@ -949,7 +959,7 @@ present_state_result:
     ABSENT_STATE_CASE(72, sub_080CDC5C);
     ABSENT_STATE_CASE(73, sub_080CDC44);
     case 75:
-        if (UnitStat(target, STAT_HP) <= 1)
+        if ((u32)UnitStat(target, STAT_HP) <= 1)
             RejectLate();
         return 1;
     ABSENT_STATE_CASE(76, sub_080CDC2C);

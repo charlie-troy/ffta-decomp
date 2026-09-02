@@ -24,6 +24,13 @@ EXTRA = {
     "sub_080DBD5C": ("match_test2", 0x0DBD5C, 20),
 }
 
+# The evaluator's final literal is a 32-bit word ending in two zero bytes.
+# Discovery stops at the last non-zero halfword, but those zero bytes remain
+# part of the function-owned literal and the matching source's .text section.
+SIZE_OVERRIDES = {
+    "sub_080C32C0": 5352,
+}
+
 
 def main(argv):
     if len(argv) != 2:
@@ -44,7 +51,8 @@ def main(argv):
             if f is None:
                 print(f"warning: {name} not in manifest, skipped")
                 continue
-            entries.append((name, name, f["offset"], f["size"]))
+            entries.append((name, name, f["offset"],
+                            SIZE_OVERRIDES.get(name, f["size"])))
 
     for name, (obj, off, size) in EXTRA.items():
         if os.path.isfile(os.path.join(REPO, "src", obj + ".c")):

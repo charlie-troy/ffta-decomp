@@ -585,8 +585,8 @@ def check_evaluator_partitions(rom):
     ]
     shape_counts = collections.Counter(row["shape"] for row in probability_rows)
     dominant_roots = max(shape_counts.values())
-    reference_path = os.path.join(os.path.dirname(__file__), "..", "reference",
-                                  "ai_ability_eval.c")
+    reference_path = os.path.join(os.path.dirname(__file__), "..", "src",
+                                  "batch13", "sub_080C32C0.c")
     reference_source = open(reference_path, encoding="utf-8").read()
     reference_ids = {
         int(value) for value in re.findall(r"\bcase\s+(\d+)\s*:",
@@ -625,7 +625,7 @@ def check_evaluator_partitions(rom):
     print(f"   evaluator exit reach counts: {exit_text}")
     print(f"   dominant probability/status shape: {dominant_roots}/31 roots")
     print("   direct exits: 8 unconditional accept / 11 reject-next ids")
-    print(f"   readable reference switch: {len(reference_ids)}/92 ids")
+    print(f"   matched source switch: {len(reference_ids)}/92 ids")
     print("   endpoint: final literal 0x00003C33; next push at 0x080C47A8")
     print(f"   -> {'PASS' if ok else 'FAIL'}")
     return ok

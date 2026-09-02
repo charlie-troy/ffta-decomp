@@ -101,7 +101,7 @@ entry but is not read by the accessor.
 
 ## Decompilation status
 
-**The full 16 MB ROM rebuilds byte-identical.** 172 functions are compiled from
+**The full 16 MB ROM rebuilds byte-identical.** 173 functions are compiled from
 C and placed at their real addresses; everything else is pulled from the base
 ROM with `.incbin`. `make rom` fails unless the SHA1 matches, so no change can
 silently break the build. `make mod` is the same build with the SHA1 gate
@@ -113,7 +113,7 @@ relaxed, for deliberate changes.
 | SHA1 | `4ac05441f4de70a4ec3dd932116346c61b8783d9` |
 | Compiler | **agbcc** (pret's patched gcc 2.95.3, the AGB SDK compiler) |
 | Flags | `-mthumb-interwork -Wimplicit -Wparentheses -O2` |
-| Functions matched | **172** (4,536 bytes) |
+| Functions matched | **173** (9,888 bytes) |
 | Full ROM rebuild | **matching** |
 | Functions discovered | 3,594 (via luvdis + local analysis) |
 

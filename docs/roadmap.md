@@ -6,7 +6,7 @@ Each phase lists the objective, why it is worth doing now, concrete steps using
 tools that already exist, and a definition of done. The reusable loop for any
 "map a table / name a field" step is stated once at the end.
 
-State snapshot: 172 functions matched (4,536 bytes) · full 16 MB ROM rebuilds
+State snapshot: 173 functions matched (9,888 bytes) · full 16 MB ROM rebuilds
 byte-identical · CI hash gate on every function · 3,594 functions discovered ·
 abilities, jobs, items, missions and map terrain mapped and editable · text
 decodes at 99.7% · 10/10 execution checks pass (`tools/validate_ai.py`).
@@ -34,7 +34,7 @@ turns.
      **eight** (priority, properties, flags, stat_ids, healthy_rule, gate,
      resist_slots, unarmed). The README repeats "six checks".
    - `docs/matching-notes.md` says "113 functions, 3,044 bytes"; the README and
-     `data/functions.json` say **172 / 4,536**.
+     `data/functions.json` say **173 / 9,888**.
    - `docs/unit-ai-table.md` is superseded by `docs/job-table.md` (123 vs 116
      entries; "b04 unknown" vs race confirmed; four dead/raw offsets now closed).
      Mark it superseded.
@@ -432,15 +432,14 @@ account for the other guessed-offset mismatches.
 
 ---
 
-## Phase 7 — Make the evaluator's *rules* editable (the long-horizon decomp)
+## Phase 7 — Make the evaluator's *rules* editable — complete
 
 **Objective:** byte-match `sub_080C32C0` (5,352 bytes) so rule changes ship via
 `make mod`.
 
-**Why last:** it is *the* function for AI behaviour, and today only its
-*constants* are patchable (the priority CSV and the 10/49 gates). Changing
-rules needs it matching under `src/` — the single biggest decomp effort, and
-the repo explicitly ranks it below widening the table surface.
+**Why it was last:** it is *the* function for AI behaviour. Changing its rules
+required the repo's single biggest matching effort, so the work followed the
+higher-return table and no-compiler editing surfaces.
 
 **Steps:**
 
@@ -449,7 +448,7 @@ the repo explicitly ranks it below widening the table surface.
    case-owned bytes, 88 shared bytes, four evaluator exits, and embedded data.
 2. **Dominant family complete 2026-08-31.** Cases 1/2 and the 30-root
    probability-plus-absent-state shape are readable in
-   `reference/ai_ability_eval.c`; CT boundaries execute and the shape census is
+   `src/batch13/sub_080C32C0.c`; CT boundaries execute and the shape census is
    locked by validation. The seven-root inverse/present-state cancellation
    family is also translated, with remove-Frog executed absent and present.
    Both zero-byte dispatch roots are explicit: eight ids accept immediately
@@ -458,45 +457,45 @@ the repo explicitly ranks it below widening the table surface.
 3. **Readable reconstruction complete 2026-08-31.** All 92 ids / 66 roots are
    represented, including the four final calculation-heavy roots. The AI gate
    asserts complete switch coverage and the file passes a C89 syntax check.
-4. Convert the readable `reference/ai_ability_eval.c` gauntlet into
-   matching C under `src/`, applying the lessons in `docs/matching-notes.md`
+4. **Completed 2026-09-02:** convert the readable evaluator gauntlet into
+   matching C at `src/batch13/sub_080C32C0.c`, applying the lessons in `docs/matching-notes.md`
    (ternary vs if/else for shared stores; globals as extern symbols, never cast
    literal addresses; literal-vs-`int`-variable register allocation; branch
    polarity by test kind).
-   **Current compiler baseline:** the full agbcc candidate and retail are both
+   **Matched compiler baseline:** the full agbcc source and retail are both
    5,352 bytes, with the exact 20-byte frame, `sp+12`/`sp+16` action/index
    slots, and effect table at `+0x364`. All 66 case roots match their retail
    owned-byte sizes (3,958 / 3,958), all shared owner groups match at 88 / 88
    bytes, and all 85 RNG/modulo sites remain. The candidate initialization,
    effect-pointer setup, target-state reachability check, and switch range
    guard now follow retail's instruction topology. Relocation-aware equality is
-   3,729 / 3,732 comparable bytes (three one-byte mismatches), up from
+   3,732 / 3,732 comparable bytes (zero mismatches), up from
    2,981 / 3,728. The retry tails and case-92 post-epilogue literal pool now
    occupy their exact retail offsets, and the opening gauntlet is exact through
    `+0x128`. The mode 7/8/10 negative-action branch now has retail's direct
    reflect fallthrough, and mode-local scratch registers now match. The
    simulated-status case family and case-16 rejection topology are exact.
-   The remaining work is limited to two mode-range register encodings and one
-   signed-versus-unsigned case-75 branch opcode; size and CFG equality still do
-   not imply byte identity.
-5. Match the **66 distinct case bodies** one at a time — each is small and
-   depends only on already-matched helpers (flag getters/setters,
-   `sub_080C7EA4`, the RNG, `__modsi3`).
-6. Iterate with `make match SRC=... AT=... LEN=...` → `make index` → `make
-   check` → `make rom` after each batch.
-7. Ship the first **rule mod** (e.g., make the AI play its best option every
-   time by removing the randomness) as proof the pipeline works end to end.
+   Splitting the mode-6 normalized range from case 49's range iterator closed
+   the last two register encodings; sharing the unsigned JP/HP boundary closed
+   the final condition opcode.
+5. **Completed 2026-09-02:** match all 66 distinct case bodies and integrate
+   the 5,352-byte evaluator into the normal source/build manifest.
+6. **Completed 2026-09-02:** ship `make mod-ai-always-pass`. The source-driven
+   preset changes all 85 status-roll thresholds while preserving layout;
+   `verify_mod` attributes all 85 changed bytes to `sub_080C32C0` and reports
+   zero unattributed bytes.
 
-**Done when:** `sub_080C32C0` compiles byte-identical, and a rule edit builds
-via `make mod` with `verify_mod` reporting exactly that one function changed.
+**Done 2026-09-02:** `sub_080C32C0` compiles byte-identical, and a rule edit
+builds via the mod pipeline with `verify_mod` reporting exactly that one
+function changed.
 
 ---
 
 ## Phase 8 — Long tail and cleanup
 
 - The **7 undecoded text strings** (0.3%).
-- The **9 skipped maps** and the **height-flag**, if not closed in Phase 3.
-- The **mission index** fields, if not closed in Phase 2.
+- Select future function matches from concrete modding goals rather than raw
+  decompilation percentage.
 - Revisit the deliberately-ugly matching constructs (e.g. `sub_080CDD88`'s
   load-bearing duplicated branch) once surrounding code clarifies the real
   idiom — never at the cost of the match.

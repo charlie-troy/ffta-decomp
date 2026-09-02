@@ -30,11 +30,11 @@ status and backlog tables are living sections and should be kept current.
 | Item | State |
 |---|---|
 | Branch | `master`, tracking `origin/master` |
-| Active phase | Phase 7 — editable evaluator rules |
-| Current work package | AI7.4 — turn the readable evaluator into matching source |
-| Last closed package | AI7.3 — reconstructed all 92 effect ids / 66 roots |
-| Baseline | 172 matched functions / 4,536 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 172/172; AI 10/10; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
+| Active phase | Phase 8 — long tail and cleanup |
+| Current work package | DEC8.1 — select the next modding-driven function |
+| Last closed package | AI7.4 — byte-matched and integrated the full evaluator |
+| Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
+| Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -52,7 +52,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.1 | P3 | Complete | Partition evaluator rule blocks | All 92 ids have reproducible owned/shared CFG boundaries and embedded data is excluded |
 | AI7.2 | P3 | Complete | Reconstruct dominant evaluator cases | CT, 30-root absent-state, and seven-root cancellation families land in readable reference C |
 | AI7.3 | P3 | Complete | Reconstruct exceptional evaluator cases | All 92 effect ids / 66 roots are represented in readable reference C |
-| AI7.4 | P3 | Active | Match the whole evaluator | Matching source replaces the reference without changing retail ROM bytes |
+| AI7.4 | P3 | Complete | Match the whole evaluator | Matching source replaces the reference without changing retail ROM bytes |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -116,6 +116,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.4c | 2026-09-02 | Removed the mode-dispatch control-flow excess and aligned downstream layout | Exact mode fallthrough topology; 3,606/3,732 comparable bytes equal; 126 mismatches in 53 runs |
 | AI7.4d | 2026-09-02 | Aligned mode-local scratch flow and the simulated-status case family | Exact 5,352-byte layout; 3,675/3,732 comparable bytes equal; 57 mismatches in 34 runs |
 | AI7.4e | 2026-09-02 | Matched the late exceptional cases and reflect/final-value joins | 3,729/3,732 comparable bytes equal; three one-byte register/condition encodings remain |
+| AI7.4f | 2026-09-02 | Reached byte identity, integrated the evaluator, and shipped the first source rule preset | 3,732/3,732 comparable bytes; 173/173 functions; retail ROM matches; preset changes only 85 evaluator bytes |
 
 ## Decisions and evidence
 
@@ -591,6 +592,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Evaluator integration and first source rule mod
+
+Objective:
+
+- Close Phase 7 by reaching byte identity, replacing the reference-only source,
+  and proving a deliberate rule edit can travel through the normal mod build.
+
+Completed:
+
+- Split mode 6's normalized range from case 49's iterator and made the shared
+  case-7/case-75 boundary unsigned. Those changes closed the final three bytes:
+  3,732/3,732 relocation-comparable bytes now match.
+- Moved the 5,352-byte evaluator to `src/batch13/sub_080C32C0.c`, added its
+  callable/global linker symbols, and taught object verification to relocate
+  internal `.text` pointers used by jump tables and literal pools.
+- Regenerated the function index at 173 functions / 9,888 bytes. `make check`
+  verifies 173/173, and the full ROM retains SHA1
+  `4ac05441f4de70a4ec3dd932116346c61b8783d9`.
+- Added `make mod-ai-always-pass`. It compiles self/other status-roll thresholds
+  as 100/101, above every possible 0..100 roll while preserving layout.
+- Built and verified the preset: 85 bytes changed, all 85 belong to
+  `sub_080C32C0`, and zero bytes are unattributed.
+
+Next action:
+
+- Start Phase 8 by selecting the next function from an explicit modding goal,
+  rather than growing the matched-function count without a user-facing edit.
 
 ### 2026-09-02 — Evaluator exceptional-case convergence
 

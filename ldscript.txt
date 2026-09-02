@@ -11,6 +11,7 @@
  */
 
 gUnk_020020D0 = 0x020020D0;
+gEwram = 0x02000000;
 gUnk_02009000 = 0x02009000;
 gUnk_020091A0 = 0x020091A0;
 gUnk_03000028 = 0x03000028;
@@ -18,6 +19,7 @@ gUnk_03000890 = 0x03000890;
 gUnk_03002F58 = 0x03002F58;
 gUnk_03002710 = 0x03002710;
 gUnk_030034B8 = 0x030034B8;
+gAbilityTable = 0x0855187C;
 
 SECTIONS
 {
@@ -164,6 +166,9 @@ SECTIONS
         . = 0x0ba7fc;
         build/obj/sub_080BA7FC.o(.text)
         build/obj/rom.o(.rom_000ba816)
+        . = 0x0c32c0;
+        build/obj/sub_080C32C0.o(.text)
+        build/obj/rom.o(.rom_000c47a8)
         . = 0x0c7b08;
         build/obj/sub_080C7B08.o(.text)
         build/obj/rom.o(.rom_000c7b1e)
