@@ -141,7 +141,8 @@ at compile time. Both exceed every possible 0..100 roll; keeping the constants
 distinct also preserves retail's shared-block layout. The default build remains
 byte-identical.
 
-Anything reported outside a function you deliberately edited is a bug.
+Anything reported outside a function or data block you deliberately edited is
+a bug.
 
 ## What is known
 
@@ -160,6 +161,9 @@ saturates, a byte written to the wrong column, an edit that changes nothing.
 `tools/verify_mod.py` diffs your ROM against the base, names every changed
 field, and then measures the consequence by running **both ROMs' own decision
 code**, so the answer comes from the game rather than from a description of it.
+Matched functions and custom-LZSS map-graphics allocations are attributed too,
+so source-driven rule mods and tile edits do not disappear into an
+“unattributed” byte count.
 
 ```bash
 make verify-mod MOD=build/ffta-mod.gba

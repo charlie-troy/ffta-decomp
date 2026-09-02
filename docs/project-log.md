@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
 | Current work package | DEC8.1 — select the next modding-driven function |
-| Last closed package | MAP8.1 — make exported tile graphics editable |
+| Last closed package | VER8.1 — attribute graphics mods in verification receipts |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -47,6 +47,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.3 | P1 | Complete | Decode custom-LZSS map graphics | All 50 unique streams match the retail decoder and malformed data is rejected |
 | MAP3.4 | P1 | Complete | Characterize animation blocks and mode bytes | Readers name the controls and reproducible exports cover all present blocks |
 | MAP8.1 | P1 | Complete | Make exported map tile graphics editable | All 50 streams recompress within allocation; unchanged and edited apply paths round-trip safely |
+| VER8.1 | P1 | Complete | Attribute graphics changes in mod receipts | Changed bytes are grouped by source stream/map ids with zero false unattributed bytes |
 | ITEM4.1 | P2 | Complete | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Icon paths execute end to end; behavioral flags have readers; hand bits have explicit population evidence; CSV round-trips |
 | AI5.1 | P2 | Complete | Expand unit-status and stat naming | All 69 stat cases named; all 47 represented live bits named or explicitly classified numeric; 21/21 gate |
 | AI6.1 | P2 | Complete | Decode the job accessor | All 48 fields execute across 116 jobs; redirect, resistance, and morph-family checks pass |
@@ -120,6 +121,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.4f | 2026-09-02 | Reached byte identity, integrated the evaluator, and shipped the first source rule preset | 3,732/3,732 comparable bytes; 173/173 functions; retail ROM matches; preset changes only 85 evaluator bytes |
 | TXT8.1 | 2026-09-02 | Decoded the final seven primary-table strings and added a completeness gate | 2,757/2,757 strings clean; 7/7 edge anchors locked |
 | MAP8.1 | 2026-09-02 | Added guarded custom-LZSS graphics recompression and write-back | 50/50 streams round-trip and fit; unedited ROM exact; one-byte tile edit confined to its allocation |
+| VER8.1 | 2026-09-02 | Extended mod receipts to identify custom-LZSS graphics allocations | Map-0 edit: 10,834/10,834 bytes attributed to stream `0x0856c8b8` shared by maps 0/1; zero unattributed |
 
 ## Decisions and evidence
 
@@ -595,6 +597,28 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Graphics-aware mod verification
+
+Objective:
+
+- Ensure the new graphics workflow produces an auditable receipt instead of
+  making legitimate compressed-byte churn look like unexplained corruption.
+
+Completed:
+
+- Extended `verify_mod.py` to derive all 50 graphics allocation ranges from
+  the base ROM and group changed bytes by source address and sharing map ids.
+- Replayed the map-0 one-byte tile edit. Recompression changes 10,834 ROM
+  bytes; all 10,834 are attributed to graphics stream `0x0856c8b8`, shared by
+  maps 0 and 1, with zero unattributed bytes.
+- Rechecked the source evaluator preset: its 85 bytes remain attributed only
+  to `sub_080C32C0`; graphics attribution remains zero.
+
+Next action:
+
+- Extend receipts across the other supported map editing surfaces so every
+  first-party apply workflow can distinguish intended changes from spillover.
 
 ### 2026-09-02 — Editable custom-LZSS map graphics
 

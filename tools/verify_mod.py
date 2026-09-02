@@ -17,6 +17,7 @@ import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ffta_names import Names
+from map_data import COUNT as MAP_COUNT, decode_graphics
 import ability_table as A
 
 PRIO_FILTER = 0x0812F1DC
@@ -81,6 +82,21 @@ def main(argv):
         return 1
 
     nm = Names(base)
+    graphics = {}
+    for map_id in range(MAP_COUNT):
+        meta = decode_graphics(base, map_id)
+        group = graphics.setdefault(meta["source_offset"], {
+            "end": meta["source_offset"] + meta["compressed_bytes"],
+            "maps": [],
+        })
+        group["maps"].append(map_id)
+
+    def containing_graphics(off):
+        for start, info in graphics.items():
+            if start <= off < info["end"]:
+                return start
+        return None
+
     diff = [i for i in range(len(base)) if base[i] != mod[i]]
     print(f"bytes changed: {len(diff)}")
     if not diff:
@@ -89,6 +105,7 @@ def main(argv):
 
     groups = collections.defaultdict(list)
     changed_functions = collections.defaultdict(list)
+    changed_graphics = collections.defaultdict(list)
     other = []
     for off in diff:
         kind, idx, o, name = classify(off)
@@ -97,7 +114,11 @@ def main(argv):
             if function_name:
                 changed_functions[function_name].append(off)
             else:
-                other.append(off)
+                graphics_start = containing_graphics(off)
+                if graphics_start is not None:
+                    changed_graphics[graphics_start].append(off)
+                else:
+                    other.append(off)
         else:
             groups[(kind, idx)].append((o, name, base[off], mod[off]))
 
@@ -108,9 +129,13 @@ def main(argv):
     print(f"  in matched functions : {sum(map(len, changed_functions.values()))} byte(s)")
     for function_name, offsets in sorted(changed_functions.items()):
         print(f"    {function_name}: {len(offsets)} byte(s)")
+    print(f"  in map graphics      : {sum(map(len, changed_graphics.values()))} byte(s)")
+    for start, offsets in sorted(changed_graphics.items()):
+        maps = ",".join(str(i) for i in graphics[start]["maps"])
+        print(f"    {0x08000000 + start:#010x} (maps {maps}): {len(offsets)} byte(s)")
     print(f"  unattributed         : {len(other)} byte(s)")
     if other:
-        print("    (outside known tables and matched functions)")
+        print("    (outside known tables, functions, and map graphics)")
         for off in other[:8]:
             print(f"    {0x08000000 + off:#010x}: "
                   f"{base[off]:#04x} -> {mod[off]:#04x}")
