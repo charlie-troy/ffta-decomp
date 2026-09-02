@@ -17,7 +17,7 @@ PY  ?= python3
 
 BUILD := build
 
-.PHONY: all rom mod mod-ai-always-pass check index setup verify verify-mod validate-text funcs match progress clean
+.PHONY: all rom mod mod-ai-always-pass check index setup verify verify-mod validate-text validate-strategies funcs match progress clean
 
 all: rom
 
@@ -53,6 +53,9 @@ verify:
 
 validate-text:
 	$(PY) tools/validate_text.py "$(ROM)"
+
+validate-strategies:
+	$(PY) tools/validate_ai_strategy.py "$(ROM)"
 
 ## Show what a modded ROM changes about the AI's decisions, measured by
 ## running both ROMs' own code. MOD= is the ROM you built.

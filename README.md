@@ -11,6 +11,11 @@ Two things live here:
 2. **A matching decompilation** underneath it, so the parts that are code and
    not data can be changed too. The full 16 MB ROM rebuilds byte-identical.
 
+For tailored auto-battle behavior, start with declarative
+[AI strategy profiles](docs/ai-strategy-profiles.md). They combine ordered
+ability rules, job fallback priorities, and status-effect gates in one guarded,
+previewable configuration.
+
 > **No ROM data lives in this repository.** You supply your own dump. The build
 > verifies its SHA1 and extracts what it needs at build time. `.gitignore`
 > excludes `*.gba` and `*.bin`; keep it that way.

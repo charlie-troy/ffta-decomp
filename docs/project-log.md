@@ -30,11 +30,11 @@ status and backlog tables are living sections and should be kept current.
 | Item | State |
 |---|---|
 | Branch | `master`, tracking `origin/master` |
-| Active phase | Phase 8 — long tail and cleanup |
-| Current work package | None — bounded roadmap clear; next work needs a concrete modding goal |
-| Last closed package | AUD8.1 — audit remaining maintenance gaps |
+| Active phase | Phase 9 — player-authored auto-battle strategies |
+| Current work package | STRAT9.2 — decode target scoring and intent weights |
+| Last closed package | STRAT9.1 — declarative strategy profiles |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
+| Core gates | `make check` 173/173; AI 10/10; strategies 5/5; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -63,6 +63,11 @@ status and backlog tables are living sections and should be kept current.
 | CLN8.3 | P3 | Complete | Classify safe object padding without weakening the build gate | Zero-only alignment padding is reported as safe; truncation and nonzero overruns fail; build output has no false alarm |
 | AUD8.1 | P3 | Complete | Audit the repository for the next evidence-backed maintenance gap | Stale commands, dead paths, and validation blind spots are either fixed or explicitly ruled out |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
+| STRAT9.1 | P0 | Complete | Compose existing AI controls into player-authored strategy profiles | Ordered guarded rules, preview/apply, two presets, strict attribution, execution validation, and user documentation |
+| STRAT9.2 | P0 | Active | Decode target scoring and intent weights | Damage/heal/status/safety target choices are behavior-backed and exposed as profile controls |
+| STRAT9.3 | P1 | Pending | Decode movement and resource policies | Verified movement intent and MP/HP/CT conservation controls join the profile contract |
+| STRAT9.4 | P1 | Pending | Assign strategies at useful runtime scopes | Per-unit/job/clan/battle feasibility is proven before adding storage or hooks |
+| STRAT9.5 | P1 | Pending | Validate contrasting profiles in full auto battles | Fixed multi-turn replays demonstrate action, target, and movement differences |
 
 ## Closed work packages
 
@@ -136,6 +141,7 @@ status and backlog tables are living sections and should be kept current.
 | CLN8.2 | 2026-09-02 | Normalized legacy source names and centralized non-discovery metadata | 14 explicit supplemental records; index restored to 173/9,888 after catching a silent 159-entry regression; 173/173 and exact ROM |
 | CLN8.3 | 2026-09-02 | Centralized object-size and alignment-padding classification | 173 objects checked; one 26→28 zero-only pad accepted with ROM evidence; missing/truncated/nonzero-overrun paths fail; exact ROM |
 | AUD8.1 | 2026-09-02 | Audited source/index coverage, executable guidance, and repository text health | Injected unindexed source fails both CI verification and layout generation; stale 123/116, 14/16, 99.7%/100%, and priority-direction claims corrected; UTF-8/JSON/local-link audits pass |
+| STRAT9.1 | 2026-09-02 | Added player-authored auto-battle strategy profiles | Ordered ability/job selectors and status gates; aggressive 387-byte and deterministic 451-byte profiles; 5/5 strategy checks; full release gate 71.1s |
 
 ## Decisions and evidence
 
@@ -611,6 +617,43 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Declarative auto-battle strategy profiles
+
+Objective:
+
+- Turn the existing low-level AI tuning controls into a cohesive, reusable
+  strategy format that a player can tailor without editing CSVs or C source.
+
+Completed:
+
+- Added `ai_strategy.py` with schema validation, no-write preview, atomic apply,
+  base-ROM SHA1 binding, overwrite protection, and ordered rules that match the
+  original state before applying deliberate later overrides.
+- Ability selectors support exact ids/names, name fragments, all numeric table
+  fields, and semantic all/any/none flag conditions. Actions can set, add, or
+  scale the three established AI fields with strict ranges and optional exact
+  match-count guards.
+- Job rules expose fallback priority by index/name/field condition. Shared
+  self-target and other-target status gates join the same profile.
+- Shipped aggressive-pressure and deterministic-eligibility profiles. They
+  produce 387 and 451 final changed bytes respectively, without enabling
+  retail-disabled priority-zero actions.
+- Added a 5/5 strategy validator covering deterministic diffs, allocation
+  confinement, selector/override behavior, malformed-profile rejection, and
+  87 changed job priorities executed through the retail getter.
+- Strict mod verification accepts the aggressive profile with zero
+  unattributed bytes. The complete release gate passes in 71.1 seconds and
+  restores the exact retail build.
+- Documented the workflow, full selector/action contract, safety model,
+  shipped profiles, and honest boundary: action eligibility is customizable;
+  target selection, movement, resource policy, assignment scope, and multi-turn
+  acceptance are the remaining Phase 9 work.
+
+Next action:
+
+- Trace candidate records after `sub_080C32C0` to identify the fields and
+  functions that choose targets and score damage, healing, status, and safety.
 
 ### 2026-09-02 — Post-roadmap maintenance audit
 

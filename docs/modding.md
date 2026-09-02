@@ -1,5 +1,9 @@
 # Modding the battle AI
 
+For a cohesive auto-battle style rather than a one-off table edit, use
+[strategy profiles](ai-strategy-profiles.md). A profile composes the controls
+below into ordered, named rules and can be previewed before it writes anything.
+
 Two ways to change AI behaviour, in increasing order of effort.
 
 ## 1. Edit the ability table (no code, no compiler)

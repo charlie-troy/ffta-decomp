@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "name": "Deterministic action eligibility",
+  "description": "Removes the known priority and shared status-gate refusal rolls while preserving actions disabled by a retail priority of zero.",
+  "base_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
+  "status_gates": {
+    "self": 100,
+    "other": 100
+  },
+  "ability_rules": [
+    {
+      "name": "Always retain usable abilities",
+      "match": {
+        "fields": {
+          "ai_priority": {"min": 1}
+        }
+      },
+      "set": {"ai_priority": 100},
+      "expect_matches": 302
+    }
+  ],
+  "job_rules": [
+    {
+      "name": "Always retain enabled fallback job actions",
+      "match": {
+        "fields": {
+          "ai_priority": {"min": 1}
+        }
+      },
+      "set": {"ai_priority": 100}
+    }
+  ]
+}

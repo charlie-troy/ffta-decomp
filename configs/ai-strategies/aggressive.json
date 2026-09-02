@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "name": "Aggressive pressure",
+  "description": "Strongly favors offensive actions, keeps debuffs relevant, and reduces random refusal of status plays.",
+  "base_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
+  "status_gates": {
+    "self": 25,
+    "other": 75
+  },
+  "ability_rules": [
+    {
+      "name": "Normalize usable actions",
+      "match": {
+        "fields": {
+          "ai_priority": {"min": 1}
+        }
+      },
+      "set": {"ai_priority": 35},
+      "expect_matches": 302
+    },
+    {
+      "name": "Prefer offensive actions",
+      "match": {
+        "fields": {
+          "ai_priority": {"min": 1}
+        },
+        "flags_all": ["offensive"]
+      },
+      "set": {"ai_priority": 95},
+      "expect_matches": 228
+    },
+    {
+      "name": "Keep healthy-target debuffs competitive",
+      "match": {
+        "fields": {
+          "ai_priority": {"min": 1},
+          "ai_behaviour": 2
+        }
+      },
+      "set": {"ai_priority": 70}
+    }
+  ],
+  "job_rules": []
+}

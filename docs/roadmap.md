@@ -529,6 +529,27 @@ function changed.
 
 ---
 
+## Phase 9 — Player-authored auto-battle strategies
+
+1. ~~**Declarative profile layer.**~~ **Closed 2026-09-02:** ability
+   likelihood/rule fields, job fallback priorities, and shared status gates
+   compose through guarded ordered JSON rules. Preview/apply, two profiles,
+   strict attribution, execution checks, and documentation ship together.
+2. **Target-scoring model.** Trace the candidate score fields after
+   `sub_080C32C0`, identify ally/enemy and target-selection weights, and expose
+   verified controls for damage, healing, buff/debuff, KO, and safety intent.
+3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
+   CT conservation thresholds, then add strategy controls only where the ROM's
+   behavior can be causally validated.
+4. **Unit/player assignment.** Determine whether policies can be selected per
+   unit, job, clan, or battle. If retail state has no safe policy slot, add a
+   source-driven table with explicit save/runtime compatibility constraints.
+5. **Scenario acceptance.** Replay fixed battles under contrasting profiles
+   and prove action/target/movement differences over multiple turns. Do not
+   market eligibility tuning alone as full tactical control.
+
+---
+
 ## The standard loop (for any "map a new table / name a field" step)
 
 1. **Static hypothesis:** `tools/find_accessors.py` (property accessors),

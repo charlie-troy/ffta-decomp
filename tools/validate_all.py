@@ -12,6 +12,7 @@ import time
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VALIDATORS = (
     "validate_ai.py",
+    "validate_ai_strategy.py",
     "validate_missions.py",
     "validate_maps.py",
     "validate_items.py",
