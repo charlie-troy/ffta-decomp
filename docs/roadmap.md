@@ -470,14 +470,15 @@ the repo explicitly ranks it below widening the table surface.
    bytes, and all 85 RNG/modulo sites remain. The candidate initialization,
    effect-pointer setup, target-state reachability check, and switch range
    guard now follow retail's instruction topology. Relocation-aware equality is
-   3,675 / 3,732 comparable bytes (57 mismatches in 34 runs), up from
+   3,729 / 3,732 comparable bytes (three one-byte mismatches), up from
    2,981 / 3,728. The retry tails and case-92 post-epilogue literal pool now
    occupy their exact retail offsets, and the opening gauntlet is exact through
    `+0x128`. The mode 7/8/10 negative-action branch now has retail's direct
    reflect fallthrough, and mode-local scratch registers now match. The
    simulated-status case family and case-16 rejection topology are exact.
-   Remaining work is concentrated in 34 localized runs; size and CFG equality
-   still do not imply byte identity.
+   The remaining work is limited to two mode-range register encodings and one
+   signed-versus-unsigned case-75 branch opcode; size and CFG equality still do
+   not imply byte identity.
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).

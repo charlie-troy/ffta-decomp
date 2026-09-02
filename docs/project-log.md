@@ -115,6 +115,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.4b | 2026-09-02 | Aligned the retry tail, post-epilogue literal pool, and opening gauntlet register flow | Exact tail/pool offsets; prefix exact through `+0x128`; 3,450/3,732 comparable bytes equal |
 | AI7.4c | 2026-09-02 | Removed the mode-dispatch control-flow excess and aligned downstream layout | Exact mode fallthrough topology; 3,606/3,732 comparable bytes equal; 126 mismatches in 53 runs |
 | AI7.4d | 2026-09-02 | Aligned mode-local scratch flow and the simulated-status case family | Exact 5,352-byte layout; 3,675/3,732 comparable bytes equal; 57 mismatches in 34 runs |
+| AI7.4e | 2026-09-02 | Matched the late exceptional cases and reflect/final-value joins | 3,729/3,732 comparable bytes equal; three one-byte register/condition encodings remain |
 
 ## Decisions and evidence
 
@@ -590,6 +591,32 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Evaluator exceptional-case convergence
+
+Objective:
+
+- Eliminate the remaining localized case-body differences after the evaluator's
+  overall layout and shared control flow became exact.
+
+Completed:
+
+- Fixed the positive-action load in cases 4/6/21 and the negative-action plus
+  one-third-HP register flow in case 38.
+- Matched case 43's final status-test branch order and case 49's item loop,
+  including its `r5` counter, unsigned 24..26 bounds, and `r2` range increment.
+- Matched case 55's one-third-HP register and case 75's surrounding layout.
+- Aligned mode 9, mode 11, and both reflect-path ability-id reloads, then used
+  the retail unsigned MP comparison and final-value zero extension.
+- Improved relocation-aware equality from 3,675/3,732 to 3,729/3,732. The only
+  remaining differences are two register encodings in the mode-6 normalized
+  range calculation and one signed-versus-unsigned branch opcode in case 75.
+
+Next action:
+
+- Test narrowly isolated assembly or source-type shapes for offsets `+0x224`,
+  `+0x228`, and `+0x12E1`. Reject any experiment that changes the 5,352-byte
+  function size or moves otherwise exact code.
 
 ### 2026-09-02 — Evaluator mode locals and simulated-status alignment
 

@@ -131,6 +131,7 @@ extern u8 sub_080CDAF4(struct Unit *u);
 extern u8 sub_0812F154(struct Unit *u);
 extern u8 sub_081341BC(struct Unit *a, struct Unit *b); /* recent-target membership */
 extern u8 sub_0812F1DC(s16 v);
+extern u8 sub_0812F1DCWide(int v) __asm__("sub_0812F1DC");
 extern u8 sub_0812F0E4(struct Unit *u, int a, int b);
 extern u16 sub_0812E6A4(struct Unit *u);
 extern u8 sub_08133A58(struct Unit *u, u16 effectId);
@@ -443,8 +444,15 @@ check_range_code:
             Reject();
         case 9:
         {
+            register int modeAbilityId __asm__("r0");
             register s16 *estimatePtr __asm__("r4");
-            if (act->abilityId != 0)
+            __asm__ volatile (
+                "ldr r1, [sp, #12]\n\t"
+                "ldrh %0, [r1]"
+                : "=r" (modeAbilityId)
+                :
+                : "r1");
+            if (modeAbilityId != 0)
                 goto check_reflect_nonzero;
             estimatePtr = effectEstimateAlt;
             sub_0812F0D8(user, estimatePtr);
@@ -477,29 +485,58 @@ check_range_code:
             Reject();
         }
         case 11:
-            if (act->abilityId == 0)
+        {
+            register int modeAbilityId __asm__("r0");
+            __asm__ volatile (
+                "ldr r2, [sp, #12]\n\t"
+                "ldrh %0, [r2]"
+                : "=r" (modeAbilityId)
+                :
+                : "r2");
+            if (modeAbilityId == 0)
                 goto check_final_value;
-            if (AbilityProp(act->abilityId, 0x1A))
+            if (AbilityPropWide(modeAbilityId, 0x1A))
             {
                 s16 cost = (s16)AbilityMpCost(target, act->abilityId);
-                if (cost <= UnitStat(target, 0x15))
+                if ((u32)cost <= (u32)UnitStat(target, 0x15))
                     e >>= 1;
             }
             goto check_reflect;
+        }
         default:
             break;
         }
 
 check_reflect:
-        if (act->abilityId == 0)
+    {
+        register int reflectAbilityId __asm__("r0");
+        __asm__ volatile (
+            "ldr r1, [sp, #12]\n\t"
+            "ldrh %0, [r1]"
+            : "=r" (reflectAbilityId)
+            :
+            : "r1");
+        if (reflectAbilityId == 0)
             goto check_final_value;
+    }
 check_reflect_nonzero:
-        if (sub_0812F154(target) && AbilityProp(act->abilityId, 0x12))
+        if (!sub_0812F154(target))
+            goto check_final_value;
+    {
+        register int reflectAbilityId __asm__("r0");
+        __asm__ volatile (
+            "ldr r2, [sp, #12]\n\t"
+            "ldrh %0, [r2]"
+            : "=r" (reflectAbilityId)
+            :
+            : "r2");
+        if (AbilityPropWide(reflectAbilityId, 0x12))
             Reject();
+    }
     }
 
 check_final_value:
-    if (!sub_0812F1DC(e))
+    if (!sub_0812F1DCWide((u16)e))
         Reject();
     __asm__ volatile (
         "mov r0, #0\n\t"
@@ -691,9 +728,19 @@ next_effect:
     case 4:
     case 6:
     case 21:
-        if (act->unk_0C <= 0)
+    {
+        register int positiveActionValue __asm__("r0");
+        __asm__ volatile (
+            "ldr r2, [sp, #12]\n\t"
+            "mov r1, #12\n\t"
+            "ldrsh %0, [r2, r1]"
+            : "=r" (positiveActionValue)
+            :
+            : "r1", "r2");
+        if (positiveActionValue <= 0)
             RejectLate();
         return 1;
+    }
     ABSENT_STATE_CASE(22, sub_080CDB9C);
     PRESENT_STATE_CASE(23, sub_080CDB9C);
     ABSENT_STATE_CASE(24, sub_080CDB84);
@@ -732,12 +779,30 @@ next_effect:
     PRESENT_STATE_CASE(36, sub_080CD98C);
     ABSENT_STATE_CASE(37, sub_080CDA64);
     case 38:
-        if (act->unk_0C >= 0)
+    {
+        register int negativeActionValue __asm__("r0");
+        register int currentHpForThird __asm__("r4");
+        __asm__ volatile (
+            "ldr r2, [sp, #12]\n\t"
+            "mov r1, #12\n\t"
+            "ldrsh %0, [r2, r1]"
+            : "=r" (negativeActionValue)
+            :
+            : "r1", "r2");
+        if (negativeActionValue >= 0)
             Reject();
-        e = UnitStat(target, STAT_HP);
-        if (e > sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3))
-            Reject();
-        return 1;
+        currentHpForThird = UnitStat(target, STAT_HP);
+        sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3);
+        __asm__ volatile (
+            "cmp r4, r0\n\t"
+            "bgt 1f\n\t"
+            "b AiEvaluateAbility_accept_current\n"
+            "1:\n\t"
+            "bl AiEvaluateAbility_reject_all"
+            :
+            : "r" (currentHpForThird)
+            : "cc");
+    }
     case 41:
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
@@ -755,13 +820,19 @@ next_effect:
         if (!sub_080CD98C(target))
             __asm__ volatile ("b AiEvaluateAbility_accept_current");
         if (!sub_080CDB54(target) || !sub_080CDB3C(target) ||
-            !sub_080CD95C(target) || !sub_080CD974(target) ||
-            !sub_080CDB24(target))
+            !sub_080CD95C(target) || !sub_080CD974(target))
             return 1;
-case43_reject:
-        __asm__ volatile ("" ::: "memory");
-        RejectLate();
-        return 1;
+        sub_080CDB24(target);
+        __asm__ volatile (
+            "lsl r0, r0, #24\n\t"
+            "cmp r0, #0\n\t"
+            "beq 1f\n\t"
+            "b AiEvaluateAbility_reject_current\n"
+            "1:\n\t"
+            "bl AiEvaluateAbility_accept_current"
+            :
+            :
+            : "r0", "cc");
     ABSENT_STATE_CASE(45, sub_080CDB24);
     ABSENT_STATE_CASE(46, sub_080CD92C);
     PRESENT_STATE_CASE(47, sub_080CD92C);
@@ -772,35 +843,52 @@ case43_reject:
             RejectLate();
         return 1;
     case 49:
-        i = 0;
+    {
+        register int itemIndex __asm__("r5");
+        itemIndex = 0;
         adjustedRange = 0x1D000000;
         do
         {
-            int itemType = sub_080CA7A4(
+            sub_080CA7A4(
                 (u16)UnitStat(target, (u8)(adjustedRange >> 24)), 3);
-            if (itemType <= 0x1A)
-            {
-                __asm__ volatile ("");
-                if (itemType >= 0x18)
-                    return 1;
-            }
-            adjustedRange += 0x01000000;
-            i++;
+            __asm__ volatile (
+                "cmp r0, #26\n\t"
+                "bhi 1f\n\t"
+                "cmp r0, #24\n\t"
+                "bcc 1f\n\t"
+                "bl AiEvaluateAbility_accept_current\n"
+                "1:"
+                :
+                :
+                : "cc");
+            __asm__ volatile (
+                "mov r2, #128\n\t"
+                "lsl r2, r2, #17\n\t"
+                "add %0, %0, r2"
+                : "+r" (adjustedRange)
+                :
+                : "r2");
+            itemIndex++;
         }
-        while (i <= 4);
+        while (itemIndex <= 4);
         RejectLate();
         break;
+    }
     ABSENT_STATE_CASE(51, sub_080CDAC4);
     ABSENT_STATE_CASE(52, sub_080CDAAC);
     case 55:
+    {
+        register int currentHpForThird __asm__("r4");
         if (!AiPassesStatusProbability(user, target))
             RejectLate();
         if (sub_080CDA4C(target))
             RejectLate();
-        e = UnitStat(target, STAT_HP);
-        if (e > sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3))
+        currentHpForThird = UnitStat(target, STAT_HP);
+        if (currentHpForThird >
+            sub_08142AB0(UnitStat(target, STAT_MAX_HP), 3))
             RejectLate();
         return 1;
+    }
     ABSENT_STATE_CASE(56, sub_080CDB3C);
     PRESENT_STATE_CASE(57, sub_080CDB3C);
     case 59:
