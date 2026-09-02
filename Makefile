@@ -58,7 +58,7 @@ validate-text:
 ## running both ROMs' own code. MOD= is the ROM you built.
 verify-mod:
 	@test -n "$(MOD)" || { echo "usage: make verify-mod MOD=build/ffta-mod.gba"; exit 2; }
-	$(PY) tools/verify_mod.py "$(ROM)" "$(MOD)"
+	$(PY) tools/verify_mod.py "$(ROM)" "$(MOD)" --strict
 
 funcs:
 	cd tools && $(PY) find_leaf_funcs.py "$(ROM)" --max-bytes 48 --count 20 --min-callers 4

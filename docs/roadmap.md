@@ -502,6 +502,9 @@ function changed.
 - ~~Make exported map tile graphics editable.~~ **Closed 2026-09-02:** the
   custom-LZSS encoder round-trips and fits all 50 unique streams, and guarded
   `apply-graphics` confines writes to each original allocation.
+- ~~Make first-party mod receipts fail closed.~~ **Closed 2026-09-02:** ability,
+  job, item, mission, matched-function, graphics, arrangement, terrain, and
+  clipping changes are attributed; `make verify-mod` fails on any other byte.
 - Select future function matches from concrete modding goals rather than raw
   decompilation percentage.
 - Revisit the deliberately-ugly matching constructs (e.g. `sub_080CDD88`'s

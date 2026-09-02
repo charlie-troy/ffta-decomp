@@ -166,6 +166,11 @@ custom-LZSS graphics plus recompressed arrangement, terrain, and clipping
 blocks, so source-driven rule mods and map edits do not disappear into an
 “unattributed” byte count.
 
+`make verify-mod` enables strict mode and fails if any changed byte is outside
+the supported ability, job, item, mission, matched-function, or map allocation
+surfaces. Run `python tools/verify_mod.py base.gba mod.gba` directly only when
+auditing an intentional external patch that is expected to touch unknown data.
+
 ```bash
 make verify-mod MOD=build/ffta-mod.gba
 ```

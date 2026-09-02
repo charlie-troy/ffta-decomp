@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
 | Current work package | DEC8.1 — select the next modding-driven function |
-| Last closed package | VER8.2 — attribute packed map edits in verification receipts |
+| Last closed package | VER8.3 — complete strict first-party mod receipts |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -49,6 +49,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP8.1 | P1 | Complete | Make exported map tile graphics editable | All 50 streams recompress within allocation; unchanged and edited apply paths round-trip safely |
 | VER8.1 | P1 | Complete | Attribute graphics changes in mod receipts | Changed bytes are grouped by source stream/map ids with zero false unattributed bytes |
 | VER8.2 | P1 | Complete | Attribute packed map changes in mod receipts | Arrangement, terrain, and clipping recompression is grouped by owning allocation and shared map ids |
+| VER8.3 | P1 | Complete | Fail closed on unexplained first-party mod bytes | Item/mission fields are named; all supported surfaces pass; an unknown byte fails strict verification |
 | ITEM4.1 | P2 | Complete | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Icon paths execute end to end; behavioral flags have readers; hand bits have explicit population evidence; CSV round-trips |
 | AI5.1 | P2 | Complete | Expand unit-status and stat naming | All 69 stat cases named; all 47 represented live bits named or explicitly classified numeric; 21/21 gate |
 | AI6.1 | P2 | Complete | Decode the job accessor | All 48 fields execute across 116 jobs; redirect, resistance, and morph-family checks pass |
@@ -124,6 +125,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP8.1 | 2026-09-02 | Added guarded custom-LZSS graphics recompression and write-back | 50/50 streams round-trip and fit; unedited ROM exact; one-byte tile edit confined to its allocation |
 | VER8.1 | 2026-09-02 | Extended mod receipts to identify custom-LZSS graphics allocations | Map-0 edit: 10,834/10,834 bytes attributed to stream `0x0856c8b8` shared by maps 0/1; zero unattributed |
 | VER8.2 | 2026-09-02 | Extended mod receipts across all three packed map apply workflows | Map-0 arrangement 1,031/1,031; terrain 120/120; clipping 147/147 bytes attributed; zero unattributed in each ROM |
+| VER8.3 | 2026-09-02 | Completed first-party receipt coverage and enabled strict verification | Item and mission edits name their fields; evaluator preset passes strict; injected `0x08000100` edit fails with one unattributed byte |
 
 ## Decisions and evidence
 
@@ -599,6 +601,30 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Strict first-party mod receipts
+
+Objective:
+
+- Cover the remaining supported table editors and convert zero-unattributed
+  from an informational observation into an enforceable local gate.
+
+Completed:
+
+- Added item and mission table ranges and field names to `verify_mod.py`.
+  A Shortsword Attack edit and Herb Picking fee edit each produce a named,
+  one-byte receipt with zero unattributed bytes.
+- Confirmed that all first-party write surfaces are now covered: ability, job,
+  item, mission, matched source functions, map graphics, arrangement, terrain,
+  and clipping.
+- Added `--strict` and enabled it in `make verify-mod`. The 85-byte evaluator
+  preset passes; a synthetic edit at unsupported address `0x08000100` exits
+  nonzero and reports exactly one unattributed byte.
+
+Next action:
+
+- Add a single local validation entrypoint so the full ROM, function, domain,
+  text, and strict-mod gates cannot drift into an undocumented manual checklist.
 
 ### 2026-09-02 — Packed-map-aware mod verification
 

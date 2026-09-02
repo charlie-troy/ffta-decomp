@@ -280,6 +280,8 @@ the ROM.
 | `tools/find_leaf_funcs.py` | Call-site-driven function discovery |
 | `tools/match.sh` | cpp -> agbcc -> as -> raw Thumb bytes |
 | `tools/verify_match.py` | Byte and instruction diff against the ROM |
+| `tools/verify_mod.py` | Strict attribution receipt for every first-party mod surface |
+| `tools/map_data.py` | Guarded export/apply workflows for map layers and graphics |
 
 `tools/thumb.py` exists because capstone's Thumb mode decodes ARMv6T2+
 encodings (`cbz`, `it`, `movw`) that an ARM7TDMI cannot execute. Accepting

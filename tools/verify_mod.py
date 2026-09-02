@@ -21,6 +21,8 @@ from ffta_lz import block_length
 from map_data import (COUNT as MAP_COUNT, _arrangement_cells, _clipping_cells,
                       _height_cells, decode_graphics, resolve_block)
 import ability_table as A
+import item_table as I
+import mission_table as M
 
 PRIO_FILTER = 0x0812F1DC
 # sub_080CCD50 exposes only +0x00..+0x0a of an ability entry, so ai_priority at
@@ -51,6 +53,11 @@ for _n, _o, _w in A.COLUMNS:
     for _k in range(_w):
         ABIL_OFF[_o + _k] = _n if _w == 1 else f"{_n}[{_k}]"
 
+ITEM_OFF = {}
+for _n, _o, _w in I.COLUMNS:
+    for _k in range(_w):
+        ITEM_OFF[_o + _k] = _n if _w == 1 else f"{_n}[{_k}]"
+
 
 def classify(off):
     """Name the table field a changed ROM offset belongs to."""
@@ -62,6 +69,14 @@ def classify(off):
     if 0 <= u < A.UNIT_COUNT * A.UNIT_STRIDE:
         i, o = divmod(u, A.UNIT_STRIDE)
         return ("job", i, o, A.UNIT_NAMED.get(o, f"b{o:02x}"))
+    item = off - I.BASE
+    if 0 <= item < I.COUNT * I.STRIDE:
+        i, o = divmod(item, I.STRIDE)
+        return ("item", i, o, ITEM_OFF.get(o, f"padding_{o:#04x}"))
+    mission = off - M.BASE
+    if 0 <= mission < M.COUNT * M.STRIDE:
+        i, o = divmod(mission, M.STRIDE)
+        return ("mission", i, o, M.col(o))
     return (None, None, None, None)
 
 
@@ -75,6 +90,8 @@ def main(argv):
     p.add_argument("base")
     p.add_argument("modded")
     p.add_argument("--samples", type=int, default=4000)
+    p.add_argument("--strict", action="store_true",
+                   help="fail when any changed byte is unattributed")
     args = p.parse_args(argv)
 
     base = open(args.base, "rb").read()
@@ -161,6 +178,10 @@ def main(argv):
           f"{sum(1 for k in groups if k[0] == 'ability')} entr(ies)")
     print(f"  in the job table     : "
           f"{sum(1 for k in groups if k[0] == 'job')} entr(ies)")
+    print(f"  in the item table    : "
+          f"{sum(1 for k in groups if k[0] == 'item')} entr(ies)")
+    print(f"  in the mission table : "
+          f"{sum(1 for k in groups if k[0] == 'mission')} entr(ies)")
     print(f"  in matched functions : {sum(map(len, changed_functions.values()))} byte(s)")
     for function_name, offsets in sorted(changed_functions.items()):
         print(f"    {function_name}: {len(offsets)} byte(s)")
@@ -184,7 +205,14 @@ def main(argv):
     print("changed fields")
     print("-" * 62)
     for (kind, idx) in sorted(groups):
-        who = nm.ability(idx) if kind == "ability" else nm.job(idx)
+        if kind == "ability":
+            who = nm.ability(idx)
+        elif kind == "job":
+            who = nm.job(idx)
+        elif kind == "item":
+            who = nm.item(idx)
+        else:
+            who = nm.mission(idx)
         for o, name, b, m in sorted(groups[(kind, idx)]):
             print(f"  {kind:<7} {idx:>3} {who[:16]:<17} {name:<22} "
                   f"{b:>3} -> {m:>3}")
@@ -269,6 +297,10 @@ def main(argv):
             m = [A.resist_get(mod, idx, n) for n in range(8)]
             ch = [f"slot {n}: {b[n]} -> {m[n]}" for n in range(8) if b[n] != m[n]]
             print(f"  job {idx:>3}: " + ("; ".join(ch) if ch else "no slot changed"))
+    if args.strict and other:
+        print()
+        print(f"FAIL: strict verification found {len(other)} unattributed byte(s)")
+        return 1
     return 0
 
 
