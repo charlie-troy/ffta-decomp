@@ -8,12 +8,13 @@ import hashlib
 import os
 import tempfile
 
-from ffta_lz import block_length, map_lzss, pack
+from ffta_lz import block_length, map_lzss, map_lzss_compress, pack
 from map_data import (COUNT, _arrangement_cells, _height_cells,
                       _clipping_cells, cmd_apply_arrangement,
-                      cmd_apply_clipping, cmd_apply_terrain, cmd_arrangement,
-                      cmd_clipping, cmd_graphics, cmd_terrain, decode_graphics,
-                      cmd_animations, decode_animation, resolve_block)
+                      cmd_apply_clipping, cmd_apply_graphics, cmd_apply_terrain,
+                      cmd_arrangement, cmd_clipping, cmd_graphics, cmd_terrain,
+                      decode_graphics, cmd_animations, decode_animation,
+                      resolve_block)
 from emulate import Gba
 
 
@@ -204,17 +205,74 @@ def main(argv=None):
     if not ok:
         failures.append("graphics decoder")
 
+    encoded = [(meta, map_lzss_compress(meta["raw"]))
+               for meta in unique_metas]
+    encoder_roundtrips = all(map_lzss(blob) == meta["raw"]
+                             for meta, blob in encoded)
+    encoder_fits = all(len(blob) <= meta["compressed_bytes"]
+                       for meta, blob in encoded)
+    encoded_bytes = sum(len(blob) for _, blob in encoded)
+    retail_bytes = sum(meta["compressed_bytes"] for meta, _ in encoded)
+    ok = encoder_roundtrips and encoder_fits
+    print(f"11. graphics encoder: {'OK' if ok else 'FAIL'} "
+          f"(50/50 round-trip and fit; {encoded_bytes}/{retail_bytes} bytes)")
+    if not ok:
+        failures.append("graphics encoder")
+
     with tempfile.TemporaryDirectory(prefix="ffta-graphics-validation-") as temp:
         cmd_graphics(args.rom, temp)
         files = os.listdir(temp)
         raw_files = [name for name in files if name.endswith(".4bpp")]
         with open(os.path.join(temp, "index.csv"), newline="") as fh:
             index_rows = list(csv.DictReader(fh))
-        ok = len(raw_files) == 50 and len(index_rows) == COUNT
-    print(f"11. graphics export: {'OK' if ok else 'FAIL'} "
-          f"({len(raw_files)} unique files; {len(index_rows)} index rows)")
+        unchanged_rom = os.path.join(temp, "unchanged.gba")
+        unchanged_ok = cmd_apply_graphics(args.rom, temp, unchanged_rom) == 0
+        unchanged_ok &= open(unchanged_rom, "rb").read() == rom
+
+        map0_row = next(row for row in index_rows if int(row["map"]) == 0)
+        map0_file = os.path.join(temp, map0_row["file"])
+        edited_raw = bytearray(open(map0_file, "rb").read())
+        edited_raw[0] ^= 1
+        open(map0_file, "wb").write(edited_raw)
+        edited_rom_path = os.path.join(temp, "edited.gba")
+        edited_ok = cmd_apply_graphics(args.rom, temp, edited_rom_path) == 0
+        edited_rom = open(edited_rom_path, "rb").read()
+        edited_ok &= decode_graphics(edited_rom, 0)["raw"] == edited_raw
+        map0_meta = graphics[0]
+        changed = [i for i, (before, after) in enumerate(zip(rom, edited_rom))
+                   if before != after]
+        edited_ok &= bool(changed) and all(
+            map0_meta["source_offset"] <= i <
+            map0_meta["source_offset"] + map0_meta["compressed_bytes"]
+            for i in changed)
+
+        # Incompressible same-size data must fail atomically instead of
+        # leaving a partially updated output ROM.
+        value = 0x12345678
+        refused_raw = bytearray()
+        for _ in range(len(edited_raw)):
+            value ^= (value << 13) & 0xFFFFFFFF
+            value ^= value >> 17
+            value ^= (value << 5) & 0xFFFFFFFF
+            refused_raw.append(value & 0xFF)
+        open(map0_file, "wb").write(refused_raw)
+        refused_rom_path = os.path.join(temp, "refused.gba")
+        refused_ok = (cmd_apply_graphics(args.rom, temp, refused_rom_path) == 1
+                      and not os.path.exists(refused_rom_path))
+        ok = (len(raw_files) == 50 and len(index_rows) == COUNT and
+              unchanged_ok)
+    print(f"12. graphics export/apply: {'OK' if ok else 'FAIL'} "
+          f"({len(raw_files)} unique files; {len(index_rows)} index rows; "
+          f"unedited byte-identical={unchanged_ok})")
     if not ok:
-        failures.append("graphics export")
+        failures.append("graphics export/apply")
+
+    ok = edited_ok and refused_ok
+    print(f"13. graphics edit/refusal: {'OK' if ok else 'FAIL'} "
+          f"(edit re-read; {len(changed)} in-allocation ROM bytes changed; "
+          f"oversize atomic={refused_ok})")
+    if not ok:
+        failures.append("graphics edit round-trip")
 
     animations = [decode_animation(rom, map_id) for map_id in range(COUNT)]
     present = [meta for meta in animations if meta is not None]
@@ -226,7 +284,7 @@ def main(argv=None):
           all(meta["frame_count"] in (4, 8) for meta in present) and
           all(frame["duration"] in (8, 10) for meta in present
               for frame in meta["frames"]))
-    print(f"12. map animations: {'OK' if ok else 'FAIL'} "
+    print(f"14. map animations: {'OK' if ok else 'FAIL'} "
           f"(83 maps/28 unique; {unique_frames} unique frames; VRAM 0x06000020)")
     if not ok:
         failures.append("map animations")
@@ -241,7 +299,7 @@ def main(argv=None):
         alternate_ok &= gba.call(0x0801DB98, [map_id]) == rom[entry + 0x55]
     ok = primary_ok and alternate_ok and all(
         rom[0x569104 + map_id * 0x58 + 0x57] == 0 for map_id in range(COUNT))
-    print(f"13. render modes: {'OK' if ok else 'FAIL'} "
+    print(f"15. render modes: {'OK' if ok else 'FAIL'} "
           f"(324 executed selections; +0x57 reserved zero)")
     if not ok:
         failures.append("render modes")
@@ -255,12 +313,12 @@ def main(argv=None):
         frame_files = [name for name in os.listdir(temp) if name.endswith(".4bpp")]
         ok = (len(animation_rows) == COUNT and len(frame_rows) == 124 and
               len(frame_files) == 124)
-    print(f"14. animation export: {'OK' if ok else 'FAIL'} "
+    print(f"16. animation export: {'OK' if ok else 'FAIL'} "
           f"({len(animation_rows)} index rows; {len(frame_rows)} frames/files)")
     if not ok:
         failures.append("animation export")
 
-    print(f"\n{14 - len(failures)}/14 map checks passed")
+    print(f"\n{16 - len(failures)}/16 map checks passed")
     return 1 if failures else 0
 
 

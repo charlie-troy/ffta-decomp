@@ -8,6 +8,7 @@
     python tools/map_data.py clipping          baserom.gba clipping.csv
     python tools/map_data.py apply-clipping    baserom.gba clipping.csv out.gba
     python tools/map_data.py graphics          baserom.gba graphics-dir
+    python tools/map_data.py apply-graphics    baserom.gba graphics-dir out.gba
     python tools/map_data.py animations        baserom.gba animations-dir
 """
 import csv
@@ -15,7 +16,8 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ffta_lz import block_length, compress, lz77, map_lzss, pack
+from ffta_lz import (block_length, compress, lz77, map_lzss,
+                     map_lzss_compress, pack)
 
 TBL = 0x08569104
 STRIDE = 0x58
@@ -333,6 +335,90 @@ def cmd_graphics(rom_path, out_dir):
     return 0
 
 
+def cmd_apply_graphics(rom_path, graphics_dir, out_path):
+    """Recompress edited exported graphics without crossing their allocation."""
+    import hashlib
+
+    rom = bytearray(open(rom_path, "rb").read())
+    index_path = os.path.join(graphics_dir, "index.csv")
+    required = {"map", "source_address", "wrapper_type", "decompressed_bytes",
+                "compressed_bytes", "sha256", "file"}
+    rows_by_source = {}
+    seen_maps = set()
+    with open(index_path, newline="") as fh:
+        reader = csv.DictReader(fh)
+        if not required.issubset(reader.fieldnames or []):
+            raise ValueError("graphics index is missing required columns; export it again")
+        for row in reader:
+            map_id = int(row["map"], 0)
+            if not 0 <= map_id < COUNT or map_id in seen_maps:
+                raise ValueError(f"invalid or duplicate graphics map id {map_id}")
+            seen_maps.add(map_id)
+            meta = decode_graphics(rom, map_id)
+            source_address = 0x08000000 + meta["source_offset"]
+            if int(row["source_address"], 0) != source_address:
+                raise ValueError(f"map {map_id}: stale graphics source address")
+            if int(row["wrapper_type"], 0) != meta["wrapper_type"]:
+                raise ValueError(f"map {map_id}: stale graphics wrapper type")
+            if int(row["decompressed_bytes"], 0) != len(meta["raw"]):
+                raise ValueError(f"map {map_id}: stale decompressed size")
+            if int(row["compressed_bytes"], 0) != meta["compressed_bytes"]:
+                raise ValueError(f"map {map_id}: stale compressed size")
+            digest = hashlib.sha256(meta["raw"]).hexdigest()
+            if row["sha256"].lower() != digest:
+                raise ValueError(f"map {map_id}: stale graphics hash")
+            rows_by_source.setdefault(meta["source_offset"], []).append((row, meta))
+    if seen_maps != set(range(COUNT)):
+        raise ValueError(f"graphics index has {len(seen_maps)}/{COUNT} map rows")
+
+    refused = unchanged = 0
+    pending = []
+    root = os.path.realpath(graphics_dir)
+    for source, entries in sorted(rows_by_source.items()):
+        requested = None
+        meta = entries[0][1]
+        for row, _ in entries:
+            filename = row["file"]
+            path = os.path.realpath(os.path.join(root, filename))
+            if os.path.commonpath((root, path)) != root:
+                raise ValueError(f"graphics file escapes export directory: {filename}")
+            raw = open(path, "rb").read()
+            if requested is not None and raw != requested:
+                raise ValueError(f"conflicting files for shared graphics at {source:#x}")
+            requested = raw
+        if len(requested) != len(meta["raw"]) or len(requested) % 32:
+            raise ValueError(
+                f"graphics at {0x08000000 + source:#010x} must remain "
+                f"{len(meta['raw'])} bytes of whole 4bpp tiles")
+        if requested == meta["raw"]:
+            unchanged += 1
+            continue
+        blob = map_lzss_compress(requested)
+        room = meta["compressed_bytes"]
+        if len(blob) > room:
+            print(f"  graphics at {0x08000000 + source:#010x}: recompressed to "
+                  f"{len(blob)} bytes but only {room} are available, refused")
+            refused += 1
+            continue
+        pending.append((source, blob, room, requested))
+
+    if refused:
+        print(f"0 graphics block(s) rewritten, {unchanged} unchanged, "
+              f"{refused} refused; output not written")
+        return 1
+
+    for source, blob, room, requested in pending:
+        rom[source:source + len(blob)] = blob
+        if map_lzss(rom, source) != requested:
+            raise ValueError(f"graphics verification failed at {source:#x}")
+        print(f"  graphics at {0x08000000 + source:#010x}: rewritten, "
+              f"{len(blob)}/{room} bytes used")
+    open(out_path, "wb").write(rom)
+    print(f"{len(pending)} graphics block(s) rewritten, {unchanged} unchanged, "
+          f"0 refused, wrote {out_path}")
+    return 0
+
+
 def cmd_animations(rom_path, out_dir):
     import hashlib
 
@@ -500,6 +586,8 @@ def main(argv):
             return cmd_apply_arrangement(argv[1], argv[2], argv[3])
         if len(argv) == 4 and argv[0] == "apply-clipping":
             return cmd_apply_clipping(argv[1], argv[2], argv[3])
+        if len(argv) == 4 and argv[0] == "apply-graphics":
+            return cmd_apply_graphics(argv[1], argv[2], argv[3])
     except (OSError, ValueError, KeyError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

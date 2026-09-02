@@ -39,6 +39,12 @@ synthetic units built in RAM.
 tables. It requires all 2,757 strings to decode without unknown codes and locks
 the seven punctuation/symbol edge cases that completed the character map.
 
+`validate_maps.py` has sixteen checks. In addition to the decoded map layers,
+retail graphics execution, animations, and render modes, it now requires all 50
+custom-LZSS streams to recompress within their allocations, an unedited export
+to reproduce the ROM byte-for-byte, and a real tile-byte edit to survive
+write-back with every ROM change confined to the owning graphics block.
+
 The AI gate now has ten checks. Checks 9 and 10 protect the Phase 7 evaluator
 work: the switch remains partitioned into 92 ids / 66 roots / 3,958 owned plus
 88 shared code bytes, and executing case 1 and Quicken case 2 proves their

@@ -194,6 +194,8 @@ works both directions, so the pipeline exists and this is pure extension.
 3. **Graphics (`+0x00`) — done 2026-08-24.** The `0x20`/`0x22` bytes are FFTA
    wrappers, not GBA Huffman. The strict custom-LZSS decoder byte-matches the
    retail routine on all 50 unique streams and exports indexed 4bpp tiles.
+   **Editing closed 2026-09-02:** a guarded encoder round-trips and fits all 50
+   streams; an exported one-byte tile edit survives write-back and re-read.
 4. **Animations and modes — done 2026-08-24.** `+0x14/+0x18` describe 28
    unique uncompressed 4bpp animation sets on 83 maps; `+0x1c` is their VRAM
    destination, not a pointer. Primary/alternate render modes `+0x54/+0x55`
@@ -205,9 +207,9 @@ works both directions, so the pipeline exists and this is pure extension.
 7. Give each newly-decoded block a dump/apply command with the same
    grow-refusal guard `apply-terrain` uses.
 
-**Complete 2026-08-24:** arrangement, terrain, and clipping are editable with
-byte-identical round-trips and size guards; graphics and animation frames
-export reproducibly, with graphics matched against the retail decoder.
+**Complete, extended 2026-09-02:** arrangement, terrain, clipping, and graphics
+are editable with byte-identical unedited round-trips and size guards;
+animation frames export reproducibly, and graphics match the retail decoder.
 
 ---
 
@@ -497,6 +499,9 @@ function changed.
 - ~~The **7 undecoded text strings**.~~ **Closed 2026-09-02:** the remaining
   comparison, percentage, parenthesis, and decorative-bracket glyphs are mapped;
   `tools/validate_text.py` verifies 2,757/2,757 strings and seven edge anchors.
+- ~~Make exported map tile graphics editable.~~ **Closed 2026-09-02:** the
+  custom-LZSS encoder round-trips and fits all 50 unique streams, and guarded
+  `apply-graphics` confines writes to each original allocation.
 - Select future function matches from concrete modding goals rather than raw
   decompilation percentage.
 - Revisit the deliberately-ugly matching constructs (e.g. `sub_080CDD88`'s

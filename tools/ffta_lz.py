@@ -1,4 +1,4 @@
-"""Decode FFTA's BIOS-LZ77 map blocks and custom-LZSS map graphics.
+"""Decode and encode FFTA's BIOS-LZ77 map blocks and custom-LZSS graphics.
 
 Each block carries an 8-byte header: the four bytes 11 FF FF FF, then a
 standard GBA LZ77 header (0x10 plus a 24-bit decompressed size). The payload
@@ -212,3 +212,111 @@ def map_lzss(data, off=0, with_consumed=False):
 
     result = bytes(out)
     return (result, p - off) if with_consumed else result
+
+
+def map_lzss_compress(raw):
+    """Compress bytes with FFTA's map-graphics LZSS grammar.
+
+    Dynamic programming chooses the smallest stream from the legal candidates.
+    Back-reference candidates are drawn from equal three-byte prefixes within
+    the format's 64 KiB window. Capping a pathological prefix chain keeps the
+    search bounded; zero and 0xff runs have dedicated tokens and are evaluated
+    independently.
+    """
+    size = len(raw)
+    matches = [None] * size
+    history = {}
+
+    for pos in range(size):
+        short_len = long_len = extended_len = 0
+        short_disp = long_disp = extended_disp = 0
+        if pos + 3 <= size:
+            key = raw[pos:pos + 3]
+            checked = 0
+            for prior in reversed(history.get(key, ())):
+                displacement = pos - prior
+                if displacement > 0x10000:
+                    break
+                limit = min(260, size - pos)
+                length = 3
+                while (length < limit and
+                       raw[prior + length] == raw[pos + length]):
+                    length += 1
+                if displacement <= 0x800 and min(length, 18) > short_len:
+                    short_len, short_disp = min(length, 18), displacement
+                if displacement <= 0x4000 and min(length, 67) > long_len:
+                    long_len, long_disp = min(length, 67), displacement
+                if length > extended_len:
+                    extended_len, extended_disp = length, displacement
+                checked += 1
+                if short_len == 18 and long_len == 67 and extended_len == 260:
+                    break
+                if checked >= 512:
+                    break
+            history.setdefault(key, []).append(pos)
+
+        zero_run = ff_run = 0
+        if raw[pos] == 0:
+            zero_run = 1
+            while (pos + zero_run < size and zero_run < 258 and
+                   raw[pos + zero_run] == 0):
+                zero_run += 1
+        elif raw[pos] == 0xFF:
+            ff_run = 1
+            while (pos + ff_run < size and ff_run < 258 and
+                   raw[pos + ff_run] == 0xFF):
+                ff_run += 1
+        matches[pos] = (short_len, short_disp, long_len, long_disp,
+                        extended_len, extended_disp, zero_run, ff_run)
+
+    costs = [10 ** 9] * (size + 1)
+    choices = [None] * size
+    costs[size] = 0
+    for pos in range(size - 1, -1, -1):
+        options = (("literal", 1, min(64, size - pos), 1, 0),)
+        short_len, short_disp, long_len, long_disp, extended_len, \
+            extended_disp, zero_run, ff_run = matches[pos]
+        options += (
+            ("zero-short", 2, min(zero_run, 33), 1, 0),
+            ("zero-extended", 3, zero_run, 2, 0),
+            ("ff", 3, ff_run, 2, 0),
+            ("backref-short", 3, short_len, 2, short_disp),
+            ("backref-long", 4, long_len, 3, long_disp),
+            ("backref-extended", 5, extended_len, 4, extended_disp),
+        )
+        for kind, first, last, overhead, displacement in options:
+            for length in range(first, last + 1):
+                cost = overhead + (length if kind == "literal" else 0)
+                cost += costs[pos + length]
+                if cost < costs[pos]:
+                    costs[pos] = cost
+                    choices[pos] = (kind, length, displacement)
+
+    out = bytearray(size.to_bytes(4, "big"))
+    pos = 0
+    while pos < size:
+        kind, length, displacement = choices[pos]
+        if kind == "literal":
+            out.append(0x40 + length - 1)
+            out.extend(raw[pos:pos + length])
+        elif kind == "zero-short":
+            out.append(0x20 + length - 2)
+        elif kind == "zero-extended":
+            out.extend((0x02, length - 3))
+        elif kind == "ff":
+            out.extend((0x01, length - 3))
+        elif kind == "backref-short":
+            value = displacement - 1
+            out.extend((0x80 | ((length - 3) << 3) | ((value >> 8) & 7),
+                        value & 0xFF))
+        elif kind == "backref-long":
+            value = displacement - 1
+            out.extend((0x10 | ((length - 4) & 0x0F),
+                        ((value >> 8) & 0x3F) | (((length - 4) & 0x30) << 2),
+                        value & 0xFF))
+        else:
+            value = displacement - 1
+            out.extend((0x00, length - 5, (value >> 8) & 0xFF,
+                        value & 0xFF))
+        pos += length
+    return bytes(out)

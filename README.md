@@ -49,7 +49,8 @@ is no formation table, because battle setups are scripted one unit at a time.
 Map data is mapped as well, in [docs/map-data.md](docs/map-data.md). The
 arrangement, terrain, and clipping-tilemap packed-run formats are decoded
 across all 162 logical maps. All three are editable with redirects resolved and
-a guard that refuses any compressed block that would no longer fit.
+a guard that refuses any compressed block that would no longer fit. The 50
+unique custom-LZSS tile-graphics streams now export and safely recompress too.
 
 The item table is mapped too, in [docs/item-table.md](docs/item-table.md):
 all 19 of its accessor properties are plain loads, weapon attack power feeds
@@ -306,14 +307,13 @@ Current execution state, decisions, risks, and dated evidence are maintained in
 update it with every material batch.
 
 All four of the original goals are done: the leaf batch, the linker script and
-full rebuild, the CI gate, and progress reporting.
+full rebuild, the CI gate, and progress reporting. The mapped gameplay tables,
+map layers and tile graphics also have guarded editing workflows.
 
 The job table is finished, in the sense that the four still-unnamed offsets are
 provably dead: no code in the ROM reads them, so there is nothing left to
 discover about them. See [docs/job-table.md](docs/job-table.md).
 
-The former highest-risk live-validation item is now closed.
-
-1. **The rest of the map blocks.** Terrain, arrangement, and clipping decode
-   and round-trip; custom-LZSS graphics and animation sets decode to indexed
-   4bpp files. Map Phase 3 is complete; item-table stragglers are next.
+The remaining source work is deliberately goal-driven: select a concrete mod,
+then match only the functions whose rule changes that mod requires. Phase 8 in
+the roadmap records closed cleanup items and the current selection policy.

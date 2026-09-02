@@ -32,9 +32,9 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
 | Current work package | DEC8.1 — select the next modding-driven function |
-| Last closed package | TXT8.1 — close the primary text character map |
+| Last closed package | MAP8.1 — make exported tile graphics editable |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
+| Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -46,6 +46,7 @@ status and backlog tables are living sections and should be kept current.
 | MAP3.2 | P1 | Complete | Characterize map block `+0x08` | The clipping loader/consumer are identified and a guarded descriptor edit round-trips |
 | MAP3.3 | P1 | Complete | Decode custom-LZSS map graphics | All 50 unique streams match the retail decoder and malformed data is rejected |
 | MAP3.4 | P1 | Complete | Characterize animation blocks and mode bytes | Readers name the controls and reproducible exports cover all present blocks |
+| MAP8.1 | P1 | Complete | Make exported map tile graphics editable | All 50 streams recompress within allocation; unchanged and edited apply paths round-trip safely |
 | ITEM4.1 | P2 | Complete | Name item `+0x0d/+0x0e` and remaining `+0x0c` bits | Icon paths execute end to end; behavioral flags have readers; hand bits have explicit population evidence; CSV round-trips |
 | AI5.1 | P2 | Complete | Expand unit-status and stat naming | All 69 stat cases named; all 47 represented live bits named or explicitly classified numeric; 21/21 gate |
 | AI6.1 | P2 | Complete | Decode the job accessor | All 48 fields execute across 116 jobs; redirect, resistance, and morph-family checks pass |
@@ -118,6 +119,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.4e | 2026-09-02 | Matched the late exceptional cases and reflect/final-value joins | 3,729/3,732 comparable bytes equal; three one-byte register/condition encodings remain |
 | AI7.4f | 2026-09-02 | Reached byte identity, integrated the evaluator, and shipped the first source rule preset | 3,732/3,732 comparable bytes; 173/173 functions; retail ROM matches; preset changes only 85 evaluator bytes |
 | TXT8.1 | 2026-09-02 | Decoded the final seven primary-table strings and added a completeness gate | 2,757/2,757 strings clean; 7/7 edge anchors locked |
+| MAP8.1 | 2026-09-02 | Added guarded custom-LZSS graphics recompression and write-back | 50/50 streams round-trip and fit; unedited ROM exact; one-byte tile edit confined to its allocation |
 
 ## Decisions and evidence
 
@@ -593,6 +595,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Editable custom-LZSS map graphics
+
+Objective:
+
+- Turn the existing 50-file graphics export into a safe, reversible modding
+  surface without relocating adjacent ROM data.
+
+Completed:
+
+- Implemented all six encoder token families with bounded match search and a
+  dynamic-programming size pass. All 50 unique retail streams round-trip and
+  compress to 613,977 bytes versus retail's 621,615 bytes.
+- Added `map_data.py apply-graphics`. It validates the complete 162-row index,
+  source addresses, wrapper types, sizes, hashes, shared files, and directory
+  containment; decompressed size must remain fixed and growth past the original
+  per-stream allocation is refused without writing a partial output ROM.
+- Extended map validation from 14 to 16 checks. An unchanged graphics export
+  reproduces the ROM byte-for-byte. Toggling one byte in map 0 survives
+  recompression and re-read, with every changed ROM byte inside the original
+  compressed allocation.
+- Removed the README's stale “item-table stragglers are next” handoff and made
+  the remaining goal-driven source-selection policy explicit.
+
+Next action:
+
+- Select the next source function only when a concrete modding goal requires
+  it; otherwise continue Phase 8 with validation and usability cleanup.
 
 ### 2026-09-02 — Primary text decoder completion
 

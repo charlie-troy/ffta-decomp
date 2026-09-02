@@ -136,8 +136,13 @@ streams. The Python output byte-matches the retail decoder on all 50.
 
 `graphics` exports those 50 unique `.4bpp` files plus a 162-row `index.csv`
 containing source addresses, wrapper types, sizes, tile counts, hashes, and
-filenames. It is decode-only: no custom-LZSS encoder is claimed, so graphics
-cannot yet be written back safely.
+filenames. `apply-graphics` uses a bounded dynamic-programming encoder over all
+six token families. Every retail stream recompresses within its original
+allocation (613,977 bytes total versus retail's 621,615), so edited files can
+be written back without relocating adjacent ROM data. Decompressed sizes must
+remain unchanged, shared pointers must agree, and any stream that grows past
+its own allocation is refused. Graphics apply is atomic: if any edited stream
+does not fit, no output ROM is written.
 
 ## Animation and render modes
 
@@ -185,6 +190,7 @@ python tools/map_data.py apply-arrangement baserom.gba arrangement.csv out.gba
 python tools/map_data.py clipping baserom.gba clipping.csv
 python tools/map_data.py apply-clipping baserom.gba clipping.csv out.gba
 python tools/map_data.py graphics baserom.gba graphics-dir
+python tools/map_data.py apply-graphics baserom.gba graphics-dir out.gba
 python tools/map_data.py animations baserom.gba animations-dir
 python tools/validate_maps.py baserom.gba
 ```
@@ -194,8 +200,11 @@ recompress, measure, and refuse growth. Uncompressed arrangement blocks edit
 only the selected tile-id bytes. Redirected and pointer-aliased maps share
 storage; conflicting edits to the same underlying value are refused.
 
-Verified across all 162 logical maps: all three unedited CSVs reproduce the ROM
-byte-for-byte. A compressed map-0 arrangement edit fits in 2,510 of 2,511
+Verified across all 162 logical maps: all three unedited CSVs and an unedited
+graphics directory reproduce the ROM byte-for-byte. All 50 graphics streams
+round-trip through the new encoder and fit their allocations. A one-byte map-0
+tile edit survives re-read with every changed ROM byte confined to that
+stream's allocation. A compressed map-0 arrangement edit fits in 2,510 of 2,511
 bytes, an uncompressed map-24 edit writes its one-byte id in place, and a
 map-0 permission edit fits exactly in its 137-byte terrain allocation. A
 separate map-0 height edit that grew to 139 bytes was refused as designed.
