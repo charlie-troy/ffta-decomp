@@ -1,4 +1,4 @@
-/* Match-test candidate for sub_080DBD5C (file offset 0x0dbd5c, 20 bytes, 21 callers).
+/* sub_080DBD5C (file offset 0x0dbd5c, 20 bytes, 21 callers), byte-matched.
  *
  * Original:
  *     push {r4, lr}

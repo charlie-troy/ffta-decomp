@@ -1,4 +1,4 @@
-// Match-test candidate for sub_08005BB0 (file offset 0x005bb0, 18 bytes, 55 callers).
+// sub_08005BB0 (file offset 0x005bb0, 18 bytes, 55 callers), byte-matched.
 //
 // Original:
 //     push {lr}

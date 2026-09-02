@@ -514,6 +514,10 @@ function changed.
   2026-09-02:** `sub_080CDD88`'s duplicated branch remains compiler-shaping and
   load-bearing; all 100 generated functions still match. Their stale
   “NOT YET MATCHING” headers and generator commentary were corrected instead.
+- ~~Normalize the two pre-convention source filenames.~~ **Closed
+  2026-09-02:** both sources now use their real `sub_*` names; one explicit
+  supplemental metadata manifest replaces three private exception maps, and
+  index generation refuses to silently omit a source.
 
 ---
 

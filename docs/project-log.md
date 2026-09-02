@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
-| Current work package | CLN8.2 — normalize legacy source filenames |
-| Last closed package | CLN8.1 — audit load-bearing matching constructs |
+| Current work package | CLN8.3 — classify safe object padding |
+| Last closed package | CLN8.2 — normalize legacy source filenames |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -59,7 +59,8 @@ status and backlog tables are living sections and should be kept current.
 | AI7.3 | P3 | Complete | Reconstruct exceptional evaluator cases | All 92 effect ids / 66 roots are represented in readable reference C |
 | AI7.4 | P3 | Complete | Match the whole evaluator | Matching source replaces the reference without changing retail ROM bytes |
 | CLN8.1 | P3 | Complete | Audit deliberately ugly matching constructs | Improve exact source where possible; otherwise record why the construct remains load-bearing |
-| CLN8.2 | P3 | Active | Normalize the two pre-convention source filenames | Real function names replace `match_test*`; generator/index exceptions disappear; all gates remain exact |
+| CLN8.2 | P3 | Complete | Normalize the two pre-convention source filenames | Real function names replace `match_test*`; generator/index exceptions disappear; all gates remain exact |
+| CLN8.3 | P3 | Active | Classify safe object padding without weakening the build gate | Zero-only alignment padding is reported as safe; truncation and nonzero overruns fail; build output has no false alarm |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -131,6 +132,7 @@ status and backlog tables are living sections and should be kept current.
 | VER8.3 | 2026-09-02 | Completed first-party receipt coverage and enabled strict verification | Item and mission edits name their fields; evaluator preset passes strict; injected `0x08000100` edit fails with one unattributed byte |
 | VAL8.1 | 2026-09-02 | Added the cross-platform `validate_all.py` local release runner | Complete proof-mod/build/domain pass succeeds in 69.9 seconds and restores the default retail build |
 | CLN8.1 | 2026-09-02 | Audited compiler-shaped source and corrected generated-file status claims | 100/100 generated functions remain byte-matched; stale “NOT YET MATCHING” headers removed; duplicated setter branch retained |
+| CLN8.2 | 2026-09-02 | Normalized legacy source names and centralized non-discovery metadata | 14 explicit supplemental records; index restored to 173/9,888 after catching a silent 159-entry regression; 173/173 and exact ROM |
 
 ## Decisions and evidence
 
@@ -606,6 +608,35 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Source naming and metadata normalization
+
+Objective:
+
+- Remove the two pre-convention source names and their scattered build/index
+  exceptions without losing established function coverage.
+
+Completed:
+
+- Renamed `match_test.c` and `match_test2.c` to their real function names and
+  removed all three legacy exception maps.
+- Caught an intermediate index regeneration dropping from 173 to 159 entries:
+  the leaf-discovery cache does not own 14 manually established or non-leaf
+  functions.
+- Added `data/manual_functions.json` and one shared metadata loader so those 14
+  records have a single documented owner, including the evaluator's final zero
+  halfword.
+- Made index generation fail before writing if any `src/sub_*.c` has no
+  discovery or manual metadata. The regenerated index is back to 173 functions
+  and 9,888 matched bytes.
+- `make check` passes 173/173 and `make rom` reproduces SHA1
+  `4ac05441f4de70a4ec3dd932116346c61b8783d9`.
+
+Next action:
+
+- Make the object-size diagnostic distinguish the one known zero-padding case
+  from unsafe truncation or nonzero overlap, then keep that check fail-closed in
+  the retail build.
 
 ### 2026-09-02 — Compiler-shaped source audit
 

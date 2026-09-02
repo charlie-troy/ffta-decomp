@@ -35,7 +35,7 @@
   },
   {
    "name": "sub_08005BB0",
-   "object": "match_test",
+   "object": "sub_08005BB0",
    "address": 134241200,
    "offset": 23472,
    "size": 18,
@@ -1299,7 +1299,7 @@
   },
   {
    "name": "sub_080DBD5C",
-   "object": "match_test2",
+   "object": "sub_080DBD5C",
    "address": 135118172,
    "offset": 900444,
    "size": 20,

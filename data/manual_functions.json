@@ -1,0 +1,18 @@
+{
+ "functions": [
+  {"name": "sub_08001CD0", "offset": 7376, "size": 16, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_08001CE0", "offset": 7392, "size": 16, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_08007170", "offset": 29040, "size": 12, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_08017508", "offset": 95496, "size": 12, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_0809A530", "offset": 632112, "size": 12, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_0809A53C", "offset": 632124, "size": 12, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_080A946C", "offset": 693356, "size": 10, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_080C32C0", "offset": 799424, "size": 5352, "reason": "whole evaluator; discovery omits the final zero halfword of its literal pool"},
+  {"name": "sub_080D4768", "offset": 870248, "size": 10, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_080D9B58", "offset": 891736, "size": 10, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_080DBA50", "offset": 899664, "size": 10, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_080DD47C", "offset": 906364, "size": 12, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_0812F0CC", "offset": 1241292, "size": 10, "reason": "manually matched outside the leaf discovery cache"},
+  {"name": "sub_0812F0D8", "offset": 1241304, "size": 10, "reason": "manually matched outside the leaf discovery cache"}
+ ]
+}

@@ -193,7 +193,7 @@ they compile without any other symbol being known.
 Write a candidate in `src/`, then:
 
 ```bash
-make match SRC=src/match_test.c AT=0x5bb0 LEN=18
+make match SRC=src/sub_08005BB0.c AT=0x5bb0 LEN=18
 ```
 
 That preprocesses, compiles with agbcc, assembles, and prints an
@@ -210,7 +210,10 @@ the ROM to a build server.
 What CI runs instead is a genuine per-function regression gate. `data/functions.json`
 records each function's address, size, and the **SHA-256 of the bytes it must
 compile to**. Hashes, not bytes, so the file carries no ROM content and is safe
-to commit. CI builds agbcc, compiles every function, and checks each object's
+to commit. `data/manual_functions.json` supplements the discovery cache for
+manually established or non-leaf functions; `make index` merges both sources
+and refuses to replace the index if any `src/sub_*.c` lacks metadata. CI builds
+agbcc, compiles every function, and checks each object's
 `.text` against that hash.
 
 That catches the failure that actually matters day to day: a change that makes a

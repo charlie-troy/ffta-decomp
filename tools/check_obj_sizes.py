@@ -9,13 +9,11 @@ Usage:
 import os
 import re
 import sys
-import json
 import struct
 
+from function_metadata import load_metadata
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-EXTRA = {"match_test": ("sub_08005BB0", 18), "match_test2": ("sub_080DBD5C", 20)}
-
 
 def text_bytes(path):
     """Return the contents of the .text section of an ELF object."""
@@ -77,7 +75,7 @@ def text_size(path):
 
 
 def main(argv):
-    manifest = {f["name"]: f for f in json.load(open(argv[0]))}
+    manifest = load_metadata(argv[0])
     objdir = argv[1] if len(argv) > 1 else os.path.join(REPO, "build", "obj")
 
     bad = []
@@ -86,9 +84,7 @@ def main(argv):
         if not fn.endswith(".o") or fn == "rom.o":
             continue
         stem = fn[:-2]
-        if stem in EXTRA:
-            expect = EXTRA[stem][1]
-        elif stem in manifest:
+        if stem in manifest:
             expect = manifest[stem]["size"]
         else:
             continue

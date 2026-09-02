@@ -16,19 +16,12 @@ Usage:
 import os
 import re
 import sys
-import json
 import argparse
+
+from function_metadata import load_metadata
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE = 0x08000000
-
-# Matched before the src/ naming convention settled; both live in src/ now
-# under names the manifest does not use.
-EXTRA = {
-    "sub_08005BB0": ("match_test", 0x005BB0, 18),
-    "sub_080DBD5C": ("match_test2", 0x0DBD5C, 20),
-}
-
 
 def parse_args(argv):
     p = argparse.ArgumentParser()
@@ -72,7 +65,7 @@ def collect_sources():
 
 def main(argv):
     args = parse_args(argv)
-    manifest = {f["name"]: f for f in json.load(open(args.manifest))}
+    manifest = load_metadata(args.manifest)
     sources = collect_sources()
 
     placed = []
@@ -88,11 +81,6 @@ def main(argv):
             "offset": f["offset"],
             "size": f["size"],
         })
-
-    # the two originals, whose sources are named after the match test
-    for name, (obj, off, size) in EXTRA.items():
-        if os.path.isfile(os.path.join(REPO, "src", obj + ".c")):
-            placed.append({"name": name, "obj": obj, "offset": off, "size": size})
 
     placed.sort(key=lambda f: f["offset"])
 

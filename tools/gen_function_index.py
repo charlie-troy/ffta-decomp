@@ -16,21 +16,9 @@ import sys
 import json
 import hashlib
 
+from function_metadata import load_metadata
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# Matched before the src/ naming convention settled.
-EXTRA = {
-    "sub_08005BB0": ("match_test", 0x005BB0, 18),
-    "sub_080DBD5C": ("match_test2", 0x0DBD5C, 20),
-}
-
-# The evaluator's final literal is a 32-bit word ending in two zero bytes.
-# Discovery stops at the last non-zero halfword, but those zero bytes remain
-# part of the function-owned literal and the matching source's .text section.
-SIZE_OVERRIDES = {
-    "sub_080C32C0": 5352,
-}
-
 
 def main(argv):
     if len(argv) != 2:
@@ -38,9 +26,10 @@ def main(argv):
         return 2
 
     rom = open(argv[0], "rb").read()
-    manifest = {f["name"]: f for f in json.load(open(argv[1]))}
+    manifest = load_metadata(argv[1])
 
     entries = []
+    missing = []
     for root, _dirs, files in os.walk(os.path.join(REPO, "src")):
         for fn in sorted(files):
             m = re.match(r"^(sub_[0-9A-Fa-f]{8})\.c$", fn)
@@ -49,14 +38,15 @@ def main(argv):
             name = m.group(1)
             f = manifest.get(name)
             if f is None:
-                print(f"warning: {name} not in manifest, skipped")
+                missing.append(name)
                 continue
-            entries.append((name, name, f["offset"],
-                            SIZE_OVERRIDES.get(name, f["size"])))
+            entries.append((name, name, f["offset"], f["size"]))
 
-    for name, (obj, off, size) in EXTRA.items():
-        if os.path.isfile(os.path.join(REPO, "src", obj + ".c")):
-            entries.append((name, obj, off, size))
+    if missing:
+        for name in sorted(missing):
+            print(f"error: source {name} has no discovery or manual metadata")
+        print("function index not written")
+        return 1
 
     entries.sort(key=lambda e: e[2])
 

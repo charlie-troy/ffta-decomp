@@ -38,7 +38,7 @@ SECTIONS
         build/obj/sub_0800395C.o(.text)
         build/obj/rom.o(.rom_0000397c)
         . = 0x005bb0;
-        build/obj/match_test.o(.text)
+        build/obj/sub_08005BB0.o(.text)
         build/obj/rom.o(.rom_00005bc2)
         . = 0x006adc;
         build/obj/sub_08006ADC.o(.text)
@@ -456,7 +456,7 @@ SECTIONS
         build/obj/sub_080DBA50.o(.text)
         build/obj/rom.o(.rom_000dba5a)
         . = 0x0dbd5c;
-        build/obj/match_test2.o(.text)
+        build/obj/sub_080DBD5C.o(.text)
         build/obj/rom.o(.rom_000dbd70)
         . = 0x0dbeb4;
         build/obj/sub_080DBEB4.o(.text)
