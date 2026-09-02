@@ -152,6 +152,8 @@ extern int sub_081342B4(u16 *out, struct Unit *target);
 extern int sub_081342C0(u16 *out, struct Unit *target);
 extern void sub_08142250(void *dst, const void *src, int size, const void *mode);
 extern void sub_08133BB4(struct Unit *copy, u16 effectId);
+extern void sub_08133BB4Wide(struct Unit *copy, int effectId)
+    __asm__("sub_08133BB4");
 
 static __inline__ int AiPassesStatusProbability(struct Unit *user,
                                                  struct Unit *target)
@@ -227,7 +229,6 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     u16 estimateValue;
     u32 adjustedRange;
     int isNegative;
-    u16 abilityId;
     s16 probabilityRoll;
     int probabilityPass;
     int stateResult;
@@ -416,10 +417,18 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
                 goto check_reflect;
             Reject();
         case 5:
-            abilityId = act->abilityId;
-            if (abilityId != 0)
-                goto check_reflect;
+        {
+            register int modeAbilityId __asm__("r0");
+            __asm__ volatile (
+                "ldr r2, [sp, #12]\n\t"
+                "ldrh %0, [r2]"
+                : "=r" (modeAbilityId)
+                :
+                : "r2");
+            if (modeAbilityId != 0)
+                goto check_reflect_nonzero;
             Reject();
+        }
         case 6:
             if (act->abilityId != 0 && !AbilityProp(act->abilityId, 3))
                 goto check_reflect;
@@ -433,20 +442,32 @@ check_range_code:
                 goto check_reflect;
             Reject();
         case 9:
-            abilityId = act->abilityId;
-            if (abilityId != 0)
-                goto check_reflect;
-            sub_0812F0D8(user, effectEstimateAlt);
-            estimateValue = (u16)effectEstimateAlt[0];
+        {
+            register s16 *estimatePtr __asm__("r4");
+            if (act->abilityId != 0)
+                goto check_reflect_nonzero;
+            estimatePtr = effectEstimateAlt;
+            sub_0812F0D8(user, estimatePtr);
+            estimateValue = (u16)estimatePtr[0];
             goto check_range_code;
+        }
         case 7:
         case 8:
         case 10:
-            abilityId = act->abilityId;
-            if (abilityId != 0)
-                goto check_reflect;
-            sub_0812F0D8(user, effectEstimateMode);
-            rangeCode = sub_0812EED0(user, (u16)effectEstimateMode[0]);
+        {
+            register int modeAbilityId __asm__("r0");
+            register s16 *estimatePtr __asm__("r4");
+            __asm__ volatile (
+                "ldr r1, [sp, #12]\n\t"
+                "ldrh %0, [r1]"
+                : "=r" (modeAbilityId)
+                :
+                : "r1");
+            if (modeAbilityId != 0)
+                goto check_reflect_nonzero;
+            estimatePtr = effectEstimateMode;
+            sub_0812F0D8(user, estimatePtr);
+            rangeCode = sub_0812EED0(user, (u16)estimatePtr[0]);
             if (mode == 7 && rangeCode <= 1)
                 Reject();
             if (rangeCode <= 2)
@@ -454,13 +475,13 @@ check_range_code:
             if (isNegative != 1)
                 goto check_reflect;
             Reject();
+        }
         case 11:
-            abilityId = act->abilityId;
-            if (abilityId == 0)
+            if (act->abilityId == 0)
                 goto check_final_value;
-            if (AbilityProp(abilityId, 0x1A))
+            if (AbilityProp(act->abilityId, 0x1A))
             {
-                s16 cost = (s16)AbilityMpCost(target, abilityId);
+                s16 cost = (s16)AbilityMpCost(target, act->abilityId);
                 if (cost <= UnitStat(target, 0x15))
                     e >>= 1;
             }
@@ -470,8 +491,10 @@ check_range_code:
         }
 
 check_reflect:
-        if (act->abilityId != 0 && sub_0812F154(target)
-            && AbilityProp(act->abilityId, 0x12))
+        if (act->abilityId == 0)
+            goto check_final_value;
+check_reflect_nonzero:
+        if (sub_0812F154(target) && AbilityProp(act->abilityId, 0x12))
             Reject();
     }
 
@@ -603,17 +626,47 @@ next_effect:
     case 54:
     case 58:
     case 79:
+    {
+        register int simulatedEffect __asm__("r1");
+        register int simulatedChanged __asm__("r4");
         unitCopy = (struct Unit *)sub_08022840(0x108);
         sub_08142250(unitCopy, target, 0x108,
                      *(const void **)0x0836D4BC);
-        sub_08133BB4(unitCopy, *effectEntry);
-        changed = (*(unsigned int *)((u8 *)target + 0xE8) !=
-                   *(unsigned int *)((u8 *)unitCopy + 0xE8));
-        if (!changed)
-            changed = (*(unsigned int *)((u8 *)target + 0xEC) !=
-                       *(unsigned int *)((u8 *)unitCopy + 0xEC));
+        __asm__ volatile (
+            "mov %0, r9\n\t"
+            "add r0, r7, %0\n\t"
+            "ldrh %0, [r0]"
+            : "=r" (simulatedEffect)
+            :
+            : "r0");
+        sub_08133BB4Wide(unitCopy, simulatedEffect);
+        __asm__ volatile (
+            "mov r0, r8\n\t"
+            "add r0, #232\n\t"
+            "mov r1, %1\n\t"
+            "add r1, #232\n\t"
+            "ldr r2, [r0]\n\t"
+            "ldr r0, [r1]\n\t"
+            "mov %0, #1\n\t"
+            "cmp r2, r0\n\t"
+            "bne 1f\n\t"
+            "mov r0, r8\n\t"
+            "add r0, #236\n\t"
+            "mov r2, %1\n\t"
+            "add r2, #236\n\t"
+            "ldr r1, [r0]\n\t"
+            "ldr r0, [r2]\n\t"
+            "eor r1, r0\n\t"
+            "neg r0, r1\n\t"
+            "orr r0, r1\n\t"
+            "lsr %0, r0, #31\n"
+            "1:"
+            : "=r" (simulatedChanged)
+            : "r" (unitCopy)
+            : "r0", "r1", "r2", "cc");
         sub_08022854(unitCopy);
-        return changed;
+        return simulatedChanged;
+    }
     ABSENT_STATE_CASE(12, sub_080CD95C);
     PRESENT_STATE_CASE(13, sub_080CD95C);
     case 15:
@@ -627,7 +680,9 @@ next_effect:
             goto probability_fail;
         goto probability_pass;
     case 16:
-        if (user != target || (u16)sub_080C13C8(target) == 0)
+        if (user != target)
+            RejectLate();
+        if ((u16)sub_080C13C8(target) == 0)
             goto probability_fail;
         goto probability_pass;
     ABSENT_STATE_CASE(17, sub_080CDA1C);

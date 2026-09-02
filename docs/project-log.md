@@ -114,6 +114,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.4a | 2026-09-02 | Aligned the evaluator's candidate-loop scaffold and restored retail behavior around reachability | 5,352-byte function; table `+0x364`; 3,958 owned + 88 shared bytes; 3,303/3,732 comparable bytes equal |
 | AI7.4b | 2026-09-02 | Aligned the retry tail, post-epilogue literal pool, and opening gauntlet register flow | Exact tail/pool offsets; prefix exact through `+0x128`; 3,450/3,732 comparable bytes equal |
 | AI7.4c | 2026-09-02 | Removed the mode-dispatch control-flow excess and aligned downstream layout | Exact mode fallthrough topology; 3,606/3,732 comparable bytes equal; 126 mismatches in 53 runs |
+| AI7.4d | 2026-09-02 | Aligned mode-local scratch flow and the simulated-status case family | Exact 5,352-byte layout; 3,675/3,732 comparable bytes equal; 57 mismatches in 34 runs |
 
 ## Decisions and evidence
 
@@ -589,6 +590,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Evaluator mode locals and simulated-status alignment
+
+Objective:
+
+- Continue offset-order byte matching without destabilizing the already exact
+  function size, switch table, shared tails, or probability-call census.
+
+Completed:
+
+- Removed the long-lived mode-stage ability id and used narrow register-shaped
+  loads and scratch pointers in modes 5, 7/8/10, and 9.
+- Split the known-nonzero reflect join so those modes no longer repeat the
+  ability-id zero test.
+- Reconstructed cases 11/53/54/58/79 with retail's exact effect-entry reload
+  and two-word simulated-status comparison, including the preset-true branch
+  polarity before the second word is checked.
+- Corrected case 16 so a non-self target rejects directly while only the zero
+  state result enters the shared probability-failure join.
+- Improved relocation-aware equality from 3,606/3,732 to 3,675/3,732;
+  remaining mismatches fell from 126 to 57 and runs from 53 to 34.
+
+Next action:
+
+- Continue with the localized mismatches in the later case bodies, beginning
+  at `+0x85D` and `+0xBBB`; defer the persistent `r7`/`r6` opening-register
+  pair because function-scope constraints have repeatedly worsened the global
+  allocation.
 
 ### 2026-09-02 — Evaluator mode-dispatch alignment
 
