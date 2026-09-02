@@ -505,6 +505,9 @@ function changed.
 - ~~Make first-party mod receipts fail closed.~~ **Closed 2026-09-02:** ability,
   job, item, mission, matched-function, graphics, arrangement, terrain, and
   clipping changes are attributed; `make verify-mod` fails on any other byte.
+- ~~Consolidate the local release checklist.~~ **Closed 2026-09-02:**
+  `tools/validate_all.py` verifies the proof mod, strict receipt, function
+  bytes, exact retail rebuild, and all base-ROM domain gates in one run.
 - Select future function matches from concrete modding goals rather than raw
   decompilation percentage.
 - Revisit the deliberately-ugly matching constructs (e.g. `sub_080CDD88`'s

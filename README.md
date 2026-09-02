@@ -282,6 +282,7 @@ the ROM.
 | `tools/verify_match.py` | Byte and instruction diff against the ROM |
 | `tools/verify_mod.py` | Strict attribution receipt for every first-party mod surface |
 | `tools/map_data.py` | Guarded export/apply workflows for map layers and graphics |
+| `tools/validate_all.py` | One-command local release gate, including the retail and proof-mod builds |
 
 `tools/thumb.py` exists because capstone's Thumb mode decodes ARMv6T2+
 encodings (`cbz`, `it`, `movw`) that an ARM7TDMI cannot execute. Accepting

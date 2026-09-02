@@ -4,6 +4,17 @@ The rest of this repository is static analysis: reading code and saying what it
 appears to do. This runs the ROM's own functions on an emulated ARM7TDMI and
 measures the result.
 
+Run the complete local release gate with one command:
+
+```bash
+python tools/validate_all.py baserom.gba
+```
+
+It builds and strictly verifies the source-driven proof mod first, then restores
+the default compiler configuration, checks all 173 functions, rebuilds the
+byte-identical retail ROM, and runs every base-ROM validator below. A successful run
+leaves `build/obj` and `build/ffta.gba` in their normal retail state.
+
 ```bash
 python tools/validate_ai.py baserom.gba
 python tools/validate_missions.py baserom.gba
