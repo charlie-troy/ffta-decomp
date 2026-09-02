@@ -161,8 +161,9 @@ saturates, a byte written to the wrong column, an edit that changes nothing.
 `tools/verify_mod.py` diffs your ROM against the base, names every changed
 field, and then measures the consequence by running **both ROMs' own decision
 code**, so the answer comes from the game rather than from a description of it.
-Matched functions and custom-LZSS map-graphics allocations are attributed too,
-so source-driven rule mods and tile edits do not disappear into an
+Matched functions and map allocations are attributed too. This covers
+custom-LZSS graphics plus recompressed arrangement, terrain, and clipping
+blocks, so source-driven rule mods and map edits do not disappear into an
 “unattributed” byte count.
 
 ```bash

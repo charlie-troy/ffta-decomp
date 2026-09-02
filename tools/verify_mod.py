@@ -17,7 +17,9 @@ import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ffta_names import Names
-from map_data import COUNT as MAP_COUNT, decode_graphics
+from ffta_lz import block_length
+from map_data import (COUNT as MAP_COUNT, _arrangement_cells, _clipping_cells,
+                      _height_cells, decode_graphics, resolve_block)
 import ability_table as A
 
 PRIO_FILTER = 0x0812F1DC
@@ -91,6 +93,36 @@ def main(argv):
         })
         group["maps"].append(map_id)
 
+    map_blocks = {}
+    map_byte_owner = {}
+    block_fields = (
+        ("arrangement", 0x04, _arrangement_cells),
+        ("clipping", 0x08, _clipping_cells),
+        ("terrain", 0x10, _height_cells),
+    )
+    for map_id in range(MAP_COUNT):
+        for label, field, cell_reader in block_fields:
+            meta = resolve_block(base, map_id, field)
+            key = (label, meta["offset"])
+            info = map_blocks.setdefault(key, {"maps": [], "bytes": set()})
+            info["maps"].append(map_id)
+            if info["bytes"]:
+                continue
+            if meta["storage"] == "wrapped-lz77":
+                size = block_length(base, meta["offset"])
+                info["bytes"].update(range(meta["offset"], meta["offset"] + size))
+            elif meta["storage"] == "raw":
+                _, cells = cell_reader(meta)
+                for cell in cells.values():
+                    width = cell.get("width", 2)
+                    start = meta["raw_offset"] + cell["data_offset"]
+                    info["bytes"].update(range(start, start + width))
+    for key, info in map_blocks.items():
+        for off in info["bytes"]:
+            prior = map_byte_owner.setdefault(off, key)
+            if prior != key:
+                raise ValueError(f"overlapping map data ownership at {off:#x}")
+
     def containing_graphics(off):
         for start, info in graphics.items():
             if start <= off < info["end"]:
@@ -106,6 +138,7 @@ def main(argv):
     groups = collections.defaultdict(list)
     changed_functions = collections.defaultdict(list)
     changed_graphics = collections.defaultdict(list)
+    changed_map_blocks = collections.defaultdict(list)
     other = []
     for off in diff:
         kind, idx, o, name = classify(off)
@@ -117,6 +150,8 @@ def main(argv):
                 graphics_start = containing_graphics(off)
                 if graphics_start is not None:
                     changed_graphics[graphics_start].append(off)
+                elif off in map_byte_owner:
+                    changed_map_blocks[map_byte_owner[off]].append(off)
                 else:
                     other.append(off)
         else:
@@ -133,9 +168,14 @@ def main(argv):
     for start, offsets in sorted(changed_graphics.items()):
         maps = ",".join(str(i) for i in graphics[start]["maps"])
         print(f"    {0x08000000 + start:#010x} (maps {maps}): {len(offsets)} byte(s)")
+    print(f"  in map data          : {sum(map(len, changed_map_blocks.values()))} byte(s)")
+    for (label, start), offsets in sorted(changed_map_blocks.items()):
+        maps = ",".join(str(i) for i in map_blocks[(label, start)]["maps"])
+        print(f"    {label} {0x08000000 + start:#010x} (maps {maps}): "
+              f"{len(offsets)} byte(s)")
     print(f"  unattributed         : {len(other)} byte(s)")
     if other:
-        print("    (outside known tables, functions, and map graphics)")
+        print("    (outside known tables, functions, and map allocations)")
         for off in other[:8]:
             print(f"    {0x08000000 + off:#010x}: "
                   f"{base[off]:#04x} -> {mod[off]:#04x}")
