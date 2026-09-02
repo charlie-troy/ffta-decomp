@@ -518,6 +518,10 @@ function changed.
   2026-09-02:** both sources now use their real `sub_*` names; one explicit
   supplemental metadata manifest replaces three private exception maps, and
   index generation refuses to silently omit a source.
+- ~~Remove the false object-size alarm from full builds.~~ **Closed
+  2026-09-02:** the shared size classifier rejects missing/truncated objects
+  and nonzero overruns, while the one alignment pad is accepted only after a
+  base-ROM check proves its two covered bytes are zero.
 
 ---
 

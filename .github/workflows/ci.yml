@@ -48,21 +48,4 @@ jobs:
         run: python3 tools/verify_functions.py data/functions.json build/obj
 
       - name: Check object sizes against the function index
-        run: |
-          python3 - <<'PY'
-          import json, sys, os
-          sys.path.insert(0, "tools")
-          import check_obj_sizes as c
-          idx = json.load(open("data/functions.json"))
-          bad = []
-          for f in idx["functions"]:
-              p = os.path.join("build/obj", f["object"] + ".o")
-              n = c.text_size(p)
-              if n is None or n < f["size"]:
-                  bad.append((f["name"], f["size"], n))
-          if bad:
-              for name, want, got in bad:
-                  print(f"{name}: expected at least {want} bytes, got {got}")
-              sys.exit(1)
-          print(f"{len(idx['functions'])} object(s) are at least their function size")
-          PY
+        run: python3 tools/check_obj_sizes.py data/functions.json build/obj

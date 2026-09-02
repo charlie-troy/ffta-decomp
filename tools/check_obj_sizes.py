@@ -1,13 +1,14 @@
-"""Report objects whose .text size does not equal the function's ROM size.
+"""Validate object .text sizes against their function-owned ROM ranges.
 
-A mismatch means the assembler padded the section, which makes the object
-overrun whatever follows it in the ROM and breaks the link.
+An object may carry alignment padding past the function. With a base ROM this
+tool proves that every padded-over byte is zero; without one it reports padding
+as unverified but still rejects missing, unreadable, or truncated objects.
 
 Usage:
-    python tools/check_obj_sizes.py <manifest.json> [objdir]
+    python tools/check_obj_sizes.py <manifest.json> [objdir] [--rom baserom.gba]
 """
+import argparse
 import os
-import re
 import sys
 import struct
 
@@ -74,34 +75,72 @@ def text_size(path):
     return None
 
 
+def classify_size(expected, actual, offset=None, rom=None):
+    """Return (classification, detail) for one compiled .text section."""
+    if actual is None:
+        return "error", "has no readable .text section"
+    if actual < expected:
+        return "error", f"is truncated: expected {expected}, got {actual}"
+    if actual == expected:
+        return "exact", ""
+
+    detail = f"padded {expected} -> {actual}"
+    if rom is None:
+        return "unverified-padding", detail
+    if offset is None or offset + actual > len(rom):
+        return "error", f"{detail}, extending past the supplied ROM"
+    tail = rom[offset + expected:offset + actual]
+    if any(tail):
+        return "error", f"{detail}, covering nonzero ROM bytes"
+    return "safe-padding", f"{detail}, covering only zero ROM bytes"
+
+
+def parse_args(argv):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("manifest")
+    parser.add_argument("objdir", nargs="?", default=os.path.join(REPO, "build", "obj"))
+    parser.add_argument("--rom", help="base ROM used to prove padding is safe")
+    return parser.parse_args(argv)
+
+
 def main(argv):
-    manifest = load_metadata(argv[0])
-    objdir = argv[1] if len(argv) > 1 else os.path.join(REPO, "build", "obj")
+    args = parse_args(argv)
+    manifest = load_metadata(args.manifest)
+    rom = None
+    if args.rom:
+        with open(args.rom, "rb") as handle:
+            rom = handle.read()
 
-    bad = []
-    checked = 0
-    for fn in sorted(os.listdir(objdir)):
-        if not fn.endswith(".o") or fn == "rom.o":
-            continue
-        stem = fn[:-2]
-        if stem in manifest:
-            expect = manifest[stem]["size"]
-        else:
-            continue
-        actual = text_size(os.path.join(objdir, fn))
-        checked += 1
-        if actual != expect:
-            bad.append((stem, expect, actual))
+    results = []
+    for name, row in sorted(manifest.items(), key=lambda item: item[1]["offset"]):
+        obj = row.get("object", name)
+        path = os.path.join(args.objdir, obj + ".o")
+        actual = text_size(path) if os.path.isfile(path) else None
+        kind, detail = classify_size(row["size"], actual, row["offset"], rom)
+        results.append((name, kind, detail))
 
-    print(f"checked {checked} object(s)")
-    if not bad:
-        print("all .text sizes match their ROM sizes")
-        return 0
+    errors = [result for result in results if result[1] == "error"]
+    safe = [result for result in results if result[1] == "safe-padding"]
+    unverified = [result for result in results if result[1] == "unverified-padding"]
 
-    print(f"{len(bad)} mismatch(es):")
-    for stem, expect, actual in bad:
-        print(f"  {stem}: expected {expect}, got {actual} (+{actual - expect})")
-    return 1
+    print(f"checked {len(results)} object(s)")
+    for name, _kind, detail in safe:
+        print(f"  safe: {name} {detail}")
+    for name, _kind, detail in unverified:
+        print(f"  note: {name} {detail}; supply --rom to verify")
+    for name, _kind, detail in errors:
+        print(f"  error: {name} {detail}")
+
+    if errors:
+        print(f"FAILED: {len(errors)} unsafe object(s)")
+        return 1
+    if unverified:
+        print(f"PASS with {len(unverified)} unverified padded object(s)")
+    elif safe:
+        print(f"PASS with {len(safe)} ROM-verified safe padded object(s)")
+    else:
+        print("PASS: all .text sizes exactly match their function ranges")
+    return 0
 
 
 if __name__ == "__main__":

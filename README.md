@@ -220,6 +220,10 @@ That catches the failure that actually matters day to day: a change that makes a
 function stop compiling to the right code. It does **not** prove the ROM links
 or that placement is correct, because nothing without the ROM can.
 
+The size gate also rejects missing or truncated objects. Alignment padding is
+reported but cannot be proven safe in CI; `make rom` supplies the base ROM and
+accepts padding only when every covered byte is zero.
+
 ```bash
 make check    # what CI runs; no ROM needed
 make rom      # the real gate; needs your own dump

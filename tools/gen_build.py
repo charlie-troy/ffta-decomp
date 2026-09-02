@@ -94,20 +94,16 @@ def main(argv):
         for f in placed:
             obj_path = os.path.join(args.objdir, f["obj"] + ".o")
             actual = check_obj_sizes.text_size(obj_path)
-            if actual is None or actual == f["size"]:
-                continue
-            if actual < f["size"]:
-                print(f"error: {f['name']} object is {actual} bytes, "
-                      f"function is {f['size']}")
+            kind, detail = check_obj_sizes.classify_size(
+                f["size"], actual, f["offset"], rom)
+            if kind in ("error", "unverified-padding"):
+                print(f"error: {f['name']} {detail}")
+                if kind == "unverified-padding":
+                    print("error: --rom is required when an object is padded")
                 return 1
-            tail = rom[f["offset"] + f["size"]:f["offset"] + actual] if rom else None
-            if tail is None or tail.strip(b"\x00"):
-                print(f"error: {f['name']} object is padded to {actual} bytes "
-                      f"but the ROM bytes it would cover are not zero")
-                return 1
-            print(f"note: {f['name']} padded {f['size']} -> {actual}, "
-                  f"padding covers zero bytes in the ROM")
-            f["size"] = actual
+            if kind == "safe-padding":
+                print(f"note: {f['name']} {detail}")
+                f["size"] = actual
 
     # overlap check: two functions claiming the same bytes would corrupt the ROM
     for a, b in zip(placed, placed[1:]):

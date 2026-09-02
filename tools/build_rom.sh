@@ -44,12 +44,6 @@ fi
 echo "=== compiling C ==="
 bash tools/compile_src.sh "$OBJ" || exit 1
 
-# Informational: the linker script is generated from real object sizes below,
-# so padding is tolerated as long as it covers zero bytes in the ROM. A padded
-# section is still worth seeing.
-echo "=== object size check ==="
-python3 tools/check_obj_sizes.py "$MANIFEST" "$OBJ" || true
-
 # ---- generate placement from the objects just built ----
 echo "=== generating rom.s and ldscript.txt ==="
 python3 tools/gen_build.py "$MANIFEST" \

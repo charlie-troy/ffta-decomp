@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
-| Current work package | CLN8.3 — classify safe object padding |
-| Last closed package | CLN8.2 — normalize legacy source filenames |
+| Current work package | AUD8.1 — audit remaining maintenance gaps |
+| Last closed package | CLN8.3 — classify safe object padding |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -60,7 +60,8 @@ status and backlog tables are living sections and should be kept current.
 | AI7.4 | P3 | Complete | Match the whole evaluator | Matching source replaces the reference without changing retail ROM bytes |
 | CLN8.1 | P3 | Complete | Audit deliberately ugly matching constructs | Improve exact source where possible; otherwise record why the construct remains load-bearing |
 | CLN8.2 | P3 | Complete | Normalize the two pre-convention source filenames | Real function names replace `match_test*`; generator/index exceptions disappear; all gates remain exact |
-| CLN8.3 | P3 | Active | Classify safe object padding without weakening the build gate | Zero-only alignment padding is reported as safe; truncation and nonzero overruns fail; build output has no false alarm |
+| CLN8.3 | P3 | Complete | Classify safe object padding without weakening the build gate | Zero-only alignment padding is reported as safe; truncation and nonzero overruns fail; build output has no false alarm |
+| AUD8.1 | P3 | Active | Audit the repository for the next evidence-backed maintenance gap | Stale commands, dead paths, and validation blind spots are either fixed or explicitly ruled out |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -133,6 +134,7 @@ status and backlog tables are living sections and should be kept current.
 | VAL8.1 | 2026-09-02 | Added the cross-platform `validate_all.py` local release runner | Complete proof-mod/build/domain pass succeeds in 69.9 seconds and restores the default retail build |
 | CLN8.1 | 2026-09-02 | Audited compiler-shaped source and corrected generated-file status claims | 100/100 generated functions remain byte-matched; stale “NOT YET MATCHING” headers removed; duplicated setter branch retained |
 | CLN8.2 | 2026-09-02 | Normalized legacy source names and centralized non-discovery metadata | 14 explicit supplemental records; index restored to 173/9,888 after catching a silent 159-entry regression; 173/173 and exact ROM |
+| CLN8.3 | 2026-09-02 | Centralized object-size and alignment-padding classification | 173 objects checked; one 26→28 zero-only pad accepted with ROM evidence; missing/truncated/nonzero-overrun paths fail; exact ROM |
 
 ## Decisions and evidence
 
@@ -608,6 +610,33 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Fail-closed alignment-padding classification
+
+Objective:
+
+- Remove the build's alarming but ignored size mismatch without weakening its
+  protection against an object overwriting adjacent retail data.
+
+Completed:
+
+- Reworked `check_obj_sizes.py` to classify exact, unverified-padding,
+  ROM-verified safe-padding, and error states from one implementation.
+- CI now calls the same checker directly. It rejects missing, unreadable, or
+  truncated objects and reports the one padded object as unverified because CI
+  correctly has no retail ROM.
+- The full build reuses the same classifier and refuses padding without a ROM
+  or when any covered byte is nonzero. The previous ignored mismatch check and
+  duplicated CI script are gone.
+- Verified the real 26→28-byte `sub_080CB4A4` case, synthetic zero/nonzero
+  padding cases, the no-ROM refusal in the layout generator, and a matching
+  retail SHA1 `4ac05441f4de70a4ec3dd932116346c61b8783d9`.
+
+Next action:
+
+- Audit documented commands, repository automation, and validator coverage for
+  the next bounded maintenance gap. Do not match more arbitrary functions in
+  the absence of a concrete modding goal.
 
 ### 2026-09-02 — Source naming and metadata normalization
 
