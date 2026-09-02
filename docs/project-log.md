@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
-| Current work package | CLN8.1 — audit load-bearing matching constructs |
-| Last closed package | VAL8.1 — consolidate the complete local release gate |
+| Current work package | CLN8.2 — normalize legacy source filenames |
+| Last closed package | CLN8.1 — audit load-bearing matching constructs |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -58,7 +58,8 @@ status and backlog tables are living sections and should be kept current.
 | AI7.2 | P3 | Complete | Reconstruct dominant evaluator cases | CT, 30-root absent-state, and seven-root cancellation families land in readable reference C |
 | AI7.3 | P3 | Complete | Reconstruct exceptional evaluator cases | All 92 effect ids / 66 roots are represented in readable reference C |
 | AI7.4 | P3 | Complete | Match the whole evaluator | Matching source replaces the reference without changing retail ROM bytes |
-| CLN8.1 | P3 | Active | Audit deliberately ugly matching constructs | Improve exact source where possible; otherwise record why the construct remains load-bearing |
+| CLN8.1 | P3 | Complete | Audit deliberately ugly matching constructs | Improve exact source where possible; otherwise record why the construct remains load-bearing |
+| CLN8.2 | P3 | Active | Normalize the two pre-convention source filenames | Real function names replace `match_test*`; generator/index exceptions disappear; all gates remain exact |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -129,6 +130,7 @@ status and backlog tables are living sections and should be kept current.
 | VER8.2 | 2026-09-02 | Extended mod receipts across all three packed map apply workflows | Map-0 arrangement 1,031/1,031; terrain 120/120; clipping 147/147 bytes attributed; zero unattributed in each ROM |
 | VER8.3 | 2026-09-02 | Completed first-party receipt coverage and enabled strict verification | Item and mission edits name their fields; evaluator preset passes strict; injected `0x08000100` edit fails with one unattributed byte |
 | VAL8.1 | 2026-09-02 | Added the cross-platform `validate_all.py` local release runner | Complete proof-mod/build/domain pass succeeds in 69.9 seconds and restores the default retail build |
+| CLN8.1 | 2026-09-02 | Audited compiler-shaped source and corrected generated-file status claims | 100/100 generated functions remain byte-matched; stale “NOT YET MATCHING” headers removed; duplicated setter branch retained |
 
 ## Decisions and evidence
 
@@ -604,6 +606,31 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Compiler-shaped source audit
+
+Objective:
+
+- Revisit deliberately awkward matching constructs without trading away byte
+  identity for cosmetic source cleanup.
+
+Completed:
+
+- Reconfirmed that `sub_080CDD88`'s always-true duplicated setter branch is the
+  documented four-byte agbcc shaping constraint; neighboring evaluator source
+  does not change the isolated function's compilation model.
+- Found a broader accuracy issue: all 100 generated bitfield files were already
+  indexed and byte-matched but their generated headers still said “NOT YET
+  MATCHING.” Corrected the generator and regenerated every header.
+- Removed a second stale generator comment that said recognized alternate and
+  halfword shapes were deliberately skipped even though their matching
+  templates are now active.
+- `make check` remains 173/173. No executable source statement changed.
+
+Next action:
+
+- Rename the two legacy `match_test*.c` files to their real function names and
+  remove the three special-case maps that predate the source naming convention.
 
 ### 2026-09-02 — One-command local release gate
 

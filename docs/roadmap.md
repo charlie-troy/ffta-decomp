@@ -510,9 +510,10 @@ function changed.
   bytes, exact retail rebuild, and all base-ROM domain gates in one run.
 - Select future function matches from concrete modding goals rather than raw
   decompilation percentage.
-- Revisit the deliberately-ugly matching constructs (e.g. `sub_080CDD88`'s
-  load-bearing duplicated branch) once surrounding code clarifies the real
-  idiom — never at the cost of the match.
+- ~~Revisit the deliberately-ugly matching constructs.~~ **Audited
+  2026-09-02:** `sub_080CDD88`'s duplicated branch remains compiler-shaping and
+  load-bearing; all 100 generated functions still match. Their stale
+  “NOT YET MATCHING” headers and generator commentary were corrected instead.
 
 ---
 
