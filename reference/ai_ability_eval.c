@@ -212,12 +212,14 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
     int stateResult;
     register int rawStateResult __asm__("r0");
     u16 *abilityList;
-    u16 *effectEntry;
+    register u16 *effectEntry __asm__("r6");
     struct Unit *unitCopy;
     int count, i, found, changed;
     u8 saved;
     register struct Unit *actor __asm__("r10") = user;
     register struct Unit *subject __asm__("r8") = target;
+    register u32 effectOffset __asm__("r9");
+    register u16 *effectBase __asm__("r7");
     struct AiEvaluatorFrame frame;
     int candidateIndex;
 
@@ -240,8 +242,18 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
         Reject();
 
     /* One specific ability additionally requires a user flag. */
-    if (act->abilityId == 0x109 && !sub_080C8240(user) && !sub_080C8260(user))
-        Reject();
+    {
+        register int firstAbility __asm__("r1");
+        __asm__ volatile (
+            "ldr r0, [sp, #12]\n\t"
+            "ldrh %0, [r0]"
+            : "=r" (firstAbility)
+            :
+            : "r0");
+        if (firstAbility == 0x109 &&
+            !sub_080C8240(user) && !sub_080C8260(user))
+            Reject();
+    }
 
     if (checkCost)
     {
@@ -370,30 +382,52 @@ check_reflect:
 check_final_value:
     if (!sub_0812F1DC(e))
         Reject();
-    candidateIndex = 0;
-    if (candidateIndex >= act->unk_0A)
-        Reject();
+    __asm__ volatile (
+        "mov r0, #0\n\t"
+        "str r0, %0\n\t"
+        "ldr r1, [sp, #12]\n\t"
+        "ldrh r1, [r1, #10]\n\t"
+        "cmp r0, r1\n\t"
+        "blt 1f\n\t"
+        "bl AiEvaluateAbility_reject_all\n"
+        "1:"
+        : "=m" (candidateIndex)
+        :
+        : "r0", "r1", "cc");
 
 next_effect:
+    {
+    register int effectId __asm__("r2");
+    int reachable;
+
     /* The candidate effects are the u16 list at action +4. Failed entries
      * advance through the list; successful entries return immediately. */
-    effectEntry = (u16 *)((u8 *)act + 4) + candidateIndex;
-    if (*effectEntry == 0)
+    __asm__ volatile (
+        "ldr r2, [sp, #16]\n\t"
+        "lsl r0, r2, #1\n\t"
+        "ldr r1, [sp, #12]\n\t"
+        "add r1, #4\n\t"
+        "add %0, r1, r0\n\t"
+        "ldrh %1, [%0]\n\t"
+        "mov %2, r0\n\t"
+        "mov %3, r1"
+        : "=r" (effectEntry), "=r" (effectId),
+          "=r" (effectOffset), "=r" (effectBase)
+        :
+        : "r0", "r1");
+    if (effectId == 0)
         RejectLate();
 
     /* A status bit is briefly cleared around the reachability test, then put
      * back, so the test is done as though the unit did not have it. */
-    saved = sub_080CD8FC(user);
-    sub_080CDD88(user, 0);
-    if (!sub_08133A58(target, *effectEntry))
-    {
-        sub_080CDD88(user, saved);
+    saved = sub_080CD8FC(target);
+    sub_080CDD88(target, 0);
+    reachable = sub_08133A58(target, *effectEntry);
+    sub_080CDD88(target, saved);
+    if (!reachable)
         RejectLate();
-    }
-    sub_080CDD88(user, saved);
 
-    if ((u16)(*effectEntry - 1) > 0x5B)
-        RejectLate();
+    }
 
 #define ABSENT_STATE_CASE(id, test) \
     case id: \
@@ -730,6 +764,7 @@ reject_current:
     if (candidateIndex < act->unk_0A)
         goto next_effect;
 reject_all:
+    __asm__ volatile ("AiEvaluateAbility_reject_all:");
     return 0;
 #undef RejectLate
 #undef Reject

@@ -463,19 +463,17 @@ the repo explicitly ranks it below widening the table surface.
    (ternary vs if/else for shared stores; globals as extern symbols, never cast
    literal addresses; literal-vs-`int`-variable register allocation; branch
    polarity by test kind).
-   **Current compiler baseline:** explicit return/redispatch control, direct
-   state calls, duplicated self/other RNG arms, and the restored signed-action
-   gate produce one 5,354-byte agbcc function versus retail's 5,352 (+2). Its
-   20-byte frame, `sp+12`/`sp+16` action/index slots, and effect table at
-   `+0x364` match retail. All 66 case roots match their retail owned-byte sizes
-   (3,958 / 3,958), all shared owner groups match at 88 / 88 bytes, and all 85
-   RNG/modulo sites remain. Remaining work is outside the case CFG: remove one
-   two-byte action-pointer copy in the retry tail, reproduce retail's
-   post-epilogue placement of the case-92 literal pool, then perform a full
-   byte comparison. The relocation-aware baseline currently has 2,981 / 3,728
-   comparable bytes equal (747 mismatches in 172 runs); the prologue is exact,
-   and work proceeds in offset order from the action reload at `+0x30`, not
-   from size alone.
+   **Current compiler baseline:** the full agbcc candidate and retail are both
+   5,352 bytes, with the exact 20-byte frame, `sp+12`/`sp+16` action/index
+   slots, and effect table at `+0x364`. All 66 case roots match their retail
+   owned-byte sizes (3,958 / 3,958), all shared owner groups match at 88 / 88
+   bytes, and all 85 RNG/modulo sites remain. The candidate initialization,
+   effect-pointer setup, target-state reachability check, and switch range
+   guard now follow retail's instruction topology. Relocation-aware equality is
+   3,303 / 3,732 comparable bytes (429 mismatches in 173 runs), up from
+   2,981 / 3,728. Remaining layout work starts with moving the case-92 literal
+   pool behind the epilogue so the common reject tails land at retail offsets;
+   size and CFG equality still do not imply byte identity.
 5. Match the **66 distinct case bodies** one at a time — each is small and
    depends only on already-matched helpers (flag getters/setters,
    `sub_080C7EA4`, the RNG, `__modsi3`).

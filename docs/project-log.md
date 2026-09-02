@@ -1,6 +1,6 @@
 # Project log
 
-Last updated: 2026-09-01
+Last updated: 2026-09-02
 
 This is the operational source of truth for resuming the project. `README.md`
 describes the product, `CLAUDE.md` describes the working method, and
@@ -111,6 +111,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.1 | 2026-08-31 | Replaced linear case slicing with a control-flow-owned evaluator partition | 92 ids / 66 roots; 3,958 owned + 88 shared bytes; four explicit exits; AI 10/10 |
 | AI7.2 | 2026-08-31 | Reconstructed CT, absent-state, and cancellation rule families | 39 roots in readable C; 30/31 probability roots share one normalized shape; CT and remove-Frog boundaries execute |
 | AI7.3 | 2026-08-31 | Completed readable reconstruction of all evaluator dispatch roots | 92/92 ids and 66/66 roots represented; reference syntax check; AI 10/10 |
+| AI7.4a | 2026-09-02 | Aligned the evaluator's candidate-loop scaffold and restored retail behavior around reachability | 5,352-byte function; table `+0x364`; 3,958 owned + 88 shared bytes; 3,303/3,732 comparable bytes equal |
 
 ## Decisions and evidence
 
@@ -586,6 +587,41 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Evaluator candidate-loop alignment
+
+Objective:
+
+- Replace the structurally compressed candidate-effect loop with retail's
+  actual initialization, pointer state, reachability restore, and dispatch
+  sequence without disturbing the exact case CFG.
+
+Completed:
+
+- Reconstructed the explicit zero/index-count guard at `+0x2EE` and the
+  candidate entry setup at `+0x2FE`, including retail's `r9` byte offset,
+  `r7` action-plus-four base, and `r6` entry pointer.
+- Corrected a behavioral error in the readable reference: retail temporarily
+  clears and restores the **target** state around `sub_08133A58`, not the
+  acting unit. The predicate result is retained across the single restore call
+  exactly as retail does.
+- Removed the redundant pre-switch range check. The compiler-generated switch
+  bound already implements retail's one subtract / unsigned `<= 91` guard.
+- Restored the action reload at `+0x30`; this also recovered retail's table
+  alignment padding. The whole function is now exactly 5,352 bytes and the
+  92-entry table starts at exact offset `+0x364`.
+- Preserved all 66 distinct roots, 3,958/3,958 case-owned bytes, 88/88 shared
+  bytes, and all 85 RNG/modulo pairs.
+- Improved relocation-aware byte equality from 2,981/3,728 to 3,303/3,732;
+  mismatches fell from 747 to 429 while mismatch runs remained localized at
+  173. This is a byte-alignment checkpoint, not a byte-identical function.
+
+Next action:
+
+- Move the case-92 literal pool from before the common retry tail to retail's
+  post-epilogue slot. This should pull `reject_current`/`reject_all` ten bytes
+  earlier, resolving the repeated internal long-branch target deltas without
+  changing any case-owned or shared CFG sizes.
 
 ### 2026-08-31 — AI evaluator control-flow partition
 
