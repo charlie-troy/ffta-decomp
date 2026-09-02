@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
-| Current work package | AUD8.1 — audit remaining maintenance gaps |
-| Last closed package | CLN8.3 — classify safe object padding |
+| Current work package | None — bounded roadmap clear; next work needs a concrete modding goal |
+| Last closed package | AUD8.1 — audit remaining maintenance gaps |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -61,7 +61,7 @@ status and backlog tables are living sections and should be kept current.
 | CLN8.1 | P3 | Complete | Audit deliberately ugly matching constructs | Improve exact source where possible; otherwise record why the construct remains load-bearing |
 | CLN8.2 | P3 | Complete | Normalize the two pre-convention source filenames | Real function names replace `match_test*`; generator/index exceptions disappear; all gates remain exact |
 | CLN8.3 | P3 | Complete | Classify safe object padding without weakening the build gate | Zero-only alignment padding is reported as safe; truncation and nonzero overruns fail; build output has no false alarm |
-| AUD8.1 | P3 | Active | Audit the repository for the next evidence-backed maintenance gap | Stale commands, dead paths, and validation blind spots are either fixed or explicitly ruled out |
+| AUD8.1 | P3 | Complete | Audit the repository for the next evidence-backed maintenance gap | Stale commands, dead paths, and validation blind spots are either fixed or explicitly ruled out |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 
 ## Closed work packages
@@ -135,6 +135,7 @@ status and backlog tables are living sections and should be kept current.
 | CLN8.1 | 2026-09-02 | Audited compiler-shaped source and corrected generated-file status claims | 100/100 generated functions remain byte-matched; stale “NOT YET MATCHING” headers removed; duplicated setter branch retained |
 | CLN8.2 | 2026-09-02 | Normalized legacy source names and centralized non-discovery metadata | 14 explicit supplemental records; index restored to 173/9,888 after catching a silent 159-entry regression; 173/173 and exact ROM |
 | CLN8.3 | 2026-09-02 | Centralized object-size and alignment-padding classification | 173 objects checked; one 26→28 zero-only pad accepted with ROM evidence; missing/truncated/nonzero-overrun paths fail; exact ROM |
+| AUD8.1 | 2026-09-02 | Audited source/index coverage, executable guidance, and repository text health | Injected unindexed source fails both CI verification and layout generation; stale 123/116, 14/16, 99.7%/100%, and priority-direction claims corrected; UTF-8/JSON/local-link audits pass |
 
 ## Decisions and evidence
 
@@ -610,6 +611,39 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Post-roadmap maintenance audit
+
+Objective:
+
+- Find any remaining actionable validation or documentation gap before
+  declaring the bounded Phase 8 roadmap clear.
+
+Completed:
+
+- Found and closed a fail-open path: a new conventionally named source could
+  compile while remaining absent from `data/functions.json`, after which CI
+  and the retail build could both ignore it. `verify_functions.py` and
+  `gen_build.py` now reject that state.
+- Proved both rejection paths with a temporary `sub_DEADBEEF.c` fixture, then
+  removed the fixture. Normal verification remains 173/173 with zero unindexed
+  sources.
+- Reconciled stale operational guidance: map validation is 16/16, primary text
+  decoding is 2,757/2,757, and the complete local gate is documented.
+- Corrected the user-facing fallback job-table bound from 123 to 116, removed
+  the obsolete claim that only priority is editable, and synchronized
+  `ai-findings.md` with the complete ability layout.
+- Fixed the one contradictory priority sentence: higher priority is more
+  likely, as the execution gate proves. Normalized that document from legacy
+  Windows-1252 to UTF-8.
+- Audited all repository text for UTF-8 decoding, all data JSON, shell syntax,
+  Python syntax, and Markdown local links; all pass.
+
+Next action:
+
+- Choose a concrete gameplay/modding outcome. That goal should determine the
+  next table investigation or function match; arbitrary percentage-driven
+  decompilation remains intentionally out of scope.
 
 ### 2026-09-02 — Fail-closed alignment-padding classification
 

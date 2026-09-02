@@ -33,13 +33,13 @@ which describes the same table at the same offset, and verified against the ROM.
 
 Three of the 28 bytes are AI-specific, per ability, for all 347 abilities:
 
-- **`+0x1A` AI priority** — a single byte deciding how eagerly the AI reaches
-  for an ability. Higher is less likely. This is the most direct behaviour
+- **`+0x1A` AI priority** â€” a single byte deciding how eagerly the AI reaches
+  for an ability. Higher is more likely. This is the most direct behaviour
   knob in the game and it needs no code changes at all.
-- **`+0x19` AI behaviour** — when the ability is considered. Value 2
+- **`+0x19` AI behaviour** â€” when the ability is considered. Value 2
   ("healthy") is the one `sub_080C32C0` implements by rejecting the ability
   when the target is below half HP.
-- **`+0x18` AI condition** — special-case handling; 306 of 347 abilities use
+- **`+0x18` AI condition** â€” special-case handling; 306 of 347 abilities use
   the default.
 
 Editing these changes AI behaviour without touching a single instruction.

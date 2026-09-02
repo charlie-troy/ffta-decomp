@@ -92,7 +92,8 @@ shown to be dead data rather than merely unexplained.
 
 Mapped and editable with no compiler: abilities, jobs, items, map terrain,
 arrangement and clipping tilemaps,
-missions. Text decodes at 99.7%, so every CSV carries real names.
+missions. All 2,757 primary-table strings decode, so every CSV carries real
+names.
 
 Genuinely open, with the reason:
 
@@ -115,7 +116,8 @@ Genuinely open, with the reason:
 ```bash
 python tools/validate_ai.py "<rom>"      # must stay 10/10
 python tools/validate_missions.py "<rom>" # must stay 13/13 when missions change
-python tools/validate_maps.py "<rom>"     # must stay 14/14 when maps change
+python tools/validate_maps.py "<rom>"     # must stay 16/16 when maps change
+python tools/validate_all.py "<rom>"      # complete local release gate
 ```
 
 Every table tool must round-trip: dumping and re-applying an unedited CSV has

@@ -522,6 +522,10 @@ function changed.
   2026-09-02:** the shared size classifier rejects missing/truncated objects
   and nonzero overruns, while the one alignment pad is accepted only after a
   base-ROM check proves its two covered bytes are zero.
+- ~~Audit validation and documentation drift after the Phase 8 work.~~
+  **Closed 2026-09-02:** CI and full builds now reject an unindexed `sub_*.c`;
+  stale map/text counts, the job-table bound, and contradictory AI-priority
+  guidance were reconciled against the current tools and execution evidence.
 
 ---
 

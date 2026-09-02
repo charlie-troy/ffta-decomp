@@ -82,6 +82,12 @@ def main(argv):
             "size": f["size"],
         })
 
+    if missing:
+        print(f"error: {len(missing)} source(s) not in manifest: "
+              f"{', '.join(sorted(missing)[:5])}")
+        print("error: run make index before building")
+        return 1
+
     placed.sort(key=lambda f: f["offset"])
 
     # A section whose alignment directives survive gets padded up to a multiple
@@ -211,9 +217,6 @@ def main(argv):
     total = sum(f["size"] for f in placed)
     print(f"placed {len(placed)} function(s), {total:,} bytes of C")
     print(f"{len(gaps)} incbin gap(s) covering {args.rom_size - total:,} bytes")
-    if missing:
-        print(f"warning: {len(missing)} source(s) not in manifest: "
-              f"{', '.join(sorted(missing)[:5])}")
     return 0
 
 

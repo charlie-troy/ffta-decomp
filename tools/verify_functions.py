@@ -15,6 +15,7 @@ Usage:
     python tools/verify_functions.py [index.json] [objdir]
 """
 import os
+import re
 import sys
 import json
 import hashlib
@@ -22,6 +23,17 @@ import hashlib
 import elfutil
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def source_function_names():
+    """Return every conventionally named decompiled source in src/."""
+    names = set()
+    for root, _dirs, files in os.walk(os.path.join(REPO, "src")):
+        for filename in files:
+            match = re.match(r"^(sub_[0-9A-Fa-f]{8})\.c$", filename)
+            if match:
+                names.add(match.group(1))
+    return names
 
 
 def main(argv):
@@ -37,6 +49,8 @@ def main(argv):
     with open(index) as fh:
         data = json.load(fh)
     funcs = data["functions"]
+    indexed_names = {f["name"] for f in funcs}
+    unindexed = sorted(source_function_names() - indexed_names)
 
     ok, bad, missing, unresolved = [], [], [], []
     relocated = 0
@@ -66,6 +80,7 @@ def main(argv):
     print(f"MISMATCH   : {len(bad)}")
     print(f"missing    : {len(missing)}")
     print(f"unresolved : {len(unresolved)}")
+    print(f"unindexed  : {len(unindexed)}")
 
     for name, size, actual in bad:
         print(f"  mismatch {name} (expected {size} bytes, object .text {actual})")
@@ -74,8 +89,10 @@ def main(argv):
     for name, syms in unresolved[:10]:
         print(f"  {name} references unknown symbol(s): {', '.join(syms)}")
         print("    add them to data/symbols.txt")
+    for name in unindexed[:10]:
+        print(f"  source missing from index: {name}")
 
-    if bad or missing or unresolved:
+    if bad or missing or unresolved or unindexed:
         return 1
     print("\nall functions compile to the expected bytes")
     return 0

@@ -1,10 +1,10 @@
 # Battle AI: what has been located
 
-Found statically, with no emulator, by ranking functions on how many of the
-100 matched unit-flag accessors they call. See `tools/callgraph.py`.
-
-Confidence is marked per item. Addresses are verified; field *meanings* are
-inferred from how the AI uses them and are not yet confirmed by running the game.
+Initially found statically by ranking functions on how many of the 100 matched
+unit-flag accessors they call; see `tools/callgraph.py`. The central evaluator,
+its 92-case dispatch, and the named unit fields are now also protected by
+byte-matching and execution checks. Individual sections distinguish remaining
+inference from behavior-backed findings.
 
 ## The central function
 
@@ -56,19 +56,18 @@ for AI behaviour changes.**
 
 | What | Address | Notes |
 |---|---|---|
-| Ability data | `0x0855187C` | stride **0x1C** (28 bytes), roughly 344 usable entries; entry 0 is a null row |
+| Ability data | `0x0855187C` | stride **0x1C** (28 bytes), 347 entries; entry 0 is a null row |
 | Effect dispatch | `0x080C3624` | 92 entries, all internal to `sub_080C32C0` |
 | Secondary dispatch | `0x080C347C` | 8 entries, index `uVar7 - 4` |
 
-Ability entry fields, inferred from the first rows and from AI usage:
+The full 28-byte layout is maintained in [ability-table.md](ability-table.md).
+The three AI-specific fields are:
 
-| Offset | Guess | Basis |
+| Offset | Field | Basis |
 |---|---|---|
-| `+0x0B` | AP cost | values 40, 60, 80, 0, 90 |
-| `+0x19` | ability class | AI treats `2` as heal-like; distribution is almost entirely 0/1/2 |
-| `+0x1A` | AI priority | higher = more likely; corrected from the earlier "accuracy" guess, see [ability-table.md](ability-table.md) |
-
-The remaining 24 bytes per entry are not yet identified.
+| `+0x18` | AI condition | Special-case handling; 306/347 entries use the default |
+| `+0x19` | AI behavior | Value 2 rejects targets below half HP; values span 0–3 |
+| `+0x1A` | AI priority | Higher = more likely; 0 never and 100 always, confirmed by execution |
 
 ## Unit struct: confirmed stat offsets
 
@@ -218,9 +217,9 @@ building libgcc rather than being decompiled. It is the same category as
 
 `sub_0813413C(unit, abilityId)` is the priority getter. For a real ability it
 returns the ability table's `+0x1A`; for ability id 0 it falls back to a
-**second table at `0x08521A14`, stride 0x34, priority byte at `+0x32`**. That
-second table is a separate AI-tunable dataset and is not yet covered by
-`tools/ability_table.py`.
+**job table at `0x08521A14`, stride 0x34, priority byte at `+0x32`**. It is
+editable through `tools/ability_table.py dump-units/apply-units`; the current
+layout and evidence live in [job-table.md](job-table.md).
 
 Only two functions call it, `sub_080C1EB4` and `sub_080C2618`, both in the AI
 region. `sub_080C2618` stores the value into a candidate record rather than
@@ -232,9 +231,9 @@ Both callers pass the byte to `sub_0812F1DC`, whose result decides survival, and
 that predicate keeps an ability more often as the priority rises. Higher means
 **more** likely. The derivation is in `docs/ability-table.md`.
 
-The fallback table is bounded at **123 entries**: index 123 and 124 are all
-zero and 125 onwards is unrelated data. Its priority byte spans the same 0-100
-scale as the ability table, over 14 distinct values.
+The table is bounded at **116 entries**. The earlier 123-entry estimate was a
+false plausibility bound that included unrelated following data. Its priority
+byte spans the same 0-100 scale as the ability table, over 14 distinct values.
 
 ## Candidate-list model, confirmed by disassembly
 

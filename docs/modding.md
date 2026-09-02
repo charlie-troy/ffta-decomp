@@ -72,7 +72,7 @@ baseline. Note the AI is randomised in other places too (see
 ## 1b. The fallback table
 
 When an action carries no ability id, `sub_0813413C` reads its priority from a
-second table at `0x08521A14` instead: stride `0x34`, **123 entries**, priority
+second table at `0x08521A14` instead: stride `0x34`, **116 entries**, priority
 byte at `+0x32`, indexed by the unit byte at `+0x05`. Its values use the same
 0-100 scale.
 
@@ -81,9 +81,9 @@ python tools/ability_table.py dump-units  baserom.gba units.csv
 python tools/ability_table.py apply-units baserom.gba units.csv ffta-mod.gba
 ```
 
-Only the priority byte is written back. The rest of each 52-byte entry is left
-untouched because its layout is not established, and guessing at it would risk
-corrupting unit data.
+All 52 bytes are exposed. Established fields have semantic column names; bytes
+whose role is still unknown retain neutral `bNN` names. The guarded 116-entry
+bound prevents edits from spilling into the unrelated data that follows.
 
 ## 1c. The status-effect gates
 
