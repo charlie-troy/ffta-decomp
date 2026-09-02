@@ -58,8 +58,17 @@ independently:
 | `81 03` | `>` | `Damage > MP`, `HP > 1/2` |
 | `81 08` | `&` | `Flesh & Bones`, `Blade & Turtle` |
 | `80 F1` | `/` | `HP > 1/2` |
+| `81 02` | `<` | `Heal < 50`, `Heal < 100` |
+| `81 07` | `%` | `100% Wool` |
+| `80 F7` / `80 F8` | `(` / `)` | `(not used)`, `(---)` |
+| `80 FB` / `80 FC` | `〖` / `〗` | `〖Enhance〗` |
 
-**2,750 of 2,757 strings (99.7%) now decode with no unknown codes.**
+**All 2,757 strings in the four primary tables now decode with no unknown
+codes.** The final seven were two comparison labels, one percentage label, a
+parenthesized unused marker, two parenthesized placeholders, and a decorated
+menu label. `tools/validate_text.py` locks both complete coverage and those
+seven edge-case readings. Their contextual readings agree with the published
+[FFTA character table](https://datacrystal.tcrf.net/wiki/Final_Fantasy_Tactics_Advance/Strings).
 
 ## Which table a name id points at is not uniform
 
@@ -96,6 +105,7 @@ reports:
 ```bash
 python tools/strings.py list baserom.gba
 python tools/strings.py dump baserom.gba 0x0855A64C 512 missions.csv
+python tools/validate_text.py baserom.gba
 ```
 
 The name column is informational: `apply` ignores it, and every table still

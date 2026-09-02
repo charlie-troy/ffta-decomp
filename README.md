@@ -34,8 +34,8 @@ exposed:
 
 **The text is decoded**, so every dump carries real names rather than ids:
 abilities read as `Cure` and `Curaga`, items as `Shortsword`, jobs as
-`Soldier`, missions as `Snowball Fight`. 99.7% of the game's strings decode
-with no unknown codes. See [docs/text.md](docs/text.md).
+`Soldier`, missions as `Snowball Fight`. All 2,757 strings in the four primary
+tables decode with no unknown codes. See [docs/text.md](docs/text.md).
 
 Mission data is mapped in [docs/mission-data.md](docs/mission-data.md), which
 was undocumented anywhere and had to be found by scanning the ROM for table

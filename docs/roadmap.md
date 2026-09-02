@@ -8,8 +8,9 @@ tools that already exist, and a definition of done. The reusable loop for any
 
 State snapshot: 173 functions matched (9,888 bytes) · full 16 MB ROM rebuilds
 byte-identical · CI hash gate on every function · 3,594 functions discovered ·
-abilities, jobs, items, missions and map terrain mapped and editable · text
-decodes at 99.7% · 10/10 execution checks pass (`tools/validate_ai.py`).
+abilities, jobs, items, missions and map terrain mapped and editable · all
+2,757 primary-table strings decode · 10/10 execution checks pass
+(`tools/validate_ai.py`).
 The separate job-field gate passes 4/4, covering 5,568 retail formula reads,
 causal redirect/resistance patches, and the morph-family flag.
 
@@ -493,7 +494,9 @@ function changed.
 
 ## Phase 8 — Long tail and cleanup
 
-- The **7 undecoded text strings** (0.3%).
+- ~~The **7 undecoded text strings**.~~ **Closed 2026-09-02:** the remaining
+  comparison, percentage, parenthesis, and decorative-bracket glyphs are mapped;
+  `tools/validate_text.py` verifies 2,757/2,757 strings and seven edge anchors.
 - Select future function matches from concrete modding goals rather than raw
   decompilation percentage.
 - Revisit the deliberately-ugly matching constructs (e.g. `sub_080CDD88`'s

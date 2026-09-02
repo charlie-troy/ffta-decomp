@@ -11,6 +11,7 @@ python tools/validate_maps.py baserom.gba
 python tools/validate_items.py baserom.gba
 python tools/validate_statuses.py baserom.gba
 python tools/validate_job_fields.py baserom.gba
+python tools/validate_text.py baserom.gba
 ```
 
 Compile and summarize the current whole-evaluator matching candidate without
@@ -33,6 +34,10 @@ shared join. It also calls out case groups that agbcc has merged differently.
 No save state, no playable game, no emulator GUI. `tools/emulate.py` maps the
 ROM and blank RAM under Unicorn, then calls functions with chosen arguments and
 synthetic units built in RAM.
+
+`validate_text.py` is the static completeness gate for the four primary text
+tables. It requires all 2,757 strings to decode without unknown codes and locks
+the seven punctuation/symbol edge cases that completed the character map.
 
 The AI gate now has ten checks. Checks 9 and 10 protect the Phase 7 evaluator
 work: the switch remains partitioned into 92 ids / 66 roots / 3,958 owned plus

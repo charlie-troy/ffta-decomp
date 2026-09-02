@@ -32,7 +32,7 @@ status and backlog tables are living sections and should be kept current.
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 8 — long tail and cleanup |
 | Current work package | DEC8.1 — select the next modding-driven function |
-| Last closed package | AI7.4 — byte-matched and integrated the full evaluator |
+| Last closed package | TXT8.1 — close the primary text character map |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; jobs 4/4; missions 13/13; maps 14/14; items 8/8; statuses/state 21/21; matching ROM SHA1 |
 
@@ -117,6 +117,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.4d | 2026-09-02 | Aligned mode-local scratch flow and the simulated-status case family | Exact 5,352-byte layout; 3,675/3,732 comparable bytes equal; 57 mismatches in 34 runs |
 | AI7.4e | 2026-09-02 | Matched the late exceptional cases and reflect/final-value joins | 3,729/3,732 comparable bytes equal; three one-byte register/condition encodings remain |
 | AI7.4f | 2026-09-02 | Reached byte identity, integrated the evaluator, and shipped the first source rule preset | 3,732/3,732 comparable bytes; 173/173 functions; retail ROM matches; preset changes only 85 evaluator bytes |
+| TXT8.1 | 2026-09-02 | Decoded the final seven primary-table strings and added a completeness gate | 2,757/2,757 strings clean; 7/7 edge anchors locked |
 
 ## Decisions and evidence
 
@@ -592,6 +593,28 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Primary text decoder completion
+
+Objective:
+
+- Close the seven-string text backlog with evidence-backed glyph mappings and
+  a reproducible completeness gate.
+
+Completed:
+
+- Mapped `81 02` as `<`, `81 07` as `%`, `80 F7/F8` as parentheses, and
+  `80 FB/FC` as the decorative brackets around `Enhance`.
+- Confirmed the mappings in context: `Heal < 50`, `Heal < 100`, `100% Wool`,
+  `(not used)`, two `(---)` placeholders, and `〖Enhance〗`.
+- Added `tools/validate_text.py` and `make validate-text`; the gate requires all
+  2,757 entries across the main, UI, mission, and first-name tables to decode
+  without unknown codes and separately locks all seven edge cases.
+
+Next action:
+
+- Select the next function only from a concrete modding goal, then build the
+  smallest source/edit/verification slice that unlocks it.
 
 ### 2026-09-02 — Evaluator integration and first source rule mod
 
