@@ -113,6 +113,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.3 | 2026-08-31 | Completed readable reconstruction of all evaluator dispatch roots | 92/92 ids and 66/66 roots represented; reference syntax check; AI 10/10 |
 | AI7.4a | 2026-09-02 | Aligned the evaluator's candidate-loop scaffold and restored retail behavior around reachability | 5,352-byte function; table `+0x364`; 3,958 owned + 88 shared bytes; 3,303/3,732 comparable bytes equal |
 | AI7.4b | 2026-09-02 | Aligned the retry tail, post-epilogue literal pool, and opening gauntlet register flow | Exact tail/pool offsets; prefix exact through `+0x128`; 3,450/3,732 comparable bytes equal |
+| AI7.4c | 2026-09-02 | Removed the mode-dispatch control-flow excess and aligned downstream layout | Exact mode fallthrough topology; 3,606/3,732 comparable bytes equal; 126 mismatches in 53 runs |
 
 ## Decisions and evidence
 
@@ -588,6 +589,34 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Evaluator mode-dispatch alignment
+
+Objective:
+
+- Continue offset-order byte matching through the pre-switch mode dispatcher
+  while preserving the exact function, table, and case-CFG boundaries.
+
+Completed:
+
+- Matched the signed `action + 0x0E` threshold load and the mode-stage ability
+  property load with narrow register-constrained blocks.
+- Identified the dispatcher-wide two-byte excess: modes 7/8/10 tested
+  `isNegative == 1`, branched around rejection, then emitted an unconditional
+  jump to `check_reflect`. Retail instead tests `isNegative != 1` and branches
+  directly to the shared reflect path.
+- Reversed that source predicate without changing behavior. Removing the
+  redundant transfer realigned case 11, `check_reflect`, the final-value gate,
+  candidate loop, all case roots, common tails, epilogue, and literal pool.
+- Improved relocation-aware equality from 3,450/3,732 to 3,606/3,732;
+  remaining mismatches fell from 282 to 126 and runs from 77 to 53.
+
+Next action:
+
+- Shape the remaining pre-mode register differences, starting with the
+  `r7` signed-effect / `r6` sign-flag pair at `+0x129`, then the three scratch
+  pointer/load sequences beginning at `+0x1F3`. Avoid function-scope fixed
+  locals, which have already been proven to destabilize global allocation.
 
 ### 2026-09-02 — Evaluator tail, pool, and prefix alignment
 

@@ -377,15 +377,35 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
         if (!(sub_081341BC(user, target) || isNegative))
             goto check_final_value;
 
-        if (!isNegative && act->unk_0E < 0x1E)
-            Reject();
+        if (!isNegative)
+        {
+            register int actionThreshold __asm__("r0");
+            __asm__ volatile (
+                "ldr r2, [sp, #12]\n\t"
+                "mov r1, #14\n\t"
+                "ldrsh %0, [r2, r1]"
+                : "=r" (actionThreshold)
+                :
+                : "r1", "r2");
+            if (actionThreshold < 0x1E)
+                Reject();
+        }
 
         mode = sub_0812E6A4(target) & 0xFFFF;
         if (!sub_0812F0E4(target, (signed char)target->tileX,
                           (signed char)target->tileY))
             mode = 0;
-        if (act->abilityId != 0 && AbilityProp(act->abilityId, 0x11))
-            mode = 0;                                /* flag bit 6 */
+        {
+            register int modeAbility __asm__("r0");
+            __asm__ volatile (
+                "ldr r2, [sp, #12]\n\t"
+                "ldrh %0, [r2]"
+                : "=r" (modeAbility)
+                :
+                : "r2");
+            if (modeAbility != 0 && AbilityPropWide(modeAbility, 0x11))
+                mode = 0;                            /* flag bit 6 */
+        }
 
         switch (mode)
         {
@@ -431,9 +451,9 @@ check_range_code:
                 Reject();
             if (rangeCode <= 2)
                 e >>= 1;
-            if (isNegative == 1)
-                Reject();
-            goto check_reflect;
+            if (isNegative != 1)
+                goto check_reflect;
+            Reject();
         case 11:
             abilityId = act->abilityId;
             if (abilityId == 0)
