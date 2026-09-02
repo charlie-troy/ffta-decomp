@@ -28,7 +28,8 @@ MOD_CALLS=$(grep -c $'\tbl\tsub_08142950' "$ASM" || true)
 
 grep -q $'\tadd\tsp, sp, #-20' "$ASM"
 grep -q $'\tstr\tr2, \[sp, #12\]' "$ASM"
-grep -q $'\tstr\t.*\[sp, #16\]' "$ASM"
+grep -Eq '^[[:space:]]+str[[:space:]]+r0, \[sp, #16\]' "$ASM"
+grep -Eq '^[[:space:]]+str[[:space:]]+r2, \[sp, #16\]' "$ASM"
 test "$RNG_CALLS" -eq 85
 test "$MOD_CALLS" -eq 85
 

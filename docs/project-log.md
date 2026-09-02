@@ -112,6 +112,7 @@ status and backlog tables are living sections and should be kept current.
 | AI7.2 | 2026-08-31 | Reconstructed CT, absent-state, and cancellation rule families | 39 roots in readable C; 30/31 probability roots share one normalized shape; CT and remove-Frog boundaries execute |
 | AI7.3 | 2026-08-31 | Completed readable reconstruction of all evaluator dispatch roots | 92/92 ids and 66/66 roots represented; reference syntax check; AI 10/10 |
 | AI7.4a | 2026-09-02 | Aligned the evaluator's candidate-loop scaffold and restored retail behavior around reachability | 5,352-byte function; table `+0x364`; 3,958 owned + 88 shared bytes; 3,303/3,732 comparable bytes equal |
+| AI7.4b | 2026-09-02 | Aligned the retry tail, post-epilogue literal pool, and opening gauntlet register flow | Exact tail/pool offsets; prefix exact through `+0x128`; 3,450/3,732 comparable bytes equal |
 
 ## Decisions and evidence
 
@@ -587,6 +588,40 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Evaluator tail, pool, and prefix alignment
+
+Objective:
+
+- Move the displaced case-92 constants behind the epilogue, align the common
+  retry tail, and continue byte comparison through the opening gauntlet.
+
+Completed:
+
+- Replaced case 92's compiler-local pool with a named post-epilogue pool at
+  `+0x14E0/+0x14E4`, retaining the `gEwram` relocation and `0x00003C33`
+  literal inside the 5,352-byte function symbol.
+- Moved `reject_current` and `reject_all` to retail's exact `+0x14BA` and
+  `+0x14CC` offsets. The retry tail now retains the incremented index in `r2`,
+  compares against the action count in `r0`, and transfers back to the named
+  `+0x300` candidate-loop entry exactly as retail does.
+- Added wide-signature aliases plus narrow fixed-register helpers for the
+  opening ability-property, MP-cost, and ability-table reads. This preserves
+  readable conditions while matching retail's load order and register use.
+- Reconstructed both signed-action veto reads with their retail register
+  order. The candidate is now byte-exact from the prologue through `+0x128`;
+  the first remaining mismatch is the `e` / sign-flag register assignment.
+- Hardened the candidate report so its stack-index checks recognize both
+  compiler-emitted and intentional inline-assembly stores.
+- Improved relocation-aware equality from 3,303/3,732 to 3,450/3,732;
+  remaining mismatches fell from 429 to 282 and mismatch runs from 173 to 77.
+  Function size, table location, CFG ownership, and RNG topology remain exact.
+
+Next action:
+
+- Reproduce retail's `r7` signed-effect / `r6` sign-flag allocation beginning
+  at `+0x129` without function-scope fixed locals, which were tested and
+  rejected because they perturbed global allocation and added four bytes.
 
 ### 2026-09-02 — Evaluator candidate-loop alignment
 

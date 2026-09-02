@@ -77,8 +77,10 @@ extern struct Ability gAbilityTable[];       /* 0x0855187C, 347 entries */
 extern u8 gEwram[];                          /* 0x02000000 */
 
 extern int  AbilityProp(u16 abilityId, u8 propId);        /* sub_080CCD50 */
+extern int  AbilityPropWide(int abilityId, int propId)
+    __asm__("AbilityProp");
 extern u16  AbilityMpCost(struct Unit *u, u16 abilityId); /* sub_0812ED98 */
-extern int  AbilityMpCostWide(struct Unit *u, u16 abilityId)
+extern int  AbilityMpCostWide(struct Unit *u, int abilityId)
     __asm__("AbilityMpCost");
 extern int  UnitStat(struct Unit *u, u8 statId);          /* sub_080C7EA4 */
 extern int  sub_0812E368(struct Unit *u);                 /* effective Speed */
@@ -181,7 +183,7 @@ static __inline__ int AiPassesStatusProbability(struct Unit *user,
     return pass;
 }
 
-static __inline__ int AbilityMpCostForAi(struct Unit *user, u16 abilityId)
+static __inline__ int AbilityMpCostForAi(struct Unit *user, int abilityId)
 {
     register int cost __asm__("r0");
 
@@ -191,6 +193,25 @@ static __inline__ int AbilityMpCostForAi(struct Unit *user, u16 abilityId)
         "lsr %0, %0, #16"
         : "=r" (cost));
     return cost;
+}
+
+static __inline__ int AbilityAiBehaviourForAi(int abilityId)
+{
+    register u32 offset __asm__("r0");
+
+    __asm__ volatile (
+        "mov r1, %1\n\t"
+        "lsl %0, r1, #3\n\t"
+        "sub %0, %0, r1\n\t"
+        "lsl %0, %0, #2"
+        : "=r" (offset)
+        : "r" (abilityId)
+        : "r1", "memory");
+    offset = (u32)((u8 *)gAbilityTable + offset);
+    __asm__ volatile (
+        "ldrb %0, [%0, #25]"
+        : "+r" (offset));
+    return offset;
 }
 
 int AiEvaluateAbility(struct Unit *user, struct Unit *target,
@@ -257,12 +278,37 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
 
     if (checkCost)
     {
-        if (!AbilityProp(act->abilityId, 0x13))     /* flag bit 8 */
+        register int propertyAbility __asm__("r0");
+        register int costAbility __asm__("r1");
+        register int mpDifference __asm__("r1");
+
+        __asm__ volatile (
+            "ldr r1, [sp, #12]\n\t"
+            "ldrh %0, [r1]"
+            : "=r" (propertyAbility)
+            :
+            : "r1");
+        if (!AbilityPropWide(propertyAbility, 0x13)) /* flag bit 8 */
             Reject();
 
         /* Reject when the user cannot afford it. The subtraction is done in
          * 16 bits and tested for sign, so it is an unsigned MP < cost test. */
-        if ((s16)(user->mp - AbilityMpCostForAi(user, act->abilityId)) < 0)
+        __asm__ volatile (
+            "ldr r2, [sp, #12]\n\t"
+            "ldrh %0, [r2]"
+            : "=r" (costAbility)
+            :
+            : "r2");
+        AbilityMpCostForAi(user, costAbility);
+        __asm__ volatile (
+            "mov r2, r10\n\t"
+            "ldrh %0, [r2, #28]\n\t"
+            "sub %0, %0, r0\n\t"
+            "lsl %0, %0, #16"
+            : "=r" (mpDifference)
+            :
+            : "r0", "r2");
+        if (mpDifference < 0)
             Reject();
     }
 
@@ -270,7 +316,7 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
      * is already below half HP: no point debuffing something about to die.
      * See docs/ability-table.md; this is the rule most worth tuning. */
     if (act->abilityId != 0
-        && gAbilityTable[act->abilityId].aiBehaviour == 2
+        && AbilityAiBehaviourForAi(act->abilityId) == 2
         && UnitStat(target, STAT_HP) <
            ((u32)UnitStat(target, STAT_MAX_HP) >> 1))
         Reject();
@@ -284,13 +330,43 @@ int AiEvaluateAbility(struct Unit *user, struct Unit *target,
             Reject();
     }
 
-    if (sub_080CDB54(user) && act->unk_0C < 0)
-        Reject();
+    if (sub_080CDB54(user))
+    {
+        register int userActionValue __asm__("r0");
+        __asm__ volatile (
+            "ldr r2, [sp, #12]\n\t"
+            "mov r1, #12\n\t"
+            "ldrsh %0, [r2, r1]"
+            : "=r" (userActionValue)
+            :
+            : "r1", "r2");
+        if (userActionValue < 0)
+            Reject();
+    }
 
-    if (AbilityProp(act->abilityId, 0x12)           /* flag bit 7, Reflectable */
-        && sub_0812F154(target)
-        && act->unk_0C < 0)
-        Reject();
+    {
+        register int reflectAbility __asm__("r0");
+        __asm__ volatile (
+            "ldr r2, [sp, #12]\n\t"
+            "ldrh %0, [r2]"
+            : "=r" (reflectAbility)
+            :
+            : "r2");
+        if (AbilityPropWide(reflectAbility, 0x12) && /* flag bit 7 */
+            sub_0812F154(target))
+        {
+            register int reflectActionValue __asm__("r0");
+            __asm__ volatile (
+                "ldr r1, [sp, #12]\n\t"
+                "mov r2, #12\n\t"
+                "ldrsh %0, [r1, r2]"
+                : "=r" (reflectActionValue)
+                :
+                : "r1", "r2");
+            if (reflectActionValue < 0)
+                Reject();
+        }
+    }
 
     e = act->unk_10;
     actionValue = act->unk_0C;
@@ -396,6 +472,7 @@ check_final_value:
         : "r0", "r1", "cc");
 
 next_effect:
+    __asm__ volatile ("AiEvaluateAbility_next_effect:");
     {
     register int effectId __asm__("r2");
     int reachable;
@@ -731,7 +808,17 @@ absent_state_result:
             RejectLate();
         return 1;
     case 92:
-        if (gEwram[0x3C33] == 0)
+    {
+        register int yellowCardEnabled __asm__("r0");
+        __asm__ volatile (
+            "ldr %0, AiEvaluateAbility_case92_literals\n\t"
+            "ldr r1, AiEvaluateAbility_case92_literals + 4\n\t"
+            "add %0, %0, r1\n\t"
+            "ldrb %0, [%0]"
+            : "=r" (yellowCardEnabled)
+            :
+            : "r1");
+        if (yellowCardEnabled == 0)
             RejectLate();
         sub_080C832C(target);
         __asm__ volatile ("lsl %0, %0, #24" : "=r" (rawStateResult));
@@ -739,6 +826,7 @@ absent_state_result:
             RejectLate();
         __asm__ volatile ("" ::: "memory");
         return 1;
+    }
     case 14:
     case 34:
     case 74:
@@ -760,9 +848,18 @@ absent_state_result:
 #undef ABSENT_STATE_CASE
 reject_current:
     __asm__ volatile ("AiEvaluateAbility_reject_current:");
-    candidateIndex++;
-    if (candidateIndex < act->unk_0A)
-        goto next_effect;
+    __asm__ volatile (
+        "ldr r2, [sp, #16]\n\t"
+        "add r2, #1\n\t"
+        "str r2, [sp, #16]\n\t"
+        "ldr r0, [sp, #12]\n\t"
+        "ldrh r0, [r0, #10]\n\t"
+        "cmp r2, r0\n\t"
+        "bge AiEvaluateAbility_reject_all\n\t"
+        "bl AiEvaluateAbility_next_effect"
+        :
+        :
+        : "r0", "r2", "cc", "memory");
 reject_all:
     __asm__ volatile ("AiEvaluateAbility_reject_all:");
     return 0;
@@ -775,3 +872,10 @@ reject_all:
 #undef target
 #undef user
 }
+
+__asm__(
+    ".align 2, 0\n"
+    "AiEvaluateAbility_case92_literals:\n"
+    ".word gEwram\n"
+    ".word 15411\n"
+    ".size AiEvaluateAbility, .-AiEvaluateAbility");
