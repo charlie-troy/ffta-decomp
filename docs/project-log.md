@@ -2833,3 +2833,61 @@ Evidence:
 - `exp_est.py`: `sub_0812E0BC(caster, target, 0, 1)` = 95 for blank units
   regardless of target/caster HP and maxHP, RNG seeds 1..8, mode, and
   self-target; 100 at target HP 0. Score = estimate + 1 in every trace.
+
+### 2026-09-03 (late) — In-vivo candidate capture: the score decode meets a real battle
+
+**Goal.** The target-score decode rested on synthetic units; the frozen-RNG
+snowball battle had to show the same fields under real battle state. The
+documented workflow needs mGBA's Lua scripting frontend, which was not
+available on this machine.
+
+**What was built.**
+
+- `tools/dump_candidates.py`: GDB tool that breaks at `sub_080C2940`'s entry
+  and snapshots the candidate arenas (records at `+0x324` counts, 20-byte
+  candidates with the s16 score at `+0x0c`), labelling each hit with its
+  regime (`r2`) and caller signature (`r1`).
+- `tools/capture_candidates.py`: full no-GUI replacement for the Lua replay
+  flow. It freezes `gRngState` (0x030034B0) to `0x12345678`, injects the
+  facing-confirm A-press, then collects sort hits.
+
+**Two stub quirks had to be worked around** (neither is documented in mGBA):
+
+- the GDB stub rejects `m` reads above ~0x200 bytes per packet — arena dumps
+  must be chunked, or reads fail silently and arenas look empty;
+- `P` register writes are silently ignored and `G` writes corrupt ARM state
+  (the stub's `g`/`G` byte layout does not match `P`/`G` semantics), so input
+  injection works by patching the four bytes at `0x0800048A` — the VBlank key
+  poll's invert step (`adds r1, r2, #0; eors r1, r3` at `0x0800048A..0x08000490`,
+  the only ROM code literal of `KEYINPUT`) — to `movs r1, #1; nop` for ~10
+  frames, then restoring the retail bytes.
+
+The key-poll decode is itself a finding: FFTA polls keys inside a
+raw-IRQ-handler scan (the VBlank branch is the 8th of 13 dispatch slots at
+`0x03000F10`, ARM code copied to IWRAM), then `0x08000460` reads `KEYINPUT`
+directly, and the active-high mask is consumed across `0x080004A0`..`0x08000494`
+by several subsystems — patching after the invert injects a synthetic press for
+everything at once.
+
+**Correction to the arena model.** `sub_080C2940`'s mode=1 input list is at
+`arg0 + 0x2968` (literal pool), not `+0x2980` as an earlier note claimed;
+`r3` is a separate zero-initialised output buffer. Both regimes' input lists
+now dump correctly (chunked reads).
+
+**What the capture shows** (`outputs/mgba-snowball/candidates-run-{a,b}.json`):
+
+- mode=1 list: four ability records (`0x279c`, `0x270c`, `0x267c`, `0x25ec`),
+  one valid candidate each, scores **51 / 46 / 61 / 51** — distinct
+  real-ability impact estimates, exactly the `sub_080C2314` semantics.
+- mode=0 list: three records (`0x24cc`, `0x243c`, `0x255c`), scores **76**.
+- All rule slots carry `0x15` (positive damage), priority bytes saturate at
+  100, and the sort's secondary key is saturated on this turn — the primary
+  score is what discriminates.
+- Candidate `+0x00` reads `0x0000` in every record: the "target unit id"
+  attribution is not confirmed by this evidence and stays open.
+- Two runs reproduce byte-identically (RNG seeds, registers, arena bytes) —
+  the replay invariant now holds at the candidate-arena level too.
+
+Docs: `ai-findings.md` gains the in-vivo section; `whole-battle-trace.md`
+gains the no-GUI alternative.
+

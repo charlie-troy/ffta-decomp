@@ -563,8 +563,15 @@ function changed.
    contributions, clamped to the target's HP and max-HP bounds, with rule ids
    (0x15/0x26/9/8/0x51) naming the effect kind. Executed on synthetic units
    (sentinel-buffer out-arg mapping, estimate 95 for blank units, +5 at 0 HP,
-   RNG-independent). Remaining: real-ability magnitudes under full battle
-   state, and verified profile controls for the score and the priority
+   RNG-independent). 2026-09-03 (later): the in-vivo gap is closed —
+   `tools/capture_candidates.py` snapshots the live candidate arenas in the
+   frozen-seed snowball battle over GDB alone (input injected by patching the
+   key poll at `0x0800048A`; the WSL SDL and Windows Qt mGBA builds cannot
+   load Lua scripts). The captured turn shows real-ability scores (51/46/61/51
+   on the mode=1 list, 76 on the mode=0 list), rule code 0x15, priority 100,
+   and two byte-identical replays. Remaining: ability-specific magnitudes
+   under fuller battle state, the meaning of candidate `+0x00` (reads 0 in the
+   capture), and verified profile controls for the score and the priority
    secondary key.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's

@@ -54,6 +54,18 @@ Two fresh runs from `state-facing.ss0` reproduced all registers, RNG values,
 and stack bytes exactly. The four RNG states seen at evaluator entry were
 `0x7E9CA507`, `0xB9CFFC5D`, `0x54D48AA3`, and `0xBB950159`.
 
+### No-GUI alternative (GDB-only, no Lua)
+
+When mGBA's scripting frontend is unavailable (the WSL SDL build has no
+script interface and cannot load a Lua file from the command line),
+`tools/capture_candidates.py` performs the same flow entirely over the GDB
+stub: it freezes the RNG, injects the facing-confirm A-press by briefly
+patching the key-poll at `0x0800048A`, and snapshots the target-candidate
+arenas at `sub_080C2940`. Run it twice and compare — the second run must be
+byte-identical to the first (verified in
+`outputs/mgba-snowball/candidates-run-{a,b}.json`). See the in-vivo section
+of [ai-findings.md](ai-findings.md) for what the captures show.
+
 Validate any repeat pair with:
 
 ```powershell

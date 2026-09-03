@@ -300,6 +300,40 @@ Executed facts (synthetic-unit runs on the emulator harness):
 - ability-specific magnitudes for real ability ids need full battle state and
   are not yet exercised; the formula structure above is what is proven.
 
+#### In-vivo confirmation (frozen-RNG snowball battle)
+
+`tools/capture_candidates.py` closes the synthetic-to-real gap: running the
+frozen-seed battle under mGBA's GDB stub, it breaks at `sub_080C2940`'s entry
+and snapshots both input arenas. The captured turn shows exactly the decoded
+model:
+
+- mode=1 list (`arg0+0x2968`): four ability records (`0x279c`, `0x270c`,
+  `0x267c`, `0x25ec`), each with one valid candidate scoring **51 / 46 / 61 /
+  51** — distinct real-ability impact estimates, not constants.
+- mode=0 list (`arg0+0x5c`): three ability records (`0x24cc`, `0x243c`,
+  `0x255c`), each scoring **76**.
+- every candidate carries rule code `0x15` (positive damage) and priority
+  byte `100`, and the sort's secondary key is saturated at 100 here — the
+  primary score is what would discriminate.
+- candidate `+0x00` reads `0x0000` in all records: on this evidence the
+  "target unit id" attribution is not confirmed; the live meaning of that
+  slot stays open.
+- the entry registers identify the caller: `r1=8, r2=1` (score path) and
+  `r1=0x87, r2=0` (list scan), matching the `0x080C077C`/`0x080C078A` call
+  sites.
+
+Two runs from `state-facing.ss0` with the same frozen seed reproduce the
+arena bytes identically, including RNG seeds and registers — the replay
+invariant of `whole-battle-trace.md` holds at the candidate-arena level.
+Raw captures: `outputs/mgba-snowball/candidates-run-{a,b}.json`.
+
+The tooling is GDB-only because neither the WSL SDL build nor the Windows Qt
+build can load a Lua script from the command line. Two stub quirks the tools
+encode: `m` reads fail above ~0x200 bytes per packet (chunk small), and `P`
+register writes are silently ignored while `G` corrupts ARM state — input is
+therefore injected by patching the four bytes at `0x0800048A` (the VBlank key
+poll's invert step) to force "A held", then restoring the retail bytes.
+
 `sub_080C1EB4` is the filter: over a list of `u16` ability ids it fetches the
 priority byte, runs the `sub_0812F1DC` predicate, and stores `0` back over any
 entry that fails — removing it from the list. It skips the predicate for
