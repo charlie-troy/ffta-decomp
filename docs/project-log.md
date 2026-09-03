@@ -2711,3 +2711,36 @@ Open (STRAT9.2 continues):
 - The candidate score fields (record+0x10 and the byte keys) and their
   producers are still unidentified; the tie-break control only pins ordering
   among exactly equal candidates.
+
+### 2026-09-02 — STRAT9.2 follow-up: caller scan pins the patch's scope
+
+Objective:
+
+- Prove the `deterministic_ties` window is actually reached by retail callers
+  before building more of the score model on top of it.
+
+Completed:
+
+- Whole-ROM BL scan: `sub_080C2940` has exactly two call sites, both in one
+  setup function around `0x080C0700`: `0x080C077C` (`r1=8, r2=1`) and
+  `0x080C078A` (`r1=0x87, r2=0`).
+- The second argument selects between two comparator regimes inside the sort:
+  `mode=1` is the score path (record `+0x10` halfword, then `+0x14` bytes,
+  then the patched tie roll), `mode=0` is a list-scan path whose own
+  `Rand() % 101 <= 49` roll sits at `0x080C2E9E` ahead of the ally-safety
+  checks. Both regimes are live in retail.
+- Disjointness re-proven programmatically: of 216 in-function branch targets,
+  none enter the patched window, and no ROM-wide literal pointer targets it
+  either. The committed patch therefore changes only the `mode=1` tie roll.
+- Docs corrected to state the scope honestly (`ai-strategy-profiles.md`,
+  CLAUDE.md): `deterministic_ties` covers the `mode=1` roll only; the
+  `mode=0` roll at `0x080C2E9E` remains retail. Extending coverage to that
+  second roll is a separate future slice with its own execution proof.
+
+Evidence:
+
+- `python scan_callers.py`-style BL decode: 2 call sites, arg setup shown.
+- Branch-target scan: 0/216 targets inside `0x080C2F7E..0x080C2F94`; 0
+  literal pointers ROM-wide.
+- `validate_ai_strategy.py` still 6/6; strict attribution unchanged (409
+  bytes, zero unattributed).

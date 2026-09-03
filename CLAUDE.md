@@ -104,7 +104,10 @@ Genuinely open, with the reason:
 - **The target-candidate score model is not decoded.** `sub_080C2940` builds
   and sorts 20-byte candidate records before the evaluator runs; the sort's
   tie-break roll is a verified profile control (`deterministic_ties`), but the
-  score fields themselves and their producers remain STRAT9.2 work.
+  score fields themselves and their producers remain STRAT9.2 work. The
+  function has two comparator regimes selected by its second argument
+  (`mode=1` score path vs `mode=0` list path); the control only patches the
+  `mode=1` tie roll — the `mode=0` roll at `0x080C2E9E` stays retail.
 - **Mission fields.** The corrected constant-caller report is exhausted;
   rewards, progression, dispatch rules, fees, type, deadlines, clear
   conditions, clan-skill requirements, cancellation, and hidden reward previews

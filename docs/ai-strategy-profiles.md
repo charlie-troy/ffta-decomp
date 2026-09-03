@@ -129,6 +129,17 @@ The window is reachable only by falling through the comparator's equality
 compare; no branch, jump-table entry, or ROM pointer targets it. Strict mod
 verification attributes its 22 bytes as "AI target tie-break".
 
+**Scope.** `sub_080C2940` runs two comparator regimes, selected by its second
+argument, and the whole-ROM BL scan finds exactly two callers: the
+candidate-sort call at `0x080C077C` (`mode=1`, the score path this control
+patches) and the sibling call at `0x080C078A` (`mode=0`), whose comparator
+resolves ties with its own `Rand() % 101 <= 49` roll at `0x080C2E9E` before
+the ally-safety checks. `deterministic_ties` does not touch that second roll,
+so the `mode=0` regime keeps retail randomness. The regimes are disjoint
+(nothing in the `mode=0` block branches into the patched window), so the
+patch is safe; extending coverage to the second roll is tracked as its own
+verified slice.
+
 ## Shipped profiles
 
 - `aggressive.json` establishes a low general baseline, strongly favors
