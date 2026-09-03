@@ -2891,3 +2891,54 @@ now dump correctly (chunked reads).
 Docs: `ai-findings.md` gains the in-vivo section; `whole-battle-trace.md`
 gains the no-GUI alternative.
 
+
+### 2026-09-03 (late) — Live-battle RNG measurement: deterministic_ties proven end-to-end
+
+**Goal.** The tie-break patch was verified on synthetic executions; the
+question was whether it holds in a real battle, and what RNG the sort still
+consumes.
+
+**Method.** `tools/measure_sort_rng.py`: catch the CT tick
+(`sub_0809DF7C`, r0 = battle struct at `0x020159E4`, unit count 9), teleport
+the four player units adjacent to the enemy actor through the battle-object
+records (the tile mirror the per-frame sync at `0x0809F89E` copies over
+unit `+0xF6..+0xF8`; unit-struct edits are clobbered), set the enemy's CT to
+1000, break at the mode=1 sort entry, optionally engineer an exact tie
+(count 3, cand1 tied with cand0), then break at the caller's return
+(`0x080C0782`) and count exact LCG steps between `gRngState` snapshots.
+
+**Results** (frozen seed `0x12345678`):
+
+| run | draws inside one sort call | meaning |
+|---|---|---|
+| retail, no tie | 1 | baseline roll at `0x080C29C0` |
+| retail, tie | 3 | baseline + 2: the tie window runs twice |
+| patched, tie | 1 | tie costs nothing; exit state == retail control |
+
+The patched tie run's exit RNG state equals the retail control run's exactly
+(385735745 in both runs), so
+`deterministic_ties` provably removes **all** tie-related randomness in a
+live battle, not just in the synthetic harness.
+
+**New decode.** The two remaining `Rand()` sites in `sub_080C2940`:
+
+- `0x080C29C0` — ability-selection roll (`Rand() % 101 <= 50` gate, then a
+  range scan over arg0-relative ability slots). Upstream of target ordering;
+  it picked which of the actor's abilities this sort call evaluates.
+- `0x080C2C68` — low-HP weighted roll: when a unit's current HP
+  (`sub_080C7EA4(unit, 0x13)`) exceeds a threshold, a `Rand() % n` value
+  feeds the BST insert of that ability record.
+
+Both are future profile-control candidates (e.g. a "deterministic_action"
+control that pins ability selection).
+
+**Correction.** The roadmap's earlier "no RNG draw remains in
+`sub_080C2940`" was too strong: target ordering is fully deterministic under
+the patch, but the ability-selection roll remains. Docs updated.
+
+**Why the tie window fires twice.** The selection sort compares the tied
+challenger against the incumbent, and after a swap the new incumbent is
+compared again — the engineered tie at the head of the list therefore enters
+the window twice. Both entries consume one `Rand()` each on retail; the
+patch's branch-to-keep costs neither.
+

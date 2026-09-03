@@ -7,11 +7,13 @@ Injection path (no emulator scripting frontend available):
   3. Collect sub_080C2940 breakpoint hits and snapshot the candidate
      arenas with tools/dump_candidates.snapshot.
 """
+import argparse
 import json
+import os
 import sys
 import time
 
-sys.path.insert(0, "tools")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from trace_mgba import Gdb  # noqa: E402
 from dump_candidates import BREAK_AT, snapshot  # noqa: E402
 
@@ -20,12 +22,20 @@ POLL_PATCH = 0x0800048A
 PATCH_LEN = 4
 PATCH_BYTES = "0121c046"   # movs r1, #1 ; nop  (forces A held)
 PATCH_ORIG = "811c5940"    # adds r1, r2, #0 ; eors r1, r3 (retail)
-OUT = "outputs/mgba-snowball/candidates.json"
-MAX_HITS = 6
 
 
-def main():
-    gdb = Gdb("127.0.0.1", 2345, timeout=20)
+def main(argv=None):
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument("--out", default="outputs/mgba-snowball/candidates.json")
+    p.add_argument("--hits", type=int, default=6,
+                   help="stop after this many sort hits")
+    p.add_argument("--idle-timeout", type=float, default=90.0,
+                   help="seconds to wait between hits before giving up")
+    p.add_argument("--host", default="127.0.0.1")
+    p.add_argument("--port", type=int, default=2345)
+    args = p.parse_args(argv)
+
+    gdb = Gdb(args.host, args.port, timeout=20)
     gdb.send("?")
 
     print(f"seed before freeze: {gdb.read_mem(RNG, 4).hex()}")
@@ -46,9 +56,9 @@ def main():
 
     hits = []
     pending = stop  # the interrupt may already have delivered a sort stop
-    gdb.sock.settimeout(90)
+    gdb.sock.settimeout(args.idle_timeout)
     try:
-        while len(hits) < MAX_HITS:
+        while len(hits) < args.hits:
             if pending is None:
                 gdb.cont()
                 pending = gdb._read_packet()
@@ -59,7 +69,7 @@ def main():
                 raise RuntimeError("register read failed")
             if regs[15] == BREAK_AT:
                 hits.append(snapshot(gdb, regs, len(hits) + 1))
-                with open(OUT, "w", newline="\n") as fh:
+                with open(args.out, "w", newline="\n") as fh:
                     json.dump({"mode": "candidates", "address": BREAK_AT,
                                "hits": hits}, fh, indent=1)
             pending = None
@@ -73,7 +83,7 @@ def main():
             pass
         gdb.close()
 
-    print(f"\nwrote {OUT} ({len(hits)} hit(s))")
+    print(f"\nwrote {args.out} ({len(hits)} hit(s))")
     return 0 if hits else 1
 
 

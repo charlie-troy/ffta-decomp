@@ -556,7 +556,8 @@ function changed.
    tie-break roll (0x080C2F7E..0x080C2F94, swap when `Rand() % 101 <= 49`) is
    decoded and exposed as the verified `deterministic_ties` profile control,
    which also pins the `mode=0` order-gate roll (0x080C2E9E..0x080C2EB6) —
-   no RNG draw remains in `sub_080C2940`.
+   no target-ordering draw remains in `sub_080C2940` (the remaining
+   ability-selection roll at 0x080C29C0 is a separate, upstream choice).
    2026-09-03: the score model is decoded — `sub_080C2314` writes each
    candidate's s16 impact score at `+0x0c` (the sort's primary key): a damage/
    heal estimate from `sub_0812E0BC`/`sub_08130200` plus per-element status
@@ -570,9 +571,15 @@ function changed.
    load Lua scripts). The captured turn shows real-ability scores (51/46/61/51
    on the mode=1 list, 76 on the mode=0 list), rule code 0x15, priority 100,
    and two byte-identical replays. Remaining: ability-specific magnitudes
-   under fuller battle state, the meaning of candidate `+0x00` (reads 0 in the
-   capture), and verified profile controls for the score and the priority
-   secondary key.
+   under fuller battle state, the meaning of candidate `+0x00` (reads 0 in   the capture), and verified profile controls for the score and the priority
+   secondary key. 2026-09-03 (later still): the in-vivo tie experiment
+   (`tools/measure_sort_rng.py`) proves the patch end-to-end in a live
+   battle — an engineered score tie costs retail +2 LCG steps (the tie window
+   executes twice) while the patched ROM's tie run consumes exactly the
+   control run's single draw, with an identical exit RNG state. The capture
+   also identified the ability-selection roll (0x080C29C0) and a low-HP
+   weighted roll (0x080C2C68) as the sort's remaining RNG sites; both are
+   future profile-control candidates.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.

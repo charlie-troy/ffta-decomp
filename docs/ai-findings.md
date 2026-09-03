@@ -209,6 +209,42 @@ Two consequences worth knowing:
 - **Removing the randomness is a mod in itself.** Making the AI play its best
   option every time is a plausible difficulty mode and needs no new logic.
 
+#### RNG sites inside the target sort, measured in a live battle
+
+`tools/measure_sort_rng.py` breaks at `sub_080C2940`'s entry in the frozen-seed
+snowball battle, optionally engineers an exact score tie in the live arena
+(count 3, cand1 tied with cand0), breaks at the caller's return
+(`0x080C0782`), and counts exact LCG steps between the two `gRngState`
+values. Because the LCG is a known 32-bit recurrence, the draw count is exact,
+not statistical. Results:
+
+| run | draws inside one sort call | meaning |
+|---|---|---|
+| retail, no tie | 1 | baseline roll at `0x080C29C0` |
+| retail, tie | 3 | baseline + 2: the tie window runs twice |
+| patched, tie | 1 | tie costs nothing; exit state == retail control |
+
+The sites, statically:
+
+- `0x080C29C0` — `Rand() % 101 <= 50` gate inside the `r1==8` block. When it
+  passes, a range scan over arg0-relative ability slots picks a random
+  eligible one; this is the **ability-selection roll** (which action the actor
+  considers), upstream of target ordering. It fires once per sort call in this
+  battle and is the baseline draw.
+- `0x080C2C68` — a `Rand() % n` roll taken when a candidate's current HP
+  exceeds a threshold (`sub_080C7EA4(unit, 0x13)` vs the unit's value),
+  feeding the BST insert of that ability record. This is a **low-HP weighted
+  roll** inside the record-selection loop, not the comparator.
+- `0x080C2E9E` — the mode=0 order gate (pinned by `deterministic_ties`).
+- `0x080C2F7E` — the mode=1 tie roll (pinned by `deterministic_ties`). The
+  live measurement shows it executing **twice** per engineered tie (+2 draws
+  vs control), consistent with the selection sort comparing the tied pair
+  twice; the patched ROM removes both.
+
+So `deterministic_ties` removes every target-*ordering* draw, and in the
+measured battle leaves exactly the ability-selection roll — the patched tie
+run's exit RNG state equals the retail control run's, byte for byte.
+
 `0x08142950` is libgcc's signed modulo (`__modsi3`), not game code, and should come from
 building libgcc rather than being decompiled. It is the same category as
 `sub_08142A94` (`__negdi2`).
