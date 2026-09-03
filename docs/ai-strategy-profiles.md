@@ -135,16 +135,21 @@ verification attributes its 22 bytes as "AI target tie-break".
 
 **Scope.** `sub_080C2940` runs two comparator regimes, selected by its second
 argument, and the whole-ROM BL scan finds exactly two callers: the
-candidate-sort call at `0x080C077C` (`mode=1`) and the sibling call at
-`0x080C078A` (`mode=0`). Each regime owns exactly one RNG draw, and
-`deterministic_ties` pins both: the mode=1 full-tie roll and the mode=0
-probabilistic order gate at `0x080C2E9E`, which is reached when the
-challenger's score is negative and three exemption scans (KO, healing,
-Heaver effects) find nothing — it decides whether the swap is even considered
-before the ally-safety checks. The regimes are disjoint (nothing in the
-`mode=0` block branches into the mode=1 window), and both windows are reached
-only by falling through their preceding compares, so the same-size patches
-are safe.
+candidate-sort call at `0x080C077C` (`mode=1`, argument 8) and the sibling
+call at `0x080C078A` (`mode=0`, argument 0x87 — the slot walk is skipped and
+the record walk dispatches straight to its case-7 regime, which owns the
+HP-weighted enumeration roll: healthy targets get the random BST key
+`Rand() % 0x201 + 0x10000`, low-HP targets their current HP; a live battle
+consumes one roll per healthy-target record, 3 in the traced fight).
+`deterministic_ties` pins three sites: the mode=1 full-tie roll, the mode=0
+probabilistic order gate at `0x080C2E9E` (reached when the challenger's score
+is negative and three exemption scans — KO, healing, Heaver effects — find
+nothing; it decides whether the swap is even considered before the
+ally-safety checks), and the mode=0 enumeration branch at `0x080C2C58`, so
+mode=0 full ties break by ascending current HP instead of a random
+enumeration order. The regimes are disjoint (nothing in the `mode=0` block
+branches into the mode=1 window), and all windows are reached only by
+falling through their preceding compares, so the same-size patches are safe.
 
 With this control shipped, no RNG draw remains anywhere in
 `sub_080C2940`.
@@ -219,3 +224,9 @@ patched window ever touches the RNG.
 ```bash
 python tools/validate_ai_strategy.py baserom.gba
 ```
+
+A live census (frozen-seed snowball battle, exact LCG-step counting)
+measures the retail sort calls at 1 draw (mode=1) and 3 draws (mode=0, one
+HP-weighted enumeration roll per healthy-target record), and every patched
+build at 0 — with an engineered three-candidate tie costing retail 3 draws
+in the mode=1 call and 0 under the patches.

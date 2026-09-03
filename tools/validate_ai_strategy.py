@@ -20,7 +20,7 @@ from unicorn import UC_HOOK_CODE
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROFILES = (
-    ("aggressive.json", 433),
+    ("aggressive.json", 435),
     ("deterministic-actions.json", 460),
 )
 JOB_PRIORITY_GETTER = 0x0813413C
@@ -73,6 +73,7 @@ def main(argv):
     allowed.update(offset for offset, _value in find_gates(rom))
     allowed.update(range(ai_targeting.PATCH_OFFSET, ai_targeting.PATCH_END))
     allowed.update(range(ai_targeting.GATE_OFFSET, ai_targeting.GATE_END))
+    allowed.update(range(ai_targeting.ENUM_OFFSET, ai_targeting.ENUM_END))
     for offset, end, _retail, _patch, _label in ai_action.SITES:
         allowed.update(range(offset, end))
     surface_ok = True
@@ -287,8 +288,67 @@ def main(argv):
           f"{'PASS' if walk_ok else 'FAIL'}")
     ok &= walk_ok
 
+    print("9. mode=0 census: every RNG draw in a live-measured call is patched")
+    # Live-measured draw counts per sort call (tools/measure_sort_rng.py and
+    # the mode=0 run in the snowball battle, frozen seed): retail mode=1 = 1,
+    # retail mode=0 = 3 (one HP-weighted enumeration roll per healthy-target
+    # record), retail mode=0 with an engineered tie = +2 more, all patched
+    # builds = 0. Here the three patch windows are executed retail over seeds
+    # and the RNG must advance by the measured amounts, then advance never
+    # under the patched profile ROMs.
+    enum_entry = 0x08000000 + ai_targeting.ENUM_OFFSET
+    enum_skip = 0x080C2C5A       # bgt not taken: direct HP-key insert
+    enum_roll = 0x080C2C68       # bgt taken: random-key roll
+    with tempfile.TemporaryDirectory(prefix="ffta-ai-strategy-") as temp:
+        gbas = {}
+        for label, data in (("retail", rom), ("profile", aggressive)):
+            path = os.path.join(temp, f"enum-{label}.gba")
+            with open(path, "wb") as handle:
+                handle.write(data)
+            gbas[label] = Gba(path)
+
+        def enum_outcome(g, seed, healthy):
+            # r5 points at a record whose unit pointer (record+0) reads UNIT.
+            rec = 0x02006100
+            g.reset_ram()
+            g.write32(RNG_STATE, seed)
+            g.write32(rec, UNIT)
+            # stat 0x13 (current HP) / 0x14 (max HP) live at UNIT+0x18/0x1A.
+            g.uc.mem_write(UNIT + 0x18, (200 if healthy else 10).to_bytes(2, "little"))
+            g.uc.mem_write(UNIT + 0x1A, (300).to_bytes(2, "little"))
+            entry = enum_entry if healthy else enum_entry
+            landed = []
+
+            def hook(uc, address, size, _):
+                if address in (enum_skip, enum_roll):
+                    landed.append(address)
+                    uc.emu_stop()
+
+            h = g.uc.hook_add(UC_HOOK_CODE, hook, begin=enum_skip, end=enum_roll)
+            try:
+                g.run_range(entry, STOP, {"r5": rec})
+            finally:
+                g.uc.hook_del(h)
+            return (landed[0] if landed else None), g.read32(RNG_STATE)
+
+        retail_rolled = 0
+        profile_rolled = 0
+        profile_rng_ok = True
+        for seed in seeds:
+            exit_r, _ = enum_outcome(gbas["retail"], seed, True)
+            retail_rolled += exit_r == enum_roll
+            exit_r, state = enum_outcome(gbas["profile"], seed, True)
+            profile_rolled += exit_r == enum_roll
+            profile_rng_ok &= state == seed
+        enum_ok = (400 <= retail_rolled <= 500 and profile_rolled == 0
+                   and profile_rng_ok)
+    print(f"   retail enumeration roll taken: {retail_rolled}/500 (healthy unit)")
+    print(f"   patched enumeration: {profile_rolled}/500 rolls, RNG untouched -> "
+          f"{'PASS' if enum_ok else 'FAIL'}")
+    ok &= enum_ok
+
     print()
-    print("PASS: 8/8 AI strategy checks" if ok else "FAIL: AI strategy validation")
+    print("PASS: 9/9 AI strategy checks" if ok else "FAIL: AI strategy validation")
     return 0 if ok else 1
 
 

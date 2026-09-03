@@ -42,6 +42,7 @@ FUNCTIONS = json.load(open(os.path.join(REPO, "data", "functions.json")))["funct
 STRATEGY_REGIONS = {
     (ai_targeting.GATE_OFFSET, ai_targeting.GATE_END): "AI target order gate",
     (ai_targeting.PATCH_OFFSET, ai_targeting.PATCH_END): "AI target tie-break",
+    (ai_targeting.ENUM_OFFSET, ai_targeting.ENUM_END): "AI target enumeration order",
     (ai_action.WALK_OFFSET, ai_action.WALK_END): "AI action walk roll",
     (ai_action.KIND1_OFFSET, ai_action.KIND1_END): "AI kind-1 behaviour coin",
     (ai_action.KIND2_OFFSET, ai_action.KIND2_END): "AI kind-2 behaviour coin",

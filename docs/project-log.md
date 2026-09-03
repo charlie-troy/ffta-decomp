@@ -2992,3 +2992,17 @@ slot kind reaches the weighted roll's regime and flag 0x87's producer is
 open. The roll therefore stays uncontrolled for now; documented in
 ai-findings.md and the roadmap.
 
+
+### 2026-09-03 (latest) - Case 7 is the mode=0 regime; enumeration roll pinned
+
+The mode=0 caller passes r1=0x87 directly (skipping the slot walk), so the
+record walk's case 7 IS the mode=0 regime and the HP-weighted roll is its
+target-enumeration randomizer. A live census: one mode=0 sort call consumes
+exactly 3 draws (one roll per healthy-target record; keys Rand() % 0x201 +
+0x10000 vs current HP). deterministic_ties therefore gains a third site: the
+2-byte enumeration branch at 0x080C2C58 is NOPed so every target uses the HP
+key and mode=0 full ties break by ascending current HP. aggressive.json
+diff 433 -> 435; validate_ai_strategy 9/9 (new check executes the
+enumeration window: retail 500/500 rolls, patched 0/500, RNG untouched);
+strict attribution zero unattributed.
+

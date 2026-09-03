@@ -265,10 +265,16 @@ set 0x80/0x81/0x82, kind 7 sets flag 0 with no draw, the others set constants
 (0x3, 0x4, 0x5, 0) — and the record walk then dispatches `flag & 0x7f`
 through the second table at 0x080C2AC4. Case 0 (flag 0x80 or 0) is the
 standard record walk the candidate arena captures; the HP-weighted roll sits
-in case 7. **Open**: no slot kind reaches case 7 (flag 0x87 comes from
-elsewhere — forcing the live actor's slot kind byte to 7 yields flag 0, case
-0, a byte-identical arena, and zero draws, confirming the mapping), so the
-roll's activation regime and callers remain undecoded.
+in case 7 — and case 7 is the **mode=0 regime**: its caller (`0x080C078A`)
+passes `r1=0x87` directly, skipping the slot walk (`cmp r1, #8; bne` at the
+top) and dispatching straight into the weighted enumeration. A live census
+confirms it: one mode=0 call in the snowball battle consumes exactly 3 draws
+(one enumeration roll per healthy-target record), while forcing the mode=1
+actor's slot kind byte to 7 still yields flag 0 (case 0, byte-identical
+arena, zero draws) because the walk re-derives the flag from the kind
+handlers. `deterministic_ties` NOPs the enumeration branch (0x080C2C58), so
+every target uses the HP key and mode=0 full ties break by ascending current
+HP instead of a random enumeration order.
 
 So `deterministic_ties` removes every target-*ordering* draw, and the
 `action_selection: first` control (`tools/ai_action.py`) removes the

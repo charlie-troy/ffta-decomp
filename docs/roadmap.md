@@ -587,10 +587,12 @@ function changed.
    RNG untouched, flag 0x80 only), and the live battle measures 0 draws,
    or 0 with an engineered tie when composed with `deterministic_ties`.
    Remaining: the meaning of candidate `+0x00`, and score/priority
-   secondary-key controls. The HP-weighted roll (0x080C2C68) is decoded —
-   healthy targets (current HP > maxHP/3) get insertion key `Rand() % 0x201
-   + 0x10000` in the record-walk's case-7 regime — but no slot kind reaches
-   that regime (flag 0x87's source is open), so it has no control yet.
+   secondary-key controls. The HP-weighted roll (0x080C2C68) is decoded and
+   pinned: it is the mode=0 regime's own enumeration (the caller passes
+   r1=0x87, skipping the slot walk; healthy targets get BST key
+   Rand() % 0x201 + 0x10000, low-HP targets their current HP), a live census
+   counts 3 draws for 3 healthy-target records, and `deterministic_ties`
+   NOPs the random-key branch so ties break by ascending current HP.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.
