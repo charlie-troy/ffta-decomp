@@ -120,10 +120,13 @@ Genuinely open, with the reason:
 
 ## Before you commit
 
+Refuted approaches live in `docs/dead-ends.md`; check it before re-deriving a
+hypothesis, and add to it when one is refuted.
+
 ```bash
 python tools/validate_ai.py "<rom>"      # must stay 10/10
 python tools/validate_missions.py "<rom>" # must stay 13/13 when missions change
-python tools/validate_maps.py "<rom>"     # must stay 16/16 when maps change
+python tools/validate_maps.py "<rom>"     # must stay 17/17 when maps change
 python tools/validate_all.py "<rom>"      # complete local release gate
 ```
 

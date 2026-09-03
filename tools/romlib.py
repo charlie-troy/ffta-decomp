@@ -4,6 +4,9 @@ Function discovery works from call sites: every Thumb BL in the ROM is resolved
 to its target, and targets reached from several places that also decode cleanly
 as ARMv4T are real functions. Scanning linearly for `push {..., lr}` instead
 finds mostly graphics data and is how ROM maps end up full of ghosts.
+
+Mostly game-generic (GBA base address and scan bounds are parameters, not
+FFTA facts); reusable in other GBA projects with defaults overridden.
 """
 import collections
 

@@ -20,6 +20,19 @@ of 2026-08-31), and `make rom` reproduced the
 expected 16 MB ROM SHA1. The documentation inconsistencies listed below were
 reconciled in the same batch.
 
+## Task queue — pick the top unchecked task
+
+Sessions (and autonomous loops) resume here: take the first `[ ]` from the
+top unless something explicitly supersedes it.
+
+- [ ] MAP9.1 — Close the visual residue in the map catalog: a handful of
+  composite maps show thin seams between 16px metatile cells.
+- [ ] MAP9.2 — Reader-trace the arrangement metatile entry table: find the
+  code that indexes it from a placement id (semantics are visually verified
+  only; D-002).
+- [ ] MAP9.3 — Pin the metatile entry bits in `validate_maps.py` once the
+  reader is known, and name bit 15 (provably not an "empty" marker).
+
 ---
 
 ## Phase 0 — Reconcile the docs, re-verify the baseline (half a day)

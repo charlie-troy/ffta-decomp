@@ -606,6 +606,16 @@ status and backlog tables are living sections and should be kept current.
   terminate traversal. Generated CFG evidence, not address adjacency, defines
   the reconstruction boundary.
 
+### D-043 — Keep the GBA-generic tools inside the repo, marked not extracted
+
+- `tools/thumb.py`, `tools/emulate.py`, and `tools/romlib.py` are game-generic
+  (strict ARMv4T decoding, Unicorn harness, function discovery) and a
+  re-skill-style split into a reusable package was evaluated.
+- Decision: keep them in place. Around thirty tools import them through the
+  flat `sys.path` idiom, so an extraction would churn every importer, and no
+  second GBA project exists to consume the package. They carry docstring
+  notes marking what is generic instead; revisit if a second target appears.
+
 ## Risks and controls
 
 | Risk | Impact | Control |
@@ -617,6 +627,36 @@ status and backlog tables are living sections and should be kept current.
 | Live trace is generalized beyond its scope | AI claims become overstated | State the exact mission/turn/path covered by each trace |
 
 ## Session log
+
+### 2026-09-02 — Map asset catalog and palette type 0x00
+
+Objective:
+
+- Give the map data a visual validation loop: render every decoded asset to a
+  browsable catalog so decode hypotheses are checked against the actual
+  pixels, not just round-trip byte equality.
+
+Completed:
+
+- Added `tools/build_catalog.py` (+ `catalog_template.html`): renders all 162
+  maps, 50 graphics streams, 127 palettes, and 28 animations to gitignored
+  `outputs/`, with `--maps N-M` spot runs and an `--embedded` single-file
+  catalog for sharing. The no-ROM-data rule is honored (nothing generated is
+  committed).
+- The catalog immediately exposed an undocumented fourth palette wrapper:
+  type `0x00` (uncompressed, u24 size, raw BGR555; maps 5, 54, 56 — each ends
+  exactly on the next block's dispatch header). `resolve_block` now decodes it
+  and a new check pins it; the maps gate is 17/17.
+- Traced arrangement placement ids to the u16 metatile entry table at
+  `tile_format_offset` (length exactly covers every observed id; bits 0–9
+  first tile of a 2×2 block, 12–14 palette bank). Visually verified, not yet
+  reader-verified (D-002); documented in `docs/map-data.md` with the open
+  follow-ups MAP9.2/MAP9.3 in the roadmap.
+- Fixed the catalog's 4bpp renderer (8bpp-style row stride dropped half of
+  every pixel row); the failure is DE-010 in `docs/dead-ends.md`.
+- Added `docs/dead-ends.md` (structured refuted-hypothesis log), a
+  machine-checkable task queue to this roadmap, and D-043 (generic-tool
+  split evaluated and rejected).
 
 ### 2026-09-02 — Declarative auto-battle strategy profiles
 

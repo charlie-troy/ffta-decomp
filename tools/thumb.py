@@ -5,6 +5,9 @@ that the GBA's ARM7TDMI cannot execute. Decoding data as code and getting
 plausible-looking output is the main failure mode when mapping a ROM, so
 function discovery uses this strict classifier instead and leaves capstone
 for display only.
+
+Game-generic: no FFTA constants or table addresses; reusable in any GBA
+ARMv4T project as-is.
 """
 
 # instruction classes

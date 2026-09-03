@@ -318,7 +318,28 @@ def main(argv=None):
     if not ok:
         failures.append("animation export")
 
-    print(f"\n{16 - len(failures)}/16 map checks passed")
+    palette_types = {}
+    palette_sizes_ok = True
+    for map_id in range(COUNT):
+        meta = resolve_block(rom, map_id, 0x0C)
+        kind = rom[meta["offset"]]
+        palette_types[kind] = palette_types.get(kind, 0) + 1
+        palette_sizes_ok &= len(meta["raw"]) % 32 == 0
+    palette5 = resolve_block(rom, 5, 0x0C)
+    palette54 = resolve_block(rom, 54, 0x0C)
+    palette56 = resolve_block(rom, 56, 0x0C)
+    ends_on_dispatch = all(
+        rom[meta["offset"] + 4 + len(meta["raw"])] == 0x11
+        for meta in (palette5, palette54, palette56))
+    ok = (palette_types == {0x10: 159, 0x00: 3} and palette_sizes_ok and
+          palette54["raw"] == palette56["raw"] and ends_on_dispatch)
+    print(f"17. palettes: {'OK' if ok else 'FAIL'} "
+          f"(162 maps decode; wrappers {palette_types}; "
+          f"three raw blocks end on the next dispatch header)")
+    if not ok:
+        failures.append("palettes")
+
+    print(f"\n{17 - len(failures)}/17 map checks passed")
     return 1 if failures else 0
 
 

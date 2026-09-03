@@ -20,6 +20,17 @@ tie-break policy in one guarded, previewable configuration.
 > verifies its SHA1 and extracts what it needs at build time. `.gitignore`
 > excludes `*.gba` and `*.bin`; keep it that way.
 
+## Project site
+
+`index.html` is a dependency-free GitHub Pages landing page for this project,
+styled after FFTA's storybook menu (night-sky title screen, parchment book
+panels, gold ornaments) with hero, status stats, the no-compiler modding
+surface, validation gates, and a docs index. The repo is public, so it deploys
+with the plain free Pages source: Settings → Pages → **Deploy from a branch** →
+`master` / `/root` → Save — no build step; the first deploy takes a minute or
+two, after which the site is live at `https://charlie-troy.github.io/ffta-decomp/`.
+It ships no ROM-derived content.
+
 ---
 
 ## What is known about the AI

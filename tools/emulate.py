@@ -11,6 +11,9 @@ and individual functions are called with chosen arguments.
     gba = Gba(rom_path)
     gba.write32(0x030034B0, 12345)          # seed the RNG
     r = gba.call(0x0812F1DC, [60])          # returns r0
+
+Game-generic: knows the GBA memory map, nothing about FFTA's data; reusable
+in any GBA project as-is.
 """
 import struct
 

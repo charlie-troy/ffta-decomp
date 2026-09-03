@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FFTA map asset catalog</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #16181d; --panel: #1f232b; --panel2: #262b35; --line: #343b48;
+    --text: #d8dee9; --dim: #8a93a6; --accent: #6cb2ff; --warn: #e8b84b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 14px/1.45 system-ui, sans-serif;
+  }
+  header {
+    padding: 14px 20px; border-bottom: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline;
+    position: sticky; top: 0; background: var(--bg); z-index: 5;
+  }
+  header h1 { font-size: 17px; margin: 0; }
+  header .meta { color: var(--dim); font-size: 12px; }
+  header .meta.bad { color: var(--warn); }
+  nav {
+    display: flex; gap: 6px; padding: 10px 20px; border-bottom: 1px solid var(--line);
+    flex-wrap: wrap; align-items: center;
+  }
+  nav button {
+    background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    padding: 5px 12px; border-radius: 6px; cursor: pointer; font: inherit;
+  }
+  nav button.active { border-color: var(--accent); color: var(--accent); }
+  nav input[type=search] {
+    background: var(--panel); border: 1px solid var(--line); color: var(--text);
+    padding: 5px 10px; border-radius: 6px; font: inherit; width: 200px;
+  }
+  nav .count { color: var(--dim); font-size: 12px; }
+  .notice {
+    margin: 12px 20px 0; padding: 10px 14px; border: 1px solid var(--warn);
+    border-radius: 6px; color: var(--warn); font-size: 12.5px; max-width: 900px;
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 14px; padding: 16px 20px 40px;
+  }
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 8px; padding: 10px; cursor: pointer;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card h3 { margin: 0 0 6px; font-size: 13.5px; }
+  .card .thumb {
+    width: 128px; height: 256px; object-fit: contain; display: block;
+    margin: 0 auto 8px; background:
+      repeating-conic-gradient(#20242c 0% 25%, #181b21 0% 50%) 0 0/16px 16px;
+    image-rendering: pixelated; border-radius: 4px;
+  }
+  .card .facts { color: var(--dim); font-size: 11.5px; display: grid; gap: 2px; }
+  .card .facts b { color: var(--text); font-weight: 600; }
+  .card img.inline { image-rendering: pixelated; max-width: 100%; }
+  .chip {
+    display: inline-block; background: var(--panel2); border: 1px solid var(--line);
+    border-radius: 4px; padding: 0 6px; margin: 1px; font-size: 11px;
+  }
+  dialog {
+    background: var(--panel); color: var(--text); border: 1px solid var(--line);
+    border-radius: 10px; max-width: min(980px, 94vw); max-height: 90vh;
+    padding: 18px;
+  }
+  dialog::backdrop { background: rgba(0,0,0,.6); }
+  dialog h2 { margin: 0 0 4px; font-size: 16px; }
+  dialog .sub { color: var(--dim); font-size: 12px; margin-bottom: 12px; }
+  dialog .cols { display: flex; gap: 20px; flex-wrap: wrap; }
+  dialog .col { flex: 1 1 280px; min-width: 240px; }
+  dialog h4 { margin: 14px 0 6px; font-size: 12.5px; color: var(--accent);
+    text-transform: uppercase; letter-spacing: .04em; }
+  dialog table { border-collapse: collapse; font-size: 12.5px; width: 100%; }
+  dialog td, dialog th { border: 1px solid var(--line); padding: 3px 8px;
+    text-align: left; }
+  dialog th { color: var(--dim); font-weight: 600; }
+  dialog img.big { image-rendering: pixelated; max-width: 100%;
+    background:
+      repeating-conic-gradient(#20242c 0% 25%, #181b21 0% 50%) 0 0/16px 16px;
+    border-radius: 4px; }
+  dialog .thumbs { display: flex; gap: 10px; flex-wrap: wrap; }
+  dialog .thumbs figure { margin: 0; text-align: center; }
+  dialog .thumbs figcaption { font-size: 11px; color: var(--dim); }
+  dialog .anim-strip { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; }
+  dialog .anim-strip figure { margin: 0; text-align: center; }
+  dialog .anim-strip img { image-rendering: pixelated; width: 64px; }
+  .error { color: var(--warn); padding: 30px 20px; font-size: 15px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>FFTA map asset catalog</h1>
+  <span class="meta" id="meta"></span>
+</header>
+<nav>
+  <button data-view="maps" class="active">Maps</button>
+  <button data-view="graphics">Graphics streams</button>
+  <button data-view="palettes">Palettes</button>
+  <button data-view="animations">Animations</button>
+  <input type="search" id="q" placeholder="filter (id, address, count&hellip;)">
+  <span class="count" id="count"></span>
+</nav>
+<div class="notice" id="notice"></div>
+<main id="main"></main>
+<dialog id="detail"></dialog>
+<script>
+"use strict";
+const $ = (s, el) => (el || document).querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const cat = { data: null, view: "maps", query: "" };
+
+function facts(pairs) {
+  return "<div class=facts>" + pairs.map(([k, v]) =>
+    "<span>" + esc(k) + " <b>" + esc(v) + "</b></span>").join("") + "</div>";
+}
+
+function cards(items, render) {
+  const filtered = items.filter(it => {
+    if (!cat.query) return true;
+    const hay = (it._search || "").toLowerCase();
+    return cat.query.toLowerCase().split(/\s+/).every(t => hay.includes(t));
+  });
+  $("#count").textContent = filtered.length + " of " + items.length;
+  $("#main").innerHTML = "<div class=grid>" + filtered.map(render).join("") +
+    "</div>";
+  for (const el of $("#main").querySelectorAll(".card"))
+    el.addEventListener("click", () => renderDetail(el.dataset.key));
+}
+
+function renderMaps() {
+  cards(cat.data.maps, m => {
+    const anim = m.animation ? "yes" : "no";
+    return "<div class=card data-key=" + m.id + " data-view=maps " +
+      "_search=\"" + esc("map " + m.id + " graphics " + m.graphics_source +
+        " placements " + m.placements + " anim " + anim) + "\">" +
+      "<h3>map " + m.id + "</h3>" +
+      "<img class=thumb loading=lazy src=" + esc(m.thumbnail) + ">" +
+      facts([["source map", m.source_map], ["tiles", m.tile_count],
+             ["placements", m.placements], ["clipping", m.clipping_entries],
+             ["terrain cells", m.terrain_cells]]) +
+      "</div>";
+  });
+}
+
+function renderGraphics() {
+  cards(cat.data.graphics_streams, g =>
+    "<div class=card data-key=" + esc(g.source_address) +
+    " data-view=graphics _search=\"" + esc(g.source_address + " tiles " +
+      g.tile_count) + "\">" +
+    "<h3>" + esc(g.source_address) + "</h3>" +
+    "<img class=inline loading=lazy src=" + esc(g.file) + ">" +
+    facts([["tiles", g.tile_count],
+           ["decompressed", g.decompressed_bytes + " B"],
+           ["compressed", g.compressed_bytes + " B"],
+           ["wrapper", "0x" + g.wrapper_type.toString(16).padStart(2, "0")],
+           ["shared by", g.maps.join(", ")]]) +
+    "</div>");
+}
+
+function renderPalettes() {
+  cards(cat.data.palettes, p =>
+    "<div class=card data-key=" + esc(p.address) +
+    " data-view=palettes _search=\"" + esc(p.address + " banks " +
+      p.bank_count) + "\">" +
+    "<h3>" + esc(p.address) + "</h3>" +
+    "<img class=inline loading=lazy src=" + esc(p.file) + ">" +
+    facts([["banks", p.bank_count], ["shared by", p.maps.join(", ")]]) +
+    "</div>");
+}
+
+function renderAnimations() {
+  cards(cat.data.animations, a => {
+    const first = a.frames[0];
+    return "<div class=card data-key=" + esc(a.metadata_address) +
+      " data-view=animations _search=\"" + esc("animation " +
+      a.metadata_address + " frames " + a.frame_count) + "\">" +
+      "<h3>" + esc(a.metadata_address) + "</h3>" +
+      "<img class=inline loading=lazy width=96 src=" + esc(first.file) + ">" +
+      facts([["frames", a.frame_count], ["vram", a.vram_destination],
+             ["shared by", a.maps.join(", ")]]) +
+      "</div>";
+  });
+}
+
+function bankStrip(palette) {
+  return palette.colors.map(c =>
+    "<span class=chip style=\"background:" + c + ";width:14px;height:14px\"" +
+    "></span>").join("");
+}
+
+function renderDetail(key) {
+  const el = $("#detail");
+  const view = cat.view;
+  if (view === "maps") {
+    const m = cat.data.maps.find(x => String(x.id) === key);
+    if (!m) return;
+    const pal = cat.data.palettes.find(
+      p => m.palette_png.endsWith(p.file));
+    const anim = m.animation && cat.data.animations.find(
+      a => a.metadata_address === m.animation);
+    el.innerHTML = "<h2>map " + m.id + "</h2>" +
+      "<div class=sub>block storage: " + Object.entries(m.block_storage)
+        .map(([k, v]) => esc(k) + "=" + esc(v)).join(", ") +
+      " &middot; render modes " + m.render_modes.join("/") +
+      " &middot; shared palette index " + m.shared_palette_index + "</div>" +
+      "<div class=cols><div class=col><h4>Composite (approximate)</h4>" +
+      "<img class=big width=256 src=" + esc(m.thumbnail) + "></div>" +
+      "<div class=col><h4>Tile sheet (bank 0)</h4>" +
+      "<img class=big src=" + esc(m.tiles_png) + "></div>" +
+      "<div class=col><h4>Palette</h4><img class=big src=" +
+      esc(m.palette_png) + "><p>" + (pal ? bankStrip(pal) : "") + "</p>" +
+      (anim ? "<h4>Animation frames</h4><div class=anim-strip>" +
+        anim.frames.map(f =>
+          "<figure><img src=" + esc(f.file) + "><figcaption>" +
+          "f" + f.frame + " &times;" + f.duration + "</figcaption></figure>"
+        ).join("") + "</div>" : "") +
+      "</div></div>" +
+      "<h4>Counts</h4><table><tr><th>placements</th><td>" + m.placements +
+      "</td></tr><tr><th>clipping entries</th><td>" + m.clipping_entries +
+      "</td></tr><tr><th>terrain cells</th><td>" + m.terrain_cells +
+      "</td></tr><tr><th>graphics source</th><td>" + m.graphics_source +
+      "</td></tr></table>";
+  } else if (view === "graphics") {
+    const g = cat.data.graphics_streams.find(x => x.source_address === key);
+    if (!g) return;
+    el.innerHTML = "<h2>graphics " + esc(g.source_address) + "</h2>" +
+      "<div class=sub>wrapper 0x" + g.wrapper_type.toString(16) +
+      " &middot; shared by maps " + g.maps.join(", ") + "</div>" +
+      "<img class=big src=" + esc(g.file) + ">" +
+      "<h4>Facts</h4><table><tr><th>tiles</th><td>" + g.tile_count +
+      "</td></tr><tr><th>decompressed</th><td>" + g.decompressed_bytes +
+      " B</td></tr><tr><th>compressed</th><td>" + g.compressed_bytes +
+      " B</td></tr></table>";
+  } else if (view === "palettes") {
+    const p = cat.data.palettes.find(x => x.address === key);
+    if (!p) return;
+    el.innerHTML = "<h2>palette " + esc(p.address) + "</h2>" +
+      "<div class=sub>" + p.bank_count + " banks &middot; shared by maps " +
+      p.maps.join(", ") + "</div><p>" + bankStrip(p) + "</p>" +
+      "<img class=big src=" + esc(p.file) + ">";
+  } else {
+    const a = cat.data.animations.find(x => x.metadata_address === key);
+    if (!a) return;
+    el.innerHTML = "<h2>animation " + esc(a.metadata_address) + "</h2>" +
+      "<div class=sub>" + a.frame_count + " frames &middot; vram " +
+      a.vram_destination + " &middot; shared by maps " + a.maps.join(", ") +
+      "</div><div class=anim-strip>" + a.frames.map(f =>
+        "<figure><img src=" + esc(f.file) + "><figcaption>f" + f.frame +
+        " &times;" + f.duration + " (" + f.source_tile + ")</figcaption>" +
+        "</figure>").join("") + "</div>";
+  }
+  el.showModal();
+}
+
+const views = { maps: renderMaps, graphics: renderGraphics,
+                palettes: renderPalettes, animations: renderAnimations };
+
+for (const b of document.querySelectorAll("nav button")) {
+  b.addEventListener("click", () => {
+    cat.view = b.dataset.view;
+    for (const x of document.querySelectorAll("nav button"))
+      x.classList.toggle("active", x === b);
+    views[cat.view]();
+    $("#detail").close && $("#detail").open && $("#detail").close();
+  });
+}
+$("#q").addEventListener("input", e => {
+  cat.query = e.target.value.trim();
+  views[cat.view]();
+});
+$("#detail").addEventListener("click", e => {
+  if (e.target === $("#detail")) $("#detail").close();
+});
+
+const load = window.CATALOG
+  ? Promise.resolve(window.CATALOG)
+  : fetch("catalog.json")
+      .then(r => { if (!r.ok) throw new Error("catalog.json: HTTP " + r.status);
+                   return r.json(); });
+load
+  .then(data => {
+    cat.data = data;
+    const shaOk = data.rom_sha1 ===
+      "4ac05441f4de70a4ec3dd932116346c61b8783d9";
+    $("#meta").textContent = data.map_count + " maps \u00b7 " +
+      data.unique_graphics + " graphics \u00b7 " + data.unique_palettes +
+      " palettes \u00b7 " + data.unique_animations + " animations \u00b7 " +
+      "ROM " + data.rom_sha1.slice(0, 12);
+    $("#meta").classList.toggle("bad", !shaOk);
+    $("#meta").title = shaOk ? "SHA1 matches the target revision"
+                             : "SHA1 does NOT match the target revision";
+    $("#notice").innerHTML = data.notes.map(n => "&bull; " + esc(n))
+      .join("<br>");
+    renderMaps();
+  })
+  .catch(err => {
+    $("#main").innerHTML = "<div class=error>Failed to load catalog.json: " +
+      esc(err.message) + ". Open this page from the catalog output " +
+      "directory (e.g. python -m http.server inside it).</div>";
+  });
+</script>
+</body>
+</html>

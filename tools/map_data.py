@@ -75,6 +75,17 @@ def resolve_block(rom, map_id, field):
             return {"map": map_id, "source_map": source, "offset": off,
                     "raw_offset": None, "raw": raw, "storage": "lz77",
                     "chain": chain}
+        if kind == 0x00:
+            # Uncompressed block: u24 byte size at +1, data at +4. Seen only
+            # on three palette blocks (maps 5, 54, 56); no packed-block
+            # field uses it, which is why the editors never needed it.
+            size = _uint(rom, off + 1, 3)
+            raw = bytes(rom[off + 4:off + 4 + size])
+            if len(raw) != size:
+                raise ValueError(f"map {source} block at {off:#x} is truncated")
+            return {"map": map_id, "source_map": source, "offset": off,
+                    "raw_offset": None, "raw": raw, "storage": "raw",
+                    "chain": chain}
         raise ValueError(f"map {source} block at {off:#x} has type {kind:#x}")
 
 

@@ -48,6 +48,11 @@ The first byte of each block type is consistent across the table: palettes
 start `0x10` (plain BIOS LZ77) on 159 of 162 maps, while height, arrangement
 and clipping usually start `0x11`. Graphics start `0x20` or `0x22`, but those
 values are FFTA wrapper types rather than GBA BIOS compression identifiers.
+The three palette exceptions (maps 5, 54, 56) start `0x00`: an uncompressed
+wrapper whose u24 size counts raw bytes (160 = 5 banks on map 5, 192 = 6 on
+maps 54/56), with data at `+4`. Each ends exactly where the next block's
+`0x11` dispatch header begins, and maps 54/56 share identical palette bytes.
+`tools/validate_maps.py` check 17 pins all of this.
 
 `tools/ffta_lz.py` implements both directions. Round-tripping decompress ->
 compress -> decompress reproduces the source data exactly.
@@ -78,6 +83,36 @@ terrain stores gameplay cells overlaid by the renderer. This structure agrees
 with the independent [FFTAUtils map editor](https://github.com/spiiin/FFTAUtils);
 our implementation is a native, guarded Python decoder rather than a port of
 its C# code.
+
+### Metatile entries: what a placement id actually selects
+
+A `tile_id` is not a graphics-tile index. It indexes the u16 entry table that
+begins at `tile_format_offset` and runs to the end of the block: its length
+`(block_size - tile_format_offset) / 2` exactly covers every observed id (map 0:
+544 entries, max id 539; map 2: 796 entries, max id 791). Treating ids as
+direct tile indices instead leaves ~28% of a map's placements unresolvable
+(`tools/dead-ends.md`, DE-009).
+
+Each entry composites as one 16x16 block of four graphics tiles (2x2), taking:
+
+| bits | meaning | evidence |
+|---|---|---|
+| 0-9 | first graphics tile of a consecutive 2x2 tile block | ids stay under every map's `tile_count` when masked, with at most 1-3 out-of-range vs ~150-380 unmasked; composites render as coherent terrain |
+| 12-14 | palette bank within the block's own palette (probable) | referenced banks are 0-4, exactly the 5 banks a palette block holds; not yet isolated against other bit splits |
+| 10-11 | flip candidates, **unestablished** | three flip/ordering variants rendered equally well, so the probes never discriminated them |
+| 15 | unnamed | set on the most common entries (`0x9085`); they draw normally, so it is not an "empty" marker (DE-011) |
+
+The quad's internal 2x2 placement order (row-major vs column-major) is
+likewise unproven; the catalog uses row-major arbitrarily. Discriminating
+these residual bits needs a renderer-vs-screenshot comparison on a map with
+known asymmetries, not more same-looking composites.
+
+This semantics is established by composite rendering (every map renders as
+recognizable FFTA isometric terrain through it — see
+`tools/build_catalog.py`), not yet by tracing the retail arrangement reader.
+Under the D-002 rule it stays **visually verified, not reader-verified**:
+bit 15 is an open naming task (roadmap MAP9.2), and the bank-selection rule
+for whole-map color is likewise still open (MAP9.3).
 
 ## Terrain is packed runs of two-byte cells
 
