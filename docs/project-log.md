@@ -34,7 +34,7 @@ status and backlog tables are living sections and should be kept current.
 | Current work package | STRAT9.2 — decode target scoring and intent weights |
 | Last closed package | STRAT9.1 — declarative strategy profiles |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 173/173; AI 10/10; strategies 5/5; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
+| Core gates | `make check` 173/173; AI 10/10; strategies 6/6; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
 ## Prioritized backlog
 
@@ -2661,3 +2661,53 @@ Next action:
 - Froze RNG at `0x12345678`; two exact traces matched at all five checkpoints.
 - Restored the original save byte-for-byte and kept trace output untracked.
 - Committed and pushed as `6445ee3` (`Trace a reproducible live AI turn`).
+
+### 2026-09-02 — STRAT9.2 slice: decoded the target-candidate tie-break and shipped `deterministic_ties`
+
+Objective:
+
+- Make progress on decoding the target-scoring model by verifying and
+  correcting the in-progress tie-break slice, so that target ordering is a
+  real, executed profile control rather than a half-built guess.
+
+Completed:
+
+- **Static decode of `sub_080C2940`** (`0x0C2940`–`0x0C32BE`), the per-actor
+  target-candidate builder/sorter that runs before the evaluator: selection
+  sort over 20-byte candidate records (arena base `sb + 0x328*actor`, count
+  halfword at arena+0x324), primary key signed halfword at record+0x10,
+  secondary keys signed bytes, and a full tie resolved by
+  `Rand() % 101 <= 49` — a genuine ~49.6% coin flip that consumes one RNG
+  draw (the RNG is a 15-bit LCG, so the roll is uniform over 0..100).
+- **Dropped the broken magnitude patch.** The half-done slice's
+  `outcome_magnitude` rewrite claimed record+0x0C as the score field and
+  clobbered `r5`/`r6` (an arena pointer and score register at that address);
+  it could not be made verifiable and was replaced.
+- **New verified policy `deterministic_ties`** in `tools/ai_targeting.py`:
+  the 22-byte roll window (`0x080C2F7E..0x080C2F94`) becomes
+  `b 0x080C2FC4` (the keep-ordering path) plus 10 NOPs, so ties always keep
+  the earlier candidate and the battle RNG is untouched. Reachability was
+  proven: no branch, jump-table entry, or ROM pointer lands inside the
+  window.
+- **Execution proof in `validate_ai_strategy.py` (check 6):** over 500
+  seeded ties the retail roll swaps 250/500 (about half) while consuming one
+  RNG draw; the patched build swaps 0/500 and leaves the RNG state identical.
+- **Wiring:** `aggressive.json` gains `target_ordering: deterministic_ties`
+  (409 changed bytes, up from 387); `deterministic-actions.json` stays
+  `retail` (451 bytes); `verify_mod.py` attributes the 22 bytes as
+  "AI target tie-break"; docs updated (`ai-strategy-profiles.md`, README,
+  CLAUDE.md, roadmap, status table now says strategies 6/6).
+
+Evidence:
+
+- `python tools/validate_ai_strategy.py baserom.gba`: 6/6 checks pass.
+- Strict attribution on the applied aggressive profile: 409 bytes, zero
+  unattributed (302 ability + 85 status gates + 22 tie-break).
+- Patch-site bytes at `0x080C2F5E` confirmed byte-identical to retail before
+  every patch path.
+
+Open (STRAT9.2 continues):
+
+- The candidate score fields (record+0x10 and the byte keys) and their
+  producers are still unidentified; the tie-break control only pins ordering
+  among exactly equal candidates.

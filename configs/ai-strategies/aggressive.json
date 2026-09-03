@@ -7,6 +7,7 @@
     "self": 25,
     "other": 75
   },
+  "target_ordering": "deterministic_ties",
   "ability_rules": [
     {
       "name": "Normalize usable actions",

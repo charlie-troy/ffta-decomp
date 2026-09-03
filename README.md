@@ -13,8 +13,8 @@ Two things live here:
 
 For tailored auto-battle behavior, start with declarative
 [AI strategy profiles](docs/ai-strategy-profiles.md). They combine ordered
-ability rules, job fallback priorities, and status-effect gates in one guarded,
-previewable configuration.
+ability rules, job fallback priorities, status-effect gates, and a target
+tie-break policy in one guarded, previewable configuration.
 
 > **No ROM data lives in this repository.** You supply your own dump. The build
 > verifies its SHA1 and extracts what it needs at build time. `.gitignore`
@@ -35,6 +35,7 @@ exposed:
 | per-job AI priority | job table | no |
 | per-job elemental resistances | job table | no |
 | the 11%/50% self-versus-other gate on status effects | code | yes |
+| the target-candidate tie-break roll | code | yes (profile control) |
 | the eligibility rules (MP cost, healthy-target, reflect) | code | yes |
 
 **The text is decoded**, so every dump carries real names rather than ids:
@@ -89,7 +90,10 @@ checks pass: the priority filter, the ability property accessor, flag decoding,
 the stat-id mapping, the healthy-target rule at its exact boundaries, the
 11%/50% status gate, packed resistance decoding, unarmed attack power, the
 92-case control-flow partition, and the first two CT-window rules. See
-[docs/validation.md](docs/validation.md).
+[docs/validation.md](docs/validation.md). The strategy validator adds an
+executed tie-break check: the retail target-candidate tie roll swaps about
+half of 500 seeded ties, the `deterministic_ties` patch swaps none, and the
+patched window never touches the RNG.
 
 Whole-battle behaviour is now traced through a real enemy turn: one actor calls
 `sub_080C32C0` for four distinct targets, and a frozen-RNG replay reproduces the

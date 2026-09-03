@@ -101,6 +101,10 @@ Genuinely open, with the reason:
   frozen-RNG replay enters `sub_080C32C0` once per four distinct targets and
   reproduces exactly; see `docs/whole-battle-trace.md`. Do not generalize that
   one turn to every mission-, law-, or effect-specific path.
+- **The target-candidate score model is not decoded.** `sub_080C2940` builds
+  and sorts 20-byte candidate records before the evaluator runs; the sort's
+  tie-break roll is a verified profile control (`deterministic_ties`), but the
+  score fields themselves and their producers remain STRAT9.2 work.
 - **Mission fields.** The corrected constant-caller report is exhausted;
   rewards, progression, dispatch rules, fees, type, deadlines, clear
   conditions, clan-skill requirements, cancellation, and hidden reward previews

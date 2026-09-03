@@ -21,6 +21,7 @@ from ffta_lz import block_length
 from map_data import (COUNT as MAP_COUNT, _arrangement_cells, _clipping_cells,
                       _height_cells, decode_graphics, resolve_block)
 import ability_table as A
+import ai_targeting
 import item_table as I
 import mission_table as M
 
@@ -37,12 +38,22 @@ UNIT = 0x02000400
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FUNCTIONS = json.load(open(os.path.join(REPO, "data", "functions.json")))["functions"]
+STRATEGY_REGIONS = {
+    (ai_targeting.PATCH_OFFSET, ai_targeting.PATCH_END): "AI target tie-break",
+}
 
 
 def containing_function(off):
     for func in FUNCTIONS:
         if func["offset"] <= off < func["offset"] + func["size"]:
             return func["name"]
+    return None
+
+
+def containing_strategy_region(off):
+    for (start, end), name in STRATEGY_REGIONS.items():
+        if start <= off < end:
+            return name
     return None
 
 
@@ -154,6 +165,7 @@ def main(argv):
 
     groups = collections.defaultdict(list)
     changed_functions = collections.defaultdict(list)
+    changed_strategy = collections.defaultdict(list)
     changed_graphics = collections.defaultdict(list)
     changed_map_blocks = collections.defaultdict(list)
     other = []
@@ -164,13 +176,17 @@ def main(argv):
             if function_name:
                 changed_functions[function_name].append(off)
             else:
-                graphics_start = containing_graphics(off)
-                if graphics_start is not None:
-                    changed_graphics[graphics_start].append(off)
-                elif off in map_byte_owner:
-                    changed_map_blocks[map_byte_owner[off]].append(off)
+                strategy_name = containing_strategy_region(off)
+                if strategy_name:
+                    changed_strategy[strategy_name].append(off)
                 else:
-                    other.append(off)
+                    graphics_start = containing_graphics(off)
+                    if graphics_start is not None:
+                        changed_graphics[graphics_start].append(off)
+                    elif off in map_byte_owner:
+                        changed_map_blocks[map_byte_owner[off]].append(off)
+                    else:
+                        other.append(off)
         else:
             groups[(kind, idx)].append((o, name, base[off], mod[off]))
 
@@ -185,6 +201,9 @@ def main(argv):
     print(f"  in matched functions : {sum(map(len, changed_functions.values()))} byte(s)")
     for function_name, offsets in sorted(changed_functions.items()):
         print(f"    {function_name}: {len(offsets)} byte(s)")
+    print(f"  in strategy code     : {sum(map(len, changed_strategy.values()))} byte(s)")
+    for strategy_name, offsets in sorted(changed_strategy.items()):
+        print(f"    {strategy_name}: {len(offsets)} byte(s)")
     print(f"  in map graphics      : {sum(map(len, changed_graphics.values()))} byte(s)")
     for start, offsets in sorted(changed_graphics.items()):
         maps = ",".join(str(i) for i in graphics[start]["maps"])

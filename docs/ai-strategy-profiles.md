@@ -5,12 +5,14 @@ one repeatable JSON configuration. A profile can currently control:
 
 - per-ability likelihood and rule selectors;
 - per-job fallback-action likelihood;
-- the shared self-target and other-target status-effect gates.
+- the shared self-target and other-target status-effect gates;
+- the target-candidate tie-break policy.
 
 This is the first layer of a broader tactics system. It controls which actions
-survive eligibility filtering. Target scoring, movement intent, resource
-budgets, ally/enemy weighting, and multi-turn planning still require additional
-code mapping and are tracked as the next phase.
+survive eligibility filtering and how equal candidates are ordered. The
+candidate score model itself, movement intent, resource budgets, ally/enemy
+weighting, and multi-turn planning still require additional code mapping and
+are tracked as the rest of Phase 9.
 
 ## Normal workflow
 
@@ -38,6 +40,7 @@ accidental application to another revision or an already modified ROM.
   "description": "What this profile is trying to accomplish.",
   "base_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
   "status_gates": {"self": 25, "other": 75},
+  "target_ordering": "retail",
   "ability_rules": [],
   "job_rules": []
 }
@@ -109,23 +112,44 @@ Only `ai_priority` is writable through a strategy rule. The broader job editor
 still exposes the rest of the table, but combat statistics are balance data,
 not tactical policy, and remain deliberately separate.
 
+## Target ordering
+
+`target_ordering` selects how the game orders equal target candidates. The
+candidate sort (inside `sub_080C2940`) compares a signed halfword score at
+record `+0x10`, then two signed bytes, and breaks a full tie with one RNG
+draw, swapping the pair when `Rand() % 101 <= 49` — about half the time.
+
+- `retail` (default): keep the random tie-break.
+- `deterministic_ties`: the roll window (0x080C2F7E..0x080C2F94) becomes an
+  unconditional branch to the keep-ordering path, so the earlier candidate
+  wins every tie and the battle RNG is untouched. This changes target choice
+  only where retail would have flipped a coin.
+
+The window is reachable only by falling through the comparator's equality
+compare; no branch, jump-table entry, or ROM pointer targets it. Strict mod
+verification attributes its 22 bytes as "AI target tie-break".
+
 ## Shipped profiles
 
 - `aggressive.json` establishes a low general baseline, strongly favors
-  offensive abilities, keeps healthy-target debuffs competitive, and raises
-  the shared status gates.
+  offensive abilities, keeps healthy-target debuffs competitive, raises the
+  shared status gates, and makes equal-candidate target ties deterministic.
 - `deterministic-actions.json` sets every retail-enabled ability and job
   fallback priority to 100 and removes the known shared status-gate refusal
-  rolls. It is useful for repeatable testing, but does not remove randomness
-  elsewhere in targeting, damage, or effect-specific evaluator cases.
+  rolls. It is useful for repeatable testing, but deliberately keeps retail
+  target ordering (including its tie roll), damage randomness, and
+  effect-specific evaluator cases.
 
 ## Safety contract
 
 The profile is built entirely in memory and written only after every rule has
 validated. Unknown keys, invalid selectors, unexpected match counts, wrong ROM
 hashes, out-of-range results, and zero-match rules all fail closed. The
-strategy validator proves the shipped profiles change only the three declared
-surfaces and executes changed job priorities through the retail getter.
+strategy validator proves the shipped profiles change only the four declared
+surfaces, executes changed job priorities through the retail getter, and
+executes the tie window on retail and patched code: retail swaps about half of
+500 seeded ties, the patch swaps none, and the patched window never touches
+the RNG.
 
 ```bash
 python tools/validate_ai_strategy.py baserom.gba

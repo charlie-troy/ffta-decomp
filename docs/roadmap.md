@@ -538,6 +538,11 @@ function changed.
 2. **Target-scoring model.** Trace the candidate score fields after
    `sub_080C32C0`, identify ally/enemy and target-selection weights, and expose
    verified controls for damage, healing, buff/debuff, KO, and safety intent.
+   Progress: the candidate arena and its 20-byte records are identified
+   (`sub_080C2940`, count halfword at arena+0x324), and the sort comparator's
+   tie-break roll (0x080C2F7E..0x080C2F94, swap when `Rand() % 101 <= 49`) is
+   decoded and exposed as the verified `deterministic_ties` profile control.
+   The score fields themselves and their producers remain open.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.
