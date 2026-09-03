@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FFTA Decomp — reverse-engineering Final Fantasy Tactics Advance</title>
+<meta name="description" content="A matching decompilation and no-compiler modding toolkit for Final Fantasy Tactics Advance (GBA).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2310182e'/%3E%3Cpath d='M16 4l3.4 7.4 8.1 1-6 5.5 1.6 8L16 22l-7.1 3.9 1.6-8-6-5.5 8.1-1z' fill='%23f0c94f'/%3E%3C/svg%3E">
+<style>
+  :root {
+    /* night sky (title screen) */
+    --night: #10182e;
+    --night2: #1a2238;
+    --star: #f0dc9a;
+    /* parchment */
+    --paper: #f1e4c3;
+    --paper2: #f8f0da;
+    --paper3: #e7d6ac;
+    /* frames & ink */
+    --frame: #6e4f26;
+    --frame-dark: #4a3418;
+    --ink: #3d2c14;
+    --ink-dim: #6b5330;
+    --ink-faint: #8a744e;
+    /* gold + blue accents */
+    --gold: #c99a2e;
+    --gold2: #f0c94f;
+    --blue: #2f66a8;
+    --maxw: 1080px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font: 16px/1.6 "Trebuchet MS", Verdana, "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--gold2); color: var(--frame-dark); }
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    background: rgba(110, 79, 38, .10); border: 1px solid rgba(110, 79, 38, .25);
+    border-radius: 4px; padding: 1px 5px; color: #5c4322; font-size: .92em;
+  }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px; }
+
+  /* ============ HERO — the title screen ============ */
+  .hero {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(2.5px 2.5px at 8% 22%,  rgba(240,220,154,.95) 50%, transparent 51%),
+      radial-gradient(1.6px 1.6px at 22% 64%, rgba(240,220,154,.6)  50%, transparent 51%),
+      radial-gradient(2.1px 2.1px at 34% 18%, rgba(240,220,154,.75) 50%, transparent 51%),
+      radial-gradient(1.4px 1.4px at 47% 44%, rgba(240,220,154,.5)  50%, transparent 51%),
+      radial-gradient(2.4px 2.4px at 58% 12%, rgba(240,220,154,.9)  50%, transparent 51%),
+      radial-gradient(1.6px 1.6px at 69% 38%, rgba(240,220,154,.55) 50%, transparent 51%),
+      radial-gradient(2.0px 2.0px at 81% 20%, rgba(240,220,154,.8)  50%, transparent 51%),
+      radial-gradient(1.5px 1.5px at 90% 52%, rgba(240,220,154,.5)  50%, transparent 51%),
+      radial-gradient(1.8px 1.8px at 15% 84%, rgba(240,220,154,.45) 50%, transparent 51%),
+      radial-gradient(1.9px 1.9px at 63% 78%, rgba(240,220,154,.4)  50%, transparent 51%),
+      radial-gradient(1.4px 1.4px at 92% 82%, rgba(240,220,154,.4)  50%, transparent 51%),
+      radial-gradient(520px 300px at 30% 78%, rgba(201,154,46,.14), transparent 70%),
+      linear-gradient(180deg, #0c1326 0%, var(--night2) 58%, #232f4e 100%);
+    padding: 64px 0 96px;
+    text-align: left;
+  }
+  .eyebrow {
+    font: 600 13px/1 ui-monospace, monospace; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--gold2); margin: 0 0 16px;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6.4vw, 66px); line-height: 1.02; margin: 0 0 18px;
+    letter-spacing: .01em; font-weight: 700; color: #f6ecd2;
+    text-shadow: 0 2px 0 var(--frame-dark), 0 5px 18px rgba(0, 0, 0, .55);
+  }
+  .hero h1 .accent { color: var(--gold2); }
+  .tagline { font-size: 19px; color: #cfc3a4; max-width: 640px; margin: 0 0 26px;
+    text-shadow: 0 1px 3px rgba(0,0,0,.4); }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 34px; }
+  .chip {
+    background: var(--paper); border: 1px solid #8a6a3a; border-radius: 4px;
+    padding: 6px 13px; font: 13px ui-monospace, monospace; color: var(--ink-dim);
+    box-shadow: 0 2px 0 rgba(0, 0, 0, .35), inset 0 1px 0 #fff8e2;
+  }
+  .chip b { color: var(--frame-dark); font-weight: 700; }
+  .cta { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    padding: 12px 22px; border-radius: 8px;
+    font: 700 15px "Trebuchet MS", Verdana, sans-serif; cursor: pointer;
+    transition: .15s; letter-spacing: .02em;
+  }
+  .btn.primary {
+    background: linear-gradient(180deg, #f4d465, var(--gold));
+    color: var(--frame-dark); border: 1px solid #8a6a26;
+    box-shadow: inset 0 1px 0 #ffe9a8, 0 3px 0 #7a5a26, 0 6px 14px rgba(0,0,0,.4);
+  }
+  .btn.primary:hover {
+    background: linear-gradient(180deg, #ffe07d, #dbb03a);
+    transform: translateY(-1px); text-decoration: none;
+  }
+  .btn.ghost {
+    background: rgba(241, 228, 195, .08); color: #f1e4c3;
+    border: 1px solid #9a7a44; box-shadow: inset 0 1px 0 rgba(255, 240, 200, .15);
+  }
+  .btn.ghost:hover { background: rgba(241, 228, 195, .16); text-decoration: none; }
+
+  /* ============ THE BOOK — parchment column ============ */
+  .book {
+    max-width: 1120px; margin: -52px auto 56px; position: relative;
+    background:
+      radial-gradient(7px 7px at 16px 16px,        var(--gold) 48%, transparent 50%),
+      radial-gradient(7px 7px at calc(100% - 16px) 16px, var(--gold) 48%, transparent 50%),
+      radial-gradient(7px 7px at 16px calc(100% - 16px), var(--gold) 48%, transparent 50%),
+      radial-gradient(7px 7px at calc(100% - 16px) calc(100% - 16px), var(--gold) 48%, transparent 50%),
+      repeating-linear-gradient(0deg, rgba(110, 79, 38, .028) 0 2px, transparent 2px 4px),
+      linear-gradient(180deg, var(--paper2), var(--paper3));
+    border: 3px solid var(--frame); border-radius: 14px;
+    box-shadow:
+      inset 0 0 0 2px #caa55c,
+      inset 0 0 0 5px var(--paper2),
+      inset 0 0 0 6px #9a7a44,
+      0 22px 55px rgba(0, 0, 0, .55);
+    padding: 10px 30px 8px;
+  }
+  .book section { padding: 44px 6px; border-bottom: 2px dashed rgba(110, 79, 38, .3); }
+  .book section:last-child { border-bottom: none; }
+
+  .sec-head { max-width: 740px; margin-bottom: 26px; }
+  .sec-head h2 { font-size: 27px; margin: 0 0 8px; color: var(--frame-dark); }
+  .sec-head p { color: var(--ink-dim); margin: 0; }
+  h2 .bar {
+    display: inline-block; width: 11px; height: 11px; margin-right: 13px;
+    background: linear-gradient(135deg, var(--gold2), var(--gold));
+    border: 1px solid #7a5a26; transform: rotate(45deg); vertical-align: 2px;
+    box-shadow: inset 0 0 0 1px rgba(255, 245, 214, .6);
+  }
+
+  /* gold menu cursor, slides in on hover (the classic pointing glove) */
+  .cursor-host { position: relative; }
+  .cursor-host::before {
+    content: ""; position: absolute; left: -4px; top: 50%; opacity: 0;
+    border: 7px solid transparent; border-left: 11px solid var(--gold);
+    transform: translateY(-50%); transition: .15s; filter: drop-shadow(0 1px 1px rgba(74,52,24,.5));
+  }
+  .cursor-host:hover::before { opacity: 1; left: -12px; }
+
+  /* ============ STATS ============ */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .stat {
+    background: var(--paper2); border: 2px solid var(--frame); border-radius: 10px;
+    box-shadow: inset 0 0 0 1px #e2cf9e, inset 0 0 0 3px rgba(248, 240, 218, .8), 0 3px 0 rgba(74, 52, 24, .25);
+    padding: 20px 14px; text-align: center;
+  }
+  .stat .n {
+    font-family: Georgia, serif; font-size: 34px; font-weight: 700; line-height: 1;
+    color: var(--frame-dark);
+    text-shadow: 0 1px 0 #fff8e2;
+  }
+  .stat .n .gold { color: #a87b1c; }
+  .stat .l { margin-top: 9px; color: var(--ink-dim); font-size: 13px; line-height: 1.4; }
+  @media (max-width: 720px) { .stats { grid-template-columns: 1fr 1fr; } }
+
+  /* ============ two paths ============ */
+  .paths { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 720px) { .paths { grid-template-columns: 1fr; } }
+  .path {
+    background: var(--paper2); border: 2px solid var(--frame); border-radius: 10px;
+    box-shadow: inset 0 0 0 1px #e2cf9e, 0 3px 0 rgba(74, 52, 24, .25);
+    padding: 24px;
+  }
+  .path h3 { margin: 0 0 8px; font-size: 20px; color: var(--frame-dark); }
+  .path .tag {
+    display: inline-block; font: 700 11px ui-monospace, monospace; letter-spacing: .08em;
+    text-transform: uppercase; color: #7a5a10;
+    background: linear-gradient(180deg, #f6e3a0, var(--gold2));
+    border: 1px solid #9a7a26; border-radius: 3px; padding: 3px 9px; margin-bottom: 13px;
+    box-shadow: 0 1px 0 #9a7a26;
+  }
+  .path p { color: var(--ink-dim); margin: 0; }
+
+  /* ============ feature cards ============ */
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 860px) { .cards { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    display: block; background: var(--paper2); border: 2px solid var(--frame);
+    border-radius: 10px; padding: 20px; transition: .15s; color: var(--ink);
+    box-shadow: inset 0 0 0 1px #e2cf9e, 0 3px 0 rgba(74, 52, 24, .25);
+  }
+  .card:hover {
+    border-color: var(--gold); text-decoration: none;
+    transform: translateX(2px);
+    box-shadow: inset 0 0 0 1px #f0dfa8, 0 3px 0 rgba(74, 52, 24, .35);
+  }
+  .card .ico { font-size: 24px; }
+  .card h3 { margin: 10px 0 6px; font-size: 18px; color: var(--frame-dark); }
+  .card p { margin: 0; color: var(--ink-dim); font-size: 14px; }
+  .card .meta {
+    margin-top: 12px; font: 12px ui-monospace, monospace; color: var(--ink-faint);
+    border-top: 1px dashed rgba(110, 79, 38, .35); padding-top: 9px;
+  }
+
+  /* ============ validation checks ============ */
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 30px; }
+  @media (max-width: 720px) { .checks { grid-template-columns: 1fr; } }
+  .check { display: flex; gap: 11px; align-items: baseline; color: var(--ink-dim); font-size: 14.5px; }
+  .check .ok {
+    flex: 0 0 auto; display: inline-grid; place-items: center;
+    width: 19px; height: 19px; border-radius: 50%; position: relative; top: 3px;
+    background: linear-gradient(180deg, #f4d465, var(--gold));
+    border: 1px solid #8a6a26; color: var(--frame-dark);
+    font: 700 12px/1 Georgia, serif; box-shadow: inset 0 1px 0 #ffe9a8;
+  }
+  .check b { color: var(--frame-dark); }
+
+  /* ============ docs index — parchment list ============ */
+  .docs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 720px) { .docs { grid-template-columns: 1fr; } }
+  .doc {
+    display: flex; gap: 12px; align-items: flex-start; background: var(--paper2);
+    border: 2px solid var(--frame); border-radius: 8px; padding: 12px 15px;
+    color: var(--ink); transition: .15s;
+    box-shadow: inset 0 0 0 1px #e2cf9e;
+  }
+  .doc:hover {
+    border-color: var(--gold); text-decoration: none; transform: translateX(2px);
+    box-shadow: inset 0 0 0 1px #f0dfa8;
+  }
+  .doc .t { font-family: Georgia, serif; font-weight: 700; color: var(--frame-dark); }
+  .doc .d { color: var(--ink-dim); font-size: 13.5px; }
+  .doc .fp { color: var(--ink-faint); font: 11.5px ui-monospace, monospace; }
+
+  .linked { display: flex; flex-wrap: wrap; gap: 12px; }
+  .linked a {
+    background: var(--paper2); border: 2px solid var(--frame); border-radius: 8px;
+    padding: 10px 15px; color: var(--blue); font-weight: 600; font-size: 14px;
+    box-shadow: inset 0 0 0 1px #e2cf9e, 0 2px 0 rgba(74, 52, 24, .2); transition: .15s;
+  }
+  .linked a:hover { border-color: var(--gold); transform: translateX(2px); }
+
+  /* ============ law card — the warning ============ */
+  .law {
+    background: linear-gradient(180deg, #96332c, #7c2723); color: #f8ecd2;
+    border: 2px solid #caa55c; border-radius: 8px; padding: 15px 17px;
+    font-size: 14.5px; margin-top: 22px;
+    box-shadow: inset 0 0 0 1px rgba(255, 230, 170, .45), 0 3px 0 rgba(74, 52, 24, .45);
+  }
+  .law .law-tag {
+    display: inline-block; font: 700 11px ui-monospace, monospace; letter-spacing: .14em;
+    background: linear-gradient(180deg, #f6e3a0, var(--gold2)); color: #5c2a10;
+    border: 1px solid #9a7a26; border-radius: 3px; padding: 2px 8px; margin-right: 10px;
+    vertical-align: 1px; box-shadow: 0 1px 0 #9a7a26;
+  }
+  .law b { color: #ffe9a8; }
+  .law code { background: rgba(0, 0, 0, .25); border-color: rgba(255, 230, 170, .35); color: #ffe9a8; }
+
+  footer { padding: 6px 0 46px; color: #8d97b8; font-size: 13.5px; }
+  footer .wrap { display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; }
+  footer a { color: #b9c2dd; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Final Fantasy Tactics Advance · GBA</p>
+    <h1>FFTA <span class="accent">Decomp</span></h1>
+    <p class="tagline">Reverse-engineering the battle AI through a byte-identical
+      matching decompilation and a no-compiler modding surface.</p>
+    <div class="chips">
+      <span class="chip">ROM <b>FFTA (USA) · AFXE · rev 0</b></span>
+      <span class="chip">SHA1 <b>4ac054…78d9</b></span>
+      <span class="chip">compiler <b>agbcc</b></span>
+      <span class="chip">matched <b>173 fn</b></span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#modding">Make the AI yours</a>
+      <a class="btn ghost" href="#docs">Browse the docs</a>
+    </div>
+  </div>
+</header>
+
+<div class="book">
+  <main>
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <h2><span class="bar"></span>Two ways into the same ROM</h2>
+          <p>The project's goal is modding reach, not decompilation percentage.
+            Everything below is driven by that decision.</p>
+        </div>
+        <div class="paths">
+          <div class="path">
+            <span class="tag">no compiler needed</span>
+            <h3>Modelling as data</h3>
+            <p>The battle AI's per-ability tuning is table data, so changing how
+              the AI behaves is a CSV edit — or a declarative
+              <a href="docs/ai-strategy-profiles.md">strategy profile</a> with
+              ordered ability rules, job fallbacks, and status gates.</p>
+          </div>
+          <div class="path">
+            <span class="tag">underneath it all</span>
+            <h3>A matching decompilation</h3>
+            <p><b>173 functions</b> compile from C and sit at their real
+              addresses; everything else is pulled from the base ROM. The full
+              <b>16 MB</b> rebuild is byte-identical.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <h2><span class="bar"></span>Where it stands</h2>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="n">173</div><div class="l">functions matched, 9,888 bytes of C</div></div>
+          <div class="stat"><div class="n">100<span class="gold">%</span></div><div class="l">16 MB ROM rebuilds byte-identical</div></div>
+          <div class="stat"><div class="n">2,757</div><div class="l">primary-table strings decoded (zero unknowns)</div></div>
+          <div class="stat"><div class="n">10/10</div><div class="l">AI checks validated by running the ROM's own code</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="modding">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2><span class="bar"></span>What's mapped and editable without a compiler</h2>
+          <p>Every table below has a guarded CSV workflow that round-trips the ROM
+            byte-for-byte.</p>
+        </div>
+        <div class="cards">
+          <a class="card cursor-host" href="docs/ability-table.md"><div class="ico">✦</div>
+            <h3>Abilities</h3><p>Per-ability AI likelihood and consideration gates.</p>
+            <div class="meta">ai_priority · ai_behaviour</div></a>
+          <a class="card cursor-host" href="docs/job-table.md"><div class="ico">🛡</div>
+            <h3>Jobs</h3><p>Job AI priority and eight packed elemental resistances.</p>
+            <div class="meta">48 accessor fields · 116 jobs</div></a>
+          <a class="card cursor-host" href="docs/item-table.md"><div class="ico">⚔</div>
+            <h3>Items</h3><p>Weapon power, icon art, and hand-use / shop / pool flags.</p>
+            <div class="meta">19 accessor properties</div></a>
+          <a class="card cursor-host" href="docs/mission-data.md"><div class="ico">📜</div>
+            <h3>Missions</h3><p>Rewards, clan progress, dispatch rules, deadlines, clears.</p>
+            <div class="meta">clan points · skill requirements</div></a>
+          <a class="card cursor-host" href="docs/map-data.md"><div class="ico">🗺</div>
+            <h3>Maps</h3><p>Terrain, arrangement, clipping tilemaps, custom-LZSS graphics.</p>
+            <div class="meta">162 maps · 50 graphics streams</div></a>
+          <a class="card cursor-host" href="docs/text.md"><div class="ico">✍</div>
+            <h3>Text</h3><p>All 2,757 primary-table strings decode with real names.</p>
+            <div class="meta">abilities read as Cure, Curaga…</div></a>
+        </div>
+        <div class="law">
+          <span class="law-tag">LAW</span>
+          <b>No ROM data lives in this repository.</b> Supply your own dump; the
+          build verifies its SHA1 and extracts what it needs at build time.
+          <code>*.gba</code> and <code>*.bin</code> are gitignored.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <h2><span class="bar"></span>Validated by executing the ROM's own code</h2>
+          <p>Static decoding forms a hypothesis; the ROM's functions are then run
+            on an emulated ARM7TDMI to check it. That is how ten AI checks and a
+            whole battle turn stay reproducible.</p>
+        </div>
+        <div class="checks">
+          <div class="check"><span class="ok">✓</span><span><b>Priority filter</b> — measured vs a bias-corrected model, ±0.6pt</span></div>
+          <div class="check"><span class="ok">✓</span><span><b>Healthy-target rule</b> at its exact boundaries</span></div>
+          <div class="check"><span class="ok">✓</span><span><b>11% / 50%</b> self-vs-other status gate</span></div>
+          <div class="check"><span class="ok">✓</span><span><b>Job accessor</b> — 5,568 executed reads across 116 jobs</span></div>
+          <div class="check"><span class="ok">✓</span><span><b>Missions 13/13</b> · items 8/8 · statuses 21/21</span></div>
+          <div class="check"><span class="ok">✓</span><span><b>Maps 17/17</b> incl. palettes · text 2,757/2,757</span></div>
+          <div class="check"><span class="ok">✓</span><span><b>Whole-battle trace</b> — full enemy turn with frozen RNG</span></div>
+          <div class="check"><span class="ok">✓</span><span><b>CI per-function gate</b> — SHA-256 build hashes, no ROM needed</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="docs">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2><span class="bar"></span>Documentation</h2>
+          <p>The authoritative, evidence-backed writeups. Markdown files render
+            raw on GitHub Pages; the tables below link to the source.</p>
+        </div>
+        <div class="docs">
+          <a class="doc cursor-host" href="README.md"><span><div class="t">README</div><div class="d">What the project is, status, setup, workflow.</div><div class="fp">README.md</div></span></a>
+          <a class="doc cursor-host" href="CLAUDE.md"><span><div class="t">Working method</div><div class="d">How to work here without repeating past mistakes.</div><div class="fp">CLAUDE.md</div></span></a>
+          <a class="doc cursor-host" href="docs/roadmap.md"><span><div class="t">Roadmap</div><div class="d">Remaining work, in order, with a pick-next-task queue.</div><div class="fp">docs/roadmap.md</div></span></a>
+          <a class="doc cursor-host" href="docs/project-log.md"><span><div class="t">Project log</div><div class="d">Operational source of truth: decisions, evidence, sessions.</div><div class="fp">docs/project-log.md</div></span></a>
+          <a class="doc cursor-host" href="docs/modding.md"><span><div class="t">Modding</div><div class="d">The no-compiler modding path in one place.</div><div class="fp">docs/modding.md</div></span></a>
+          <a class="doc cursor-host" href="docs/ai-strategy-profiles.md"><span><div class="t">AI strategy profiles</div><div class="d">Declarative auto-battle behavior config.</div><div class="fp">docs/ai-strategy-profiles.md</div></span></a>
+          <a class="doc cursor-host" href="docs/dead-ends.md"><span><div class="t">Dead ends</div><div class="d">Refuted hypotheses so no session repeats them.</div><div class="fp">docs/dead-ends.md</div></span></a>
+          <a class="doc cursor-host" href="docs/ai-findings.md"><span><div class="t">AI findings</div><div class="d">How the battle AI evaluates abilities.</div><div class="fp">docs/ai-findings.md</div></span></a>
+          <a class="doc cursor-host" href="docs/validation.md"><span><div class="t">Validation</div><div class="d">Every gate and how it reproduces evidence.</div><div class="fp">docs/validation.md</div></span></a>
+          <a class="doc cursor-host" href="docs/whole-battle-trace.md"><span><div class="t">Whole-battle trace</div><div class="d">One real enemy turn, frozen-RNG replay.</div><div class="fp">docs/whole-battle-trace.md</div></span></a>
+          <a class="doc cursor-host" href="docs/turn-order.md"><span><div class="t">Turn order</div><div class="d">The battle CT / turn sequence model.</div><div class="fp">docs/turn-order.md</div></span></a>
+          <a class="doc cursor-host" href="docs/unit-flags.md"><span><div class="t">Unit flags</div><div class="d">44 unit-status and stat behaviors, named.</div><div class="fp">docs/unit-flags.md</div></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <h2><span class="bar"></span>Prior art</h2>
+          <p>No FFTA decompilation exists elsewhere. These are worth reading before
+            duplicating work.</p>
+        </div>
+        <div class="linked">
+          <a href="https://github.com/LeonarthCG/FFTA_Engine_Hacks">LeonarthCG/FFTA_Engine_Hacks</a>
+          <a href="https://github.com/spiiin/FFTAUtils">spiiin/FFTAUtils</a>
+          <a href="https://github.com/kwsch/FF_TA">kwsch/FF_TA</a>
+          <a href="https://datacrystal.tcrf.net/wiki/Final_Fantasy_Tactics_Advance">Data Crystal</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div>FFTA Decomp · reverse-engineering project · supply your own ROM dump</div>
+    <div>Docs render as raw Markdown; <a href="https://pages.github.com/">GitHub Pages</a> is used for this landing page.</div>
+  </div>
+</footer>
+
+</body>
+</html>
