@@ -18,6 +18,7 @@ import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ability_table as ability
+import ai_action
 import ai_targeting
 from ffta_names import Names
 from patch_ai_gates import find_gates
@@ -53,7 +54,8 @@ def validate_profile(profile):
     if not isinstance(profile, dict):
         raise ProfileError("profile must be a JSON object")
     _only(profile, {"schema_version", "name", "description", "base_sha1",
-                    "status_gates", "target_ordering", "ability_rules", "job_rules"}, "profile")
+                    "status_gates", "target_ordering", "action_selection",
+                    "ability_rules", "job_rules"}, "profile")
     if profile.get("schema_version") != SCHEMA_VERSION:
         raise ProfileError(f"schema_version must be {SCHEMA_VERSION}")
     for key in ("name", "description"):
@@ -75,9 +77,13 @@ def validate_profile(profile):
     target_ordering = profile.get("target_ordering", "retail")
     if target_ordering not in ai_targeting.POLICIES:
         raise ProfileError("target_ordering must be retail or deterministic_ties")
+    action_selection = profile.get("action_selection", "retail")
+    if action_selection not in ai_action.POLICIES:
+        raise ProfileError("action_selection must be retail or first")
     _validate_rules(profile.get("ability_rules", []), "ability")
     _validate_rules(profile.get("job_rules", []), "job")
     if (gates is None and target_ordering == "retail" and
+            action_selection == "retail" and
             not profile.get("ability_rules") and not profile.get("job_rules")):
         raise ProfileError("profile must define at least one strategy control")
     return profile
@@ -329,11 +335,19 @@ def build_profile(rom, profile):
     except ValueError as error:
         raise ProfileError(str(error)) from error
 
+    action_policy = profile.get("action_selection", "retail")
+    try:
+        action_updates = ai_action.apply_policy(output, action_policy)
+    except ValueError as error:
+        raise ProfileError(str(error)) from error
+
     changed = [index for index, (old, new) in enumerate(zip(original, output)) if old != new]
     return bytes(output), {"ability_rules": ability_report, "job_rules": job_report,
                            "status_gates": gate_report,
                            "target_ordering": {"policy": target_policy,
                                                "updates": target_updates},
+                           "action_selection": {"policy": action_policy,
+                                                "updates": action_updates},
                            "changed_bytes": len(changed)}
 
 
@@ -352,6 +366,8 @@ def print_report(profile, report):
               f"({gates['updates']} update(s))")
     targeting = report["target_ordering"]
     print(f"target ordering: {targeting['policy']} ({targeting['updates']} update(s))")
+    actions = report["action_selection"]
+    print(f"action selection: {actions['policy']} ({actions['updates']} update(s))")
     print(f"final changed bytes: {report['changed_bytes']}")
 
 

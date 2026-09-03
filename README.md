@@ -101,11 +101,12 @@ checks pass: the priority filter, the ability property accessor, flag decoding,
 the stat-id mapping, the healthy-target rule at its exact boundaries, the
 11%/50% status gate, packed resistance decoding, unarmed attack power, the
 92-case control-flow partition, and the first two CT-window rules. See
-[docs/validation.md](docs/validation.md). The strategy validator adds two
-executed target-ordering checks: the retail mode=1 tie roll swaps about half
-of 500 seeded ties and the mode=0 order-gate roll keeps about half, while the
-`deterministic_ties` patch makes both deterministic (keep) and never touches
-the RNG.
+[docs/validation.md](docs/validation.md). The strategy validator adds three
+executed patch checks: the retail mode=1 tie roll swaps about half of 500
+seeded ties and the mode=0 order-gate roll keeps about half, while the
+`deterministic_ties` patch makes both deterministic (keep); the action-slot
+walk plus its behaviour coins draw in 500/500 seeded runs on retail and 0/500
+under `action_selection: first`. No patched window ever touches the RNG.
 
 Whole-battle behaviour is now traced through a real enemy turn: one actor calls
 `sub_080C32C0` for four distinct targets, and a frozen-RNG replay reproduces the

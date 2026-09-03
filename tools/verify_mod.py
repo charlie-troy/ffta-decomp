@@ -21,6 +21,7 @@ from ffta_lz import block_length
 from map_data import (COUNT as MAP_COUNT, _arrangement_cells, _clipping_cells,
                       _height_cells, decode_graphics, resolve_block)
 import ability_table as A
+import ai_action
 import ai_targeting
 import item_table as I
 import mission_table as M
@@ -41,6 +42,9 @@ FUNCTIONS = json.load(open(os.path.join(REPO, "data", "functions.json")))["funct
 STRATEGY_REGIONS = {
     (ai_targeting.GATE_OFFSET, ai_targeting.GATE_END): "AI target order gate",
     (ai_targeting.PATCH_OFFSET, ai_targeting.PATCH_END): "AI target tie-break",
+    (ai_action.WALK_OFFSET, ai_action.WALK_END): "AI action walk roll",
+    (ai_action.KIND1_OFFSET, ai_action.KIND1_END): "AI kind-1 behaviour coin",
+    (ai_action.KIND2_OFFSET, ai_action.KIND2_END): "AI kind-2 behaviour coin",
 }
 
 

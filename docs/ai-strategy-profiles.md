@@ -157,27 +157,64 @@ score after `sub_080C2314` returns, and the already-shipped priority
 (`ai_priority`) control. Both are unverified as profile controls and remain
 roadmap work.
 
+## Action selection
+
+`action_selection` selects how the game picks which behaviour slot an actor
+acts on, upstream of target ordering. The slot walk (inside `sub_080C2940`,
+0x080C29A2..0x080C2A8C) holds the actor's behaviour array (count at
+arg0+0x527e, kind bytes at arg0+0x5276+i) and steps slot index i from 0:
+every non-last slot survives only on a `Rand() % 101 > 50` roll (window
+0x080C29BE..0x080C29D4), and the selected slot's kind dispatches through a
+jump table at 0x080C29FC. Two of the eight kinds flip their own coin: kind 1
+(0x080C2A22) sets flag 0x80 or 0x81, kind 2 (0x080C2A42) sets 0x80 or 0x82.
+
+- `retail` (default): keep all three draws.
+- `first`: the walk's conditional branch becomes unconditional (slot 0 is
+  always processed and the roll code is never reached), and each coin's
+  `Rand()` call becomes `movs r0, #0` + NOP, so flag 0x80 wins. Every forced
+  value — slot 0, flag 0x80 twice — is an outcome retail itself produces, so
+  the patch cannot construct a state the retail AI could not reach. The
+  battle RNG is never consulted.
+
+Each site is a same-size patch verified against the exact retail bytes, and
+no branch, jump-table entry, or ROM pointer lands inside any of them. Strict
+mod verification attributes the 9 changed bytes as "AI action walk roll" and
+"AI kind-1/kind-2 behaviour coin".
+
+**Live proof.** In the real frozen-seed snowball battle, retail consumes 1
+draw inside one sort call (a Rand() breakpoint pins the caller at
+lr=0x080C2A27, the kind-1 coin); NOPing exactly that call with everything
+else retail drops the battle to 0 draws. With `action_selection: first`, the
+live battle consumes 0 draws, and composed with `deterministic_ties` an
+engineered three-candidate tie also costs 0 draws (retail: 3).
+
+The validator executes the walk window over 500 seeds per coin-bearing kind:
+retail draws in 500/500 runs per kind, the patched ROM in 0/500 with the RNG
+state untouched and only flag 0x80 produced.
+
 ## Shipped profiles
 
 - `aggressive.json` establishes a low general baseline, strongly favors
   offensive abilities, keeps healthy-target debuffs competitive, raises the
   shared status gates, and makes equal-candidate target ties deterministic.
 - `deterministic-actions.json` sets every retail-enabled ability and job
-  fallback priority to 100 and removes the known shared status-gate refusal
-  rolls. It is useful for repeatable testing, but deliberately keeps retail
-  target ordering (including its tie roll), damage randomness, and
-  effect-specific evaluator cases.
+  fallback priority to 100, removes the known shared status-gate refusal
+  rolls, and pins action selection (`action_selection: first`). It is useful
+  for repeatable testing, but deliberately keeps retail target ordering
+  (including its tie roll), damage randomness, and effect-specific evaluator
+  cases.
 
 ## Safety contract
 
 The profile is built entirely in memory and written only after every rule has
 validated. Unknown keys, invalid selectors, unexpected match counts, wrong ROM
 hashes, out-of-range results, and zero-match rules all fail closed. The
-strategy validator proves the shipped profiles change only the four declared
-surfaces, executes changed job priorities through the retail getter, and
-executes the tie window on retail and patched code: retail swaps about half of
-500 seeded ties, the patch swaps none, and the patched window never touches
-the RNG.
+strategy validator proves the shipped profiles change only the declared
+table fields and patch windows, executes changed job priorities through the
+retail getter, and executes the tie window, the mode=0 order gate, and the
+action-selection walk on retail and patched code: retail rolls about half of
+500 seeded runs, the patches pin the conservative side every time, and no
+patched window ever touches the RNG.
 
 ```bash
 python tools/validate_ai_strategy.py baserom.gba

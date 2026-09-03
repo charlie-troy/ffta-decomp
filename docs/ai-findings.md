@@ -220,17 +220,30 @@ not statistical. Results:
 
 | run | draws inside one sort call | meaning |
 |---|---|---|
-| retail, no tie | 1 | baseline roll at `0x080C29C0` |
+| retail, no tie | 1 | baseline draw: the kind-1 behaviour coin at `0x080C2A22` |
 | retail, tie | 3 | baseline + 2: the tie window runs twice |
-| patched, tie | 1 | tie costs nothing; exit state == retail control |
+| ties pinned (`deterministic_ties`), tie | 1 | tie costs nothing; exit state == retail control |
+| `action_selection: first`, no tie | 0 | entry state == exit state |
+| `action_selection: first` + `deterministic_ties`, tie | 0 | entry state == exit state |
 
-The sites, statically:
+The sites, now fully attributed:
 
-- `0x080C29C0` — `Rand() % 101 <= 50` gate inside the `r1==8` block. When it
-  passes, a range scan over arg0-relative ability slots picks a random
-  eligible one; this is the **ability-selection roll** (which action the actor
-  considers), upstream of target ordering. It fires once per sort call in this
-  battle and is the baseline draw.
+- `0x080C29BE..0x080C29C0` — the **walk roll branch**. Before picking targets,
+  the AI picks which behaviour slot to act on: the slot list (count at
+  `arg0+0x527e`, kind bytes at `arg0+0x5276+i`) is walked from index 0, and
+  every non-last slot survives only on `Rand() % 101 > 50` (the roll itself
+  sits at `0x080C29C0`; the `bge` at `0x080C29BE` skips it for the last slot).
+  The selected slot's kind (0-7) dispatches through a jump table at
+  `0x080C29FC` (reached via `mov pc` at `0x080C29EC`).
+- `0x080C2A22` — the **kind-1 behaviour coin**: `Rand() % 101 <= 50` sets
+  flag 0x80, else 0x81. A Rand() breakpoint at the live sort (frozen-seed
+  snowball battle) catches the baseline draw here (`lr=0x080C2A27`), and
+  NOPing exactly this call with everything else retail drops the battle's
+  draw count to 0 — causal proof that this coin, not the walk roll, is the
+  baseline draw in that battle (its actor has a one-slot list, so the walk
+  roll never fires there).
+- `0x080C2A42` — the **kind-2 behaviour coin**: the same shape with flags
+  0x80/0x82.
 - `0x080C2C68` — a `Rand() % n` roll taken when a candidate's current HP
   exceeds a threshold (`sub_080C7EA4(unit, 0x13)` vs the unit's value),
   feeding the BST insert of that ability record. This is a **low-HP weighted
@@ -241,9 +254,12 @@ The sites, statically:
   vs control), consistent with the selection sort comparing the tied pair
   twice; the patched ROM removes both.
 
-So `deterministic_ties` removes every target-*ordering* draw, and in the
-measured battle leaves exactly the ability-selection roll — the patched tie
-run's exit RNG state equals the retail control run's, byte for byte.
+So `deterministic_ties` removes every target-*ordering* draw, and the
+`action_selection: first` control (`tools/ai_action.py`) removes the
+action-selection draws: the walk branch becomes unconditional (slot 0 always
+processed) and both behaviour coins become `movs r0, #0` + NOP. In the live
+battle that alone takes the sort from 1 draw to 0, and combined with
+`deterministic_ties` an engineered tie also costs nothing.
 
 `0x08142950` is libgcc's signed modulo (`__modsi3`), not game code, and should come from
 building libgcc rather than being decompiled. It is the same category as

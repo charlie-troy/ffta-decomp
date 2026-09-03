@@ -4,11 +4,13 @@
 """
 import copy
 import os
+import struct
 import sys
 import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ability_table as ability
+import ai_action
 import ai_strategy
 import ai_targeting
 from emulate import Gba, STOP
@@ -19,7 +21,7 @@ from unicorn import UC_HOOK_CODE
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROFILES = (
     ("aggressive.json", 433),
-    ("deterministic-actions.json", 451),
+    ("deterministic-actions.json", 460),
 )
 JOB_PRIORITY_GETTER = 0x0813413C
 UNIT = 0x02000400
@@ -71,6 +73,8 @@ def main(argv):
     allowed.update(offset for offset, _value in find_gates(rom))
     allowed.update(range(ai_targeting.PATCH_OFFSET, ai_targeting.PATCH_END))
     allowed.update(range(ai_targeting.GATE_OFFSET, ai_targeting.GATE_END))
+    for offset, end, _retail, _patch, _label in ai_action.SITES:
+        allowed.update(range(offset, end))
     surface_ok = True
     for filename, (_profile, mod, _report) in built.items():
         outside = [index for index, (a, b) in enumerate(zip(rom, mod))
@@ -225,8 +229,66 @@ def main(argv):
           f"{'PASS' if gate_ok else 'FAIL'}")
     ok &= gate_ok
 
+    print("8. deterministic action selection, executed")
+    walk_entry = 0x08000000 + ai_action.WALK_OFFSET
+    dispatch_done = 0x080C2A8C   # kind handlers converge here before the record walk
+    behav_base = 0x02007000      # scratch behaviour array (count at +0x527e)
+    with tempfile.TemporaryDirectory(prefix="ffta-ai-strategy-") as temp:
+        deterministic = built["deterministic-actions.json"][1]
+        gbas = {}
+        for label, data in (("retail", rom), ("profile", deterministic)):
+            path = os.path.join(temp, f"walk-{label}.gba")
+            with open(path, "wb") as handle:
+                handle.write(data)
+            gbas[label] = Gba(path)
+
+        def walk_outcome(g, seed, kind):
+            g.reset_ram()
+            g.write32(RNG_STATE, seed)
+            behav = bytearray(0x5280)
+            behav[0x527E] = 3        # three behaviour slots
+            behav[0x5276] = kind     # slot 0's kind: 1 or 2 both carry a coin
+            g.uc.mem_write(behav_base, bytes(behav))
+            # run_range's SP is IWRAM+0x7f00, so [sp,#0x28] holds the base.
+            g.uc.mem_write(0x03007F28, struct.pack("<I", behav_base))
+            landed = []
+
+            def hook(uc, address, size, _):
+                landed.append(address)
+                uc.emu_stop()
+
+            h = g.uc.hook_add(UC_HOOK_CODE, hook,
+                              begin=dispatch_done, end=dispatch_done)
+            try:
+                # Entering at the branch: r0 replicates kind - 1, r5 the slot index.
+                g.run_range(walk_entry, STOP, {"r0": kind - 1, "r5": 0})
+            finally:
+                g.uc.hook_del(h)
+            return g.read32(RNG_STATE), int.from_bytes(
+                g.uc.mem_read(0x03007F1C, 4), "little")
+
+        drew = {label: {kind: 0 for kind in (1, 2)} for label in gbas}
+        flags = {label: {kind: set() for kind in (1, 2)} for label in gbas}
+        untouched = {label: {kind: 0 for kind in (1, 2)} for label in gbas}
+        for label, g in gbas.items():
+            for kind in (1, 2):
+                for seed in seeds:
+                    state, flag = walk_outcome(g, seed, kind)
+                    drew[label][kind] += state != seed
+                    untouched[label][kind] += state == seed
+                    flags[label][kind].add(flag & 0xFF)
+    walk_ok = all(drew["retail"][k] == 500 and untouched["profile"][k] == 500
+                  and flags["profile"][k] == {0x80} for k in (1, 2))
+    print(f"   retail walk+coin draws: kind1 {drew['retail'][1]}/500, "
+          f"kind2 {drew['retail'][2]}/500")
+    print(f"   patched: kind1 {drew['profile'][1]}/500 draws, "
+          f"kind2 {drew['profile'][2]}/500 draws, RNG untouched, "
+          f"flag {sorted(flags['profile'][1])} -> "
+          f"{'PASS' if walk_ok else 'FAIL'}")
+    ok &= walk_ok
+
     print()
-    print("PASS: 7/7 AI strategy checks" if ok else "FAIL: AI strategy validation")
+    print("PASS: 8/8 AI strategy checks" if ok else "FAIL: AI strategy validation")
     return 0 if ok else 1
 
 

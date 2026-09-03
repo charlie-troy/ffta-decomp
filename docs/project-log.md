@@ -2942,3 +2942,40 @@ compared again — the engineered tie at the head of the list therefore enters
 the window twice. Both entries consume one `Rand()` each on retail; the
 patch's branch-to-keep costs neither.
 
+
+### 2026-09-03 (latest) - Action selection is a verified profile control
+
+**Decode.** The slot walk before the candidate arena is filled
+(0x080C29A2..0x080C2A8C) holds the actor's behaviour array (count at
+arg0+0x527e, kind bytes at arg0+0x5276+i) and steps slot index i from 0:
+every non-last slot survives only on `Rand() % 101 > 50` (branch at
+0x080C29BE, roll at 0x080C29C0), and the selected slot's kind dispatches
+through a jump table at 0x080C29FC. Kind 1 (0x080C2A22) and kind 2
+(0x080C2A42) each flip their own coin (`Rand() % 101 <= 50`, flags
+0x80/0x81 and 0x80/0x82).
+
+**In-vivo attribution.** A Rand() breakpoint inside the live frozen-seed
+snowball battle catches the baseline draw at lr=0x080C2A27 - the kind-1
+coin, not the walk roll (this battle's actor has a one-slot list, so the
+walk roll never fires). NOPing exactly that call with everything else
+retail drops the battle to 0 draws. This corrects the earlier
+"ability-selection roll at 0x080C29C0" attribution.
+
+**Control.** `tools/ai_action.py` adds `action_selection: first`: the walk
+branch becomes unconditional (slot 0 always processed; the dead roll is
+never reached), and each coin becomes `movs r0, #0` + NOP, so flag 0x80
+wins. Every forced value is retail-reachable. Three same-size sites
+(2 + 4 + 4 bytes) verified against exact retail bytes; strict mod
+verification attributes all 9 bytes. `deterministic-actions.json` ships the
+control (diff 451 -> 460 bytes).
+
+**Proof.** The validator's new check executes the walk window over 500
+seeds per coin-bearing kind: retail draws in 500/500 per kind, the patched
+ROM in 0/500 with the RNG untouched and only flag 0x80 produced. In the
+real battle, `action_selection: first` alone measures 0 draws (retail: 1),
+and composed with `deterministic_ties` an engineered three-candidate tie
+also costs 0 draws (retail: 3). The Thumb branch byte order bit once
+(0xe00a vs bytes 0ae0) and cost one diagnostic round.
+
+**Gates.** validate_ai_strategy 8/8; strict attribution: zero unattributed.
+

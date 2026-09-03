@@ -576,10 +576,19 @@ function changed.
    (`tools/measure_sort_rng.py`) proves the patch end-to-end in a live
    battle — an engineered score tie costs retail +2 LCG steps (the tie window
    executes twice) while the patched ROM's tie run consumes exactly the
-   control run's single draw, with an identical exit RNG state. The capture
-   also identified the ability-selection roll (0x080C29C0) and a low-HP
-   weighted roll (0x080C2C68) as the sort's remaining RNG sites; both are
-   future profile-control candidates.
+   control run's single draw, with an identical exit RNG state. 2026-09-03
+   (later still): a Rand()-breakpoint in the live battle pins the baseline
+   draw at the kind-1 behaviour coin (lr=0x080C2A27) — NOPing exactly that
+   call drops the battle to 0 draws — and the action-selection draws are now
+   a verified profile control: `action_selection: first` (`tools/ai_action.py`)
+   makes the walk branch unconditional (slot 0 always processed) and replaces
+   both behaviour coins with `movs r0, #0` + NOP. The validator executes the
+   walk window (retail 500/500 draws per coin-bearing kind, patched 0/500,
+   RNG untouched, flag 0x80 only), and the live battle measures 0 draws,
+   or 0 with an engineered tie when composed with `deterministic_ties`.
+   Remaining: the low-HP weighted roll (0x080C2C68) as a future
+   profile-control candidate, the meaning of candidate `+0x00`, and
+   score/priority secondary-key controls.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.
