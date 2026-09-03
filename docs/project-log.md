@@ -34,7 +34,7 @@ status and backlog tables are living sections and should be kept current.
 | Current work package | STRAT9.2 — decode target scoring and intent weights |
 | Last closed package | STRAT9.1 — declarative strategy profiles |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 173/173; AI 10/10; strategies 6/6; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
+| Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
 ## Prioritized backlog
 

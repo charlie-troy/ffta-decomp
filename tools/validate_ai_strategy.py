@@ -18,7 +18,7 @@ from unicorn import UC_HOOK_CODE
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROFILES = (
-    ("aggressive.json", 409),
+    ("aggressive.json", 433),
     ("deterministic-actions.json", 451),
 )
 JOB_PRIORITY_GETTER = 0x0813413C
@@ -70,6 +70,7 @@ def main(argv):
                    for index in range(ability.UNIT_COUNT))
     allowed.update(offset for offset, _value in find_gates(rom))
     allowed.update(range(ai_targeting.PATCH_OFFSET, ai_targeting.PATCH_END))
+    allowed.update(range(ai_targeting.GATE_OFFSET, ai_targeting.GATE_END))
     surface_ok = True
     for filename, (_profile, mod, _report) in built.items():
         outside = [index for index, (a, b) in enumerate(zip(rom, mod))
@@ -179,8 +180,53 @@ def main(argv):
           f"{'PASS' if tie_ok else 'FAIL'}")
     ok &= tie_ok
 
+    print("7. deterministic mode=0 order gate, executed")
+    gate_entry = 0x08000000 + ai_targeting.GATE_OFFSET
+    gate_proceed = 0x080C2EB6      # roll <= 49: proceed to the ally checks
+    with tempfile.TemporaryDirectory(prefix="ffta-ai-strategy-") as temp:
+        gbas = {}
+        for label, data in (("retail", rom), ("profile", aggressive)):
+            path = os.path.join(temp, f"gate-{label}.gba")
+            with open(path, "wb") as handle:
+                handle.write(data)
+            gbas[label] = Gba(path)
+
+        def gate_outcome(g, seed):
+            g.reset_ram()
+            g.write32(RNG_STATE, seed)
+            landed = []
+
+            def hook(uc, address, size, _):
+                if address in (gate_proceed, TIE_KEEP_EXIT):
+                    landed.append(address)
+                    uc.emu_stop()
+
+            h = g.uc.hook_add(UC_HOOK_CODE, hook,
+                              begin=gate_proceed, end=TIE_KEEP_EXIT)
+            try:
+                g.run_range(gate_entry, STOP, {"r0": 0})
+            finally:
+                g.uc.hook_del(h)
+            return landed[0] if landed else None, g.read32(RNG_STATE)
+
+        outcomes = {label: [gate_outcome(g, s) for s in seeds]
+                    for label, g in gbas.items()}
+        retail_gate = sum(exit == TIE_KEEP_EXIT
+                          for exit, _state in outcomes["retail"])
+        profile_gate = sum(exit == TIE_KEEP_EXIT
+                           for exit, _state in outcomes["profile"])
+        gate_rng = [state == seed
+                    for (exit, state), seed in zip(outcomes["profile"], seeds)]
+    gate_ok = (200 <= retail_gate <= 300 and profile_gate == 500
+               and all(gate_rng))
+    print(f"   retail gate roll: {retail_gate}/500 keep (about half; "
+          f"the rest proceed to the ally checks)")
+    print(f"   patched gate: {profile_gate}/500 keep, RNG untouched -> "
+          f"{'PASS' if gate_ok else 'FAIL'}")
+    ok &= gate_ok
+
     print()
-    print("PASS: 6/6 AI strategy checks" if ok else "FAIL: AI strategy validation")
+    print("PASS: 7/7 AI strategy checks" if ok else "FAIL: AI strategy validation")
     return 0 if ok else 1
 
 

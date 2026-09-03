@@ -39,6 +39,7 @@ UNIT = 0x02000400
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FUNCTIONS = json.load(open(os.path.join(REPO, "data", "functions.json")))["functions"]
 STRATEGY_REGIONS = {
+    (ai_targeting.GATE_OFFSET, ai_targeting.GATE_END): "AI target order gate",
     (ai_targeting.PATCH_OFFSET, ai_targeting.PATCH_END): "AI target tie-break",
 }
 

@@ -121,11 +121,13 @@ score** at candidate `+0x0c` (see the candidate-layout section in
 and breaks a full tie with one RNG draw, swapping the pair when
 `Rand() % 101 <= 49` — about half the time.
 
-- `retail` (default): keep the random tie-break.
-- `deterministic_ties`: the roll window (0x080C2F7E..0x080C2F94) becomes an
-  unconditional branch to the keep-ordering path, so the earlier candidate
-  wins every tie and the battle RNG is untouched. This changes target choice
-  only where retail would have flipped a coin.
+- `retail` (default): keep both random draws.
+- `deterministic_ties`: each roll window becomes an unconditional branch to
+  the keep-ordering path. The mode=1 window (0x080C2F7E..0x080C2F94) makes
+  equal candidates keep the earlier one; the mode=0 window
+  (0x080C2E9E..0x080C2EB6) makes an unexempted negative-score challenger
+  never swap instead of coin-flipping. Both keep the conservative side of the
+  retail coin, and the battle RNG is untouched.
 
 The window is reachable only by falling through the comparator's equality
 compare; no branch, jump-table entry, or ROM pointer targets it. Strict mod
@@ -133,14 +135,19 @@ verification attributes its 22 bytes as "AI target tie-break".
 
 **Scope.** `sub_080C2940` runs two comparator regimes, selected by its second
 argument, and the whole-ROM BL scan finds exactly two callers: the
-candidate-sort call at `0x080C077C` (`mode=1`, the score path this control
-patches) and the sibling call at `0x080C078A` (`mode=0`), whose comparator
-resolves ties with its own `Rand() % 101 <= 49` roll at `0x080C2E9E` before
-the ally-safety checks. `deterministic_ties` does not touch that second roll,
-so the `mode=0` regime keeps retail randomness. The regimes are disjoint
-(nothing in the `mode=0` block branches into the patched window), so the
-patch is safe; extending coverage to the second roll is tracked as its own
-verified slice.
+candidate-sort call at `0x080C077C` (`mode=1`) and the sibling call at
+`0x080C078A` (`mode=0`). Each regime owns exactly one RNG draw, and
+`deterministic_ties` pins both: the mode=1 full-tie roll and the mode=0
+probabilistic order gate at `0x080C2E9E`, which is reached when the
+challenger's score is negative and three exemption scans (KO, healing,
+Heaver effects) find nothing — it decides whether the swap is even considered
+before the ally-safety checks. The regimes are disjoint (nothing in the
+`mode=0` block branches into the mode=1 window), and both windows are reached
+only by falling through their preceding compares, so the same-size patches
+are safe.
+
+With this control shipped, no RNG draw remains anywhere in
+`sub_080C2940`.
 
 The sort's primary key is the impact score that `sub_080C2314` writes per
 candidate (estimated numeric effect, clamped to death/overheal bounds), and

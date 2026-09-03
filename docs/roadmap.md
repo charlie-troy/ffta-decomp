@@ -554,7 +554,9 @@ function changed.
    Progress: the candidate arena and its 20-byte records are identified
    (`sub_080C2940`, count halfword at arena+0x324), and the sort comparator's
    tie-break roll (0x080C2F7E..0x080C2F94, swap when `Rand() % 101 <= 49`) is
-   decoded and exposed as the verified `deterministic_ties` profile control.
+   decoded and exposed as the verified `deterministic_ties` profile control,
+   which also pins the `mode=0` order-gate roll (0x080C2E9E..0x080C2EB6) —
+   no RNG draw remains in `sub_080C2940`.
    2026-09-03: the score model is decoded — `sub_080C2314` writes each
    candidate's s16 impact score at `+0x0c` (the sort's primary key): a damage/
    heal estimate from `sub_0812E0BC`/`sub_08130200` plus per-element status
