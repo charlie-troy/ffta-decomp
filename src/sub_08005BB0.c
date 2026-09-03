@@ -11,7 +11,9 @@
 //     pop  {r1}
 //     bx   r1
 //
-// agbcc is cc1 proper, so this file must not #include anything.
+// agbcc is cc1 proper, so this file must not #include anything. The struct
+// projection below is copied from include/ffta.h, the registry of agreed
+// layouts; keep the two in sync.
 
 typedef unsigned char u8;
 typedef unsigned short u16;

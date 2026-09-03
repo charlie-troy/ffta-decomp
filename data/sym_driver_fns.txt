@@ -1,0 +1,30 @@
+/* m4a/MP2K driver entry points, pret pokeemerald naming as intent-to-name.
+ *
+ * These annotate the audio island documented in docs/audio-driver.md. They
+ * are NOT linker symbols (nothing in src/ calls them) and must NOT be copied
+ * into data/symbols.txt or data/asm_symbols.txt. When a function here is ever
+ * matched, promote its name by adding it to data/asm_symbols.txt, which makes
+ * gen_build.py emit a typed Thumb label inside the incbin.
+ *
+ * Names with (?): behavior inferred from call counts and shape, not yet
+ * execution-proven. The 91 unnamed functions in the island stay sub_* here.
+ */
+
+/* SWI trampolines at 0x08141860..0x08141874: one `swi` + `bx r3` each.
+ * Game code reaches the driver only through these numbers: */
+/* swi 0x0A m4aSoundMode; swi 0x0B m4aSoundVSync(?); swi 0x0C m4aSoundVJump;
+ * swi 0x0D m4aSoundMain; swi 0x0E m4aSoundClear(?); swi 0x0F m4aSoundNum? */
+
+/* Pointer-based entries called by the sound-task code: */
+sub_08141500 = 0x08141500;  /* m4aSoundMain-style dispatcher (?) */
+sub_08141520 = 0x08141520;  /* sound-task step, 141 callers from game code (?) */
+
+/* Song-selection API: */
+sub_08141540 = 0x08141540;  /* m4aSongNumStart-shaped: 484 callers, loads
+                             * gSongTable, scales song number by 8,
+                             * bounds-checks, chases header pointer */
+sub_08141570 = 0x08141570;  /* m4aSongNumStop/Start-variant, 64 callers (?) */
+sub_081451C0 = 0x081451C0;  /* song number -> MusicPlayerInfo reader */
+sub_081452C0 = 0x081452C0;  /* song number -> player with explicit status (?) */
+sub_081452F4 = 0x081452F4;  /* player status query, 6 callers (?) */
+sub_0814513C = 0x0814513C;  /* player command dispatcher (?) */

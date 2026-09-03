@@ -1,0 +1,21 @@
+/* FFTA (USA) ROM-region symbol registry, pret/SA3 style.
+ *
+ * Conventions: `g` prefixes globals; `unk` keeps unidentified storage honest.
+ * Table addresses here are proven by accessor execution (docs/*.md). Regions
+ * marked excluded are identified library code that this project deliberately
+ * does not decompile; their addresses must NOT become linker symbols until a
+ * matched source actually references them.
+ */
+
+/* -- gameplay tables (all execution-verified, see docs/) -- */
+/* gAbilityTable = 0x0855187C is a linker symbol already; it lives in
+ * data/symbols.txt because matched C relocates against it. */
+gSongTable   = 0x0814BB48;  /* 640 x 8-byte MP2K entries, validated 2026-09-02 */
+gMPlayTable  = 0x0814BB24;  /* 3 x 12-byte MusicPlayerInfo records */
+
+/* -- excluded library regions -- */
+/* 0x08141500..0x081458AC: the m4a/MP2K audio driver island, 94 functions,
+ * 10,880 bytes. Identified and excluded 2026-09-02; see docs/audio-driver.md
+ * and data/sym_driver_fns.txt. No game code calls into it except via the SWI
+ * stubs and the two pointer-based entries; it is never decompiled here. */
+/* 0x08142A94: libgcc's __negdi2, noted in nonmatching/README.md. */

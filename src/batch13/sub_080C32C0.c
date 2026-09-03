@@ -5,7 +5,9 @@
  * must reproduce the ROM exactly, and this does not.
  *
  * Purpose is to make the AI's decisions legible enough to change. Names come
- * from docs/unit-struct.md, docs/ability-table.md and docs/unit-flags.md.
+ * from docs/unit-struct.md, docs/ability-table.md and docs/unit-flags.md, and
+ * the struct projections below are copied from include/ffta.h, the registry of
+ * agreed layouts; keep the two in sync.
  * Anything still unidentified keeps its sub_ or unk_ name so the guesswork is
  * visible rather than hidden behind a confident-looking label.
  */
@@ -16,6 +18,8 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef short s16;
 
+/* Status-gate thresholds shared with include/ffta.h and the proof mod
+ * (make mod-ai-always-pass sets them to 100/101 via FFTA_CPPFLAGS). */
 #ifndef FFTA_AI_SELF_STATUS_THRESHOLD
 #define FFTA_AI_SELF_STATUS_THRESHOLD 10
 #endif

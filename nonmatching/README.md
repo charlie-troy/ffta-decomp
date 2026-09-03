@@ -15,6 +15,13 @@ natural C.
 **Not for decompilation:** `sub_08142A94` is libgcc's `__negdi2`, not game code.
 See the libgcc section of `docs/matching-notes.md`.
 
+**Not for decompilation, by region:** the m4a/MP2K audio driver island at
+`0x08141500`-`0x081458AC` (94 discovered functions, 10,880 bytes) is Nintendo
+library code, identified 2026-09-02 and deliberately excluded. See
+[docs/audio-driver.md](../docs/audio-driver.md). It is the single largest
+identified block the roadmap's "3,421 remaining functions" counted; treating
+it as out of scope removes it from the denominator, not from the repo.
+
 ## These two are parked, not open
 
 Everything reasonable has been tried on `sub_080DD580` and `sub_080BDC20`:

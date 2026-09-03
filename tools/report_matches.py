@@ -16,9 +16,13 @@ _SYMS = None
 def _symbols():
     global _SYMS
     if _SYMS is None:
-        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                         "data", "symbols.txt")
-        _SYMS = elfutil.load_symbols(p) if os.path.isfile(p) else {}
+        _SYMS = {}
+        base = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                            "data")
+        for name in ("symbols.txt", "sym_ewram.txt", "sym_iwram.txt"):
+            p = os.path.join(base, name)
+            if os.path.isfile(p):
+                _SYMS.update(elfutil.load_symbols(p))
     return _SYMS
 
 

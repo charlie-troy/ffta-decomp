@@ -19,7 +19,75 @@ gUnk_03000890 = 0x03000890;
 gUnk_03002F58 = 0x03002F58;
 gUnk_03002710 = 0x03002710;
 gUnk_030034B8 = 0x030034B8;
+gRngState = 0x030034B0;
 gAbilityTable = 0x0855187C;
+
+/* FFTA (USA) EWRAM symbol registry, pret/SA3 style.
+ *
+ * 0x02000000..0x0203FFFF, 256 KiB. The matched C references a small number of
+ * fixed anchors here, mostly parked structs and record buffers.
+ *
+ * Conventions: `g` prefixes globals; `unk` keeps unidentified storage honest.
+ * Everything listed here must also appear in data/symbols.txt (globals the C
+ * references) or data/asm_symbols.txt (call targets that are still assembly);
+ * the build and tools/elfutil.py consume those two files, this registry is the
+ * human-readable layer naming what each address means. Only addresses with
+ * retail evidence from execution, tracing, or matched readers belong here.
+ */
+
+/* gEwram marks the arena start; several matched readers take a base plus a
+ * dynamic record offset into it. */
+gEwram = 0x02000000;        /* data/symbols.txt: gUnk_020020D0 etc. anchor
+                             * specific parked structs inside the arena */
+
+/* 0x0200918C holds a struct pointer read by sub_08013364; it is not yet a
+ * linker symbol because that source still spells it as a cast literal
+ * (docs/matching-notes.md). Register it when the source adopts the symbol. */
+
+/* FFTA (USA) IWRAM symbol registry, pret/SA3 style.
+ *
+ * 0x03000000..0x03007FFF, 32 KiB. Architecture notes: 0x03007FE0..0x03007FF7
+ * are the three interrupt-struct words and 0x03007FF8..0x03007FFF the BIOS
+ * flags; everything else is game-owned.
+ *
+ * Conventions: `g` prefixes globals; `unk` keeps unidentified storage honest.
+ * Every assignment here must also appear in data/symbols.txt (globals the C
+ * references) or data/asm_symbols.txt (call targets that are still assembly);
+ * the build and tools/elfutil.py consume those two files, this registry is the
+ * human-readable layer naming what each address means. Only addresses with
+ * retail evidence from execution, tracing, or matched readers belong here.
+ */
+
+/* RNG state. The frozen-RNG AI replay writes 0x12345678 here and two traces
+ * reproduce exactly (docs/whole-battle-trace.md, tools/validate_ai.py,
+ * tools/verify_mod.py). */
+gRngState = 0x030034B0;     /* linker symbol: data/symbols.txt */
+
+/* Still-assembly call targets and work areas (gUnk_03000028, gUnk_03000890,
+ * gUnk_03002F58, gUnk_03002710, gUnk_030034B8) keep their gUnk_ names until a
+ * matched reader or trace names them. */
+
+/* FFTA (USA) ROM-region symbol registry, pret/SA3 style.
+ *
+ * Conventions: `g` prefixes globals; `unk` keeps unidentified storage honest.
+ * Table addresses here are proven by accessor execution (docs/*.md). Regions
+ * marked excluded are identified library code that this project deliberately
+ * does not decompile; their addresses must NOT become linker symbols until a
+ * matched source actually references them.
+ */
+
+/* -- gameplay tables (all execution-verified, see docs/) -- */
+/* gAbilityTable = 0x0855187C is a linker symbol already; it lives in
+ * data/symbols.txt because matched C relocates against it. */
+gSongTable   = 0x0814BB48;  /* 640 x 8-byte MP2K entries, validated 2026-09-02 */
+gMPlayTable  = 0x0814BB24;  /* 3 x 12-byte MusicPlayerInfo records */
+
+/* -- excluded library regions -- */
+/* 0x08141500..0x081458AC: the m4a/MP2K audio driver island, 94 functions,
+ * 10,880 bytes. Identified and excluded 2026-09-02; see docs/audio-driver.md
+ * and data/sym_driver_fns.txt. No game code calls into it except via the SWI
+ * stubs and the two pointer-based entries; it is never decompiled here. */
+/* 0x08142A94: libgcc's __negdi2, noted in nonmatching/README.md. */
 
 SECTIONS
 {

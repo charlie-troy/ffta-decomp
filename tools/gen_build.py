@@ -173,12 +173,20 @@ def main(argv):
     ]
 
     # Globals referenced from C are real symbols, so the linker has to resolve
-    # them. Their addresses live in data/symbols.txt.
+    # them. Their addresses live in data/symbols.txt, plus the sym_*.txt
+    # registries, which are address-only annotations of RAM the matched C does
+    # not relocate against yet.
     sympath = os.path.join(REPO, "data", "symbols.txt")
     if os.path.isfile(sympath):
         with open(sympath) as fh:
             lines.append(fh.read().rstrip())
         lines.append("")
+        for extra in ("sym_ewram.txt", "sym_iwram.txt", "sym_rom.txt"):
+            p = os.path.join(REPO, "data", extra)
+            if os.path.isfile(p):
+                with open(p) as fh:
+                    lines.append(fh.read().rstrip())
+                lines.append("")
 
     lines += [
         "SECTIONS",

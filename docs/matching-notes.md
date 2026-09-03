@@ -3,7 +3,9 @@
 ## Where things stand
 
 **Matched: 173 functions, 9,888 bytes.** Everything under `src/` is verified
-byte-identical; non-matching work lives in `nonmatching/`.
+byte-identical; non-matching work lives in `nonmatching/`. The m4a audio
+island (94 functions, 10,880 bytes) is identified library code and excluded
+from the denominator; see docs/audio-driver.md.
 
 | Group | Count | Status |
 |---|---|---|
@@ -143,6 +145,14 @@ seen so far, all fixed the same way:
 
 When output is shorter than the target, or a constant appears in a pool that
 the original computes, try promoting the constant to an `int` variable first.
+
+## Some regions are library code, not game code
+
+The same logic extends beyond single functions: the m4a/MP2K audio island at
+`0x08141500`-`0x081458AC` is Nintendo's stock driver, proven by its SWI-only
+entry stubs and zero direct callers from game code (docs/audio-driver.md).
+Excluded regions are recorded in `data/sym_rom.txt` with their evidence; the
+progress report counts them out, not as debt.
 
 ## Some functions are libgcc, not game code
 

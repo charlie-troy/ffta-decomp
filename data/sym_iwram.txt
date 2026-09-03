@@ -1,0 +1,22 @@
+/* FFTA (USA) IWRAM symbol registry, pret/SA3 style.
+ *
+ * 0x03000000..0x03007FFF, 32 KiB. Architecture notes: 0x03007FE0..0x03007FF7
+ * are the three interrupt-struct words and 0x03007FF8..0x03007FFF the BIOS
+ * flags; everything else is game-owned.
+ *
+ * Conventions: `g` prefixes globals; `unk` keeps unidentified storage honest.
+ * Every assignment here must also appear in data/symbols.txt (globals the C
+ * references) or data/asm_symbols.txt (call targets that are still assembly);
+ * the build and tools/elfutil.py consume those two files, this registry is the
+ * human-readable layer naming what each address means. Only addresses with
+ * retail evidence from execution, tracing, or matched readers belong here.
+ */
+
+/* RNG state. The frozen-RNG AI replay writes 0x12345678 here and two traces
+ * reproduce exactly (docs/whole-battle-trace.md, tools/validate_ai.py,
+ * tools/verify_mod.py). */
+gRngState = 0x030034B0;     /* linker symbol: data/symbols.txt */
+
+/* Still-assembly call targets and work areas (gUnk_03000028, gUnk_03000890,
+ * gUnk_03002F58, gUnk_03002710, gUnk_030034B8) keep their gUnk_ names until a
+ * matched reader or trace names them. */
