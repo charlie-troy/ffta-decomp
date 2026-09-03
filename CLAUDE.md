@@ -104,12 +104,13 @@ Genuinely open, with the reason:
 - **The target-candidate score model is decoded.** `sub_080C2940` builds and
   sorts 20-byte candidate records before the evaluator runs; the s16 impact
   score at candidate `+0x0c` is written by `sub_080C2314` (layout and
-  executed evidence in `docs/ai-findings.md`). Both comparator RNG draws —
-  the `mode=1` tie roll and the `mode=0` order-gate roll at `0x080C2E9E` —
-  are verified profile controls (`deterministic_ties` pins both). The
-  action-selection draws (walk roll at `0x080C29C0`, behaviour coins at
-  `0x080C2A22`/`0x080C2A42`) are pinned by the `action_selection: first`
-  control; a live battle measures 0 draws with that patch vs 1 on retail.
+  executed evidence in `docs/ai-findings.md`). All four RNG draws in the
+  sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the `mode=0`
+  HP-weighted enumeration roll (its caller passes `r1=0x87`, skipping the
+  slot walk), and the mode=1 action walk with its two kind coins — are
+  verified profile controls (`deterministic_ties` pins the first three,
+  `action_selection: first` the last); a live battle measures 0 draws
+  under the patches.
 - **Mission fields.** The corrected constant-caller report is exhausted;
   rewards, progression, dispatch rules, fees, type, deadlines, clear
   conditions, clan-skill requirements, cancellation, and hidden reward previews
