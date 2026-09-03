@@ -555,7 +555,15 @@ function changed.
    (`sub_080C2940`, count halfword at arena+0x324), and the sort comparator's
    tie-break roll (0x080C2F7E..0x080C2F94, swap when `Rand() % 101 <= 49`) is
    decoded and exposed as the verified `deterministic_ties` profile control.
-   The score fields themselves and their producers remain open.
+   2026-09-03: the score model is decoded — `sub_080C2314` writes each
+   candidate's s16 impact score at `+0x0c` (the sort's primary key): a damage/
+   heal estimate from `sub_0812E0BC`/`sub_08130200` plus per-element status
+   contributions, clamped to the target's HP and max-HP bounds, with rule ids
+   (0x15/0x26/9/8/0x51) naming the effect kind. Executed on synthetic units
+   (sentinel-buffer out-arg mapping, estimate 95 for blank units, +5 at 0 HP,
+   RNG-independent). Remaining: real-ability magnitudes under full battle
+   state, and verified profile controls for the score and the priority
+   secondary key.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.

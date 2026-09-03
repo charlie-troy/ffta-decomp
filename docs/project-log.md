@@ -2784,3 +2784,52 @@ Evidence:
   literal pointers ROM-wide.
 - `validate_ai_strategy.py` still 6/6; strict attribution unchanged (409
   bytes, zero unattributed).
+
+### 2026-09-03 — STRAT9.2: the candidate score decode (primary key named)
+
+Objective:
+
+- Name the field the target sort actually orders on and find what writes it.
+
+Completed:
+
+- Full linear disassembly of `sub_080C2940` (`0x0C2940`–`0x0C32BE`) with a
+  `.short` fallback past the undecodable pool word at `0x080C2E42` (Capstone
+  previously stopped there, hiding the whole second half of the function).
+- Reconciliation: the 20-byte target candidates live **inside** each
+  0x328-stride action record, at `record + 4 + k*0x14`, with `+0x324` doubling
+  as the candidate count (cap 0x0A). The comparator's record-relative reads
+  (`+i*0x14+0x10` halfword; `+0x14`/`+0x1C` bytes) are therefore candidate
+  `+0x0c` score and the pair's `+0x10` AI-priority bytes.
+- Canonical candidate layout written into `docs/ai-findings.md` (u16 target id
+  at `+0x00`, three effect-rule slots, validity `+0x0a`, effect flags `+0x0b`,
+  s16 impact score `+0x0c`, rule-id copy `+0x0e`, priority byte `+0x10`,
+  tail flags `+0x11`).
+- Score producer identified: `sub_080C2314(caster, target, abilityId, ...)`,
+  whose stack out-pointers are written by `sub_080C2618` as candidate
+  `+0x04/+0x0c/+0x0e/+0x0f` — it fills the rule slots, the score, and the
+  effect flags. Static decode: HP-delta estimate clamped to death/overheal
+  bounds, per-element loop adding MP/status contributions, rule ids
+  0x15 (positive) / 0x26 (negative) / 9 / 8 / 0x51, and the ability 0x146
+  special that forces score 100.
+- Executed evidence (synthetic units on the emulator harness): mapped the four
+  stack out-pointers by sentinel buffers (rule code, score, accumulator,
+  kill flag); measured the base estimate = 95 for blank units and ability 0
+  (score 96 with one status point), +5 when the target starts at 0 HP,
+  constant across RNG seeds and self-target, confirming the clamp paths.
+- Docs updated: `ai-findings.md` gains the layout + score-producer sections,
+  `ai-strategy-profiles.md` names the primary/secondary keys correctly, and
+  the roadmap progress note records what remains open (real-ability
+  magnitudes under full battle state; verified profile controls for the score
+  and the priority secondary key).
+
+Evidence:
+
+- Comparator key arithmetic vs candidate offsets: `record + i*0x14 + 0x10`
+  == candidate `i+1` `+0x0c` (verified by address algebra on the fill-side
+  `count*20+4` stride in the `sub_080C2618` caller).
+- `exp_map_args.py`: sentinel buffers — exactly three stack words written
+  (rule code 0x15, score, accumulator); `r0` = validity.
+- `exp_est.py`: `sub_0812E0BC(caster, target, 0, 1)` = 95 for blank units
+  regardless of target/caster HP and maxHP, RNG seeds 1..8, mode, and
+  self-target; 100 at target HP 0. Score = estimate + 1 in every trace.

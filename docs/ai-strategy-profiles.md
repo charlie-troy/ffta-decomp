@@ -115,9 +115,11 @@ not tactical policy, and remain deliberately separate.
 ## Target ordering
 
 `target_ordering` selects how the game orders equal target candidates. The
-candidate sort (inside `sub_080C2940`) compares a signed halfword score at
-record `+0x10`, then two signed bytes, and breaks a full tie with one RNG
-draw, swapping the pair when `Rand() % 101 <= 49` — about half the time.
+candidate sort (inside `sub_080C2940`) compares a signed halfword **impact
+score** at candidate `+0x0c` (see the candidate-layout section in
+[ai-findings.md](ai-findings.md)), then the two candidates' AI-priority bytes,
+and breaks a full tie with one RNG draw, swapping the pair when
+`Rand() % 101 <= 49` — about half the time.
 
 - `retail` (default): keep the random tie-break.
 - `deterministic_ties`: the roll window (0x080C2F7E..0x080C2F94) becomes an
@@ -139,6 +141,14 @@ so the `mode=0` regime keeps retail randomness. The regimes are disjoint
 (nothing in the `mode=0` block branches into the patched window), so the
 patch is safe; extending coverage to the second roll is tracked as its own
 verified slice.
+
+The sort's primary key is the impact score that `sub_080C2314` writes per
+candidate (estimated numeric effect, clamped to death/overheal bounds), and
+the secondary key is the ability's AI-priority byte. A strategy profile that
+wants different target choices therefore has two future levers: rewriting the
+score after `sub_080C2314` returns, and the already-shipped priority
+(`ai_priority`) control. Both are unverified as profile controls and remain
+roadmap work.
 
 ## Shipped profiles
 

@@ -235,7 +235,7 @@ The table is bounded at **116 entries**. The earlier 123-entry estimate was a
 false plausibility bound that included unrelated following data. Its priority
 byte spans the same 0-100 scale as the ability table, over 14 distinct values.
 
-## Candidate-list model, confirmed by disassembly
+## Candidate-list model, confirmed by disassembly and execution
 
 The build-then-filter pipeline is confirmed by reading the two callers' bodies,
 not just their call sites.
@@ -252,6 +252,53 @@ not just their call sites.
 Its only caller (at `0x080C2816`) walks a table of 4-byte ability entries and
 writes one record per entry into a list whose stride is `0x328` bytes
 (`0xCA << 2`); `+0x324` of each record is a running count.
+
+### The 20-byte target candidates inside each record
+
+Each 0x328 record holds up to ten 20-byte target candidates at `+0x04`
+(candidate `k` at `record + 4 + k*0x14`; the running count at `+0x324` doubles
+as the candidate count, capped at 0x0A). Candidate layout, from the store
+pattern of `sub_080C2618`/`sub_080C2314` plus execution:
+
+| offset | type | meaning |
+| --- | --- | --- |
+| `+0x00` | u16 | target unit id |
+| `+0x04` | u16 | first effect rule id |
+| `+0x06` | u16 | second effect rule id |
+| `+0x08` | u16 | third effect rule id |
+| `+0x0a` | u8 | validity (nonzero keeps the candidate) |
+| `+0x0b` | u8 | effect flags accumulated by `sub_080C2314` |
+| `+0x0c` | s16 | **impact score — the target sort's primary key** |
+| `+0x0e` | u16 | first effect rule id copy (the max-rule scan reads this one) |
+| `+0x10` | u8 | **AI priority byte — the sort's secondary key** |
+| `+0x11` | u8 | flags (`|= 2` in `sub_080C2618`'s tail when the ability-list check passes) |
+
+The sort comparator's addresses reconcile exactly against this layout: its
+`record + k*0x14 + 0x10` score read is candidate `k+1`'s `+0x0c`, and its two
+signed bytes (`+0x14` / `+0x1C` record-relative) are the pair's `+0x10`
+priority bytes.
+
+### The score producer
+
+`sub_080C2314(caster, target, abilityId, ...)` writes one candidate's effect
+block. It takes four stack out-pointers — mapped by execution with distinct
+sentinel buffers: first effect rule id, **s16 impact score**, per-element
+effect accumulator, and a kill flag — and returns validity in `r0`.
+
+Executed facts (synthetic-unit runs on the emulator harness):
+
+- the score is a numeric impact estimate: the base damage/heal estimate from
+  `sub_812E0BC`/`sub_8130200` plus per-element contributions. For blank units
+  and ability 0 the estimate is the constant 95 (score 96 with one status
+  point), +5 when the target starts at 0 HP, and deterministic across RNG
+  seeds.
+- the estimate is clamped to the target's HP (death bound) and the target's
+  remaining max-HP headroom (overheal bound) before being stored.
+- rule ids land in the rule slots: `0x15` positive effect, `0x26`
+  negative/drain, `9`/`8` per the element-type switch, `0x51` for the
+  ability `0x146` special that forces score 100.
+- ability-specific magnitudes for real ability ids need full battle state and
+  are not yet exercised; the formula structure above is what is proven.
 
 `sub_080C1EB4` is the filter: over a list of `u16` ability ids it fetches the
 priority byte, runs the `sub_0812F1DC` predicate, and stores `0` back over any
