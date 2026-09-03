@@ -2979,3 +2979,16 @@ also costs 0 draws (retail: 3). The Thumb branch byte order bit once
 
 **Gates.** validate_ai_strategy 8/8; strict attribution: zero unattributed.
 
+
+### 2026-09-03 (latest) - Two-stage dispatch decoded; weighted roll mapped to case 7
+
+The record walk's second jump table (0x080C2AC4, keyed by flag & 0x7f) maps
+the slot-handler flags: case 0 is the standard record walk, case 7 holds the
+HP-weighted target-enumeration roll (0x080C2C68: insertion key = current HP
+when current <= maxHP/3, else Rand() % 0x201 + 0x10000; BST setter
+0x080C7AB4). Forcing the live actor's slot kind byte to 7 produces flag 0 -
+kind 7 draws nothing and lands on case 0 with a byte-identical arena - so no
+slot kind reaches the weighted roll's regime and flag 0x87's producer is
+open. The roll therefore stays uncontrolled for now; documented in
+ai-findings.md and the roadmap.
+

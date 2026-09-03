@@ -244,15 +244,31 @@ The sites, now fully attributed:
   roll never fires there).
 - `0x080C2A42` — the **kind-2 behaviour coin**: the same shape with flags
   0x80/0x82.
-- `0x080C2C68` — a `Rand() % n` roll taken when a candidate's current HP
-  exceeds a threshold (`sub_080C7EA4(unit, 0x13)` vs the unit's value),
-  feeding the BST insert of that ability record. This is a **low-HP weighted
-  roll** inside the record-selection loop, not the comparator.
+- `0x080C2C68` — a `Rand() % n` roll feeding a BST insert (setter
+  `0x080C7AB4`: key at node+0, unit pointer at node+4, `bge` goes right). The
+  block at `0x080C2C2E` enumerates the record's target units and inserts each
+  with key `stat(unit, 0x13)` (current HP) when `stat 0x13 <= maxHP/3`
+  (`__divsi3` at `0x08142AB0` divides stat 0x14 by 3), else with the random
+  key `Rand() % 0x201 + 0x10000` — healthy targets are effectively shuffled
+  in insertion order. This is the **target-enumeration weighted roll**, part
+  of the record-walk **case 7** regime (second jump table at 0x080C2AC4,
+  keyed by `flag & 0x7f`).
 - `0x080C2E9E` — the mode=0 order gate (pinned by `deterministic_ties`).
 - `0x080C2F7E` — the mode=1 tie roll (pinned by `deterministic_ties`). The
   live measurement shows it executing **twice** per engineered tie (+2 draws
   vs control), consistent with the selection sort comparing the tied pair
   twice; the patched ROM removes both.
+
+The full dispatch is two-stage: slot kind (0-7) through the first table at
+0x080C29FC sets a flag at `[sp,#0x1c]` — kinds 1 and 2 draw their coin and
+set 0x80/0x81/0x82, kind 7 sets flag 0 with no draw, the others set constants
+(0x3, 0x4, 0x5, 0) — and the record walk then dispatches `flag & 0x7f`
+through the second table at 0x080C2AC4. Case 0 (flag 0x80 or 0) is the
+standard record walk the candidate arena captures; the HP-weighted roll sits
+in case 7. **Open**: no slot kind reaches case 7 (flag 0x87 comes from
+elsewhere — forcing the live actor's slot kind byte to 7 yields flag 0, case
+0, a byte-identical arena, and zero draws, confirming the mapping), so the
+roll's activation regime and callers remain undecoded.
 
 So `deterministic_ties` removes every target-*ordering* draw, and the
 `action_selection: first` control (`tools/ai_action.py`) removes the

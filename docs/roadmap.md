@@ -586,9 +586,11 @@ function changed.
    walk window (retail 500/500 draws per coin-bearing kind, patched 0/500,
    RNG untouched, flag 0x80 only), and the live battle measures 0 draws,
    or 0 with an engineered tie when composed with `deterministic_ties`.
-   Remaining: the low-HP weighted roll (0x080C2C68) as a future
-   profile-control candidate, the meaning of candidate `+0x00`, and
-   score/priority secondary-key controls.
+   Remaining: the meaning of candidate `+0x00`, and score/priority
+   secondary-key controls. The HP-weighted roll (0x080C2C68) is decoded —
+   healthy targets (current HP > maxHP/3) get insertion key `Rand() % 0x201
+   + 0x10000` in the record-walk's case-7 regime — but no slot kind reaches
+   that regime (flag 0x87's source is open), so it has no control yet.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.
