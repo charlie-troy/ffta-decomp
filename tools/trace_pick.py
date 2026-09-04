@@ -6,8 +6,10 @@ Both breakpoints are set up front and stops are dispatched on PC:
     sequencer's outputs at battle+8 (mode=0 entry heads), battle+0x3c
     (mode=1 entry heads), battle+0x70 and battle+0x72 (counts).
 
-Discriminates: static limits (both 4, empty slots copied as null heads)
-vs sort-written live counts (4/3, only filled slots copied).
+Executed result: the counts read 4/4 before AND after the sorts - they
+are the arena initializer's live record counts (sub_080C1B8C, see
+ai-findings.md), not sort outputs, and the pick copies include records
+whose candidates were all rejected (empty 20-byte blocks).
 """
 import argparse
 import json

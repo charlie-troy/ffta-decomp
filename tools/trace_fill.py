@@ -13,7 +13,10 @@ sub_080C2618 -> sub_080C2314. This tool watches the machine run:
 Predictions to falsify: the resume index marches upward per batch until
 0xFF, then the arena retires (phase flip, counter increment); after the
 cap-th increment the machine returns 0 and the sorts run on complete
-arenas.
+arenas. Note: the arena records themselves are pre-created by the setup
+stage (sub_080C1B8C initializes them from the target lists), so the
+builder's "limit" is the record count the initializer wrote.
+"""
 
 Usage: launch mGBA (WSL, GDB stub on :2345), then
   python tools/trace_fill.py [--out outputs/mgba-snowball/fill-trace.json]

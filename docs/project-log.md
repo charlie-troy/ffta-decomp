@@ -3195,3 +3195,25 @@ tools/scenario_capture.py.
   table at 0x20223ac: entries 0-3 feed mode=0, entries 4-7 feed mode=1.
 - Corrections: the pick outputs live on the sequencer context (r7), not
   the battle struct; earlier "battle+0x70/0x72" shorthand meant ctx.
+
+### 2026-09-03 (later) - Arena setup decoded; the AI phase is closed end-to-end
+
+- Hardware write watchpoints (first use of the mGBA stub's Z2) caught the
+  count-field writer: pc 0x080C1C1E inside sub_080C1B8C, called four
+  times from the orchestrator sub_080C1EB4 (call sites 0x080C1FFE,
+  0x080C2058, 0x080C20E2, 0x080C213C) with arena bases ai+0x5c and
+  ai+0x2968.
+- sub_080C1B8C(?, arena, listPtr, listCount) zeroes the count halfword
+  at arena+0x2908 and appends each accepted list entry pointer as a
+  record (arena + count*0x328 = *listPtr). Gates per entry: flag-byte
+  mismatch (or job 0xE), battle flag +0xed bit 6 (sub_080CDCEC), and
+  sub_080CD9BC.
+- sub_080C1EB4 builds the target lists (sub_08099D08/sub_08099D34) and
+  moves the actor's own entry to the list end before initializing the
+  arenas.
+- Corrections: ai+0x2964/ai+0x5270 are live record counts written by the
+  initializer (not static limits - retracted), the builder's loop bound
+  is that count, and all 8 records exist across the arenas (4+4); the
+  mode=0 "empty" record exists but got no valid candidate. The AI phase
+  is now: setup (0x080C1EB4) -> fill (0x080C286C batch machine) ->
+  sorts (0x080C2940 x2) -> picks (0x080C486C/0x080C4830) -> memset.

@@ -370,14 +370,16 @@ arena: batches at resume 0x00–0x04 then retirement; mode=0 arena: resume
 two arenas, the pass counter incrementing to the cap (1/1), and both
 sorts then running on complete arenas — the same 4-record mode=1 and
 3-record mode=0 snapshots as every capture. The geometry resolves
-entirely with the per-arena bases: the resume index indexes the
-**arena's own record slots** (`arg0 + 0x328*k`), the loop bound is the
-u16 at **`arena+0x2908`** (4 in this battle for both arenas — which is
-exactly `ai+0x5270` for the mode=1 arena, reconciling the fill machine's
-stores), and the final batch of each phase is the retirement call
-(`resume == limit` → `0xFF`). Mode=1 filled 4/4 slots; mode=0 filled
-3 of 4 — one slot produced no valid candidate under its stricter
-filter. The struct is the same AI struct the
+entirely with the arena-setup stage (below): the arenas' records are
+**pre-created by `sub_080C1B8C`** (which sets the count halfword at
+`arena+0x2908` to the accepted record count), and the builder's resume
+index walks those existing 0x328-stride record slots (`arg0 + 0x328*k`)
+with the count halfword as its bound; the final batch of each phase is
+the retirement call (`resume == count` → `0xFF`). All 8 records exist
+across the two arenas (4 + 4); what differs is candidate-level
+acceptance — mode=0's fourth record got no valid candidate from
+`sub_080C2618` (its 20-byte block stayed zero), which is why captures
+show 3 live mode=0 records. The struct is the same AI struct the
 sort uses (literals `0x2968`, `0x5270`, `0x527f`), and the sequencer
 memsets 0x5684 bytes of it after the picks (`0x080C07B0` → `0x080C480C`).
 
@@ -399,17 +401,42 @@ record heads:
 
 (`ctx` = the sequencer context, `r7` — **not** the AI struct; `[ctx]`
 holds the AI pointer.) Executed confirmation (`tools/trace_pick.py`,
-evidence `outputs/mgba-snowball/pick-trace.json`): the count fields are
-**static limits** — 4/4 before and after the sorts, and `ctx+0x70/0x72`
-receive 4/4, not the live record counts — so the copies include unfilled
-slots: mode=0's list is the 3 live heads plus `0x20223ac`, an empty slot
-that still carries a pre-assigned entry pointer, which the downstream
-consumer must skip by validity. Both lists are 0x90-stride consecutive,
-revealing the actor's **8-entry action-entry table** (`0x20223ac +
-0x90k`): entries 0–3 feed the mode=0 regime, entries 4–7 feed mode=1.
-The captured heads reconcile exactly with the standing arena captures
-(mode=1: `0x202279c/0x270c/0x267c/0x25ec` = the `#279c/#270c/#267c/
-#25ec` records).
+evidence `outputs/mgba-snowball/pick-trace.json`): the count fields read
+4/4 before and after the sorts (they are the arena initializer's record
+counts — see the arena-setup section) and `ctx+0x70/0x72` receive 4/4,
+so the copies include records whose candidates were all rejected:
+mode=0's list is the 3 live heads plus `0x20223ac`, a record whose
+20-byte candidate block stayed zero. Both lists are 0x90-stride
+consecutive, revealing the actor's **8-entry action-entry table**
+(`0x20223ac + 0x90k`): entries 0–3 feed the mode=0 regime, entries 4–7
+feed mode=1. The captured heads reconcile exactly with the standing
+arena captures (mode=1: `0x202279c/0x270c/0x267c/0x25ec` = the
+`#279c/#270c/#267c/#25ec` records).
+
+### Arena setup: `sub_080C1EB4` and the initializer `sub_080C1B8C`
+
+Before any candidate is filled, the sequencer's first AI-phase call
+(`0x080C0730` → `0x080C47A8` → **`sub_080C1EB4`**) builds and installs
+the arena records:
+
+- `sub_080C1EB4` builds target lists on the stack via `sub_08099D08` /
+  `sub_08099D34`, moves the actor's own entry to the list end (compare
+  against the actor pointer, memmove the tail, re-append), and calls the
+  initializer once per arena — four call sites (`0x080C1FFE`,
+  `0x080C2058`, `0x080C20E2`, `0x080C213C`) with arena bases `ai+0x5c`
+  and `ai+0x2968`.
+- **`sub_080C1B8C(?, arena, listPtr, listCount)`** zeroes the count
+  halfword at `arena+0x2908`, then for each list entry appends the entry
+  pointer as a record: `arena + count*0x328 = *listPtr` (u32 store at
+  `0x080C1C16`), incrementing the count halfword. Per-entry gates skip
+  an entry when: the caster/target flag bytes differ (or a job-0xE
+  special case), the entry's unit has battle flag `+0xed` bit 6 set
+  (`sub_080CDCEC`), or `sub_080CD9BC` returns nonzero.
+- Consequently the count fields the pick helpers read (`ai+0x2964` /
+  `ai+0x5270` = `arena+0x2908` of each arena) are **live record counts
+  written here**, not static limits — the earlier "static limit" reading
+  is retracted (they were already 4/4 at the sort entry because setup
+  runs before the fill, and the sort does not change them).
 
 ### The 20-byte target candidates inside each record
 
