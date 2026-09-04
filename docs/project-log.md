@@ -3217,3 +3217,15 @@ tools/scenario_capture.py.
   mode=0 "empty" record exists but got no valid candidate. The AI phase
   is now: setup (0x080C1EB4) -> fill (0x080C286C batch machine) ->
   sorts (0x080C2940 x2) -> picks (0x080C486C/0x080C4830) -> memset.
+
+### 2026-09-03 (latest) - The setup entry and the mode=0 empty record, closed
+
+- sub_080C47A8 is the sequencer's AI-turn setup entry: 0x08022840
+  (obtain/allocate the AI struct), 0x814224c template->struct copy at
+  0x080C47BE (zeroes all candidate blocks - watchpoint-proven; the copy
+  helper is IWRAM-resident at 0x03005E90), then sub_080C1EB4.
+- A write watchpoint on the mode=0 empty record's candidate block caught
+  exactly one write all turn: the template copy's zeroing. The fill's
+  sub_080C2314 returns validity 0 for entry 0 under the mode=0 rule set
+  (r3=0) before emitting any rule; which predicate inside the score
+  producer rejects it stays open (rule-engine decode).

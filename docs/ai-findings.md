@@ -431,12 +431,25 @@ the arena records:
   `0x080C1C16`), incrementing the count halfword. Per-entry gates skip
   an entry when: the caster/target flag bytes differ (or a job-0xE
   special case), the entry's unit has battle flag `+0xed` bit 6 set
-  (`sub_080CDCEC`), or `sub_080CD9BC` returns nonzero.
+  (`sub_080CDCEC`), or `sub_080CD9BC` returns nonzero. (Mode=0's fourth
+  slot: this record **exists** with entry pointer `0x20223ac`; only its
+  candidate block is zero — see the fill-pipeline section.)
 - Consequently the count fields the pick helpers read (`ai+0x2964` /
   `ai+0x5270` = `arena+0x2908` of each arena) are **live record counts
   written here**, not static limits — the earlier "static limit" reading
   is retracted (they were already 4/4 at the sort entry because setup
   runs before the fill, and the sort does not change them).
+- The setup entry itself is **`sub_080C47A8`** (the sequencer's first
+  AI-phase call): `bl 0x08022840` (obtain/allocate the AI struct),
+  `bl 0x814224c` template→struct copy at `0x080C47BE` (initializes the
+  whole struct, zeroing all candidate blocks — watchpoint-proven), then
+  the orchestrator `sub_080C1EB4`. A write watchpoint on the mode=0
+  empty record's candidate block caught exactly one write all turn —
+  the template copy's zeroing (from IWRAM-resident `0x03005E90`, called
+  at `lr=0x080C47C3`) — and never a candidate write: for entry 0 under
+  the mode=0 rule set (`r3=0`), `sub_080C2314` returns validity 0 before
+  emitting any rule. Which predicate inside the score producer rejects
+  it is a separate decode (the `sub_080C2314` rule engine).
 
 ### The 20-byte target candidates inside each record
 
