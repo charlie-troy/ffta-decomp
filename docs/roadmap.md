@@ -582,7 +582,12 @@ function changed.
    (`tools/measure_sort_rng.py`) proves the patch end-to-end in a live
    battle — an engineered score tie costs retail +2 LCG steps (the tie window
    executes twice) while the patched ROM's tie run consumes exactly the
-   control run's single draw, with an identical exit RNG state. 2026-09-03
+   control run's single draw, with an identical exit RNG state.
+   2026-09-03 (correction): the +2 figure came from the count-endianness bug
+   in `measure_sort_rng.py` (writing `:0003` big-endian = 768 slots); with
+   the fix the retail tie cost is +3 (three tied pairs at equal priority),
+   matching the executed key law, and the score/priority-controls item is
+   closed — `ai_priority` is the ordering lever, the score only sign-gates. 2026-09-03
    (later still): a Rand()-breakpoint in the live battle pins the baseline
    draw at the kind-1 behaviour coin (lr=0x080C2A27) — NOPing exactly that
    call drops the battle to 0 draws — and the action-selection draws are now
@@ -606,7 +611,15 @@ function changed.
    entry table whose first word is the target unit pointer (live deref:
    four distinct units, HP 10/16/8/18). The earlier "u16 ability id at
    record+0" and "target unit id at candidate+0x00" readings are corrected
-   in `ai-findings.md`.
+   in `ai-findings.md`. 2026-09-03 (final): the "score producer has no
+   caller" note is retracted — it was a broken BL scan (halfword-mask bug
+   skipping odd-halfword pairs). The full fill chain is traced:
+   sequencer `0x080C0752` → thunk `0x080C47FC` → two-state fill machine
+   `sub_080C286C` → arena builder `sub_080C26EC` → `sub_080C2618` →
+   `sub_080C2314`; the machine fills one batch per frame (resume index at
+   `ai+0x527f`, phase byte at `ai+0x5280`, pass counter `ai+0x5a` vs cap
+   `ai+0x58`), then the sorts run. No orphan symbols remain in the AI
+   region.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.

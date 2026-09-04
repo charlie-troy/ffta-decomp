@@ -3007,7 +3007,7 @@ enumeration window: retail 500/500 rolls, patched 0/500, RNG untouched);
 strict attribution zero unattributed.
 
 
-### 2026-09-03 (latest) — Candidate +0x00 named: ability-id operand, records are per-target action entries
+### 2026-09-03 (latest) ï¿½ Candidate +0x00 named: ability-id operand, records are per-target action entries
 
 **Goal.** Close the last open attribution from the in-vivo capture: what the
 zero-valued candidate `+0x00` word means, and what record `+0x00` really holds.
@@ -3022,10 +3022,10 @@ candidate-writer `sub_080C2618` corroborates.
 
 - Candidate `+0x00` is **`sub_080C2618`'s ability-id operand**, stored
   verbatim as u16 (`strh` at 0x080C263E/0x080C2640); the same u16 feeds the
-  priority getter. 0 means job fallback — which is why every capture shows
+  priority getter. 0 means job fallback ï¿½ which is why every capture shows
   the uniform priority 100. It is **not** a target unit id. The old
   "target unit id" attribution is formally retracted.
-- Record `+0x00` is **not** a u16 ability id either — that reading was the
+- Record `+0x00` is **not** a u16 ability id either ï¿½ that reading was the
   low halfword of a full EWRAM pointer (`0x279C` = `0x0202279C`'s low half).
 - The four mode=1 records' `+0x00` are **0x90-stride consecutive** EWRAM
   addresses (`0x020225EC + 0x90*k`): the records are **per-target action
@@ -3040,7 +3040,7 @@ whole-battle trace (one actor, four targets) and with the mode=0 enumeration
 findings. `ai-findings.md` corrected; no code changes. Open: score/priority
 secondary-key controls, multi-turn scenario acceptance.
 
-### 2026-09-03 (latest) — The sort's executed key law pinned: priority byte ascending, score is sign-only
+### 2026-09-03 (latest) ï¿½ The sort's executed key law pinned: priority byte ascending, score is sign-only
 
 **Goal.** Verify the claimed "impact score primary key / AI-priority byte
 secondary key" law in vivo, the open thread left by the score decode.
@@ -3055,7 +3055,7 @@ post-append 0x080C310A), and read the permutation at the caller's return.
 
 - The executed key is the **AI-priority byte ascending**, sign-gated:
   k1 (prios 90/80/90/10) ended 10/80/90/90 while scores 30/50/50/70 ended
-  70/50/50/30 — non-monotonic in score. k2/k3 confirm order independence
+  70/50/50/30 ï¿½ non-monotonic in score. k2/k3 confirm order independence
   and the equal-priority swap.
 - A **negative-score** candidate is demoted to last regardless of its
   priority byte, and never rises past a positive-score one (k4/k5): the
@@ -3063,7 +3063,7 @@ post-append 0x080C310A), and read the permutation at the caller's return.
   score-vs-score compare. The "score is the primary key" doc claim is
   retracted.
 - Tooling bug found and fixed: the arena count is a little-endian u16, and
-  the tie tool's `:0003` count write stored big-endian 0x0300 = 768 — the
+  the tie tool's `:0003` count write stored big-endian 0x0300 = 768 ï¿½ the
   sort walked 768 garbage slots, which is where the old "tie costs +2
   draws" came from. Re-certified: retail tie = 4 draws (coin + 3 tie rolls,
   exactly the law's prediction for three equal-priority pairs), not +2.
@@ -3085,9 +3085,9 @@ Evidence: `outputs/mgba-snowball/keylaw.jsonl` (plans), `tie-live.json`
 (re-certified matrix). Docs: ai-findings key-law section,
 ai-strategy-profiles target-ordering correction, roadmap item closed.
 
-### 2026-09-03 (latest) — Scenario capture harness; the tutorial battle's multi-turn limits mapped
+### 2026-09-03 (latest) ï¿½ Scenario capture harness; the tutorial battle's multi-turn limits mapped
 
-**Goal.** Thread 3: multi-turn scenario acceptance (STRAT9.5) — drive
+**Goal.** Thread 3: multi-turn scenario acceptance (STRAT9.5) ï¿½ drive
 consecutive AI turns and prove retail-vs-profile divergence over turns.
 
 **Method.** `tools/scenario_capture.py`: from the frozen-seed state, arm both
@@ -3101,7 +3101,7 @@ the stub stream never desyncs; A-input is pulsed via the key-poll patch.
 - **CT forcing cannot chain AI turns in this battle.** It has exactly one AI
   unit; after its turn the game parks in an IWRAM dialog loop
   (0x03000F3C/0x030037A0 samples) and the tick stops firing. 753 A pulses
-  advance no modal — the player-turn sequencer is a phase state machine
+  advance no modal ï¿½ the player-turn sequencer is a phase state machine
   (the sort caller's function dispatches a phase counter through a
   14-entry jump table at 0x080C0488), so player turns are scripted, not
   CT-driven.
@@ -3117,3 +3117,37 @@ the stub stream never desyncs; A-input is pulsed via the key-poll patch.
 Evidence: outputs/mgba-snowball/scenario-retail.jsonl,
 candidates-{aggressive,deterministic}.json. The harness ships as
 tools/scenario_capture.py.
+
+### 2026-09-03 (latest) - The AI fill pipeline is traced end-to-end; no orphan symbols
+
+- The "score producer has no caller" note (above) is **retracted** - it came
+  from a broken whole-ROM BL scan (a halfword-mask bug that skipped every
+  odd-halfword BL pair). A corrected scan finds every link immediately.
+- Full retail fill chain, all links verified by decoded call sites:
+  sequencer `bl 0x080C47FC` at `0x080C0752` -> thunk `0x080C47FC`
+  (`bl 0x080C286C`, zero-extend) -> two-state fill machine `sub_080C286C`
+  -> arena builder `sub_080C26EC` (call sites `0x080C28C4`/`0x080C290C`)
+  -> `sub_080C2618` (call site `0x080C2816`) -> `sub_080C2314`
+  (call site `0x080C266E`).
+- The fill machine (`0x080C286C`, struct = the AI struct the sort uses):
+  dispatches on the phase byte `[ai+0x5280]` (0 -> mode=1 arena at
+  `ai+0x2968`, 1 -> mode=0 arena at `ai+0x5c`), passes the resume index
+  `[ai+0x527f]` through the builder, gates on pass counter `[ai+0x5a]`
+  vs cap `[ai+0x58]`, and returns 1 to yield a frame per batch. The
+  builder returns the next resume index, or 0xFF when the action-entry
+  table (`u16 count` at `ai+0x2908`) is exhausted; 0xFF retires the arena
+  (phase flip, counter increment at phase-1 completion). When the counter
+  reaches the cap the machine returns 0 and the sequencer proceeds to the
+  two `sub_080C2940` sorts, then the picks (`0x080C486C`/`0x080C4830` ->
+  `battle+0x70/+0x72`) and the 0x5684-byte AI-struct memset
+  (`0x080C480C`, memset helper with literal 0x5684).
+- Consequence for captures: the arenas at the sort entry are complete -
+  one full fill cycle runs both arenas to entry-table exhaustion before
+  the pass counter reaches the cap, so the sorts run on finished arenas;
+  the stable 4-record mode=1 / 3-record mode=0 counts reflect the actor's
+  action entries and the per-regime filters. The batch machine exists to
+  spread the fill across frames, not to truncate. `stat(unit,6)` feeds the
+  0x94/0xD3 special-ability resolution inside the builder, not batch
+  limits.
+- Docs updated: `ai-findings.md` gains "The fill pipeline (call chain,
+  all traced)"; roadmap items 2's caller note retracted. No code changes.

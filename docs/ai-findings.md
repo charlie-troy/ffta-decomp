@@ -323,7 +323,11 @@ not just their call sites.
   at **`+0x10`**, and a run of further checks (`sub_08096D7C`, `sub_08099544`,
   `sub_0812E4A8`, `sub_080CD944`, `sub_080C82B8`) can still invalidate it.
 
-Its only caller (at `0x080C2816`) walks a table of 4-byte **pointers to
+Its caller (at `0x080C2816`) is the **arena builder** `sub_080C26EC`, which
+itself is called twice by the two-state fill machine `sub_080C286C` (the
+only writer of the AI struct's arenas), which the turn sequencer invokes
+once per frame through the zero-extend thunk `0x080C47FC` at `0x080C0752`.
+The builder walks a table of 4-byte **pointers to
 0x90-stride action entries** and writes one record per entry into a list
 whose stride is `0x328` bytes (`0xCA << 2`); `+0x324` of each record is a
 running count. In the live capture the four record pointers are consecutive
@@ -333,6 +337,39 @@ entries** for the actor's chosen action, one per target, not per ability.
 The record walk's BST orders these entries: case 0 keys by the entry's
 target's current HP (in-vivo keys 10/16/8/18), case 7 (mode=0) randomizes
 the key for healthy targets.
+
+### The fill pipeline (call chain, all traced)
+
+The candidate arenas are filled incrementally by a two-state machine, one
+batch per rendered frame:
+
+| function | role |
+| --- | --- |
+| `0x080C0752` | sequencer call site (`bl 0x080C47FC`), one batch per frame |
+| `0x080C47FC` | thunk: `bl 0x080C286C`, zero-extend the u8 result |
+| `sub_080C286C` | fill machine: dispatches on the **phase byte `[ai+0x5280]`** (0 → mode=1 arena at `ai+0x2968`, 1 → mode=0 arena at `ai+0x5c`); passes and persists the **resume index `[ai+0x527f]`**; gates on pass counter `[ai+0x5a]` vs cap `[ai+0x58]` |
+| `sub_080C26EC` | arena builder: walks the actor's action entries (count u16 at `ai+0x2908`) starting at the resume index and appends candidates via `sub_080C2618`; also receives `stat(unit, 6)` (used in the 0x94/0xD3 special-ability resolution) and the selected slot `[ai+0x56]` |
+| `sub_080C2618` | fills one 20-byte candidate (calls `sub_080C2314` at `0x080C266E`) |
+
+The builder's byte return is the next resume index, or `0xFF` when the
+action-entry table (`ai+0x2908` entries) is exhausted — that retires the
+current arena: state 0 then resets the resume index and flips the phase
+byte to 1; state 1 resets the index, increments the pass counter
+`[ai+0x5a]`, and flips the phase back to 0. The wrapper itself always
+returns 1 (the sequencer yields a frame per batch); the gate is at its
+head — when the pass counter reaches the cap `[ai+0x58]` it returns 0 and
+the sequencer proceeds straight to the two sort calls. So **one full cycle
+fills both arenas to entry-table exhaustion**, and the sorts run on
+complete arenas: the stable capture counts (4 records mode=1 / 3 mode=0)
+reflect the actor's action entries and the per-regime filters, not a
+truncated fill. The struct is the same AI struct the
+sort uses (literals `0x2968`, `0x5270`, `0x527f`), and the sequencer
+memsets 0x5684 bytes of it after the picks (`0x080C07B0` → `0x080C480C`).
+
+An earlier session note claimed the score producer had **no caller** — that
+was a broken scan (a halfword-mask bug skipped every odd-halfword BL pair);
+the chain above is complete and each link is verified by a decoded call
+site.
 
 ### The 20-byte target candidates inside each record
 
