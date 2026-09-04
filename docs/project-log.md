@@ -3299,3 +3299,16 @@ being the injected candidate fields. Pool membership is enforced at both
 the producer (sign of projected magnitude) and the gate (rule-specific
 state checks); `cand+0..3` is a u16 target id, the unit is reached by a
 double deref of the record's entry pointer.
+
+### 2026-09-04 (later still) - sign coupling fully mapped; reject-tail attribution
+
+tools/trace_reject.py breaks at the gate's shared reject tail
+(0x080C478C) and maps LR-4 back to the check that rejected each candidate.
+Retail run: zero tail hits (all retail rejection happens pre-gate, in the
+chooser's sign check). With every candidate malformed (damage rule +
+score -1): all seven rejected by rule 0x15's positive-score helper
+0x080C442E - the mirror of rule 0x26's inline negative-score check.
+
+The gate's prologue checks were also decoded: candidate flags cand+0x11
+& 3, ability 0x109 special case, cost vs caster +0x1C meter, and a
+target-HP < max/2 gate for abilities whose table byte +0x19 == 2.

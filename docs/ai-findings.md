@@ -529,6 +529,30 @@ membership is enforced at both the producer and the gate), and
 `cand+0..3` is a u16 **target id**, not a unit pointer — unit resolution
 goes through the record's entry pointer.
 
+The sign coupling inside the gate is now fully mapped. Rule 0x26's
+negative-score check is inline (`0x080C3E84`); the damage-side mirror is a
+helper — rule 0x15 (damage) calls `0x080C442E(score)`, which rejects
+scores ≤ 0 (`bgt` passes only positive). Both damage handlers (0x4C →
+`0x080C45A8`, 0x3D → `0x080C42EE`) carry the same shape as 0x26's tail:
+`RandNext()%101` (self ≤10, ally ≤49) then a target status-bit test. The
+gate's prologue before the rule loop also checks: candidate flags
+`cand+0x11 & 3`, a special case for ability id 0x109, ability cost vs the
+caster's `+0x1C` meter (with an empty-meter reject when field-0x13 is 0),
+and a "target HP must be < max/2" gate for abilities whose table byte
+`+0x19` == 2 (healing-class abilities).
+
+Executed rejection attribution (`tools/trace_reject.py`, breakpoint on the
+gate's shared reject tail `0x080C478C` with LR→call-site mapping, frozen
+RNG, facing state): **retail produces zero tail hits** — every rejection
+in the retail battle happens before the gate (the chooser's pre-gate sign
+check kills the regime-0 trio; the accepted regime-1 candidate never
+fails). With `--negate` (all seven candidates rewritten to damage rule +
+score −1, malformed by design), all seven are rejected at exactly one
+site: rule 0x15's positive-score helper. The full sign-coupling picture:
+**the producer sets the sign from the projected effect, the chooser's
+pre-gate check enforces pool membership, and the per-rule handlers re-check
+the sign so rule semantics and score polarity can never disagree.**
+
 Executed confirmation (`tools/trace_choose.py`, evidence
 `outputs/mgba-snowball/choose-trace.json`, frozen RNG, facing state): the
 walk visited regime 0 records 0/1/2 candidate 0 — **each rejected by the
