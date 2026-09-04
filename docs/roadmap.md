@@ -570,9 +570,9 @@ function changed.
    key poll at `0x0800048A`; the WSL SDL and Windows Qt mGBA builds cannot
    load Lua scripts). The captured turn shows real-ability scores (51/46/61/51
    on the mode=1 list, 76 on the mode=0 list), rule code 0x15, priority 100,
-   and two byte-identical replays. Remaining: ability-specific magnitudes
-   under fuller battle state, the meaning of candidate `+0x00` (reads 0 in   the capture), and verified profile controls for the score and the priority
-   secondary key. 2026-09-03 (later still): the in-vivo tie experiment
+   and two byte-identical replays.   Remaining: ability-specific magnitudes
+   under fuller battle state, and verified profile controls for the score and
+   the priority secondary key. 2026-09-03 (later still): the in-vivo tie experiment
    (`tools/measure_sort_rng.py`) proves the patch end-to-end in a live
    battle — an engineered score tie costs retail +2 LCG steps (the tie window
    executes twice) while the patched ROM's tie run consumes exactly the
@@ -593,6 +593,14 @@ function changed.
    Rand() % 0x201 + 0x10000, low-HP targets their current HP), a live census
    counts 3 draws for 3 healthy-target records, and `deterministic_ties`
    NOPs the random-key branch so ties break by ascending current HP.
+   2026-09-03 (latest): candidate `+0x00` is named — it is
+   `sub_080C2618`'s ability-id operand (0 = job fallback, hence priority 100
+   everywhere in the capture), *not* a target unit id; the record's own
+   `+0x00` holds a full EWRAM pointer into a 0x90-stride per-target action
+   entry table whose first word is the target unit pointer (live deref:
+   four distinct units, HP 10/16/8/18). The earlier "u16 ability id at
+   record+0" and "target unit id at candidate+0x00" readings are corrected
+   in `ai-findings.md`.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
    behavior can be causally validated.

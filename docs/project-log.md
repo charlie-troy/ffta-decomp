@@ -3006,3 +3006,36 @@ diff 433 -> 435; validate_ai_strategy 9/9 (new check executes the
 enumeration window: retail 500/500 rolls, patched 0/500, RNG untouched);
 strict attribution zero unattributed.
 
+
+### 2026-09-03 (latest) — Candidate +0x00 named: ability-id operand, records are per-target action entries
+
+**Goal.** Close the last open attribution from the in-vivo capture: what the
+zero-valued candidate `+0x00` word means, and what record `+0x00` really holds.
+
+**Method.** `scratch_rec0.py` (scratch, tools regenerate all evidence): at the
+live `sub_080C2940` entry, dump the full 32-bit words at each mode=1 record
+`+0x00`, dereference them, and read the referenced unit's HP via
+`sub_080C7EA4(unit, 0x13)`. Static disassembly of the append path and the
+candidate-writer `sub_080C2618` corroborates.
+
+**Findings.**
+
+- Candidate `+0x00` is **`sub_080C2618`'s ability-id operand**, stored
+  verbatim as u16 (`strh` at 0x080C263E/0x080C2640); the same u16 feeds the
+  priority getter. 0 means job fallback — which is why every capture shows
+  the uniform priority 100. It is **not** a target unit id. The old
+  "target unit id" attribution is formally retracted.
+- Record `+0x00` is **not** a u16 ability id either — that reading was the
+  low halfword of a full EWRAM pointer (`0x279C` = `0x0202279C`'s low half).
+- The four mode=1 records' `+0x00` are **0x90-stride consecutive** EWRAM
+  addresses (`0x020225EC + 0x90*k`): the records are **per-target action
+  entries**, each entry's first word being the **target unit pointer**
+  (live deref: four distinct units, current HP 10/16/8/18).
+- The case-0 record walk inserts into the BST keyed by the target's
+  **current HP** (`stat(unit, 0x13)`); the 20-byte candidate payload is
+  appended from the BST nodes by the walker at `0x080C7B78`.
+
+**Impact.** The record/candidate model is now internally consistent with the
+whole-battle trace (one actor, four targets) and with the mode=0 enumeration
+findings. `ai-findings.md` corrected; no code changes. Open: score/priority
+secondary-key controls, multi-turn scenario acceptance.

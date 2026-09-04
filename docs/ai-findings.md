@@ -323,9 +323,16 @@ not just their call sites.
   at **`+0x10`**, and a run of further checks (`sub_08096D7C`, `sub_08099544`,
   `sub_0812E4A8`, `sub_080CD944`, `sub_080C82B8`) can still invalidate it.
 
-Its only caller (at `0x080C2816`) walks a table of 4-byte ability entries and
-writes one record per entry into a list whose stride is `0x328` bytes
-(`0xCA << 2`); `+0x324` of each record is a running count.
+Its only caller (at `0x080C2816`) walks a table of 4-byte **pointers to
+0x90-stride action entries** and writes one record per entry into a list
+whose stride is `0x328` bytes (`0xCA << 2`); `+0x324` of each record is a
+running count. In the live capture the four record pointers are consecutive
+(`0x020225EC + 0x90*k`), and each entry's first word is a distinct target
+unit pointer (current HP 10/16/8/18) — the records are **per-target action
+entries** for the actor's chosen action, one per target, not per ability.
+The record walk's BST orders these entries: case 0 keys by the entry's
+target's current HP (in-vivo keys 10/16/8/18), case 7 (mode=0) randomizes
+the key for healthy targets.
 
 ### The 20-byte target candidates inside each record
 
@@ -336,7 +343,7 @@ pattern of `sub_080C2618`/`sub_080C2314` plus execution:
 
 | offset | type | meaning |
 | --- | --- | --- |
-| `+0x00` | u16 | target unit id |
+| `+0x00` | u16 | ability id operand of `sub_080C2618` (verbatim store at 0x080C263E; the same u16 feeds the priority getter — 0 means job fallback, which is why every capture shows priority 100 here) |
 | `+0x04` | u16 | first effect rule id |
 | `+0x06` | u16 | second effect rule id |
 | `+0x08` | u16 | third effect rule id |
@@ -381,17 +388,20 @@ frozen-seed battle under mGBA's GDB stub, it breaks at `sub_080C2940`'s entry
 and snapshots both input arenas. The captured turn shows exactly the decoded
 model:
 
-- mode=1 list (`arg0+0x2968`): four ability records (`0x279c`, `0x270c`,
-  `0x267c`, `0x25ec`), each with one valid candidate scoring **51 / 46 / 61 /
-  51** — distinct real-ability impact estimates, not constants.
-- mode=0 list (`arg0+0x5c`): three ability records (`0x24cc`, `0x243c`,
-  `0x255c`), each scoring **76**.
+- mode=1 list (`arg0+0x2968`): four records whose `+0x00` pointers are
+  consecutive 0x90-stride action entries (`0x020225EC + 0x90*k`, one per
+  target unit, current HP 10/16/8/18), each with one valid candidate scoring
+  **51 / 46 / 61 / 51** — distinct real-ability impact estimates per target,
+  not constants.
+- mode=0 list (`arg0+0x5c`): three records (consecutive action entries),
+  each scoring **76**.
 - every candidate carries rule code `0x15` (positive damage) and priority
   byte `100`, and the sort's secondary key is saturated at 100 here — the
   primary score is what would discriminate.
-- candidate `+0x00` reads `0x0000` in all records: on this evidence the
-  "target unit id" attribution is not confirmed; the live meaning of that
-  slot stays open.
+- candidate `+0x00` reads `0x0000` in all records — now explained: it is
+  `sub_080C2618`'s ability-id operand (0 = job fallback), not a target unit
+  id; the record-to-target association lives in the record's `+0x00` action
+  entry pointer, whose first word is the target unit pointer.
 - the entry registers identify the caller: `r1=8, r2=1` (score path) and
   `r1=0x87, r2=0` (list scan), matching the `0x080C077C`/`0x080C078A` call
   sites.
