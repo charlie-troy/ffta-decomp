@@ -3229,3 +3229,20 @@ tools/scenario_capture.py.
   sub_080C2314 returns validity 0 for entry 0 under the mode=0 rule set
   (r3=0) before emitting any rule; which predicate inside the score
   producer rejects it stays open (rule-engine decode).
+
+### 2026-09-04 - sequencer state machine + phase-3 chooser decoded and live-confirmed
+
+The AI turn's downstream half is mapped: the sequencer (head 0x080C045C,
+phase u16 ctx+0x54F4, 14-entry jump table 0x080C048C) runs AI setup ->
+fill -> sort/pick -> the phase-3 chooser -> decision handoff -> post-turn
+updates. The chooser (0x080C07C8) walks the ctx's shadow copies of the
+sorted arenas (ctx+0x74+0x290C*regime), validates each candidate through
+0x080C32C0, and the FIRST accepted candidate wins via decision builder
+0x080C01D0 (struct ctx+0x5290, handler ctx+0x528C); no-candidate ends the
+turn passively through 0x080C1222. tools/trace_choose.py confirmed it live:
+regime-0 records all rejected by the gate, the mode=1 arena's first record
+accepted - the enemy executes what the sort ranked first, closing the chain
+from the ai_priority tables to observable behavior. New tool: tools/disasm.py
+(literal-annotated Thumb disassembler with jump-table/head helpers). Also
+decoded: 0x0814224C-family = register-dispatch veneers (bx rN), the ctx
+phase stack (ctx+0x54F6/0x54F8), and the validity gate's leading checks.

@@ -413,6 +413,77 @@ feed mode=1. The captured heads reconcile exactly with the standing
 arena captures (mode=1: `0x202279c/0x270c/0x267c/0x25ec` = the
 `#279c/#270c/#267c/#25ec` records).
 
+### The chooser: sequencer phase 3 (`0x080C07C8`) picks the action
+
+The AI turn's decision point is sequencer phase 3. The whole AI turn is a
+**14-phase state machine**: head `0x080C045C`, phase index u16 at
+`ctx+0x54F4`, word jump table at `0x080C048C` (the phase helper
+`0x080C1260` yields one frame per call; `0x080C1248` pops a **phase
+stack** — counter at `ctx+0x54F6`, array at `ctx+0x54F8` — so the
+sequencer supports sub-sequences). The AI phases:
+
+| phase | entry | role |
+| --- | --- | --- |
+| 0 | `0x080C0720` | AI setup (`bl 0x080C47A8`), phase 1 |
+| 1 | `0x080C0750` | fill batch per frame (`bl 0x080C47FC`), phase 2 when done |
+| 2 | `0x080C0770` | sorts + picks + AI-struct reset, phase 3 |
+| 3 | `0x080C07C8` | **the chooser** — see below |
+| 4 | `0x080C09EC` | copy the decision struct to the object at `ctx[0]`, free the two ctx buffers |
+| 5 | `0x080C0A28` | post-decision state updates; when done, `0x080C0AE2` points `ctx[0]` at the AI object again |
+
+Phase 3 walks the ctx's **shadow copies of the sorted arenas** — base
+`ctx+0x74 + 0x290C*regime` (`0x290C = 13 records + the count field;
+populated by the phase-2 wrapper from the AI struct before the reset),
+with `ctx+0x54AC` = regime, `ctx+0x54AD` = candidate index, `ctx+0x54AE`
+= record index. For each record's candidates it calls the validity gate
+`0x080C32C0(caster, target, candidate, flagByte)`; the **first accepted
+candidate wins**: the decision builder `0x080C01D0` fills the 0x21C-byte
+decision struct at `ctx+0x5290` and returns the action handler, stored at
+`ctx+0x528C`; phase 4 then copies the struct to the turn object at
+`ctx[0]` and the AI phase ends. If no candidate is accepted anywhere, the
+shared tail `0x080C1222` memsets the decision area (0x21C bytes at
+`ctx+0x5290`), sets phase 5, and the turn ends in passivity.
+
+The validity gate rejects a candidate when: effect flags `+0x0B` bits 0/1
+are set (both bail through the shared return-0 tail `0x080C478C`); ability
+== 265 without both `0x080C8240`/`0x080C8260` checks; flag-byte bit 7 set
+and ability not in category 0x13 (`0x080CCD50`); flag-byte bit 7 clear
+and `0x812ED98(a, ability) > [a+0x1C]` (an MP/HP-cost style check);
+ability 0 (the job-fallback operand used by every candidate in this
+battle) and the caster-vs-target special checks; a reacting caster with a
+negative score; ability property `+0x19 == 2` with the target's 0x13/0x14
+meters unequal (a full-ness gate, e.g. for heal-type effects); and more
+beyond `0x080C3400`.
+
+Executed confirmation (`tools/trace_choose.py`, evidence
+`outputs/mgba-snowball/choose-trace.json`, frozen RNG, facing state): the
+walk visited regime 0 records 0/1/2 candidate 0 — **each rejected by the
+gate** (reconciling the watchpoint finding that those candidates were
+never even filled) — then accepted regime 1 record 0 candidate 0. The
+winner is exactly the mode=1 arena's first record (entry `0x0202267C`),
+i.e. **the top-ranked candidate under the priority-ascending key law** —
+the AI chooses what the sort put first. Decision struct as filled:
+`+0` = `[ctx+4]` (the actor's 0x90-stride action-entry array base,
+`0x020223AC` this battle), `+4` = the record's entry pointer,
+`+8/+0xA` = the winning candidate's ability operand and rule A (both 0 —
+job fallback), `+0xC` = `[ctx+0x54EC]` (battle-side pointer), `+0x10` =
+the swapped arena base (`ctx+0x2968` here), `+0x14` = the winning
+candidate's address, `+0x28` = regime flag; handler `0x080BF7C5` at
+`ctx+0x528C`.
+
+Two decode notes that apply everywhere: `bl 0x0814224C`/`0x08142250` are
+**register-dispatch veneers** (`bx r2`, `bx r3`, … one per register) — the
+real callee pointer is loaded from ROM (e.g. `r2 = *0x0836D4B8` →
+`0x03005E79`, the IWRAM-resident copy routine family), so those literals
+are function pointers, not direct calls. And `bl 0x080C1260` in any
+sequencer-context function is the frame-yield primitive.
+
+`tools/trace_choose.py` logs the walk indices at the chooser head and the
+decision fields at the choose-call return; `tools/disasm.py` is the
+literal-annotated Thumb disassembler (resolves `ldr [pc, #imm]` pools,
+branch targets, jump tables via `--table BASE,N`, and function heads via
+`--head ADDR`) used for every static decode above.
+
 ### Arena setup: `sub_080C1EB4` and the initializer `sub_080C1B8C`
 
 Before any candidate is filled, the sequencer's first AI-phase call
