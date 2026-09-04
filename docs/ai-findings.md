@@ -637,16 +637,25 @@ candidates.
 - The sequencer runs from a **fixed context** `ctx = 0x020101F8`: the
   tiny wrapper `0x080C1438` loads that pointer and calls the dispatcher
   `0x080C045C`; its single caller is the **battle scheduler** at
-  `0x0809349E` (a sibling thunk `0x080C144C` calls the phase-getter
-  `0x080C034C` for the same context).
-- The action-entry table (`0x90`-stride entries at `0x20223AC`, entries
-  0–3 feeding mode=0 and 4–7 mode=1 this battle) receives **no writes
-  during the AI turn**: an armed write watchpoint on entry 0 fired only
-  once (an interrupt artifact at ROM `0x08148F10`, mid-`0x08144000`-family
-  damage/position arithmetic that merely *reads* nearby data), never
-  during setup, fill, sort, choose, or execute. The table is built
-  upstream in battle/unit setup, outside the AI phase — a separate slice
-  if needed.
+  `0x0809349E`.
+- The context initializer is `0x080C034C(ctx, unit)` (called through
+  `0x080C144C` from `0x08093456`, arg0 = the unit's battle object): it
+  zeroes 0x553C bytes via the veneer copy routine, stores `ctx+4 = unit`,
+  copies unit fields (`+0xF6/+0xF7` → `ctx+0x54CA/0x54CB`), reads the
+  unit's `0x15` meter into `ctx+0x54C8`, seeds the frame counter at
+  `ctx+0x54F4+2`, and computes turn-order branch keys (phase 0xB for
+  AI-controlled units; bit 4 of `ctx+0x54AF` set by unit class
+  `0x0809AA10`, bit 6 when the special condition passes).
+- `ctx+4` (the action-entry array base) is written **exactly once per
+  turn** — caught live by a write watchpoint: the write is the
+  initializer's `str r4,[r5,#4]` at `0x080C0360`, fed by the scheduler's
+  `r0 = [unit_obj+4]`. The **0x90-stride entry table itself** (here
+  `0x20223AC`, entries 0–3 feeding mode=0 and 4–7 mode=1 this battle) is
+  therefore built even further upstream, during battle/unit setup: it
+  receives no writes during the AI turn, and after the turn the
+  destructor `0x080C1460` (scheduler `0x080934B2`) frees the object at
+  `ctx+0x54EC` and `ctx[0]` is left 0 — which is why a probe attaching
+  between turns reads `ctx+4 = 0`.
 - Phase 0's `0x080C47A8` arg1 also now has a name: it is the **AI struct
   size** `0x5684` (the allocation the template copy fills).
 

@@ -3312,3 +3312,16 @@ score -1): all seven rejected by rule 0x15's positive-score helper
 The gate's prologue checks were also decoded: candidate flags cand+0x11
 & 3, ability 0x109 special case, cost vs caster +0x1C meter, and a
 target-HP < max/2 gate for abilities whose table byte +0x19 == 2.
+
+### 2026-09-04 (latest) - ctx initializer and the ctx+4 producer named
+
+The sequencer context initializer is 0x080C034C(ctx, unit): zeroes 0x553C
+bytes, stores ctx+4 = unit (the unit's battle object), copies unit fields
+into ctx+0x54C8/0x54CA/0x54CB, seeds ctx+0x54F4+2, and sets turn-order
+branch keys (phase 0xB for AI units; ctx+0x54AF bits from unit class and
+special conditions). A write watchpoint caught ctx+4 being written exactly
+once per turn - by the initializer, fed by the scheduler's
+r0 = [unit_obj+4] at 0x08093454. The 0x90-stride entry table itself is
+built even further upstream (battle/unit setup); after the turn the
+destructor 0x080C1460 frees the ctx+0x54EC object, which is why probes
+attaching between turns see ctx+4 = 0.
