@@ -615,7 +615,15 @@ function changed.
    source-driven table with explicit save/runtime compatibility constraints.
 5. **Scenario acceptance.** Replay fixed battles under contrasting profiles
    and prove action/target/movement differences over multiple turns. Do not
-   market eligibility tuning alone as full tactical control.
+   market eligibility tuning alone as full tactical control. 2026-09-03:
+   `tools/scenario_capture.py` provides the per-turn sort-call capture, and
+   the two unlock paths for full multi-turn A/B are recorded in
+   `ai-strategy-profiles.md` — a battle with several AI units (the tutorial
+   has one, and its player turns are a 14-phase sequencer state machine at
+   `0x080C0488`, not CT-driven), or sequencer-phase scripting. The current
+   turn's candidate arena is provably identical across retail, aggressive,
+   and deterministic-actions ROMs (job-fallback operand 0 saturates to the
+   same priority byte under every shipped profile).
 
 ---
 

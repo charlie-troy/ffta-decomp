@@ -195,7 +195,35 @@ draw inside one sort call (a Rand() breakpoint pins the caller at
 lr=0x080C2A27, the kind-1 coin); NOPing exactly that call with everything
 else retail drops the battle to 0 draws. With `action_selection: first`, the
 live battle consumes 0 draws, and composed with `deterministic_ties` an
-engineered three-candidate tie also costs 0 draws (retail: 3).
+engineered three-candidate tie also costs 0 draws (retail: 4 — three tie
+rolls plus the coin, matching the priority-ascending key law above).
+
+## Scenario capture and the tutorial battle's limits
+
+`tools/scenario_capture.py` drives the frozen-seed snowball battle over GDB
+and snapshots a per-call summary (mode, RNG seed, per-record candidate
+counts/scores/priorities) of every sort entry hit. It also probes what a
+full multi-turn A/B run would need, and documents two hard limits found:
+
+1. **CT forcing cannot chain AI turns here.** The tutorial battle has
+   exactly one AI unit (the traced enemy); after its turn the game parks in
+   an IWRAM dialog loop and the CT tick (`sub_0809DF7C`) stops firing. The
+   player-turn sequencer is a phase state machine — the function containing
+   the sort caller dispatches a phase counter through a 14-entry jump table
+   at `0x080C0488` — so player turns are scripted, not CT-driven. Multi-turn
+   acceptance therefore needs either a battle with several AI units (a new
+   savestate) or sequencer-phase scripting.
+2. **This turn's arena cannot diverge under the shipped profiles.** Live
+   captures on retail, aggressive, and deterministic-actions ROMs
+   (`outputs/mgba-snowball/candidates-{run-a,aggressive,deterministic}.json`)
+   are byte-identical: the actor's candidate `+0x00` is the job-fallback
+   operand 0, so both profiles' priority rules saturate the same fallback
+   byte to 100, and the RNG was frozen before divergence could accumulate.
+   The profiles' real lever on this battle — the ability-table survival
+   gate — is exercised upstream of the sort and never reaches it here.
+
+STRAT9.5 ("validate contrasting profiles in full auto battles") stays open
+with these two concrete unlock paths recorded.
 
 The validator executes the walk window over 500 seeds per coin-bearing kind:
 retail draws in 500/500 runs per kind, the patched ROM in 0/500 with the RNG

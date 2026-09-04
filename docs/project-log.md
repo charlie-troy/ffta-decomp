@@ -3084,3 +3084,36 @@ post-append 0x080C310A), and read the permutation at the caller's return.
 Evidence: `outputs/mgba-snowball/keylaw.jsonl` (plans), `tie-live.json`
 (re-certified matrix). Docs: ai-findings key-law section,
 ai-strategy-profiles target-ordering correction, roadmap item closed.
+
+### 2026-09-03 (latest) — Scenario capture harness; the tutorial battle's multi-turn limits mapped
+
+**Goal.** Thread 3: multi-turn scenario acceptance (STRAT9.5) — drive
+consecutive AI turns and prove retail-vs-profile divergence over turns.
+
+**Method.** `tools/scenario_capture.py`: from the frozen-seed state, arm both
+the CT tick and the sort entry, force CT through the battle-object records,
+and snapshot a per-call summary of every sort hit. A protocol-safe
+interrupt-every-0.4s loop dispatches on PC (tick / sort / IWRAM dialog) so
+the stub stream never desyncs; A-input is pulsed via the key-poll patch.
+
+**Findings.**
+
+- **CT forcing cannot chain AI turns in this battle.** It has exactly one AI
+  unit; after its turn the game parks in an IWRAM dialog loop
+  (0x03000F3C/0x030037A0 samples) and the tick stops firing. 753 A pulses
+  advance no modal — the player-turn sequencer is a phase state machine
+  (the sort caller's function dispatches a phase counter through a
+  14-entry jump table at 0x080C0488), so player turns are scripted, not
+  CT-driven.
+- **This turn's arena cannot diverge under the shipped profiles.** Live
+  captures on retail, aggressive, and deterministic-actions ROMs are
+  identical: candidate +0x00 is the job-fallback operand 0, both profiles'
+  rules saturate the same fallback priority byte to 100, and the frozen RNG
+  gives no room for drift. The profiles' real lever here (the ability-table
+  survival gate) acts upstream of the sort and never reaches it this turn.
+- The unlock paths for STRAT9.5 are recorded: a battle with several AI
+  units (new savestate), or sequencer-phase scripting.
+
+Evidence: outputs/mgba-snowball/scenario-retail.jsonl,
+candidates-{aggressive,deterministic}.json. The harness ships as
+tools/scenario_capture.py.
