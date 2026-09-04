@@ -3039,3 +3039,48 @@ candidate-writer `sub_080C2618` corroborates.
 whole-battle trace (one actor, four targets) and with the mode=0 enumeration
 findings. `ai-findings.md` corrected; no code changes. Open: score/priority
 secondary-key controls, multi-turn scenario acceptance.
+
+### 2026-09-03 (latest) — The sort's executed key law pinned: priority byte ascending, score is sign-only
+
+**Goal.** Verify the claimed "impact score primary key / AI-priority byte
+secondary key" law in vivo, the open thread left by the score decode.
+
+**Method.** `tools/probe_key_law.py`: at the live mode=1 sort entry, rewrite
+record 0's candidate list with per-plan (score, priority) assignments
+(k1..k5, distinct seeds), snapshot the record at internal stages
+(sort head 0x080C2D14, post-sort 0x080C2FE8, append head 0x080C30B2,
+post-append 0x080C310A), and read the permutation at the caller's return.
+
+**Findings.**
+
+- The executed key is the **AI-priority byte ascending**, sign-gated:
+  k1 (prios 90/80/90/10) ended 10/80/90/90 while scores 30/50/50/70 ended
+  70/50/50/30 — non-monotonic in score. k2/k3 confirm order independence
+  and the equal-priority swap.
+- A **negative-score** candidate is demoted to last regardless of its
+  priority byte, and never rises past a positive-score one (k4/k5): the
+  mode=1 window's score reads are **sign-only pre-checks**, never a
+  score-vs-score compare. The "score is the primary key" doc claim is
+  retracted.
+- Tooling bug found and fixed: the arena count is a little-endian u16, and
+  the tie tool's `:0003` count write stored big-endian 0x0300 = 768 — the
+  sort walked 768 garbage slots, which is where the old "tie costs +2
+  draws" came from. Re-certified: retail tie = 4 draws (coin + 3 tie rolls,
+  exactly the law's prediction for three equal-priority pairs), not +2.
+- Re-certified live matrix (all with the fixed tool): retail no-tie 1,
+  retail tie 4, action-patch tie 3, aggressive no-tie 1,
+  aggressive+first tie 0. Every cell explained by the law.
+- Consequence: the shipped `ai_priority` table control *is* the
+  target-ordering lever (raising priority moves candidates earlier); a
+  score-rewrite control would only affect sign gating. The
+  "score/priority secondary-key controls" roadmap item is closed as
+  already-covered.
+- Static note: the score producer has no direct BL from any ROM code found
+  by a whole-ROM Thumb/ARM scan and no address literal; the docs' harness
+  symbol likely names an emulator-only entry point. The candidate payload
+  is assembled in-function (rule slots, then the 20-byte node copy), with
+  the BST key = target current HP (case 0) or HP/random (case 7).
+
+Evidence: `outputs/mgba-snowball/keylaw.jsonl` (plans), `tie-live.json`
+(re-certified matrix). Docs: ai-findings key-law section,
+ai-strategy-profiles target-ordering correction, roadmap item closed.

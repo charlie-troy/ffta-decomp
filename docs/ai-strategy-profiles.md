@@ -114,12 +114,16 @@ not tactical policy, and remain deliberately separate.
 
 ## Target ordering
 
-`target_ordering` selects how the game orders equal target candidates. The
-candidate sort (inside `sub_080C2940`) compares a signed halfword **impact
-score** at candidate `+0x0c` (see the candidate-layout section in
-[ai-findings.md](ai-findings.md)), then the two candidates' AI-priority bytes,
-and breaks a full tie with one RNG draw, swapping the pair when
-`Rand() % 101 <= 49` — about half the time.
+`target_ordering` selects how the game orders the target candidates inside
+each record. The candidate sort (inside `sub_080C2940`) has an executed key
+law pinned in vivo (`tools/probe_key_law.py`; see ai-findings.md): the two
+scores' sign classes gate swaps first, then the **AI-priority byte ascending**
+orders candidates, and a full tie (equal priority bytes, same sign class) is
+broken by one RNG draw, swapping the pair when `Rand() % 101 <= 49` — about
+half the time. The impact score value itself is not a sort key: a static
+reading that called it the primary key was corrected after live candidate
+engineering showed scores moving non-monotonically while priority bytes ended
+ascending.
 
 - `retail` (default): keep both random draws.
 - `deterministic_ties`: each roll window becomes an unconditional branch to
@@ -154,13 +158,13 @@ falling through their preceding compares, so the same-size patches are safe.
 With this control shipped, no RNG draw remains anywhere in
 `sub_080C2940`.
 
-The sort's primary key is the impact score that `sub_080C2314` writes per
-candidate (estimated numeric effect, clamped to death/overheal bounds), and
-the secondary key is the ability's AI-priority byte. A strategy profile that
-wants different target choices therefore has two future levers: rewriting the
-score after `sub_080C2314` returns, and the already-shipped priority
-(`ai_priority`) control. Both are unverified as profile controls and remain
-roadmap work.
+Because the executed primary key is the **priority byte** (sign-gated), the
+shipped `ai_priority` ability-table control *is* the score-ordering lever:
+raising an ability's priority moves its candidates earlier in target order.
+Rewriting the impact score would only change swap gating through its sign.
+That closes the former "score/priority secondary-key controls" roadmap item:
+there is no separate score primary key to rewrite, and the priority lever is
+already shipped and executed-verified.
 
 ## Action selection
 

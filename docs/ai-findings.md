@@ -349,15 +349,55 @@ pattern of `sub_080C2618`/`sub_080C2314` plus execution:
 | `+0x08` | u16 | third effect rule id |
 | `+0x0a` | u8 | validity (nonzero keeps the candidate) |
 | `+0x0b` | u8 | effect flags accumulated by `sub_080C2314` |
-| `+0x0c` | s16 | **impact score — the target sort's primary key** |
+| `+0x0c` | s16 | impact score (its **sign class** gates swaps; the value itself is not a sort key — see the executed key law below) |
 | `+0x0e` | u16 | first effect rule id copy (the max-rule scan reads this one) |
-| `+0x10` | u8 | **AI priority byte — the sort's secondary key** |
+| `+0x10` | u8 | **AI priority byte — the sort's executed primary key (ascending)** |
 | `+0x11` | u8 | flags (`|= 2` in `sub_080C2618`'s tail when the ability-list check passes) |
 
 The sort comparator's addresses reconcile exactly against this layout: its
 `record + k*0x14 + 0x10` score read is candidate `k+1`'s `+0x0c`, and its two
 signed bytes (`+0x14` / `+0x1C` record-relative) are the pair's `+0x10`
 priority bytes.
+
+#### The executed key law (in-vivo, five engineered plans)
+
+The earlier "score primary, priority secondary" reading was a static
+misreading — the mode=1 window only *sign-checks* the two scores
+(`challenger <= 0` keeps the incumbent order; `incumbent <= 0` forces a
+swap) and never compares score against score. In-vivo candidate engineering
+(`tools/probe_key_law.py`, evidence `outputs/mgba-snowball/keylaw.jsonl`)
+pins the executed law:
+
+1. sign gates first: a negative-score candidate never rises past a
+   positive-score one and is demoted to last regardless of its priority
+   byte (plans k4/k5);
+2. otherwise the **priority byte ascending** orders the candidates
+   (k1: prios 90/80/90/10 ended 10/80/90/90 while the scores 30/50/50/70
+   ended 70/50/50/30 — non-monotonic in score);
+3. equal priorities fall through to the `Rand() % 101 <= 49` tie roll, so
+   with all candidates at the saturated priority 100 every pair ties (a
+   count=3 arena draws 3 tie rolls + 1 baseline = 4).
+
+A count-engineering bug deserves its own note: the arena count is a
+little-endian u16, and writing `:0004` for "count 4" stores big-endian
+`0x0400` = 1024 — the sort then walks 1024 garbage slots. The committed
+tie-measurement tool had exactly that bug, which is why the retail tie
+cost was previously recorded as +2 draws; with the fix it is +3, matching
+the law (three tied pairs). The re-certified live matrix now reads:
+
+| ROM | engineered tie | draws inside one mode=1 sort call |
+| --- | --- | --- |
+| retail | no | 1 (kind-1 behaviour coin) |
+| retail | yes | 4 (coin + 3 tie rolls) |
+| `action_selection: first`, targeting retail | yes | 3 (coin patched out; 3 tie rolls remain) |
+| `action_selection: first`, targeting retail | no | 0 |
+| aggressive (`deterministic_ties`, walk retail) | no | 1 (coin) |
+| aggressive + `action_selection: first` | yes | 0 |
+
+Every cell is explained by the law: the tie patches remove exactly the tie
+rolls, the action patch removes exactly the behaviour coin, and a count=3
+all-equal-priority arena contains three tied pairs. Evidence:
+`outputs/mgba-snowball/tie-live.json` (matrix) and `keylaw.jsonl` (plans).
 
 ### The score producer
 

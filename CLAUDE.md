@@ -102,9 +102,11 @@ Genuinely open, with the reason:
   reproduces exactly; see `docs/whole-battle-trace.md`. Do not generalize that
   one turn to every mission-, law-, or effect-specific path.
 - **The target-candidate score model is decoded.** `sub_080C2940` builds and
-  sorts 20-byte candidate records before the evaluator runs; the s16 impact
-  score at candidate `+0x0c` is written by `sub_080C2314` (layout and
-  executed evidence in `docs/ai-findings.md`). All four RNG draws in the
+  sorts 20-byte candidate records before the evaluator runs; the executed
+  key law is sign gates first, then the AI-priority byte ascending (the
+  impact score's value is not a sort key — pinned in vivo by
+  `tools/probe_key_law.py`; layout and executed evidence in
+  `docs/ai-findings.md`). All four RNG draws in the
   sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the `mode=0`
   HP-weighted enumeration roll (its caller passes `r1=0x87`, skipping the
   slot walk), and the mode=1 action walk with its two kind coins — are

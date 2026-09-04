@@ -1,14 +1,24 @@
 """Measure exact RNG draws inside one mode=1 sort call, live in battle.
 
-Method: break at sub_080C2940 entry (mode=1 hit), optionally engineer an
-exact score tie (count=3, cand1 tied with cand0), then break at the caller's
-return (0x080C0782) and count LCG steps between the two RNG states. The
-15-bit LCG makes the step count exact, so one tie roll shows up as +1.
+Method: break at sub_080C2940 entry (mode=1 hit), optionally engineer a
+full-tie arena (count=3, all priority bytes equal), then break at the
+caller's return (0x080C0782) and count LCG steps between the two RNG states.
+The ANSI C 32-bit LCG makes the step count exact, so one roll shows up as
++1 draw.
 
-Runs:
-  retail control (no tie)   -> baseline draws
-  retail tie engineered     -> baseline + 1 (the tie roll)
-  patched tie engineered    -> baseline (window is a branch; no draw)
+Re-certified matrix (2026-09-03, after fixing the count endianness bug --
+see tools/probe_key_law.py and docs/ai-findings.md):
+
+  retail, no tie            -> 1 (kind-1 behaviour coin)
+  retail, tie               -> 4 (coin + 3 tie rolls; the old +2 came from
+                               a big-endian count write looping 768 slots)
+  action_selection first,
+  targeting retail, tie     -> 3 (coin patched out; tie rolls remain)
+  aggressive (ties), no tie -> 1 (coin)
+  aggressive + first, tie   -> 0
+
+Usage: python tools/measure_sort_rng.py <rom-label> [--tie]
+One run per process; relaunch mGBA between runs.
 """
 import json
 import sys
@@ -133,7 +143,8 @@ def main():
         cand2[0x0C:0x0E] = (40).to_bytes(2, "little", signed=True)
         gdb.send(f"M{cand0 + 0x14:x},20:{bytes(cand1).hex()}")
         gdb.send(f"M{cand0 + 0x28:x},20:{bytes(cand2).hex()}")
-        gdb.send(f"M{arena + 0x324:x},2:{3:04x}")
+        # Count is a little-endian u16: for count=3 write bytes 03 00.
+        gdb.send(f"M{arena + 0x324:x},2:{3:02x}00")
         print("tie engineered: count=3, scores 51/51/40")
     else:
         print("control run: no engineering")

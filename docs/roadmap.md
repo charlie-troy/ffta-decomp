@@ -559,10 +559,16 @@ function changed.
    no target-ordering draw remains in `sub_080C2940` (the remaining
    ability-selection roll at 0x080C29C0 is a separate, upstream choice).
    2026-09-03: the score model is decoded — `sub_080C2314` writes each
-   candidate's s16 impact score at `+0x0c` (the sort's primary key): a damage/
-   heal estimate from `sub_0812E0BC`/`sub_08130200` plus per-element status
-   contributions, clamped to the target's HP and max-HP bounds, with rule ids
-   (0x15/0x26/9/8/0x51) naming the effect kind. Executed on synthetic units
+   candidate's s16 impact score at `+0x0c`: a damage/heal estimate from
+   `sub_0812E0BC`/`sub_08130200` plus per-element status contributions,
+   clamped to the target's HP and max-HP bounds, with rule ids
+   (0x15/0x26/9/8/0x51) naming the effect kind. 2026-09-03 (key-law
+   correction): live candidate engineering (`tools/probe_key_law.py`) pins
+   the executed sort law — sign gates on the two scores first, then the
+   **AI-priority byte ascending** as the real key; the score value is not a
+   sort key, and the earlier "score primary" reading is retracted. The
+   shipped `ai_priority` table control is therefore the target-ordering
+   lever, closing the score/priority-controls item. Executed on synthetic units
    (sentinel-buffer out-arg mapping, estimate 95 for blank units, +5 at 0 HP,
    RNG-independent). 2026-09-03 (later): the in-vivo gap is closed —
    `tools/capture_candidates.py` snapshots the live candidate arenas in the
