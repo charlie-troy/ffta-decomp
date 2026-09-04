@@ -3167,3 +3167,14 @@ tools/scenario_capture.py.
   index's underlying table (five slots walked, four mode=1 records
   produced) and the builder's stack limit word (reads 0 at ai+0x2908
   live, so it is not an entry count).
+
+### 2026-09-03 (later still) - Fill geometry fully resolved
+
+- The resume index indexes the arena's own record slots (arg0 + 0x328*k),
+  and the loop bound is the u16 at arena+0x2908 - 4 in this battle for
+  both arenas, reconciling ai+0x5270 as the mode=1 limit's absolute
+  address. The trace's "fifth" batch per phase is the retirement call
+  (resume == limit -> 0xFF), not an extra entry.
+- Mode=1 filled 4/4 record slots; mode=0 filled 3 of 4 (one slot's
+  candidate rejected by its stricter filter). trace_fill.py now reports
+  the per-phase limit read from the correct arena-relative address.

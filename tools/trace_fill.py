@@ -38,7 +38,10 @@ OFF_RESUME = 0x527F
 OFF_PHASE = 0x5280
 OFF_COUNTER = 0x5A
 OFF_CAP = 0x58
-OFF_ENTRIES = 0x2908
+# The builder's arg0 is the arena base itself (ai+0x2968 phase 0,
+# ai+0x5c phase 1); its record-count limit is the u16 at arena+0x2908.
+ARENA = {0: 0x2968, 1: 0x5C}
+LIMIT_REL = 0x2908
 
 
 def rd8(gdb, addr):
@@ -60,14 +63,17 @@ def rd16(gdb, addr):
 
 
 def machine_state(gdb, ai):
-    return {
+    phase = rd8(gdb, ai + OFF_PHASE)
+    state = {
         "ai": ai,
         "resume": rd8(gdb, ai + OFF_RESUME),
-        "phase": rd8(gdb, ai + OFF_PHASE),
+        "phase": phase,
         "counter": rd16(gdb, ai + OFF_COUNTER),
         "cap": rd16(gdb, ai + OFF_CAP),
-        "entries": rd16(gdb, ai + OFF_ENTRIES),
     }
+    if phase in ARENA:
+        state["limit"] = rd16(gdb, ai + ARENA[phase] + LIMIT_REL)
+    return state
 
 
 def main(argv=None):
@@ -124,7 +130,7 @@ def main(argv=None):
             print(f"batch {state['batch']:2d}: phase={state['phase']} "
                   f"resume={state['resume']:#04x} "
                   f"counter={state['counter']}/{state['cap']} "
-                  f"entries={state['entries']}")
+                  f"limit={state.get('limit')}")
             pending = None
             if state["counter"] >= state["cap"]:
                 break
@@ -158,7 +164,7 @@ def main(argv=None):
         "fields": {
             "resume": OFF_RESUME, "phase": OFF_PHASE,
             "counter": OFF_COUNTER, "cap": OFF_CAP,
-            "entries": OFF_ENTRIES,
+            "arenas": ARENA, "limit_rel": LIMIT_REL,
         },
         "ai": ai,
         "batches": batches,

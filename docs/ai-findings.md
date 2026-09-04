@@ -369,11 +369,15 @@ arena: batches at resume 0x00–0x04 then retirement; mode=0 arena: resume
 0x00–0x04 then retirement), the phase byte flipping 0→1→0 across the
 two arenas, the pass counter incrementing to the cap (1/1), and both
 sorts then running on complete arenas — the same 4-record mode=1 and
-3-record mode=0 snapshots as every capture. Two geometry details stay
-open: the resume index's table (it marches 0x00→0x04, i.e. five slots,
-while only four mode=1 records exist — some entries produce no record)
-and the builder's stack limit word, which reads 0 at `ai+0x2908` in the
-live trace rather than an entry count. The struct is the same AI struct the
+3-record mode=0 snapshots as every capture. The geometry resolves
+entirely with the per-arena bases: the resume index indexes the
+**arena's own record slots** (`arg0 + 0x328*k`), the loop bound is the
+u16 at **`arena+0x2908`** (4 in this battle for both arenas — which is
+exactly `ai+0x5270` for the mode=1 arena, reconciling the fill machine's
+stores), and the final batch of each phase is the retirement call
+(`resume == limit` → `0xFF`). Mode=1 filled 4/4 slots; mode=0 filled
+3 of 4 — one slot produced no valid candidate under its stricter
+filter. The struct is the same AI struct the
 sort uses (literals `0x2968`, `0x5270`, `0x527f`), and the sequencer
 memsets 0x5684 bytes of it after the picks (`0x080C07B0` → `0x080C480C`).
 
