@@ -3151,3 +3151,19 @@ tools/scenario_capture.py.
   limits.
 - Docs updated: `ai-findings.md` gains "The fill pipeline (call chain,
   all traced)"; roadmap items 2's caller note retracted. No code changes.
+
+### 2026-09-03 (later) - Fill machine confirmed live, batch by batch
+
+- tools/trace_fill.py breaks at the fill machine's entry (0x080C286C) in
+  the live snowball battle and logs the machine state per batch
+  (outputs/mgba-snowball/fill-trace.json): mode=1 arena fills across
+  batches with the resume index marching 0x00->0x04, retires, the phase
+  byte flips to 1, the mode=0 arena fills the same way, then the pass
+  counter reaches its cap (1/1) and both sorts run on complete arenas.
+- The snapshot at the sort entry matches the standing capture baseline
+  exactly (mode=1: 4 records x count 1; mode=0: 3 records x count 1),
+  closing the loop with the static trace.
+- Two open geometry details recorded in ai-findings.md: the resume
+  index's underlying table (five slots walked, four mode=1 records
+  produced) and the builder's stack limit word (reads 0 at ai+0x2908
+  live, so it is not an entry count).

@@ -348,7 +348,7 @@ batch per rendered frame:
 | `0x080C0752` | sequencer call site (`bl 0x080C47FC`), one batch per frame |
 | `0x080C47FC` | thunk: `bl 0x080C286C`, zero-extend the u8 result |
 | `sub_080C286C` | fill machine: dispatches on the **phase byte `[ai+0x5280]`** (0 → mode=1 arena at `ai+0x2968`, 1 → mode=0 arena at `ai+0x5c`); passes and persists the **resume index `[ai+0x527f]`**; gates on pass counter `[ai+0x5a]` vs cap `[ai+0x58]` |
-| `sub_080C26EC` | arena builder: walks the actor's action entries (count u16 at `ai+0x2908`) starting at the resume index and appends candidates via `sub_080C2618`; also receives `stat(unit, 6)` (used in the 0x94/0xD3 special-ability resolution) and the selected slot `[ai+0x56]` |
+| `sub_080C26EC` | arena builder: walks entries starting at the resume index and appends candidates via `sub_080C2618`; also receives `stat(unit, 6)` (used in the 0x94/0xD3 special-ability resolution) and the selected slot `[ai+0x56]` |
 | `sub_080C2618` | fills one 20-byte candidate (calls `sub_080C2314` at `0x080C266E`) |
 
 The builder's byte return is the next resume index, or `0xFF` when the
@@ -362,7 +362,18 @@ the sequencer proceeds straight to the two sort calls. So **one full cycle
 fills both arenas to entry-table exhaustion**, and the sorts run on
 complete arenas: the stable capture counts (4 records mode=1 / 3 mode=0)
 reflect the actor's action entries and the per-regime filters, not a
-truncated fill. The struct is the same AI struct the
+truncated fill. Executed confirmation (`tools/trace_fill.py`, evidence
+`outputs/mgba-snowball/fill-trace.json`): breakpointing the machine entry
+in the live battle shows the resume index marching per batch (mode=1
+arena: batches at resume 0x00–0x04 then retirement; mode=0 arena: resume
+0x00–0x04 then retirement), the phase byte flipping 0→1→0 across the
+two arenas, the pass counter incrementing to the cap (1/1), and both
+sorts then running on complete arenas — the same 4-record mode=1 and
+3-record mode=0 snapshots as every capture. Two geometry details stay
+open: the resume index's table (it marches 0x00→0x04, i.e. five slots,
+while only four mode=1 records exist — some entries produce no record)
+and the builder's stack limit word, which reads 0 at `ai+0x2908` in the
+live trace rather than an entry count. The struct is the same AI struct the
 sort uses (literals `0x2968`, `0x5270`, `0x527f`), and the sequencer
 memsets 0x5684 bytes of it after the picks (`0x080C07B0` → `0x080C480C`).
 
