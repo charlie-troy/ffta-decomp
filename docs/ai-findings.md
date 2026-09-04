@@ -517,21 +517,62 @@ real callee pointer is loaded from ROM (e.g. `r2 = *0x0836D4B8` →
 `0x03005E79`, the IWRAM-resident copy routine family),so those literals are function pointers, not direct calls. And `bl 0x080C1260` in any
 sequencer-context function is the frame-yield primitive.
 
-### Decision -> execution: phase 4 calls the handler
+### Decision -> execution: phase 4 polls the handler
 
 Phase 4 (`0x080C09EC`) is not a copy step — with the veneer insight its
 `bl 0x0814224C` is `bx r2` where `r2 = [ctx+0x528C]`, i.e. it **calls the
 action handler** (`0x080BF7C5` observed) with r0 = the decision struct
 `ctx+0x5290` and r1 = the turn object `ctx[0]`. It frees `ctx+0x5494` /
-`ctx+0x5490` buffers beforehand and **waits while the handler returns 0**
-(`beq` back into the copy loop = yield a frame and call again); nonzero
-advances to phase 5. The handler `0x080BF7C4` is itself a **5-phase
-execution state machine** (dispatch u16 at `+0x1B8`, jump table
-`0x080BF7EC`) that resolves the ability (`0x080BDF9C`), reads target
-tiles/meters (`0x812F0D8`/`0x812EED0`) into a local struct, and drives the
-action's animation/effect phases per frame. So the full AI-turn contract
-is: sorted arena → first gate+sign-passing candidate → decision struct →
-execution state machine, all per-frame.
+`ctx+0x5490` buffers beforehand. Polling polarity: **return 0 = the action
+is finished** (phase 4 advances to phase 5); **nonzero = not finished** —
+phase 4 re-copies the struct and yields the frame, calling the handler
+again next frame. Executed (`tools/trace_exec.py`, frozen RNG, facing
+state): 8 calls, phase march `[0, 1, 3, 4, 1, 3, 4, 1]`, returns
+1×7 then 0.
+
+### The execution machine `0x080BF7C4`
+
+The handler is a **5-phase per-frame state machine** (dispatch u16 at
+`dec+0x1B8`, jump table `0x080BF7EC`):
+
+| phase | entry | role |
+| --- | --- | --- |
+| 0 | `0x080BF800` | init: validates the ability (`0x080BDF9C`), resolves the target's position/element (`0x812F0D8`/`0x812EED0`/`0x812EE98`), builds the local action record |
+| 1 | `0x080BF8C2` | resolves the next target: walks the target-tile pointer list (`dec+0x204` list, `dec+0x20C` count, `dec+0x20E` index) |
+| 2 | `0x080BFBC8` | animation-ready wait (`0x080A11DC` busy poll on `dec+0x2C`) — skipped for the plain attack traced here |
+| 3 | `0x080BFBE6` | applies the action at the current target's tile (`0x080A8700`), steps the index |
+| 4 | `0x080BFC46` | per-target wrap-up (distance/facing checks against the unit's `+0xF6/+0xF7` coords) |
+
+The AI-turn contract is therefore fully explicit: sorted arena → first
+gate+sign-passing candidate → decision struct → a per-frame execution
+state machine that steps the target list applying the chosen ability.
+
+### The score producer `sub_080C2314`: projected magnitude on the target
+
+`sub_080C2314(caster, target, ability, ...)` computes what the candidate's
+`+0x0C` score and `+0x04..0x0A` rules mean: it calls `0x8130200` to
+**project the action's effect magnitude on the target**, clamps against
+the target's HP meters (`0x080C7EA4(target, 0x13/0x14)`, so a kill can
+never project more damage than the target's current HP, and overheal
+clamps to the missing amount), and emits rule ids at the out-arg:
+**`0x15` (damage) when the projected magnitude is positive,
+`0x26` (recovery) when negative, `8`/`9` variants in two switch cases
+(jump table `0x080C24F8`)**, accumulating per-effect magnitudes into the
+score out-arg over a 2-iteration loop (`sl` counter). Special-case: ability
+`0x146` forces score 100 and rule `0x51`; a final check flips the `+0x0B`
+flags bit 0 when the summed score went negative (that is where a negative
+score can originate — recovery/malus effects) and zeroes the validity
+return when the whole projection was zero (zero-delta actions are invalid:
+nothing would change on the target). Combined with the chooser's sign
+checks this names the two arenas precisely: **regime 1 (mode=1 arena,
+sort arg 8) is the harm pool** — it accepts candidates whose projected
+effect on the record's target is positive (the target loses HP) — and
+**regime 0 (mode=0 arena, sort arg 0x87) is the help pool**, accepting
+negative projections (the target recovers). The same (ability, target)
+space is projected into both arenas; the polarity check at choose time is
+what separates attacking from supporting. The mode=0 arena's rejection of
+this battle's damage candidates is the help pool refusing projected-damage
+candidates.
 
 ### Sequencer context, scheduler, and the entry table
 

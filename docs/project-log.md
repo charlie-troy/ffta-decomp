@@ -3266,3 +3266,18 @@ execution state machine (dispatch at +0x1B8). The sequencer's fixed ctx is
 0x020101F8, its single caller is the battle scheduler at 0x0809349E, and
 the 0x90-stride action-entry table gets no writes during the AI turn
 (watchpoint-proven) - it is built in unit/battle setup upstream.
+
+### 2026-09-04 (later) - score producer + execution engine decoded and traced
+
+The last two black boxes are open. The score producer sub_080C2314 projects
+the action's effect magnitude on the target (0x8130200), clamps against the
+target's HP meters, emits rule 0x15 (damage) / 0x26 (recovery) / 8/9
+variants by magnitude sign, forces score 100 for special ability 0x146, and
+returns the nonzero-effect count as validity (zero-delta = invalid). The
+two arenas are therefore named: regime 1 = HARM pool (positive projected
+magnitude on the target), regime 0 = HELP pool (negative) - the chooser's
+sign checks just enforce pool membership. The execution handler 0x080BF7C4
+is a 5-phase per-frame state machine (init / next-target / animation wait /
+apply at tile 0x080A8700 / wrap-up); tools/trace_exec.py confirms the
+polling contract live: phase march [0,1,3,4,1,3,4,1], returns 1x7 then 0,
+and the polarity is 0 = finished, nonzero = poll again next frame.
