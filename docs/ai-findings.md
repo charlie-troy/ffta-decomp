@@ -495,6 +495,40 @@ action scores positive, so only the mode=1 arena can act; the
 the turn, while a negative-score producer (e.g. a post-condition
 penalty) would surface through mode=0.
 
+### Rule 0x26 (recovery) and the causal pool flip
+
+In the 92-entry per-rule table, rule **0x26** (recovery) dispatches to
+`0x080C3E7A` (damage rule 0x4C → `0x080C45A8`, 0x3D → `0x080C42EE`). Its
+acceptance chain:
+
+1. the candidate's score (`cand+0xC`, saved by the gate prologue) **must be
+   negative** — `bge` to the reject tail;
+2. **current HP ≤ max/3** on the candidate's target unit: the HP getter
+   `0x080C7EA4(unit, k)` is a 0x45-entry dispatch where `+0x13` → u16 at
+   `unit+0x18` (current) and `+0x14` → u16 at `unit+0x1A` (max); max/3 is
+   computed with the libgcc helpers (`0x08142AB0` = divide, `0x08142950` =
+   modulo);
+3. caster status guards (`0x080CDB6C`/`0x080CDB54`/`0x080CDA94` — bit tests
+   at `unit+0xEA`/`+0xEB`);
+4. a **`RandNext()%101` roll** (`0x08002804` is the LCG at `0x030034B0`):
+   self → ≤10, ally → ≤49, else the rule advances (candidate rejected).
+
+Causal certification of the pool law (`tools/probe_pool_law.py`, frozen
+RNG, facing state): retail resolves this battle to regime 1. Rewriting the
+mode=0 (help-pool) candidates to rule 0x26 + score −1 still fails — the
+three targets are at full HP (26/26, 19/19, 14/14) and step 2 rejects them
+(watched live at the handler's HP-check exit). Wounding each target to
+exactly max/3 (the unit pointer is a **double deref** of the record head:
+`rec+0` → 0x90-stride entry, `entry+0` → unit) makes the gate pass and the
+chooser **accept regime 0 record 0** on the walk's first entry, with zero
+rejections. The same battle that retail-resolves to a harm-pool action now
+resolves to a help-pool action purely through encoded candidate fields —
+prediction → intervention → observation match. Two probe lessons: a
+damage rule paired with a negative score is malformed and rejected (pool
+membership is enforced at both the producer and the gate), and
+`cand+0..3` is a u16 **target id**, not a unit pointer — unit resolution
+goes through the record's entry pointer.
+
 Executed confirmation (`tools/trace_choose.py`, evidence
 `outputs/mgba-snowball/choose-trace.json`, frozen RNG, facing state): the
 walk visited regime 0 records 0/1/2 candidate 0 — **each rejected by the
@@ -514,7 +548,7 @@ candidate's address, `+0x28` = regime flag; handler `0x080BF7C5` at
 Two decode notes that apply everywhere: `bl 0x0814224C`/`0x08142250` are
 **register-dispatch veneers** (`bx r2`, `bx r3`, … one per register) — the
 real callee pointer is loaded from ROM (e.g. `r2 = *0x0836D4B8` →
-`0x03005E79`, the IWRAM-resident copy routine family),so those literals are function pointers, not direct calls. And `bl 0x080C1260` in any
+`0x03005E79`, the IWRAM-resident copy routine family), so those literals are function pointers, not direct calls. And `bl 0x080C1260` in any
 sequencer-context function is the frame-yield primitive.
 
 ### Decision -> execution: phase 4 polls the handler

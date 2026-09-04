@@ -3281,3 +3281,21 @@ is a 5-phase per-frame state machine (init / next-target / animation wait /
 apply at tile 0x080A8700 / wrap-up); tools/trace_exec.py confirms the
 polling contract live: phase march [0,1,3,4,1,3,4,1], returns 1x7 then 0,
 and the polarity is 0 = finished, nonzero = poll again next frame.
+
+### 2026-09-04 (later) - rule 0x26 decoded; pool law certified causally
+
+The gate's per-rule handler for recovery (rule 0x26, `0x080C3E7A`) accepts
+only when: score negative, target current HP <= max/3 (getter `0x080C7EA4`
+field map: +0x13 = u16 at unit+0x18, +0x14 = u16 at unit+0x1A; divide via
+libgcc `0x08142AB0`/`0x08142950`), caster status guards pass, and a
+`RandNext()%101` roll succeeds (self <=10, ally <=49).
+
+`tools/probe_pool_law.py` then certified the pool law by intervention:
+rewriting the help-pool candidates as rule 0x26 + score -1 failed on
+full-HP targets (watched at the handler's HP check); wounding each target
+to max/3 flipped the battle's resolution - the chooser accepted regime 0
+record 0 on its first walk entry, retail-vs-modified the only difference
+being the injected candidate fields. Pool membership is enforced at both
+the producer (sign of projected magnitude) and the gate (rule-specific
+state checks); `cand+0..3` is a u16 target id, the unit is reached by a
+double deref of the record's entry pointer.
