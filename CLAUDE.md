@@ -106,7 +106,13 @@ Genuinely open, with the reason:
   key law is sign gates first, then the AI-priority byte ascending (the
   impact score's value is not a sort key — pinned in vivo by
   `tools/probe_key_law.py`; layout and executed evidence in
-  `docs/ai-findings.md`). All four RNG draws in the
+  `docs/ai-findings.md`). The two arenas are **polarity pools**: the mode=0
+  regime accepts only negative-scored (help) candidates, the mode=1 only
+  positive-scored (harm) ones — causally certified by
+  `tools/probe_pool_law.py`, which rewrote the help-pool candidates into
+  rule-0x26 recovery form plus wounded targets and flipped the battle's
+  resolution. Recovery rule 0x26 additionally requires target HP ≤ max/3
+  and passes a `Rand()%101` gate (self ≤10, ally ≤49).
   sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the `mode=0`
   HP-weighted enumeration roll (its caller passes `r1=0x87`, skipping the
   slot walk), and the mode=1 action walk with its two kind coins — are
