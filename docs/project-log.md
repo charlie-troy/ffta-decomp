@@ -3178,3 +3178,20 @@ tools/scenario_capture.py.
 - Mode=1 filled 4/4 record slots; mode=0 filled 3 of 4 (one slot's
   candidate rejected by its stricter filter). trace_fill.py now reports
   the per-phase limit read from the correct arena-relative address.
+
+### 2026-09-03 (latest) - Pick stage decoded and live-confirmed
+
+- sub_080C486C / sub_080C4830 are a matched pair of pick helpers: each
+  reads its arena's limit halfword (ai+0x2964 mode=0, ai+0x5270 mode=1),
+  copies that many record-head words from the arena base into the
+  sequencer context (ctx+8 mode=0, ctx+0x3c mode=1), and returns the
+  count (stored at ctx+0x72 / ctx+0x70).
+- Executed evidence (tools/trace_pick.py, outputs/mgba-snowball/
+  pick-trace.json): the limit fields are static - 4/4 before and after
+  the sorts - and the copies include the unfilled slot (mode=0's fourth
+  head 0x20223ac is a pre-assigned but empty record), so downstream
+  consumers skip invalid records themselves.
+- The head lists reveal the actor's 8-entry 0x90-stride action-entry
+  table at 0x20223ac: entries 0-3 feed mode=0, entries 4-7 feed mode=1.
+- Corrections: the pick outputs live on the sequencer context (r7), not
+  the battle struct; earlier "battle+0x70/0x72" shorthand meant ctx.

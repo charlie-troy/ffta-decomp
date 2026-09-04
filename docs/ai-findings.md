@@ -386,6 +386,31 @@ was a broken scan (a halfword-mask bug skipped every odd-halfword BL pair);
 the chain above is complete and each link is verified by a decoded call
 site.
 
+### The pick stage (sorted arenas -> sequencer outputs)
+
+After the two sorts, the sequencer extracts the results with a matched
+pair of pick helpers, each a count-driven word copy of the sorted arenas'
+record heads:
+
+| function | count read | copies from | result |
+| --- | --- | --- | --- |
+| `sub_080C486C` | u16 `ai+0x2964` (mode=0 limit) | mode=0 arena head `ai+0x5c`, word per 0x328 record | `ctx+8`, count at `ctx+0x72` |
+| `sub_080C4830` | u16 `ai+0x5270` (mode=1 limit) | mode=1 arena head `ai+0x2968`, word per 0x328 record | `ctx+0x3c`, count at `ctx+0x70` |
+
+(`ctx` = the sequencer context, `r7` — **not** the AI struct; `[ctx]`
+holds the AI pointer.) Executed confirmation (`tools/trace_pick.py`,
+evidence `outputs/mgba-snowball/pick-trace.json`): the count fields are
+**static limits** — 4/4 before and after the sorts, and `ctx+0x70/0x72`
+receive 4/4, not the live record counts — so the copies include unfilled
+slots: mode=0's list is the 3 live heads plus `0x20223ac`, an empty slot
+that still carries a pre-assigned entry pointer, which the downstream
+consumer must skip by validity. Both lists are 0x90-stride consecutive,
+revealing the actor's **8-entry action-entry table** (`0x20223ac +
+0x90k`): entries 0–3 feed the mode=0 regime, entries 4–7 feed mode=1.
+The captured heads reconcile exactly with the standing arena captures
+(mode=1: `0x202279c/0x270c/0x267c/0x25ec` = the `#279c/#270c/#267c/
+#25ec` records).
+
 ### The 20-byte target candidates inside each record
 
 Each 0x328 record holds up to ten 20-byte target candidates at `+0x04`
