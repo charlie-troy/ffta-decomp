@@ -436,8 +436,12 @@ Phase 3 walks the ctx's **shadow copies of the sorted arenas** — base
 populated by the phase-2 wrapper from the AI struct before the reset),
 with `ctx+0x54AC` = regime, `ctx+0x54AD` = candidate index, `ctx+0x54AE`
 = record index. For each record's candidates it calls the validity gate
-`0x080C32C0(caster, target, candidate, flagByte)`; the **first accepted
-candidate wins**: the decision builder `0x080C01D0` fills the 0x21C-byte
+`0x080C32C0(caster, target, candidate, flagByte)` and then applies a
+**regime-dependent sign check on the candidate's impact score**
+(candidate +0x0C, read through the same `0x84` offset the code uses): the
+regime-0 branch accepts only **negative** scores (`blt`), the regime-1
+branch only **positive** (`bgt`). The **first candidate passing both**
+wins: the decision builder `0x080C01D0` fills the 0x21C-byte
 decision struct at `ctx+0x5290` and returns the action handler, stored at
 `ctx+0x528C`; phase 4 then copies the struct to the turn object at
 `ctx[0]` and the AI phase ends. If no candidate is accepted anywhere, the
@@ -454,6 +458,42 @@ battle) and the caster-vs-target special checks; a reacting caster with a
 negative score; ability property `+0x19 == 2` with the target's 0x13/0x14
 meters unequal (a full-ness gate, e.g. for heal-type effects); and more
 beyond `0x080C3400`.
+
+### Inside the validity gate `0x080C32C0`
+
+Structure beyond `0x080C3400`: after the full-ness gate the code reads an
+**element/type value** via `0x812E6A4(target)` (halved if the caster's
+`0x812F0E4` class check fires) and dispatches an **8-case switch** (table
+`0x080C347C`): case 0 → `0x080C349C` (category-0x1B immunity → reject),
+case 1 → `0x080C34B2` (ability must be nonzero), case 2 → `0x080C34BE`
+(breakable-object checks via `0x812F0D8`/`0x812EE98`), cases 3/4/6 →
+`0x080C350E` (`0x812EED0` element check with a case-7 refinement and the
+same halving arithmetic), case 5 → `0x080C34F8` (reads the *other* arena's
+slots via `0x812F0D8`+`0x812EE98`), case 7 → `0x080C3546` (category 0x1A
++ `0x812ED98` cost vs the target's `+0x15` meter). Repeated `asrs r7,#1`
+through the cases halve an effect-strength intermediate on resist-like
+conditions. Then a **per-rule validation loop** (`0x080C35BE`): for each
+rule id (u16 at `cand+4+2i`, count at `cand+0xA`, ids 1..0x5C) it checks
+`0x080CD8FC(caster)` (caster status → reject), looks the rule up via
+`0x8133A58(target, rule)`, re-reads it after `0x080CDD88` state toggles,
+and dispatches per rule through a **92-entry table at `0x080C3624`**;
+`0x080C477A` advances to the next rule, `0x080C478C` is the reject tail.
+A final `0x0812F1DC` check plus a loop over the candidate's rule
+meters (`cand+0xA`-bounded) complete the validation; the observed return
+is r0=1 on accept, 0 on reject (the per-case score intermediate in r7 is
+not the return value).
+
+Executed attribution (`tools/trace_gate.py`, frozen RNG, facing state):
+**every candidate passes the gate** — all four stops show r0=1 (scores
++76/+76/+76 in regime 0, +61 in regime 1). The regime-0 trio is rejected
+by the post-gate **sign check**, not the gate: +76 is not negative.
+Consequence: the two arenas are two **action polarity classes** — the
+mode=0 regime (sort arg `0x87`, bit 7 set) handles negative-scored
+actions, the mode=1 regime positive-scored ones. In this battle every
+action scores positive, so only the mode=1 arena can act; the
+`deterministic-ties`/tie-profile controls in that arena therefore decide
+the turn, while a negative-score producer (e.g. a post-condition
+penalty) would surface through mode=0.
 
 Executed confirmation (`tools/trace_choose.py`, evidence
 `outputs/mgba-snowball/choose-trace.json`, frozen RNG, facing state): the
@@ -474,9 +514,42 @@ candidate's address, `+0x28` = regime flag; handler `0x080BF7C5` at
 Two decode notes that apply everywhere: `bl 0x0814224C`/`0x08142250` are
 **register-dispatch veneers** (`bx r2`, `bx r3`, … one per register) — the
 real callee pointer is loaded from ROM (e.g. `r2 = *0x0836D4B8` →
-`0x03005E79`, the IWRAM-resident copy routine family), so those literals
-are function pointers, not direct calls. And `bl 0x080C1260` in any
+`0x03005E79`, the IWRAM-resident copy routine family),so those literals are function pointers, not direct calls. And `bl 0x080C1260` in any
 sequencer-context function is the frame-yield primitive.
+
+### Decision -> execution: phase 4 calls the handler
+
+Phase 4 (`0x080C09EC`) is not a copy step — with the veneer insight its
+`bl 0x0814224C` is `bx r2` where `r2 = [ctx+0x528C]`, i.e. it **calls the
+action handler** (`0x080BF7C5` observed) with r0 = the decision struct
+`ctx+0x5290` and r1 = the turn object `ctx[0]`. It frees `ctx+0x5494` /
+`ctx+0x5490` buffers beforehand and **waits while the handler returns 0**
+(`beq` back into the copy loop = yield a frame and call again); nonzero
+advances to phase 5. The handler `0x080BF7C4` is itself a **5-phase
+execution state machine** (dispatch u16 at `+0x1B8`, jump table
+`0x080BF7EC`) that resolves the ability (`0x080BDF9C`), reads target
+tiles/meters (`0x812F0D8`/`0x812EED0`) into a local struct, and drives the
+action's animation/effect phases per frame. So the full AI-turn contract
+is: sorted arena → first gate+sign-passing candidate → decision struct →
+execution state machine, all per-frame.
+
+### Sequencer context, scheduler, and the entry table
+
+- The sequencer runs from a **fixed context** `ctx = 0x020101F8`: the
+  tiny wrapper `0x080C1438` loads that pointer and calls the dispatcher
+  `0x080C045C`; its single caller is the **battle scheduler** at
+  `0x0809349E` (a sibling thunk `0x080C144C` calls the phase-getter
+  `0x080C034C` for the same context).
+- The action-entry table (`0x90`-stride entries at `0x20223AC`, entries
+  0–3 feeding mode=0 and 4–7 mode=1 this battle) receives **no writes
+  during the AI turn**: an armed write watchpoint on entry 0 fired only
+  once (an interrupt artifact at ROM `0x08148F10`, mid-`0x08144000`-family
+  damage/position arithmetic that merely *reads* nearby data), never
+  during setup, fill, sort, choose, or execute. The table is built
+  upstream in battle/unit setup, outside the AI phase — a separate slice
+  if needed.
+- Phase 0's `0x080C47A8` arg1 also now has a name: it is the **AI struct
+  size** `0x5684` (the allocation the template copy fills).
 
 `tools/trace_choose.py` logs the walk indices at the chooser head and the
 decision fields at the choose-call return; `tools/disasm.py` is the

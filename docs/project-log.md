@@ -3246,3 +3246,23 @@ from the ai_priority tables to observable behavior. New tool: tools/disasm.py
 (literal-annotated Thumb disassembler with jump-table/head helpers). Also
 decoded: 0x0814224C-family = register-dispatch veneers (bx rN), the ctx
 phase stack (ctx+0x54F6/0x54F8), and the validity gate's leading checks.
+
+### 2026-09-04 - validity gate + sign check attributed; execution engine named
+
+Threaded the last unexplored lever: the chooser's validity gate 0x080C32C0
+is decoded through its 8-case element switch (table 0x080C347C) and its
+92-entry per-rule validation loop (table 0x080C3624). Live attribution
+(tools/trace_gate.py): every candidate PASSES the gate - the regime-0
+losers die on the chooser's post-gate regime-dependent sign check on the
+candidate impact score (regime 0 wants negative scores, regime 1 positive;
+all scores here are positive). The two arenas are two action polarity
+classes: mode=0 (sort arg 0x87) handles negative-scored actions, mode=1
+positive-scored ones - so the shipped priority/tie controls in the mode=1
+arena decide the turn in practice. Phase 4 is not a copy step: it CALLS
+the action handler through the 0x0814224C veneer (r2 = ctx+0x528C =
+0x080BF7C5, args = decision struct ctx+0x5290 + turn object ctx[0]) and
+waits frame by frame while it returns 0; the handler is itself a 5-phase
+execution state machine (dispatch at +0x1B8). The sequencer's fixed ctx is
+0x020101F8, its single caller is the battle scheduler at 0x0809349E, and
+the 0x90-stride action-entry table gets no writes during the AI turn
+(watchpoint-proven) - it is built in unit/battle setup upstream.
