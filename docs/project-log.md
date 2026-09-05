@@ -3364,3 +3364,47 @@ happens in battle setup while units are spawned into containers, and it
 receives no writes during the AI turn. Cold-boot watchpoint (stub opens
 at launch, arm before any battle exists) is the ready instrument; it
 needs title-input automation to run to completion.
+
+### 2026-09-05 - arena sides and the entry container mapped (live-verified)
+
+Closed the last semantic gap in the AI's data flow: who lands in the help
+pool vs the harm pool, and how the code stays side-agnostic.
+
+- **Entry 0 of the 0x90 table is the acting unit's own entry**; its word
+  at `+0x80` is a back-pointer to the container object C (ctor
+  `0x08097000`'s output, also `battle_obj+0`; this battle `0x0201F134`).
+  C holds two doubly-linked lists of entry pointers at **`C+0x14` and
+  `C+0x18`** (nodes `{data,prev,next}` 12 bytes; heads `{owner,first}` 12
+  bytes from `0x080C799C`; append/count/find `0x080C7A74`/`0x080C7B08`/
+  `0x080C7BF4`; iterators `0x080C7CC0` list, `0x080C7D18`/`0x080C7D70`
+  sorted tree) plus a third sorted-tree structure at `C+0x10` whose
+  consumer is elsewhere (still open). List builders `0x08099D08`/`0x08099D34`/
+  `0x08099D60` wrap one iteration over `C+0x14`/`C+0x18`/`C+0x10`.
+- **The two lists are the two battle sides**: each entry's unit carries
+  the side as `+0x28` bit 15 (`0x080C8240`). Live snowball: entries 0-3
+  side-True, 4-7 side-False; `C+0x14` = `[7,6,5,4]`, `C+0x18` = `[2,0,1,3]`.
+- **`sub_080C1EB4` picks the pairing with a side-derived flag r4** that
+  Charm (`+0xEB` bit 5) XOR-flips and Confuse (`+0xEB` bit 4) replaces
+  with a `0x08002804` draw's parity. Net: the help arena always gets the
+  actor's own side, the harm arena the opposite side (r4==0: help <-
+  C+0x14, harm <- C+0x18; r4!=0 swapped). A `+0x28` bit 0x1000
+  (`0x080C8298`) no-help mode instead merges both lists into one harm
+  arena. Actor's own entry moves to the end of its side's list (the
+  mode=0 empty fourth record is the actor's own, now explained).
+- **`sub_080C1B8C(entries, arena, list, count)` record gate**: same-side
+  units always kept; cross-side kept unless **Concealed** (`+0xE9` bit 4,
+  `0x080CD9BC`); gone units (`+0xED` bit 6, `0x080CDCEC`) dropped
+  everywhere; a job-class arena flag (`0x080CD50C`, `0x0E` special)
+  exempts cross-side units entirely.
+
+Live-verified end to end: `tools/probe_pool_sides.py` +
+`outputs/mgba-snowball/pool-sides.json` (arena record entry indices
+[2,1,3,0] = C+0x18 with actor moved last and [7,6,5,4] = C+0x14 exact),
+and caller attribution of both `sub_080C1B8C` calls (lr 0x080C20E7 ->
+arena ai+0x5c, lr 0x080C2141 -> arena ai+0x2968).
+
+Correction: the 2026-09-04 entry's "three u16 arrays at +0x10/+0x14/+0x18"
+is wrong - those are three list/tree heads; +0xC is a 0x800-byte block
+(owner for the three heads), and battle_obj stores the u16 entry count 8
+at +0xDC. ai-findings.md and unit-flags.md updated (the +0x28 bits 15/12
+are now behavior-backed for the AI arena selection).

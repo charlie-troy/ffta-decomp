@@ -677,12 +677,14 @@ wrong, and the correction reorganizes the setup-side picture:
 - **Battle object model (live-dumped this session).** Battle init
   `0x08096BA0` allocates 0x1B8 bytes, zeroes them, and installs the
   pointer at global `0x0200F4A8` (value `0x0200F4E8`). Layout as
-  observed: `+0` = pointer to the ctor object built by `0x08097000`
-  (its own `+4/+8` = two 0x34-byte objects, `+0xC` = a 0x400-byte block,
-  `+0x10/0x14/0x18` = three u16 arrays, `+0x1C` = one more alloc);
-  `+4` = **`+8` = the 0x90-stride action-entry-array base**
-  (`0x020223AC` this battle); `+0x40` = `0x0202282C` = table end
-  (base + 8·0x90), `+0x44` = one more buffer; the rest zero this battle.
+  observed: `+0` = pointer to the container object built by `0x08097000`
+  (its own `+0xC` = a 0x800-byte block whose init returns the owner for
+  three 12-byte **list heads stored at `+0x10`/`+0x14`/`+0x18`** — see
+  the arena-setup section — plus two sub-objects at `+4`/`+8` and one
+  more alloc at `+0x20`); `+4` = **`+8` = the 0x90-stride
+  action-entry-array base** (`0x020223AC` this battle, u16 entry count
+  8 at `+0xDC`); `+0x40` = `0x0202282C` = table end (base + 8·0x90),
+  `+0x44` = one more buffer; the rest zero this battle.
   This object is the scheduler's arg0: `r0 = [battle_obj+4]` feeds the
   ctx initializer, so **`ctx+4` = `[battle_obj+4]` = the entry-array
   base** (not the battle object itself). The AI orchestration
@@ -724,7 +726,7 @@ line up with the fill machinery's reads:
 | `+0x04` | — | 0 |
 | `+0x08` | u16 | x position · 16 (pixel coords; e.g. `0x00d0` = 208) |
 | `+0x0c` | u16 | y position · 16 |
-| `+0x1e..0x20` | u8s | small values (0-2) on entries 0-3 (the help-pool group), 0 on entries 4-7 — regime-group-correlated, meaning undetermined |
+| `+0x1e..0x20` | u8s | small values (0-2) on entries 0-3 (side-True, the actor's side this battle), 0 on entries 4-7 — side-group-correlated, meaning undetermined |
 | `+0x24` | u32 | packed small ints; low byte is a permutation of 1..8 across the 8 entries (spawn/encounter id), upper bytes vary (`0xde/0x38/0xa8/0x6e/0x4c/0x56/0xdb`) — undetermined |
 | `+0x34` | u8 | small counter byte (`0x2c`-`0x3a` across entries) — undetermined |
 | `+0x38` | u16 | 1 (constant) |
@@ -736,43 +738,110 @@ literal-annotated Thumb disassembler (resolves `ldr [pc, #imm]` pools,
 branch targets, jump tables via `--table BASE,N`, and function heads via
 `--head ADDR`) used for every static decode above.
 
-### Arena setup: `sub_080C1EB4` and the initializer `sub_080C1B8C`
+### Arena setup: `sub_080C1EB4`, the container lists, and the record gate
 
 Before any candidate is filled, the sequencer's first AI-phase call
 (`0x080C0730` → `0x080C47A8` → **`sub_080C1EB4`**) builds and installs
-the arena records:
+the arena records. The source of the two arenas is now mapped end to end
+and confirmed live (`tools/probe_pool_sides.py`, evidence
+`outputs/mgba-snowball/pool-sides.json`):
 
-- `sub_080C1EB4` builds target lists on the stack via `sub_08099D08` /
-  `sub_08099D34`, moves the actor's own entry to the list end (compare
-  against the actor pointer, memmove the tail, re-append), and calls the
-  initializer once per arena — four call sites (`0x080C1FFE`,
-  `0x080C2058`, `0x080C20E2`, `0x080C213C`) with arena bases `ai+0x5c`
-  and `ai+0x2968`.
-- **`sub_080C1B8C(?, arena, listPtr, listCount)`** zeroes the count
-  halfword at `arena+0x2908`, then for each list entry appends the entry
-  pointer as a record: `arena + count*0x328 = *listPtr` (u32 store at
-  `0x080C1C16`), incrementing the count halfword. Per-entry gates skip
-  an entry when: the caster/target flag bytes differ (or a job-0xE
-  special case), the entry's unit has battle flag `+0xed` bit 6 set
-  (`sub_080CDCEC`), or `sub_080CD9BC` returns nonzero. (Mode=0's fourth
-  slot: this record **exists** with entry pointer `0x20223ac`; only its
-  candidate block is zero — see the fill-pipeline section.)
-- Consequently the count fields the pick helpers read (`ai+0x2964` /
-  `ai+0x5270` = `arena+0x2908` of each arena) are **live record counts
-  written here**, not static limits — the earlier "static limit" reading
-  is retracted (they were already 4/4 at the sort entry because setup
-  runs before the fill, and the sort does not change them).
-- The setup entry itself is **`sub_080C47A8`** (the sequencer's first
-  AI-phase call): `bl 0x08022840` (obtain/allocate the AI struct),
-  `bl 0x814224c` **memset-0** at `0x080C47BE` (see the corrected veneer
-  reading below — it zeroes the whole struct, candidate blocks included —
-  watchpoint-proven), then the orchestrator `sub_080C1EB4`. A write
-  watchpoint on the mode=0 empty record's candidate block caught exactly
-  one write all turn — the zeroing (from IWRAM-resident `0x03005E90`,
-  called at `lr=0x080C47C3`) — and never a candidate write: for entry 0
-  under the mode=0 rule set (`r3=0`), `sub_080C2314` returns validity 0
-  before emitting any rule. Which predicate inside the score producer
-  rejects it is a separate decode (the `sub_080C2314` rule engine).
+**The entry container.** Entry 0 of the 0x90-stride table is **the acting
+unit's own entry**, and its word at `+0x80` is a back-pointer to the
+container object `C` (this battle `0x0201F134`, which is also what
+`battle_obj+0` points to — the ctor object built by `0x08097000`). `C`
+carries **two doubly-linked lists of entry pointers at `C+0x14` and
+`C+0x18`** (plus a third, differently-shaped structure at `C+0x10`, see
+below). List nodes are 12 bytes `{data@0, prev@4, next@8}`, heads are 12
+bytes `{owner@0, first@4, last?@8}` created by `0x080C799C`; the append /
+count / find helpers are `0x080C7A74` / `0x080C7B08` / `0x080C7BF4`, and
+the iteration helpers are `0x080C7CC0` (plain list) and
+`0x080C7D18`/`0x080C7D70` (sorted tree). The list builders
+`sub_08099D08`/`sub_08099D34`/`sub_08099D60` wrap one iteration each
+over `C+0x14`, `C+0x18`, `C+0x10` respectively and append each node's
+`data` pointer (the entry pointer) to a count/buffer pair.
+
+**The two lists are the two battle sides.** Each entry's unit record
+(`entry+0`) carries the side as **`+0x28` bit 15** (the persistent-status
+word; read by `0x080C8240`). Live in the snowball battle: entries 0–3
+are side-True, entries 4–7 side-False; `C+0x14` = side-False `[7,6,5,4]`,
+`C+0x18` = side-True `[2,0,1,3]`. (The structure at `C+0x10` is a sorted
+tree over the entries — first element is the table-end sentinel
+`base+8·0x90` — used through builder `0x08099D60`/iterator
+`0x080C7D18`; no arena-setup site calls it, so its consumer is elsewhere
+and its semantics remain open.)
+
+**`sub_080C1EB4(ai, entries)` picks the pairing.** Its prologue computes
+a flag `r4` from the actor's own side bit, then flips it under the
+**Charm** and **Confuse** live statuses (`+0xEB` bits 0x20/0x10,
+`0x080CDB6C`/`0x080CDB54`; Confuse replaces it with the parity of a
+`0x08002804` draw — a confused actor randomly chooses whom to regard as
+an enemy). Then:
+
+- if the actor has `+0x28` bit 0x1000 set (`0x080C8298`) — the
+  "no-help / fight everything" mode — it builds **one combined arena**
+  (mode 1 base `ai+0x2968`) by appending the `C+0x14` list then the
+  `C+0x18` list, and stores its count at `ai+0x5270`/`ai+0x5275`;
+- otherwise it builds two arenas, and which list feeds the help arena is
+  side-dependent: for `r4 == 0` (side-False actor) mode 0 (`ai+0x5c`) ←
+  `C+0x14` and mode 1 (`ai+0x2968`) ← `C+0x18`; for `r4 != 0` (side-True
+  actor) the pairing is swapped — mode 0 ← `C+0x18`, mode 1 ← `C+0x14`.
+  Net effect: **the help arena always holds the actor's own side and the
+  harm arena always the opposite side**, whichever list that is. Four
+  call sites (`0x080C1FFE`/`0x080C2058` in the `r4==0` path,
+  `0x080C20E2`/`0x080C213C` in the `r4!=0` path) call the record
+  builder twice.
+
+In each two-arena path the actor's own entry is **moved to the end of
+its side's list** before the records are built (linear search against
+`entries`, memmove of the tail, re-append), which is why the help arena's
+last record is the actor's own (in retail it is the empty-record fourth
+slot with entry pointer `0x20223ac` — a unit does not produce a
+help-pool candidate for itself; see the fill-pipeline note below).
+
+**`sub_080C1B8C(entries, arena, list, count)`** (caller-attributed live
+at `lr = 0x080C20E7` → arena `0x02031d14` = `ai+0x5c`, and
+`lr = 0x080C2141` → arena `0x02034620` = `ai+0x2968`) zeroes the record
+count halfword at `arena+0x2908`, then for each list entry appends the
+entry pointer as a record (`arena + count*0x328 = *list` at
+`0x080C1C16`) and increments the count. Per-entry gates:
+
+- the unit side byte of caster vs target (both via `0x080C8240`) —
+  same-side entries always become records;
+- an arena-flag byte derived from the actor's job class
+  (`0x080CD50C`: `[unit+6]` race × `[unit+0x3B]` job through the
+  `0x0851BA84` table, or the constant `0x0E` when `0x080C8298` is set) —
+  a `0x0E` arena flag exempts every cross-side entry;
+- cross-side entries are otherwise kept unless the target is
+  **Concealed** (`+0xE9` bit 0x10, `0x080CD9BC` — you cannot be put in
+  the harm pool while concealed);
+- all entries are dropped when the unit is **gone** (`+0xED` bit 0x40,
+  `0x080CDCEC`).
+
+The count fields the pick helpers read (`ai+0x2964` / `ai+0x5270` =
+`arena+0x2908` of each arena) are therefore **live record counts written
+here**, not static limits — the earlier "static limit" reading is
+retracted (they are already 4/4 at the sort entry because setup runs
+before the fill, and the sort does not change them).
+
+Consequence for the pool law: the help arena is exactly "units the actor
+could help", the harm arena exactly "units the actor could hurt", and
+the sign checks decoded earlier are what keep a damage projection out of
+the help pool (a same-side target in the help arena whose projection is
+positive damage) and a recovery out of the harm pool.
+
+The setup entry itself is **`sub_080C47A8`** (the sequencer's first
+AI-phase call): `bl 0x08022840` (obtain/allocate the AI struct),
+`bl 0x814224c` **memset-0** at `0x080C47BE` (see the corrected veneer
+reading below — it zeroes the whole struct, candidate blocks included —
+watchpoint-proven), then the orchestrator `sub_080C1EB4`. A write
+watchpoint on the mode=0 empty record's candidate block caught exactly
+one write all turn — the zeroing (from IWRAM-resident `0x03005E90`,
+called at `lr=0x080C47C3`) — and never a candidate write: for the actor's
+own record under the mode=0 rule set (`r3=0`), `sub_080C2314` returns
+validity 0 before emitting any rule. Which predicate inside the score
+producer rejects it is a separate decode (the `sub_080C2314` rule
+engine).
 
 ### The 20-byte target candidates inside each record
 

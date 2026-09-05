@@ -116,6 +116,18 @@ Genuinely open, with the reason:
   (`0x0200F4A8` → `0x0200F4E8`) carries the action-entry-array base at
   `+4` and feeds it (not the object) to the AI orchestration — decoded
   with the memset correction in `docs/ai-findings.md`.
+- **The arena sides and entry container are mapped.** Entry 0 of the
+  0x90-stride table is the acting unit's own entry; its `+0x80` word is a
+  back-pointer to the container object (`0x08097000` ctor) that holds two
+  doubly-linked side lists at `+0x14`/`+0x18` of entry pointers. The side
+  of each unit is `+0x28` bit 15 (`0x080C8240`); the help arena always
+  receives the actor's own side and the harm arena the opposite side
+  (the pairing swaps via Charm/Confuse on `+0xEB` and a `+0x28`-bit-12
+  no-help mode merges both lists into one harm arena). The record gate
+  `sub_080C1B8C` keeps same-side units always, cross-side unless
+  Concealed (`+0xE9` bit 4), and drops gone units (`+0xED` bit 6).
+  Live-verified by `tools/probe_pool_sides.py`;
+  `outputs/mgba-snowball/pool-sides.json`.
   sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the `mode=0`
   HP-weighted enumeration roll (its caller passes `r1=0x87`, skipping the
   slot walk), and the mode=1 action walk with its two kind coins — are
