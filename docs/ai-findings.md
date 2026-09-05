@@ -450,10 +450,23 @@ resolve the whole phase set:
 | 0–5 | (above) | AI plan, choose, execute |
 | 8 | `0x080C1068` | end-of-turn restore: copies `ctx+0x54CA/0x54CB` (tile snapshot) and `ctx+0x54C8` (meter snapshot) back onto the unit, then conditional tails on `0x54AF`/`0x54BE` (no-op when the unit neither moved nor spent) |
 
-Phases 11 (`0x080C04C4` → 12), 12 (`0x080C04E0`, nibble unpack into
-`0x54B4/0x54B5/0x54BA`) and 13 (`0x080C10EE`, trivial return) are reached
-via the init branch that seeds phase 0xB and via phase-stack pops; their
-turn roles are not exercised by this battle. The initial phase is **9**
+Phases 11–13 form the **deferred-displacement route**, reached when the
+init's `0x080C95A8(0xd)`-nonzero branch (global byte `0x0200203D`) seeds
+phase 0xB. Phase 11 (`0x080C04C4`) tells the shared **placement/move
+object at global `0x020158B0`** (0xAC bytes; mode halfword 2 at
+`+0x64`, sub-API `0x080C7078`) about the queued target value at
+`ctx+0x54CC`; phase 12 (`0x080C04E0`) polls it (`0x080C7638`) until
+done, then unpacks the result vector stored **packed** at
+`ctx+0x54D0..0x54DC` (low/high nibbles) into the working coordinate
+fields `ctx+0x54B4/0x54B5/0x54BA/0x54C2`, appends a per-call result byte
+into the `ctx+0x54E4` array, and sets phase 13; phase 13
+(`0x080C10EE`) returns 0 to end the sequence. This is the forced-
+movement / knockback-style path — distinct from the phase-9/10 movement-
+range grid. Its queued input fields (`ctx+0x54CC`, the packed
+`ctx+0x54D0..0x54DC`) are written by code outside the sequencer (no ROM
+literal addresses them; the writer computes the ctx pointer, so it was
+not located by a literal scan). Not exercised by the (stationary,
+ranged) traced turn. The initial phase is **9**
 for the traced actor (the init path through `0x080C03C2`); the 0xB seed
 belongs to the other init branch (`0x080C95A8(0xd)` nonzero) — the older
 "phase 0xB for AI units" note over-generalized.
