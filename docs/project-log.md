@@ -1,6 +1,6 @@
 # Project log
 
-Last updated: 2026-09-02
+Last updated: 2026-09-05
 
 This is the operational source of truth for resuming the project. `README.md`
 describes the product, `CLAUDE.md` describes the working method, and

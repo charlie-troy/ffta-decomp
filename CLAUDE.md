@@ -128,10 +128,11 @@ Genuinely open, with the reason:
   Concealed (`+0xE9` bit 4), and drops gone units (`+0xED` bit 6).
   Live-verified by `tools/probe_pool_sides.py`;
   `outputs/mgba-snowball/pool-sides.json`.
-  sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the `mode=0`
-  HP-weighted enumeration roll (its caller passes `r1=0x87`, skipping the
-  slot walk), and the mode=1 action walk with its two kind coins — are
-  verified profile controls (`deterministic_ties` pins the first three,
+- **Every target-ordering draw in the sort is a verified profile control.**
+  The sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the
+  `mode=0` HP-weighted enumeration roll (its caller passes `r1=0x87`,
+  skipping the slot walk), and the mode=1 action walk with its two kind
+  coins — are all pinned (`deterministic_ties` covers the first three,
   `action_selection: first` the last); a live battle measures 0 draws
   under the patches.
 - **Mission fields.** The corrected constant-caller report is exhausted;
