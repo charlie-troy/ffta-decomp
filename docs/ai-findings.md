@@ -790,10 +790,10 @@ alignment). Fields, now with writer provenance:
 | `+0x04` | — | 0 (factory zero-fill) | |
 | `+0x08` | u16 | x position · 16 (pixel coords; e.g. `0x00d0` = 208) | wrapper `0x08092440` via `0x08099E68` |
 | `+0x0c` | u16 | y position · 16 | wrapper via `0x08099E68` |
-| `+0x1e` | u8 | per-unit property byte (`0/1/2`) from `0x08022238` — not side-correlated (this battle `{0,0,1,2}` vs `{0,0,1,1}`) | wrapper via `0x08022238` |
+| `+0x1e` | u8 | per-type property byte (`0/1/2`) from `0x08022238` (side-aware getter `0x080CB65C` reading the `+8/+9/+0xA` region of a per-type record at ROM `0x085273D8`) — not side-correlated (this battle `{0,0,1,2}` vs `{0,0,1,1}`) | wrapper via `0x08022238` |
 | `+0x20` | u8 | **unit height** (copy of `unit+0xF8`) | factory |
 | `+0x24` | u32 | **registration/order key** = `C+0x10` count helper `0x08099CB8` at creation (full u32 written; its low byte is the 1-based registration order — a permutation of 1..8 here — and is the ordering key mirrored to `unit+0xFB`; the upper bytes are not consumed) | factory via `0x08099CB8` (also `unit+0xFB`) |
-| `+0x34` | u16 | per-unit property halfword (`0x2c`-`0x3a`) from `0x08022238` return | wrapper via `0x08022238` |
+| `+0x34` | u16 | per-type property halfword (`0x2c`-`0x3a` here) from `0x08022238` return — the `+4/+5` u16 of the same per-type record (`0x085273D8`, 0xE-stride, keyed by the `unit+0x04` type byte), read by `0x080CB714` | wrapper via `0x08022238` |
 | `+0x38` | u16 | 1 (constant) | factory |
 | `+0x3c` | ptr | shared `0x02021A14` buffer (copy of `[C+0x1C]`) | factory |
 | `+0x80` | ptr | container `C` back-pointer (`0x0201F134`) | factory |
@@ -1059,6 +1059,21 @@ entries that first pass a three-way `sub_08133970` check, so that check is an
 exemption from the priority gate. The evaluator `sub_080C32C0` is the later
 chooser: it is the only other caller of the predicate (`0x080C35A0`) and
 re-applies the same gate while scoring.
+
+## A per-type record table at `0x085273D8` (reader-discovered, not yet mapped)
+
+`0x080CB65C`/`0x080CB714` (and their neighbours `0x080CB750`, `0x080CB78C`,
+... in the `0x080CB6xx`–`0x080CB8xx` family) index a ROM table at
+**`0x085273D8` with stride 0xE keyed by the unit-type byte `unit+0x04`**
+(`(t<<3) - t) << 1 = t·14`), falling back to the generic battle-stat getter
+`0x080C92F0(unit, k)` when the unit is not a battle object (`0x080C817C`).
+The reader at `0x08022238` copies one byte of it into each action entry's
+`+0x1E` (side-dependent path via `0x080CB65C`, reading the record's
+`+8/+9/+0xA` nibble/flag region plus a threshold table at `0x03003A60`) and
+the `+4/+5` u16 into `+0x34`. Rows look like `{type, +1..+3, u16@+4, u16@+6,
++8 flags, +0xA, ...}`; individual field meanings are not yet pinned. This is
+a candidate for the next table-mapping pass (`tools/find_accessors.py` style:
+enumerate readers, then name fields from executed consumers).
 
 ## Supporting primitives worth naming
 

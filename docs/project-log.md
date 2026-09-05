@@ -3488,3 +3488,16 @@ key. This supersedes the closing line of the 2026-09-05 follow-up entry
 ("exact entry-allocation call site remains un-singled-out"). The earlier
 "0x90-byte entries" label is now "0x84-byte entries with 0x90 allocator
 stride".
+
+### 2026-09-05 (final) - entry +0x1E/+0x34 provenance traced to a new per-type table 0x085273D8
+
+0x08022238(unit, byte*) (the entry wrapper's field source) is a two-call
+shim: +0x1E = 0x080CB65C(unit, side-flag), +0x34 = 0x080CB714(unit). Both
+are per-type record readers: table 0x085273D8, stride 0xE, keyed by the
+unit+0x04 type byte ((t*8-t)<<1 = t*14), with a generic battle-stat-getter
+fallback (0x080C92F0) for non-battle units (0x080C817C). 0x080CB714 reads
+the record's +4/+5 u16 (0x2c-0x3a for this battle's types); 0x080CB65C is
+side-aware and reads the +8/+9/+0xA region with a 0x03003A60 threshold
+table. Individual field meanings are not yet pinned - 0x085273D8 is a
+candidate for the next reader-driven table pass (recorded in
+ai-findings.md). Nothing in docs/tools previously referenced this table.
