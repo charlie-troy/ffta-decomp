@@ -587,8 +587,14 @@ function changed.
    in `measure_sort_rng.py` (writing `:0003` big-endian = 768 slots); with
    the fix the retail tie cost is +3 (three tied pairs at equal priority),
    matching the executed key law, and the score/priority-controls item is
-   closed — `ai_priority` is the ordering lever, the score only sign-gates. 2026-09-03
-   (later still): a Rand()-breakpoint in the live battle pins the baseline
+   closed — `ai_priority` is the ordering lever, the score only sign-gates.
+   2026-09-05 (STRAT9.2 close-out): a full read-scan of the chooser
+   (0x080C07C8..0x080C0A28) and the decision builder (0x080C01D0) proves
+   the impact score's magnitude has no downstream consumer beyond the two
+   regime sign checks and the per-rule sign re-checks, so a score-magnitude
+   profile control is structurally impossible without ROM changes — the
+   shipped levers are the complete control surface and STRAT9.2 is closed.
+   2026-09-03 (later still): a Rand()-breakpoint in the live battle pins the baseline
    draw at the kind-1 behaviour coin (lr=0x080C2A27) — NOPing exactly that
    call drops the battle to 0 draws — and the action-selection draws are now
    a verified profile control: `action_selection: first` (`tools/ai_action.py`)
@@ -622,7 +628,14 @@ function changed.
    region.
 3. **Movement and resource policy.** Locate movement-choice scoring and MP/HP/
    CT conservation thresholds, then add strategy controls only where the ROM's
-   behavior can be causally validated.
+   behavior can be causally validated. 2026-09-05 (scoped): the full per-turn
+   march is live-traced (`tools/trace_turn_march.py`) — phases 9-10 build the
+   16x16 movement range grid (`ctx+0x54EC`, terrain helpers
+   `0x08099FB0`/`0x08099F58`, class gate `0x0812F0E4`) *before* the AI plan
+   (phase 0), phase 3 hands the grid pointer to the decision builder
+   `0x080C01D0`, and phase 8 restores the tile/meter snapshots at turn end.
+   The tile-write/walk site is not exercised by the ranged snowball battle
+   and remains the open target.
 4. **Unit/player assignment.** Determine whether policies can be selected per
    unit, job, clan, or battle. If retail state has no safe policy slot, add a
    source-driven table with explicit save/runtime compatibility constraints.

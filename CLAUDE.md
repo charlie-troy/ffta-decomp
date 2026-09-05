@@ -135,6 +135,14 @@ Genuinely open, with the reason:
   coins — are all pinned (`deterministic_ties` covers the first three,
   `action_selection: first` the last); a live battle measures 0 draws
   under the patches.
+- **The per-turn phase march is live-traced** (`tools/trace_turn_march.py`):
+  phases 9-10 build the 16x16 movement range grid at `ctx+0x54EC` before
+  the AI plan (phase 0), phase 3 hands that grid to the decision builder
+  `0x080C01D0`, and phase 8 restores the unit's tile/meter snapshots at
+  turn end. The tile-write/walk site (STRAT9.3) is not exercised by the
+  ranged snowball battle and is the open target. The candidate impact
+  score is consumed only by sign checks, so STRAT9.2 is closed on that
+  negative result.
 - **Mission fields.** The corrected constant-caller report is exhausted;
   rewards, progression, dispatch rules, fees, type, deadlines, clear
   conditions, clan-skill requirements, cancellation, and hidden reward previews

@@ -31,8 +31,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | STRAT9.2 — decode target scoring and intent weights |
-| Last closed package | STRAT9.1 — declarative strategy profiles |
+| Current work package | STRAT9.3 — decode movement and resource policies |
+| Last closed package | STRAT9.2 — decode target scoring and intent weights |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -64,8 +64,8 @@ status and backlog tables are living sections and should be kept current.
 | AUD8.1 | P3 | Complete | Audit the repository for the next evidence-backed maintenance gap | Stale commands, dead paths, and validation blind spots are either fixed or explicitly ruled out |
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 | STRAT9.1 | P0 | Complete | Compose existing AI controls into player-authored strategy profiles | Ordered guarded rules, preview/apply, two presets, strict attribution, execution validation, and user documentation |
-| STRAT9.2 | P0 | Active | Decode target scoring and intent weights | Damage/heal/status/safety target choices are behavior-backed and exposed as profile controls |
-| STRAT9.3 | P1 | Pending | Decode movement and resource policies | Verified movement intent and MP/HP/CT conservation controls join the profile contract |
+| STRAT9.2 | P0 | Complete | Decode target scoring and intent weights | Behavior-backed target choices exposed as profile controls; closed 2026-09-05 with the negative result that the impact score's magnitude has no downstream consumer (sign-only), so the shipped levers are the full control surface |
+| STRAT9.3 | P1 | Active | Decode movement and resource policies | Verified movement intent and MP/HP/CT conservation controls join the profile contract. Scoped 2026-09-05: the 16x16 movement range grid is built in phases 9-10 before the AI plan and handed to the decision builder; the walk-site itself is the open target |
 | STRAT9.4 | P1 | Pending | Assign strategies at useful runtime scopes | Per-unit/job/clan/battle feasibility is proven before adding storage or hooks |
 | STRAT9.5 | P1 | Pending | Validate contrasting profiles in full auto battles | Fixed multi-turn replays demonstrate action, target, and movement differences |
 
@@ -3423,3 +3423,41 @@ the +0x28-bit-0x1000 flag out of both, and tree-inserts keyed by
 The exact entry-allocation call site that first writes each 0x90 entry's
 +0x80 container back-pointer remains un-singled-out (cold-boot watchpoint
 still needs title input automation).
+
+
+### 2026-09-05 (later) - full per-turn phase march traced; STRAT9.2 closed; STRAT9.3 scoped
+
+A new live instrument, tools/trace_turn_march.py, breaks at the sequencer
+dispatcher 0x080C045C every frame of the frozen-seed enemy turn and logs
+phase / flag byte / live-vs-saved tile (outputs/mgba-snowball/turn-march.json).
+The complete march of the snowball enemy turn is
+9 -> 10x43 -> 0 -> 1x11 -> 2 -> 3 -> 5 -> [3,5]x3 -> 4x8 -> 8; the actor's
+tile stays (6,7) throughout (its throw reaches from where it stands).
+
+- Phase 9 allocates the 0x100-byte movement grid at ctx+0x54EC; phase 10
+  fills the 16x16 grid (5 cells/frame - the ~43-frame residence is the
+  256-cell scan) via the terrain helpers 0x08099FB0 (mark 2) / 0x08099F58
+  (mark 1) plus the class gate 0x0812F0E4 (bit 0x80), then pops the phase
+  stack. The range grid is therefore built BEFORE the AI plan (phase 0)
+  and phase 3 passes it to the decision builder 0x080C01D0 ([sp+0xc]).
+- Phase 8 is the end-of-turn restore (tile snapshot 0x54CA/0x54CB and
+  meter 0x54C8 copied back onto the unit); a no-op for a unit that
+  neither moved nor spent.
+- The initial phase is 9 for the traced actor; the older "phase 0xB for
+  AI units" note over-generalized one init branch (the 0xB seed belongs
+  to the 0x080C95A8(0xd)-nonzero path). Corrected in ai-findings.md.
+- Phases 11/12/13 are reached only via that branch / phase-stack pops and
+  are not exercised by this battle.
+
+STRAT9.2 closed on a negative result: a full read-scan of phase 3 and the
+decision builder shows the candidate impact score (+0x0C) is consumed only
+by the two regime sign checks (ldrsh at 0x080C0894 / 0x080C08DC) plus the
+per-rule sign re-checks; its magnitude has no downstream consumer, so a
+score-magnitude profile control is structurally impossible without ROM
+changes. The shipped levers (ai_priority ordering, pool polarity,
+deterministic ties/action) are the complete control surface.
+
+STRAT9.3 (movement and resource policy) becomes the current work package:
+the movement grid's location (ctx+0x54EC), fill order (pre-plan), and
+hand-off to the decision builder are now pinned; the open target is the
+tile-write/walk-site, which this ranged battle never exercises.

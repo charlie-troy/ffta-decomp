@@ -431,6 +431,40 @@ sequencer supports sub-sequences). The AI phases:
 | 4 | `0x080C09EC` | copy the decision struct to the object at `ctx[0]`, free the two ctx buffers |
 | 5 | `0x080C0A28` | post-decision state updates; when done, `0x080C0AE2` points `ctx[0]` at the AI object again |
 
+### The full turn march and the pre-AI phases (live-traced)
+
+`tools/trace_turn_march.py` breaks at the dispatcher `0x080C045C` every
+frame of the frozen-seed enemy turn and logs the phase index, the
+`0x54AF` flag byte, and the actor's live vs saved tile
+(`outputs/mgba-snowball/turn-march.json`). The complete march of this
+enemy turn is
+`9 → 10×43 → 0 → 1×11 → 2 → 3 → 5 → [3,5]×3 → 4×8 → 8`, with the actor
+tile constant at (6,7) throughout — the snowball throw reaches its
+target from where the unit stands, so this battle never walks. The rows
+resolve the whole phase set:
+
+| phase | entry | role (live/static) |
+| --- | --- | --- |
+| 9 | `0x080C05FC` | allocate the 0x100-byte **movement grid** at `ctx+0x54EC`, zero it and the `ctx+0x54F0/0x54F1` cell counters, → 10 |
+| 10 | `0x080C0644` | **fill the 16×16 movement grid** `[y*16+x]` over several frames (5 cells per frame via `0x080C1260` yield — the observed ~43-frame residence is the 256-cell scan) using the terrain helpers `0x08099FB0` (mark 2) and `0x08099F58` (mark 1, arg 0xff), with the unit-class gate `0x0812F0E4` OR-ing bit 0x80 for its own reachable cells; phase-stack pop (`0x080C1248`) when y>15 |
+| 0–5 | (above) | AI plan, choose, execute |
+| 8 | `0x080C1068` | end-of-turn restore: copies `ctx+0x54CA/0x54CB` (tile snapshot) and `ctx+0x54C8` (meter snapshot) back onto the unit, then conditional tails on `0x54AF`/`0x54BE` (no-op when the unit neither moved nor spent) |
+
+Phases 11 (`0x080C04C4` → 12), 12 (`0x080C04E0`, nibble unpack into
+`0x54B4/0x54B5/0x54BA`) and 13 (`0x080C10EE`, trivial return) are reached
+via the init branch that seeds phase 0xB and via phase-stack pops; their
+turn roles are not exercised by this battle. The initial phase is **9**
+for the traced actor (the init path through `0x080C03C2`); the 0xB seed
+belongs to the other init branch (`0x080C95A8(0xd)` nonzero) — the older
+"phase 0xB for AI units" note over-generalized.
+
+Significance for STRAT9.3 (movement/resource policy): the movement
+*range grid* is computed in phases 9–10 **before** the AI plan runs in
+phase 0, and phase 3 hands the grid pointer to the decision builder
+`0x080C01D0` (`[sp+0xc]` at `0x080C0998`) — reachability is available at
+choose time. The tile-write / walk-site itself is never exercised in this
+battle (no walking), so that site remains the concrete STRAT9.3 target.
+
 Phase 3 walks the ctx's **shadow copies of the sorted arenas** — base
 `ctx+0x74 + 0x290C*regime` (`0x290C = 13 records + the count field;
 populated by the phase-2 wrapper from the AI struct before the reset),
@@ -447,6 +481,19 @@ decision struct at `ctx+0x5290` and returns the action handler, stored at
 `ctx[0]` and the AI phase ends. If no candidate is accepted anywhere, the
 shared tail `0x080C1222` memsets the decision area (0x21C bytes at
 `ctx+0x5290`), sets phase 5, and the turn ends in passivity.
+
+**Score-value audit (STRAT9.2 close-out, negative result).** A full
+read-scan of phase 3 (`0x080C07C8`–`0x080C0A28`) and the decision
+builder (`0x080C01D0`) shows the candidate's impact score at `+0x0C` is
+read in exactly two places in the chooser — the two regime sign checks
+(`ldrsh` at `0x080C0894` with the `blt`, and at `0x080C08DC` with the
+`bgt`) — and by no other code in the choose or decide path; the per-rule
+gate handlers re-check only its sign as well. The score's magnitude has
+no downstream consumer, so a profile control over score magnitude is
+structurally impossible without ROM changes. The shipped levers
+(`ai_priority` ordering, pool polarity, deterministic rolls) are
+therefore the complete control surface; STRAT9.2 is closed on this
+evidence.
 
 The validity gate rejects a candidate when: effect flags `+0x0B` bits 0/1
 are set (both bail through the shared return-0 tail `0x080C478C`); ability
@@ -643,9 +690,11 @@ candidates.
   zeroes 0x553C bytes via the veneer copy routine, stores `ctx+4 = unit`,
   copies unit fields (`+0xF6/+0xF7` → `ctx+0x54CA/0x54CB`), reads the
   unit's `0x15` meter into `ctx+0x54C8`, seeds the frame counter at
-  `ctx+0x54F4+2`, and computes turn-order branch keys (phase 0xB for
-  AI-controlled units; bit 4 of `ctx+0x54AF` set by unit class
-  `0x0809AA10`, bit 6 when the special condition passes).
+  `ctx+0x54F4+2`, and computes turn-order branch keys (the initial
+  phase is 0xB only on the `0x080C95A8(0xd)`-nonzero branch; the traced
+  actor seeds phase 9 — see the full-turn-march section; bit 4 of
+  `ctx+0x54AF` set by unit class `0x0809AA10`, bit 6 when the special
+  condition passes).
 - `ctx+4` (the action-entry array base) is written **exactly once per
   turn** — caught live by a write watchpoint: the write is the
   initializer's `str r4,[r5,#4]` at `0x080C0360`, fed by the scheduler's
