@@ -683,14 +683,15 @@ wrong, and the correction reorganizes the setup-side picture:
   `+4` = **`+8` = the 0x90-stride action-entry-array base**
   (`0x020223AC` this battle); `+0x40` = `0x0202282C` = table end
   (base + 8·0x90), `+0x44` = one more buffer; the rest zero this battle.
-  This object is the `unit` argument flowing into the sequencer chain
-  (`ctx+4` = `[battle_obj+4]`), and the AI orchestration
-  `sub_080C1EB4(ai, unit)` reads it directly (`ldr r0,[unit+0x80]`,
-  `str ai+0/[ai+4]=unit`), then builds target lists from the **element
-  containers rooted at `unit+0x10/0x14/0x18`** (the ctor's three u16
-  arrays) via the container iterators `0x080C7CC0/0x080C7D18/0x080C7D70`
-  — the arena records' `entry+0` unit pointers are exactly the elements
-  of those containers.
+  This object is the scheduler's arg0: `r0 = [battle_obj+4]` feeds the
+  ctx initializer, so **`ctx+4` = `[battle_obj+4]` = the entry-array
+  base** (not the battle object itself). The AI orchestration
+  `sub_080C1EB4(ai, entries)` then receives the **entry-array base** as
+  its second argument (`ai+0 = [entries+0x80]`, `ai+4 = entries`) and
+  builds target lists from the element containers reachable through it
+  (the container iterators `0x080C7CC0/0x080C7D18/0x080C7D70` wrap the
+  entries; the arena records' `entry+0` unit pointers are the elements
+  of those containers).
 - **Unit-record array.** A fixed array of twelve **0x108-byte unit
   records starts at `0x02002FC4`** (0x80-record stride is `0x108`),
   pre-seeded from ROM records `0x0854CD54 + id·0x1C` (12 bytes copied,
