@@ -210,7 +210,7 @@ application or effective-state joins:
 | `0x0040` | **Yellow Card** | Yellow Card raw effect 207/case 92 writes this bit; Yellow Clip raw effect 206/case 91 clears it |
 | `0x0800` | **Zombie** | the effective Zombie predicate accepts this bit or live `+0xe9` bit 3; initialization copies it through the live setter |
 | `0x8000` | **AI side** (which of the two battle sides the unit belongs to) | the AI arena setup (`sub_080C1EB4`) and record gate (`sub_080C1B8C`) split the entry container's two side lists and gate records on this bit (`0x080C8240`); live snowball battle: entries 0-3 set, 4-7 clear |
-| `0x1000` | **AI no-help mode** (fight-everything) | when set on the acting unit, `sub_080C1EB4` skips the help arena and merges both side lists into the single harm arena (`0x080C8298`); also feeds the `0x0E` arena-flag exemption |
+| `0x1000` | **AI unaffiliated / no-help mode** | units with this bit are kept out of both side pools by the container refresh (`0x08098CE8` — they register only into the all-units `C+0x10` list); an actor bearing it gets no help arena and a single merged harm arena over both side lists in `sub_080C1EB4` (`0x080C8298`), plus the `0x0E` arena-flag exemption |
 
 The other observed masks (`0x0004`, `0x0008`, `0x0020`, `0x0100`,
 `0x2000`, `0x4000`) have broad category/capability callers but

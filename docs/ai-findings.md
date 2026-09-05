@@ -704,15 +704,20 @@ wrong, and the correction reorganizes the setup-side picture:
   (`[0x020159CC]` array, slot = `0x4D8 + idx·8`, `str rec,[slot+4]`).
   The entry-table unit pointers observed this battle were exactly
   `0x02002FC4 + 0x108·k` (k = 0..7) — consecutive spawned units.
-- **The entry-array builder remains unlocated** — the honest residue.
-  It receives no writes during the AI turn; the two tick-numbered
-  savestates predate this battle session; and no ROM literal anywhere
-  stores the base word (it is computed), so the write happens in
-  battle setup, likely while spawning units into the containers above
-  (possibly in IWRAM-resident code). A cold-boot watchpoint experiment
-  was attempted (stub opens at launch) but needs title-screen input
-  automation to reach a battle. The 0x90-entry field map below is from
-  the live dump regardless.
+- **The entry-array builder's home is now bounded to the battle
+  unit-container subsystem.** The entry-array base itself receives no
+  writes during the AI turn and no ROM literal stores it (it is
+  computed), but the **side-list membership writes** — which entries
+  land in `C+0x14` vs `C+0x18` — happen in the `0x08098xxx`–
+  `0x0809Axxx` container cluster (`0x08098CE8` refresh via
+  `0x080C7A74`/`0x080C7BF4`, `0x080989AC` placement check, single
+  callers in the `0x0809Axxx` turn-manager wrappers), keyed by the same
+  `+0x28`-bit-15 side bit the arena gate uses. The exact allocation
+  call site that creates each 0x90 entry and writes its `+0x80`
+  container back-pointer is not yet singled out; the two tick-numbered
+  savestates predate this battle session, and the cold-boot watchpoint
+  that could catch it needs title-screen input automation. The 0x90-entry
+  field map below is from the live dump regardless.
 
 ### The 0x90-byte action entries (live dump, 8 entries)
 
@@ -768,8 +773,22 @@ are side-True, entries 4–7 side-False; `C+0x14` = side-False `[7,6,5,4]`,
 `C+0x18` = side-True `[2,0,1,3]`. (The structure at `C+0x10` is a sorted
 tree over the entries — first element is the table-end sentinel
 `base+8·0x90` — used through builder `0x08099D60`/iterator
-`0x080C7D18`; no arena-setup site calls it, so its consumer is elsewhere
-and its semantics remain open.)
+`0x080C7D18`; no arena-setup site calls it. Its consumer is the
+**battle unit-container subsystem at `0x08098xxx`–`0x0809Axxx`**
+(the entry-table builder thread's home): `0x08098C20` enumerates
+`[C+0x10]` and bubble-sorts the objects by the byte at `unit+0x104`,
+`0x08098CE8` (single caller `0x0809A9B2`) re-checks every object in the
+`C+0x10` list and appends it to the appropriate side list — `C+0x18`
+for side-True units, `C+0x14` for side-False units, or keeps it only in
+`C+0x10` when the unit has the `+0x28`-bit-0x1000 unaffiliated flag —
+inserting each into the sorted tree keyed by `[entry+0x24]`, and
+`0x080989AC` (single caller `0x0809A618`) is a placement check that
+walks `[C+0x10]` against a proposed position. `0x08097504` places a
+unit. So the side lists the AI arenas consume are maintained by this
+subsystem during battle setup/placement, via the same
+`0x080C7A74`/`0x080C7BF4` appends the arena decode uses. The exact
+entry-allocation call site that first creates an entry and writes its
+`+0x80` back-pointer has not been singled out yet.)
 
 **`sub_080C1EB4(ai, entries)` picks the pairing.** Its prologue computes
 a flag `r4` from the actor's own side bit, then flips it under the

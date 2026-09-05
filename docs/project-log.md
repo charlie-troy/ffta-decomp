@@ -3408,3 +3408,18 @@ is wrong - those are three list/tree heads; +0xC is a 0x800-byte block
 (owner for the three heads), and battle_obj stores the u16 entry count 8
 at +0xDC. ai-findings.md and unit-flags.md updated (the +0x28 bits 15/12
 are now behavior-backed for the AI arena selection).
+
+### 2026-09-05 (follow-up) - the container side lists' writer cluster is bounded
+
+A corrected BL caller scan (first-halfword prefix (h >> 11) == 0x1E, plain
+BL decode) now bounds the last open entry-builder thread further. The
+container's side-list membership writes happen in the battle
+unit-container subsystem 0x08098xxx-0x0809Axxx: 0x08098CE8 (refresh,
+single caller 0x0809A9B2) appends every object of the all-units C+0x10
+list into C+0x18 (side-True) or C+0x14 (side-False), keeps units bearing
+the +0x28-bit-0x1000 flag out of both, and tree-inserts keyed by
+[entry+0x24]; 0x08098C20 re-sorts C+0x10 by the unit+0x104 byte;
+0x080989AC (single caller 0x0809A618) is a placement check over C+0x10.
+The exact entry-allocation call site that first writes each 0x90 entry's
++0x80 container back-pointer remains un-singled-out (cold-boot watchpoint
+still needs title input automation).
