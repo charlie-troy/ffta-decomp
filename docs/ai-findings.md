@@ -753,38 +753,50 @@ wrong, and the correction reorganizes the setup-side picture:
   (`[0x020159CC]` array, slot = `0x4D8 + idx·8`, `str rec,[slot+4]`).
   The entry-table unit pointers observed this battle were exactly
   `0x02002FC4 + 0x108·k` (k = 0..7) — consecutive spawned units.
-- **The entry-array builder's home is now bounded to the battle
-  unit-container subsystem.** The entry-array base itself receives no
-  writes during the AI turn and no ROM literal stores it (it is
-  computed), but the **side-list membership writes** — which entries
-  land in `C+0x14` vs `C+0x18` — happen in the `0x08098xxx`–
-  `0x0809Axxx` container cluster (`0x08098CE8` refresh via
-  `0x080C7A74`/`0x080C7BF4`, `0x080989AC` placement check, single
-  callers in the `0x0809Axxx` turn-manager wrappers), keyed by the same
-  `+0x28`-bit-15 side bit the arena gate uses. The exact allocation
-  call site that creates each 0x90 entry and writes its `+0x80`
-  container back-pointer is not yet singled out; the two tick-numbered
-  savestates predate this battle session, and the cold-boot watchpoint
-  that could catch it needs title-screen input automation. The 0x90-entry
-  field map below is from the live dump regardless.
+- **The entry factory and its call site are now pinned (2026-09-05).**
+  Each per-unit action entry is created by **`0x0809716C(C, unit)`**,
+  called from the wrapper **`0x08092440(C, unit)`**, called per active
+  unit by the battle-flow sweep **`0x08124CE8`** (itself reached from
+  the unit-spawn region around `0x08124C40`; the same sweep binds each
+  unit into its battle-slot handle). The factory: allocates a block of
+  **0x84 bytes** (the allocator rounds each block up to the observed
+  0x90 stride — 0x84 rounds to 16-byte alignment), zeroes it, writes
+  the unit pointer at `+0x00`, the **registration/order key at `+0x24`**
+  (`0x08099CB8(C)` = the current count of `C+0x10`; 1-based in this
+  battle, a 1..8 permutation — also stored to `unit+0xFB`), the
+  container pointer at `+0x80`, the shared ctor buffer `[C+0x1C]` at
+  `+0x3C`, constant 1 at `+0x38`, the unit height (`unit+0xF8`) at
+  `+0x20`, sets `unit+0x28` bit 0, and links the entry into the
+  `C+0x10` list (append `0x080C7A74`) plus its BST (insert
+  `0x080C7AB4`, key = `entry+0x24`). The wrapper then fills the pixel
+  coords (`+0x08/+0x0C` via `0x08099E68` from `unit+0xF6/+0xF7`), the
+  `+0x1E` byte and `+0x34` u16 from the per-unit property call
+  `0x08022238(unit, byte*)`, and height via `0x0809836C`, and routes
+  the entry into `C+0x14` (side-False) or `C+0x18` (side-True) by the
+  same `+0x28`-bit-15 side bit the arena gate uses. The entries are
+  therefore born during battle setup, one per active unit — which is
+  why the array receives no writes during the AI turn.
 
-### The 0x90-byte action entries (live dump, 8 entries)
+### The 0x84-byte action entries (live dump, 8 entries)
 
-Each entry correlates to one spawned unit record: `+0` = the unit
-record pointer (see above), and the pixel-position and ability fields
-line up with the fill machinery's reads:
+Each entry correlates to one spawned unit record. Logical size is
+**0x84 bytes** (factory `0x0809716C` allocates 0x84); the allocator
+rounds each block up to the observed **0x90 stride** (0x84 → 16-byte
+alignment). Fields, now with writer provenance:
 
-| offset | type | meaning (snowball-battle values) |
-| --- | --- | --- |
-| `+0x00` | ptr | unit record pointer (`0x02002FC4 + 0x108·k`) |
-| `+0x04` | — | 0 |
-| `+0x08` | u16 | x position · 16 (pixel coords; e.g. `0x00d0` = 208) |
-| `+0x0c` | u16 | y position · 16 |
-| `+0x1e..0x20` | u8s | small values (0-2) on entries 0-3 (side-True, the actor's side this battle), 0 on entries 4-7 — side-group-correlated, meaning undetermined |
-| `+0x24` | u32 | packed small ints; low byte is a permutation of 1..8 across the 8 entries (spawn/encounter id), upper bytes vary (`0xde/0x38/0xa8/0x6e/0x4c/0x56/0xdb`) — undetermined |
-| `+0x34` | u8 | small counter byte (`0x2c`-`0x3a` across entries) — undetermined |
-| `+0x38` | u16 | 1 (constant) |
-| `+0x3c` | ptr | shared `0x02021A14` buffer allocated by ctor `0x08097000` |
+| offset | type | meaning (snowball-battle values) | written by |
+| --- | --- | --- | --- |
+| `+0x00` | ptr | unit record pointer (`0x02002FC4 + 0x108·k`) | factory `0x0809716C` |
+| `+0x04` | — | 0 (factory zero-fill) | |
+| `+0x08` | u16 | x position · 16 (pixel coords; e.g. `0x00d0` = 208) | wrapper `0x08092440` via `0x08099E68` |
+| `+0x0c` | u16 | y position · 16 | wrapper via `0x08099E68` |
+| `+0x1e` | u8 | per-unit property byte (`0/1/2`) from `0x08022238` — not side-correlated (this battle `{0,0,1,2}` vs `{0,0,1,1}`) | wrapper via `0x08022238` |
+| `+0x20` | u8 | **unit height** (copy of `unit+0xF8`) | factory |
+| `+0x24` | u32 | **registration/order key** = `C+0x10` count helper `0x08099CB8` at creation (full u32 written; its low byte is the 1-based registration order — a permutation of 1..8 here — and is the ordering key mirrored to `unit+0xFB`; the upper bytes are not consumed) | factory via `0x08099CB8` (also `unit+0xFB`) |
+| `+0x34` | u16 | per-unit property halfword (`0x2c`-`0x3a`) from `0x08022238` return | wrapper via `0x08022238` |
+| `+0x38` | u16 | 1 (constant) | factory |
+| `+0x3c` | ptr | shared `0x02021A14` buffer (copy of `[C+0x1C]`) | factory |
+| `+0x80` | ptr | container `C` back-pointer (`0x0201F134`) | factory |
 
 `tools/trace_choose.py` logs the walk indices at the chooser head and the
 decision fields at the choose-call return; `tools/disasm.py` is the
@@ -835,9 +847,14 @@ inserting each into the sorted tree keyed by `[entry+0x24]`, and
 walks `[C+0x10]` against a proposed position. `0x08097504` places a
 unit. So the side lists the AI arenas consume are maintained by this
 subsystem during battle setup/placement, via the same
-`0x080C7A74`/`0x080C7BF4` appends the arena decode uses. The exact
-entry-allocation call site that first creates an entry and writes its
-`+0x80` back-pointer has not been singled out yet.)
+`0x080C7A74`/`0x080C7BF4` appends the arena decode uses. The entry
+factory itself is `0x0809716C` (see the entry-table section above), so
+`C+0x10` is the complete all-entries set and `C+0x14`/`C+0x18` the
+per-side subsets. Each of the three heads is a **dual-structure
+container**: registration appends to the head's doubly-linked chain
+(`0x080C7A74`) *and* BST-inserts the same node keyed by `entry+0x24`
+(`0x080C7AB4`), which is why the append/count helpers and the tree
+iterators coexist on one head.)
 
 **`sub_080C1EB4(ai, entries)` picks the pairing.** Its prologue computes
 a flag `r4` from the actor's own side bit, then flips it under the

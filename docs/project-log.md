@@ -3461,3 +3461,30 @@ STRAT9.3 (movement and resource policy) becomes the current work package:
 the movement grid's location (ctx+0x54EC), fill order (pre-plan), and
 hand-off to the decision builder are now pinned; the open target is the
 tile-write/walk-site, which this ranged battle never exercises.
+
+
+### 2026-09-05 (latest) - entry factory and call site pinned; entry field map corrected
+
+The last open entry-builder thread is closed statically - no cold-boot
+watchpoint needed. Each per-unit action entry is created by
+0x0809716C(C, unit), called by the wrapper 0x08092440(C, unit), called per
+active unit by the battle-flow sweep 0x08124CE8 (unit-spawn region
+0x08124C40). Factory writes (0x84-byte allocation, allocator-aligned to the
+observed 0x90 stride): +0x00 = unit, +0x24 = registration/order key
+(0x08099CB8 = the C+0x10 count helper at creation; low byte 1..8 in this
+battle, mirrored to unit+0xFB), +0x80 = C back-pointer, +0x3C = [C+0x1C]
+shared buffer, +0x38 = 1, +0x20 = unit height (unit+0xF8), unit+0x28 bit 0
+set, then linked into C+0x10 (append + BST keyed by entry+0x24). The wrapper fills +0x08/+0x0C
+pixel coords (0x08099E68) and the +0x1E byte / +0x34 u16 from the per-unit
+property call 0x08022238, and routes the entry into C+0x14 (side-False) or
+C+0x18 (side-True) by the +0x28-bit-15 side bit. C+0x10/0x14/0x18 are dual
+chain+tree heads (registration appends AND BST-inserts the same node).
+
+Corrections to the earlier live-dump table in ai-findings.md: +0x20 is the
+unit height (not undetermined); +0x1E and +0x34 come from 0x08022238 and are
+not side-correlated (this battle {0,0,1,2} on side-True vs {0,0,1,1} on
+side-False); +0x24's meaningful content is its low byte, the 1-based order
+key. This supersedes the closing line of the 2026-09-05 follow-up entry
+("exact entry-allocation call site remains un-singled-out"). The earlier
+"0x90-byte entries" label is now "0x84-byte entries with 0x90 allocator
+stride".

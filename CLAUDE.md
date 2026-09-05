@@ -127,7 +127,13 @@ Genuinely open, with the reason:
   `sub_080C1B8C` keeps same-side units always, cross-side unless
   Concealed (`+0xE9` bit 4), and drops gone units (`+0xED` bit 6).
   Live-verified by `tools/probe_pool_sides.py`;
-  `outputs/mgba-snowball/pool-sides.json`.
+  `outputs/mgba-snowball/pool-sides.json`. The entry factory is pinned:
+  `0x0809716C(C, unit)` (via wrapper `0x08092440` from the battle-flow
+  sweep `0x08124CE8`) allocates each 0x84-byte entry (allocator-aligned
+  to the observed 0x90 stride), writes the unit/height/order-key/`+0x80`
+  back-pointer/shared-buffer fields, and registers it into the `C+0x10`
+  all-units set and its side's list (dual chain+tree heads at
+  `C+0x10/0x14/0x18`).
 - **Every target-ordering draw in the sort is a verified profile control.**
   The sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the
   `mode=0` HP-weighted enumeration roll (its caller passes `r1=0x87`,
