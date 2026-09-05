@@ -112,7 +112,10 @@ Genuinely open, with the reason:
   `tools/probe_pool_law.py`, which rewrote the help-pool candidates into
   rule-0x26 recovery form plus wounded targets and flipped the battle's
   resolution. Recovery rule 0x26 additionally requires target HP ≤ max/3
-  and passes a `Rand()%101` gate (self ≤10, ally ≤49).
+  and passes a `Rand()%101` gate (self ≤10, ally ≤49). The battle object
+  (`0x0200F4A8` → `0x0200F4E8`) carries the action-entry-array base at
+  `+4` and feeds it (not the object) to the AI orchestration — decoded
+  with the memset correction in `docs/ai-findings.md`.
   sort — the `mode=1` tie roll, the `mode=0` order-gate roll, the `mode=0`
   HP-weighted enumeration roll (its caller passes `r1=0x87`, skipping the
   slot walk), and the mode=1 action walk with its two kind coins — are
