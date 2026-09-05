@@ -3325,3 +3325,41 @@ r0 = [unit_obj+4] at 0x08093454. The 0x90-stride entry table itself is
 built even further upstream (battle/unit setup); after the turn the
 destructor 0x080C1460 frees the ctx+0x54EC object, which is why probes
 attaching between turns see ctx+4 = 0.
+
+### 2026-09-04 - battle object decoded; memset correction; entry table mapped
+
+Followed the scheduler's arg0 upstream. Battle init `0x08096BA0` allocates
+and **zeroes** a 0x1B8-byte battle object (no template copy - see
+correction below) and installs it at `0x0200F4A8` (value `0x0200F4E8`).
+Its `+4` = `+8` = the 0x90-stride action-entry-array base (`0x020223AC`
+this battle; `+0x40` = table end, `+0x44` = spare buffer). A helper ctor
+`0x08097000` builds the sub-object at `+0` with two 0x34-byte objects
+(`+4/+8`), a 0x400 block (`+0xC`), three u16 arrays (`+0x10/0x14/0x18`),
+and a shared buffer (`+0x1C` = `0x02021A14`). The AI orchestration
+`sub_080C1EB4(ai, unit=battle_obj)` consumes it directly: `ai+0` =
+`[unit+0x80]`, `ai+4` = unit, target lists built from the element
+containers at `unit+0x10/0x14/0x18` (arena records' `entry+0` unit
+pointers are the container elements). Also mapped: the fixed twelve
+0x108-byte unit records at `0x02002FC4` (spawned by the battle
+event-script VM via `0x08096E18`, pre-seeded from ROM records
+`0x0854CD54+id*0x1C`; battle-flow `0x08124CE8` binds active ones into
+battle-slot handles at `[0x020159CC]+0x4D8+idx*8`), and a live dump of
+all eight 0x90-byte entries (`outputs/mgba-snowball/entry_table_dump.bin`,
+field map in ai-findings).
+
+**Correction:** `0x0836D4B8` -> `0x03005E79` is not a template-copy
+routine - it is IWRAM-resident **memset-0**, one third of a memset/memcpy
+library DMA-copied from ROM `0x08A38A2C` to `0x03005E78` by `0x08002768`
+(memset-0 `+0`, byte-fill `+0x34`, memcpy `+0x70`; the pointer table sits
+at the block's tail). Every `bl 0x814224C` with `r2=[0x0836D4B8]` and
+`(dst,size)` args is a zeroing call. The earlier "template->struct copy"
+reading of the AI-struct and battle-object inits is retracted in
+ai-findings.md; watchpoint observations stand unchanged (the one write
+they caught WAS the memset).
+
+Entry-table builder: still unlocated, now with the search space sharply
+bounded - the base is computed (no ROM literal stores it), the write
+happens in battle setup while units are spawned into containers, and it
+receives no writes during the AI turn. Cold-boot watchpoint (stub opens
+at launch, arm before any battle exists) is the ready instrument; it
+needs title-input automation to run to completion.

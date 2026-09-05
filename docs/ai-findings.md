@@ -656,8 +656,78 @@ candidates.
   destructor `0x080C1460` (scheduler `0x080934B2`) frees the object at
   `ctx+0x54EC` and `ctx[0]` is left 0 — which is why a probe attaching
   between turns reads `ctx+4 = 0`.
-- Phase 0's `0x080C47A8` arg1 also now has a name: it is the **AI struct
-  size** `0x5684` (the allocation the template copy fills).
+- Phase 0's `0x080C47A8` arg1 is also the **AI struct size** `0x5684`
+  (the allocation the memset fills).
+
+### Corrected reading of the `bl 0x0814224C` sites and the battle object
+
+Two stale claims elsewhere in these notes ("template→struct copy") are
+wrong, and the correction reorganizes the setup-side picture:
+
+- `0x0814224C` is the register-dispatch veneer (`bx r2`, `bx r3`, ...),
+  and the pointer at **`0x0836D4B8` — the constant almost every call
+  loads into the dispatch register — is `0x03005E79`, an IWRAM-resident
+  `memset(dst, 0, size)`**. The 0xB0-byte routine block it lives in is
+  DMA-copied from ROM `0x08A38A2C` to `0x03005E78` by `0x08002768` at
+  boot; the block is a small memset/memcpy library (memset-0 at `+0`,
+  byte-fill at `+0x34`, memcpy at `+0x70`). So every `bl 0x814224C`
+  with `r2 = [0x0836D4B8]` and `(dst, size)` in `r0/r1` is a **zeroing
+  call** — there is no template copy: the AI struct (0x5684) and the
+  battle object (0x1B8) are allocated fresh and zeroed.
+- **Battle object model (live-dumped this session).** Battle init
+  `0x08096BA0` allocates 0x1B8 bytes, zeroes them, and installs the
+  pointer at global `0x0200F4A8` (value `0x0200F4E8`). Layout as
+  observed: `+0` = pointer to the ctor object built by `0x08097000`
+  (its own `+4/+8` = two 0x34-byte objects, `+0xC` = a 0x400-byte block,
+  `+0x10/0x14/0x18` = three u16 arrays, `+0x1C` = one more alloc);
+  `+4` = **`+8` = the 0x90-stride action-entry-array base**
+  (`0x020223AC` this battle); `+0x40` = `0x0202282C` = table end
+  (base + 8·0x90), `+0x44` = one more buffer; the rest zero this battle.
+  This object is the `unit` argument flowing into the sequencer chain
+  (`ctx+4` = `[battle_obj+4]`), and the AI orchestration
+  `sub_080C1EB4(ai, unit)` reads it directly (`ldr r0,[unit+0x80]`,
+  `str ai+0/[ai+4]=unit`), then builds target lists from the **element
+  containers rooted at `unit+0x10/0x14/0x18`** (the ctor's three u16
+  arrays) via the container iterators `0x080C7CC0/0x080C7D18/0x080C7D70`
+  — the arena records' `entry+0` unit pointers are exactly the elements
+  of those containers.
+- **Unit-record array.** A fixed array of twelve **0x108-byte unit
+  records starts at `0x02002FC4`** (0x80-record stride is `0x108`),
+  pre-seeded from ROM records `0x0854CD54 + id·0x1C` (12 bytes copied,
+  `+4` = active flag) by `0x08096E18(unit_slot)`, which is invoked by
+  the battle event-script VM's spawn command `0x08123670`. Battle-flow
+  `0x08124CE8` later sweeps all 12 records, wraps each active one
+  (`0x08092440`), and binds it into a battle-slot handle
+  (`[0x020159CC]` array, slot = `0x4D8 + idx·8`, `str rec,[slot+4]`).
+  The entry-table unit pointers observed this battle were exactly
+  `0x02002FC4 + 0x108·k` (k = 0..7) — consecutive spawned units.
+- **The entry-array builder remains unlocated** — the honest residue.
+  It receives no writes during the AI turn; the two tick-numbered
+  savestates predate this battle session; and no ROM literal anywhere
+  stores the base word (it is computed), so the write happens in
+  battle setup, likely while spawning units into the containers above
+  (possibly in IWRAM-resident code). A cold-boot watchpoint experiment
+  was attempted (stub opens at launch) but needs title-screen input
+  automation to reach a battle. The 0x90-entry field map below is from
+  the live dump regardless.
+
+### The 0x90-byte action entries (live dump, 8 entries)
+
+Each entry correlates to one spawned unit record: `+0` = the unit
+record pointer (see above), and the pixel-position and ability fields
+line up with the fill machinery's reads:
+
+| offset | type | meaning (snowball-battle values) |
+| --- | --- | --- |
+| `+0x00` | ptr | unit record pointer (`0x02002FC4 + 0x108·k`) |
+| `+0x04` | — | 0 |
+| `+0x08` | u16 | x position · 16 (pixel coords; e.g. `0x00d0` = 208) |
+| `+0x0c` | u16 | y position · 16 |
+| `+0x1e..0x20` | u8s | small values (0-2) on entries 0-3 (the help-pool group), 0 on entries 4-7 — regime-group-correlated, meaning undetermined |
+| `+0x24` | u32 | packed small ints; low byte is a permutation of 1..8 across the 8 entries (spawn/encounter id), upper bytes vary (`0xde/0x38/0xa8/0x6e/0x4c/0x56/0xdb`) — undetermined |
+| `+0x34` | u8 | small counter byte (`0x2c`-`0x3a` across entries) — undetermined |
+| `+0x38` | u16 | 1 (constant) |
+| `+0x3c` | ptr | shared `0x02021A14` buffer allocated by ctor `0x08097000` |
 
 `tools/trace_choose.py` logs the walk indices at the chooser head and the
 decision fields at the choose-call return; `tools/disasm.py` is the
@@ -693,15 +763,15 @@ the arena records:
   runs before the fill, and the sort does not change them).
 - The setup entry itself is **`sub_080C47A8`** (the sequencer's first
   AI-phase call): `bl 0x08022840` (obtain/allocate the AI struct),
-  `bl 0x814224c` template→struct copy at `0x080C47BE` (initializes the
-  whole struct, zeroing all candidate blocks — watchpoint-proven), then
-  the orchestrator `sub_080C1EB4`. A write watchpoint on the mode=0
-  empty record's candidate block caught exactly one write all turn —
-  the template copy's zeroing (from IWRAM-resident `0x03005E90`, called
-  at `lr=0x080C47C3`) — and never a candidate write: for entry 0 under
-  the mode=0 rule set (`r3=0`), `sub_080C2314` returns validity 0 before
-  emitting any rule. Which predicate inside the score producer rejects
-  it is a separate decode (the `sub_080C2314` rule engine).
+  `bl 0x814224c` **memset-0** at `0x080C47BE` (see the corrected veneer
+  reading below — it zeroes the whole struct, candidate blocks included —
+  watchpoint-proven), then the orchestrator `sub_080C1EB4`. A write
+  watchpoint on the mode=0 empty record's candidate block caught exactly
+  one write all turn — the zeroing (from IWRAM-resident `0x03005E90`,
+  called at `lr=0x080C47C3`) — and never a candidate write: for entry 0
+  under the mode=0 rule set (`r3=0`), `sub_080C2314` returns validity 0
+  before emitting any rule. Which predicate inside the score producer
+  rejects it is a separate decode (the `sub_080C2314` rule engine).
 
 ### The 20-byte target candidates inside each record
 
