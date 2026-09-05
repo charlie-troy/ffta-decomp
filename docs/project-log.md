@@ -3335,11 +3335,12 @@ Its `+4` = `+8` = the 0x90-stride action-entry-array base (`0x020223AC`
 this battle; `+0x40` = table end, `+0x44` = spare buffer). A helper ctor
 `0x08097000` builds the sub-object at `+0` with two 0x34-byte objects
 (`+4/+8`), a 0x400 block (`+0xC`), three u16 arrays (`+0x10/0x14/0x18`),
-and a shared buffer (`+0x1C` = `0x02021A14`). The AI orchestration
-`sub_080C1EB4(ai, unit=battle_obj)` consumes it directly: `ai+0` =
-`[unit+0x80]`, `ai+4` = unit, target lists built from the element
-containers at `unit+0x10/0x14/0x18` (arena records' `entry+0` unit
-pointers are the container elements). Also mapped: the fixed twelve
+and a shared buffer (`+0x1C` = `0x02021A14`). The scheduler passes `[battle_obj+4]` (the entry-array
+base) down through the ctx init, so the AI orchestration runs as
+`sub_080C1EB4(ai, entries)`: `ai+0` = `[entries+0x80]`, `ai+4` =
+entries, and the target lists enumerate the element containers
+reachable from it (arena records' `entry+0` unit pointers are the
+container elements). Also mapped: the fixed twelve
 0x108-byte unit records at `0x02002FC4` (spawned by the battle
 event-script VM via `0x08096E18`, pre-seeded from ROM records
 `0x0854CD54+id*0x1C`; battle-flow `0x08124CE8` binds active ones into
