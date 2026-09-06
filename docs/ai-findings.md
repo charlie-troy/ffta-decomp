@@ -1177,20 +1177,48 @@ exemption from the priority gate. The evaluator `sub_080C32C0` is the later
 chooser: it is the only other caller of the predicate (`0x080C35A0`) and
 re-applies the same gate while scoring.
 
-## A per-type record table at `0x085273D8` (reader-discovered, not yet mapped)
+## The per-type record table at `0x085273D8` (reader-driven mapping)
 
-`0x080CB65C`/`0x080CB714` (and their neighbours `0x080CB750`, `0x080CB78C`,
-... in the `0x080CB6xx`–`0x080CB8xx` family) index a ROM table at
-**`0x085273D8` with stride 0xE keyed by the unit-type byte `unit+0x04`**
-(`(t<<3) - t) << 1 = t·14`), falling back to the generic battle-stat getter
-`0x080C92F0(unit, k)` when the unit is not a battle object (`0x080C817C`).
-The reader at `0x08022238` copies one byte of it into each action entry's
-`+0x1E` (side-dependent path via `0x080CB65C`, reading the record's
-`+8/+9/+0xA` nibble/flag region plus a threshold table at `0x03003A60`) and
-the `+4/+5` u16 into `+0x34`. Rows look like `{type, +1..+3, u16@+4, u16@+6,
-+8 flags, +0xA, ...}`; individual field meanings are not yet pinned. This is
-a candidate for the next table-mapping pass (`tools/find_accessors.py` style:
-enumerate readers, then name fields from executed consumers).
+**`0x085273D8`, stride 0xE, keyed by the unit-type byte `unit+0x04`**
+(`(t<<3) - t) << 1 = t·14). The type byte is the unit's species/type:
+`0x080C817C(unit)` returns type>1 — **types 0/1 are non-battle units**
+(menu/overworld), so the reader family falls back to the generic stat
+getter `0x080C92F0(unit, k)` for them and rows 0–1 are never read for
+battle units. Battle units in the tutorial battle: types 15/16/17 (side-
+False kids), 23/24/25/26/56/76.
+
+**Reader census (14 literal sites**; the `0x080CB6xx`–`0x080CB9xx` family
+plus `0x0807171E`, `0x08087CC8`, `0x080C9704`, `0x080C9AE0`,
+`0x080CEADA`, `0x08125CCA` — the last is the battle-flow/unit-spawn
+region `0x08124C40`):
+
+| field | access | meaning (proven or inferred) |
+| --- | --- | --- |
+| `+1` | u8 (`0x080C9704`) | copied into `[some unit field]+5`; battle-flow area |
+| `+2` | u8 (`0x08087CCC`, `0x080C970C`) | flag byte consulted at `0x080C970C` |
+| `+4` | u16 le (`0x080CB73C` = `0x080CB714`) | **entry `+0x34`** source; = stat-id-4 override for battle types (generic `0x080C92F0(unit,4)` fallback); values 43–120 by type |
+| `+6` | u16 le (`0x080CB778`) | stat-id-5 override (`0x080CB750`); mostly 0xbc=188 here |
+| `+8` low nibble | u8 (`0x080CB6B0`, side==1) | **entry `+0x1E`** source (live-verified: types 24/25/26/56 → 0/0/1/2 = entries `{0,0,1,2}`) |
+| `+8` high nibble / `+9` low nibble | count (side==1 path) | when nonzero, `0x080CB65C` loads a 0x20-byte block into a runtime slot (below) |
+| `+9` high nibble / `+0xA` | count + index (side==0 path) | same block-load mechanism for the other side |
+| `+0xB` | u8 (`0x080CB7B4`/`0x080CB824`/`0x080CB888`/`0x080CB944`/`0x08125CCE`) | read by the spawn/battle-flow region |
+| `+0xC` | u8 (`0x080CB7E2`, `0x08125CD0`) | read by the spawn/battle-flow region |
+
+**The block-load mechanism.** When a row's count nibble is nonzero,
+`0x080CB65C` copies 0x20 bytes from a runtime bank at **`0x03003A60`**
+(indexed `(nibble<<5)`) into the buffer returned by `0x080CBB7C(count-1)`;
+`0x080CBB7C(n)` resolves the ROM source of that runtime bank by a mode
+byte at `0x02000000+0x2FC2` (bits 0–1): mode 0 → **`0x0841A560`**,
+mode 1 → **`0x0841BB40`**, mode 2 → **`0x0841B060`** (all 0x20-stride
+record banks), via `0x080CBB7C`'s copy helper (0x20 bytes, through the
+IWRAM veneer). The runtime bank has **35+ consumers** across battle/ability
+code (`0x080B5C2C`, `0x080B6808`, `0x080B7154`, `0x080D4654`,
+`0x080DB538`, `0x08115CB0`, `0x081184D0`, `0x0812662C`–`0x08126828`,
+`0x08137804`, `0x0813EA7C`, ...) — a per-slot behavior/profile store. The
+tutorial types all have count 0, so no block is loaded in this battle; the
+mechanism fires for special/named types in real battles. This whole chain
+is a strong candidate for the **per-character AI/reaction profile** the
+strategy layer would eventually want to mod.
 
 ## Supporting primitives worth naming
 

@@ -3502,6 +3502,20 @@ table. Individual field meanings are not yet pinned - 0x085273D8 is a
 candidate for the next reader-driven table pass (recorded in
 ai-findings.md). Nothing in docs/tools previously referenced this table.
 
+Follow-up table pass (reader census): 0x085273D8 is the per-unit-type
+record table, stride 0xE, keyed by unit+0x04. 0x080C817C = type>1
+(types 0/1 are non-battle units; rows 0/1 never read for battle). Field
+access census across all 14 literal sites: +1/+2 u8 (battle-flow), u16
+at +4 (entry +0x34; stat-4 override), u16 at +6 (stat-5 override; 0xbc
+here), +8 low nibble (entry +0x1E; live-verified types 24/25/26/56 ->
+0/0/1/2), +8-high/+9/+0xA = count+index fields that trigger 0x20-byte
+profile-block loads from runtime bank 0x03003A60 into 0x080CBB7C
+buffers; 0x080CBB7C resolves the ROM bank by mode byte 0x02000000+
+0x2FC2: 0x0841A560 (mode 0) / 0x0841BB40 (mode 1) / 0x0841B060 (mode
+2), all 0x20-stride. 0x03003A60 has 35+ consumers across battle code.
+Tutorial types have count 0 (no load); mechanism targets special/named
+types in real battles -- candidate per-character AI/reaction profile.
+
 ### 2026-09-05 (movement layer) - canonical tile proven frozen; live snapshot area and phase-8 sync decoded
 
 Write-watching the acting unit's canonical tile (unit+0xF6/+0xF7) across a
