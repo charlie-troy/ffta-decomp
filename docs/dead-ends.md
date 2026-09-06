@@ -158,3 +158,49 @@ CLAUDE.md carries the slogan.
   explicitly.
 - **Do not:** cite `docs/whole-battle-trace.md` as evidence for paths it did
   not trace. Whole-battle closure applies to the traced turn only.
+
+### DE-013 — A position rewrite can put the tutorial AI out of range
+
+- **Tried (2026-09-05/06):** teleporting the snowball-battle AI actor far from
+  every target to force an approach-walk: `scratch_teleport_far.py` (unit
+  tile + entry pixels), then `scratch_walk_force.py` (additionally
+  `ctx+0x54CA/54CB`, the turn-starter queue tile that phase 8 restores from).
+- **Refuted by:** the decision stayed byte-identical (handler `0x080BF7C5`,
+  ability 0, rule 0) with the actor at (1,1) 10+ tiles from every target —
+  `teleport-far-1-1.json`, `walk-force-1-1.json`. The snowball throw's reach
+  is data-map-wide or the tutorial enemy's candidate set is degenerate (one
+  command, four forced targets).
+- **Do not:** spend more emulator cycles trying to make this battle's AI walk;
+  it structurally cannot. A real battle (Zophar endgame save, Windows mGBA) is
+  required for the live walk-site observation.
+
+### DE-014 — WSL headless mGBA boots FFTA into a stuck intro page
+
+- **Tried (2026-09-06):** booting baserom.gba headless under the WSL SDL mGBA
+  build (dummy SDL video, Xvfb, and with the Zophar battery save) to reach the
+  title/menus for input automation. Ten-plus distinct attempts, input injected
+  by RAM-patching the key poll at `0x0800048A`.
+- **Refuted by:** every boot wedges on the same unresponsive intro story slide
+  ~40-70 s in, even untouched (keys are polled at ~20/s but A/START change
+  nothing). The identical ROM/save on the **Windows Qt build**
+  (`C:/Users/charl/ffta-tools/mGBA-0.10.5-win64/mGBA.exe`) boots normally and
+  reaches the title when START is pressed in the first seconds; without early
+  START the same unresponsive slide appears there too — so the slide is a
+  real game state (the video's tail), not an emulator bug.
+- **Do not:** drive FFTA boot navigation on the WSL/headless build; use the
+  Windows Qt build with `-g` and the steer client
+  (`tools/steer_mgba.py`). Its GDB stub accepts only one client per emulator
+  session, so each boot must be driven by a single long-lived connection.
+
+### DE-015 — Keypad register writes drive mGBA input
+
+- **Tried (2026-09-06):** writing `0x04000130` (KEYINPUT) directly to inject
+  key presses, and connecting to the GDB stub with a poll-then-close probe
+  before the real client.
+- **Refuted by:** mGBA ignores KEYINPUT register writes from the stub
+  (readback unchanged); the only input channel is patching the game's poll at
+  `0x0800048A` to report a held mask. And a connect-then-close pre-poll
+  consumes the stub's initial stop packet and wedges the listener ("Connection
+  lost", subsequent connects refused) — launch mGBA, sleep, then connect once.
+- **Do not:** write KEYINPUT; never pre-poll the port. One client per mGBA
+  session, started after the emulator is up.

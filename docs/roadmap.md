@@ -648,7 +648,16 @@ function changed.
    slot (memcpy dst = canonical `0x02002FC4+0x108k`, src = slot). Those
    regions are the concrete movement-commit surface for the next slice
    (full decode), then a walking battle is needed to observe an actual
-   destination choice.
+   destination choice. 2026-09-06: the tutorial-battle route is now
+   **proven closed** — `tools/scratch_walk_force.py` rewrites every
+   position-of-record field (`unit+0xF6/F7`, entry pixels,
+   `ctx+0x54CA/54CB`) before the grid build and the AI decision stays
+   byte-identical at (1,1) (`walk-force-1-1.json`); the snowball throw is
+   data-map-wide or the tutorial enemy choice is degenerate. Live
+   observation moved to a real battle via the Zophar endgame save on the
+   Windows mGBA build (steer tooling: `tools/steer_mgba.py`, screen
+   renderer `tools/gba_render.py`; in-game field reached 2026-09-06,
+   `outputs/mgba-steer/step-009.png`).
 4. **Unit/player assignment.** Determine whether policies can be selected per
    unit, job, clan, or battle. If retail state has no safe policy slot, add a
    source-driven table with explicit save/runtime compatibility constraints.

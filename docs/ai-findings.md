@@ -549,22 +549,34 @@ step/destination writes should land in this record array through one of
 those helpers, and the canonical tile only catches up at the unit's own
 phase 8. This frozen battle exercises only the ranged no-walk path.
 
-**Teleport experiment: this battle cannot go out of range.**
-`tools/scratch_teleport_far.py` rewrites the actor's entry pixel coords
-(`entry+8/+0xC`) and canonical tile to (1,1) — 10+ tiles from every
-harm-pool target — at the first phase-9 dispatch, then traces the march
-(`outputs/mgba-snowball/teleport-far-1-1.json`). The AI's decision is
-**identical**: phase march `10×43 → 0 → 1×11 → 2 → 3 → [3,5]×4 → 4×8 →
-8`, same handler `0x080BF7C5`, ability 0, rule 0; no walk, no passive
-turn. Either the throw reaches the whole map or the targeting reads the
-actor's position from a field other than the entry pixels / canonical
-tile (both of which the experiment rewrote) — and the phase-8 commit
-restored x=6 from the turn-starter's queue, showing the rewritten fields
-are not the position of record. Either way, no reachable position in
-this tutorial can put the AI out of range, so the battle is
-*structurally* incapable of exercising an AI approach-walk — STRAT9.3's
-live observation needs a battle with genuinely ranged or melee AI units
-(e.g. a normal battle).
+**Teleport experiments: this battle cannot go out of range (closed).**
+Two probes rewrite the position of record before the phase-9/10 grid
+build:
+
+- `tools/scratch_teleport_far.py` rewrites the actor's entry pixel coords
+  (`entry+8/+0xC`) and canonical tile (`unit+0xF6/+0xF7`) to (1,1) at the
+  first phase-9 dispatch
+  (`outputs/mgba-snowball/teleport-far-1-1.json`). Its trace proved those
+  are NOT the position of record: the rewritten (1,1) held through phases
+  10→0→1→2→3→decision→4, and only the phase-8 strb tail wrote x=6 back
+  — the turn-starter's queue tile `ctx+0x54CA/54CB` (written at
+  `0x080C041E`/`0x080C0428`; see the turn-starter notes above).
+- `tools/scratch_walk_force.py` therefore additionally rewrites
+  `ctx+0x54CA/54CB` (the grid-build origin) to (1,1) at the same point
+  (`outputs/mgba-snowball/walk-force-1-1.json`). The decision is still
+  **byte-identical**: phase march `10×43 → 0 → 1×11 → 2 → 3 → [3,5]×4 →
+  4×8 → 8`, handler `0x080BF7C5`, ability 0, rule 0; tile and ctxq stay
+  (1,1) the whole turn — no walk, no passive.
+
+With every position field the AI could read moved 10+ tiles from every
+target, the snowball throw still hits all four targets: its reach is
+**data-map-wide** (or the tutorial enemy's choice is degenerate — one
+command, four forced targets). Either way no reachable state of this
+battle can put the AI out of range, so it is *structurally* incapable of
+exercising an AI approach-walk. STRAT9.3's live observation needs a
+battle with genuinely ranged or melee AI units (a normal or endgame
+battle, e.g. from the Zophar endgame save — see the Windows-mGBA
+navigation thread in project-log).
 
 **Tooling note.** mGBA write watchpoints in this build behave as
 **one-shot**: the first write to the watched range stops the CPU and the

@@ -1,4 +1,46 @@
 # Project log
+## 2026-09-06
+
+### Walk-force experiment: the tutorial battle cannot walk (STRAT9.3 closed-live)
+
+`tools/scratch_walk_force.py` (evidence `outputs/mgba-snowball/walk-force-1-1.json`)
+rewrites **every** position-of-record field the earlier teleport probe missed --
+the turn-starter's queue tile `ctx+0x54CA/54CB` (the phase-8 strb restore source,
+written at `0x080C041E`/`0x080C0428`) in addition to the unit canonical tile and
+entry pixel coords -- at the actor's first phase-9 dispatch, i.e. before the
+phase-9/10 movement-grid build. With the actor genuinely at (1,1), 10+ tiles
+from every harm-pool target, the AI decision is still **byte-identical**
+(handler `0x080BF7C5`, ability 0, rule 0; march `10x43 -> 0 -> 1x11 -> 2 -> 3 ->
+[3,5]x4 -> 4x8 -> 8`, tile and ctxq pinned at (1,1) the whole turn). The snowball
+throw's reach is data-map-wide (or the tutorial enemy's candidate set is
+degenerate: one command, four forced targets), so no reachable state of this
+battle exercises an AI approach-walk. The docs' earlier "either the throw is
+map-wide or the rewrite missed the position of record" question is closed on the
+second branch: the missing field was found and rewriting it changes nothing.
+
+### Windows mGBA path to a real walking battle (in progress)
+
+The one route left for a live walk-site observation is a real battle with
+genuinely ranged/melee AI (the Zophar endgame save, "ready for the last
+battle"). Boot-intro navigation is impossible on the WSL headless mGBA build
+(every boot wedges on an intro text page; no BIOS; see dead-ends), but the
+Windows Qt build `mGBA-0.10.5-win64` (`C:/Users/charl/ffta-tools`) hosts the
+GDB stub on :2345 and boots normally. Facts established:
+
+- The stub accepts **one client per emulator session** -- after a client
+  disconnects, the listener stops accepting and mGBA must be restarted. All
+  probing for a given boot must happen in one connection
+  (`tools/steer_mgba.py` is that client: render + text-tile diag, then execute
+  key commands from `outputs/mgba-steer/cmd.json`; key delivery is the RAM
+  poll-patch at `0x0800048A`).
+- With the Zophar battery save installed as `baserom.sav`, the boot skips the
+  video if START is pressed in the first seconds; without early START the game
+  sits on an input-ignoring story slide (the WSL freeze, reproduced).
+  Navigation reached: white logo screen -> (START) -> dark load -> character
+  summary (0x5b40, OBJ sprites) -> (A) -> an in-game field scene with the party
+  sprites (2026-09-06, `outputs/mgba-steer/step-009.png`). Screen text reading
+  via tilemap glyphs is the remaining blocker to menu-level automation.
+
 
 Last updated: 2026-09-05
 
