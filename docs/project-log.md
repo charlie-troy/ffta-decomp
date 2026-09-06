@@ -3501,3 +3501,45 @@ side-aware and reads the +8/+9/+0xA region with a 0x03003A60 threshold
 table. Individual field meanings are not yet pinned - 0x085273D8 is a
 candidate for the next reader-driven table pass (recorded in
 ai-findings.md). Nothing in docs/tools previously referenced this table.
+
+### 2026-09-05 (movement layer) - canonical tile proven frozen; live snapshot area and phase-8 sync decoded
+
+Write-watching the acting unit's canonical tile (unit+0xF6/+0xF7) across a
+whole AI turn fires exactly once, at phase 8 -- no movement code writes it
+mid-turn. The single write is the unit-record sync loop 0x0809F850 (probe
+tools/scratch_copy_sync.py, ordering probes scratch_phase8_seq.py and
+scratch_watch_sync.py): for all 9 units, in container pointer order
+(obj+0xD6C[i], obj = 0x08022840 result), it memcpys (dst=r0=canonical record
+0x02002FC4+0x108k, src=r1=live snapshot slot 0x020159E8+0x108i, len 0x108)
+each canonical record back from its live slot. Phase 8's head (0x080C1068)
+also re-writes ctx+0x54CA/0x54CB onto the unit tile -- a no-op, because the
+turn-starter queued that pair from the unit tile at turn start (writes at
+0x080C041E/0x080C0428, live-caught by tools/scratch_queue_tile.py; meter
+ctx+0x54C8 at 0x080C0410 from 0x080C7EA4; old tile saved to
+ctx+0x54B4/0x54B5).
+
+This corrects the earlier "phase 8 commits the walk" reading: the actor's
+canonical (6,7)->(6,5) change this turn is a *restore from the live slot*
+(which held (6,5); all other units' canonicals already equal their slots),
+not a movement. The actor never walks in this ranged battle -- confirmed, and
+now understood structurally.
+
+The 0x020159E8 record array is the battle container's own first slots
+(obj = 0x020159E4 from 0x08022840; slots at obj+4+0x108i). Watching the
+actor's slot tile (0x02015EFE) stopped in four phase-2/phase-8 contexts:
+  * phase 2: 0x080BDBAC -- a thin wrapper zeroing a 0x4504-byte region
+    (bl 0x814224C at 0x080BDBB4) that contains the record slots;
+  * phase 8 x3: 0x0809DE94 -- the container refresh helper 0x0809F850
+    calls in its prologue (zeroes [obj, obj+0xE1C), then bubble-sorts the
+    obj+0xD6C pointer list by each unit's +0x104 byte), twice; and
+    0x08121EB7 (battle-flow region 0x08121Exx, same family as the
+    entry/unit spawn sweep 0x08124CE8).
+Those regions are the concrete STRAT9.3 movement-commit surface.
+
+Tooling note (reconciles old single-event captures): mGBA Z2 write
+watchpoints here are one-shot (consumed on the first hit; re-arm after each
+event) and watch stops land several instructions late -- PCs/registers read
+at the stop can be mid-way through a later call in the same region, with
+stop PCs inside IWRAM-copied routines (pc 0x03005F08 byte-matches ROM
+0x08A38ABC). Attribute the containing region from the return address; pin
+exact write instructions by breaking at ROM call sites or single-stepping.

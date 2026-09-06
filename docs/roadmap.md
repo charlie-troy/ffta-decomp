@@ -635,7 +635,20 @@ function changed.
    (phase 0), phase 3 hands the grid pointer to the decision builder
    `0x080C01D0`, and phase 8 restores the tile/meter snapshots at turn end.
    The tile-write/walk site is not exercised by the ranged snowball battle
-   and remains the open target.
+   and remains the open target. 2026-09-05 (later): the canonical tile
+   (`unit+0xF6/+0xF7`) is now proven **frozen during the whole AI turn**
+   (one phase-8 write total); the live record array `0x020159E8` (9×0x108,
+   the container object's own first slots, obj = `0x020159E4`) is where
+   position updates land — write-watching the actor's slot tile stopped in
+   phase-2 reset code (`0x080BDBAC`, zeroes 0x4504 bytes) and in
+   phase-8 container-refresh code (`0x0809DE94`, which zeroes `[obj,
+   obj+0xE1C)` and bubble-sorts the `obj+0xD6C` list by each unit's +0x104
+   byte; and the `0x08121Exx` battle-flow region). Phase 8's unit-record
+   sync loop `0x0809F850` restores each canonical record from its live
+   slot (memcpy dst = canonical `0x02002FC4+0x108k`, src = slot). Those
+   regions are the concrete movement-commit surface for the next slice
+   (full decode), then a walking battle is needed to observe an actual
+   destination choice.
 4. **Unit/player assignment.** Determine whether policies can be selected per
    unit, job, clan, or battle. If retail state has no safe policy slot, add a
    source-driven table with explicit save/runtime compatibility constraints.

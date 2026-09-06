@@ -438,17 +438,19 @@ frame of the frozen-seed enemy turn and logs the phase index, the
 `0x54AF` flag byte, and the actor's live vs saved tile
 (`outputs/mgba-snowball/turn-march.json`). The complete march of this
 enemy turn is
-`9 → 10×43 → 0 → 1×11 → 2 → 3 → 5 → [3,5]×3 → 4×8 → 8`, with the actor
-tile constant at (6,7) throughout — the snowball throw reaches its
-target from where the unit stands, so this battle never walks. The rows
-resolve the whole phase set:
+`9 → 10×43 → 0 → 1×11 → 2 → 3 → 5 → [3,5]×3 → 4×8 → 8`. The actor's
+**canonical tile (`unit+0xF6/+0xF7`) is frozen during the whole turn**
+(write-watch across phases 9→7: zero writes) — the snowball throw
+reaches its target from where the unit stands, so this battle never
+walks — and at phase 8 it is overwritten once. The rows resolve the
+whole phase set:
 
 | phase | entry | role (live/static) |
 | --- | --- | --- |
 | 9 | `0x080C05FC` | allocate the 0x100-byte **movement grid** at `ctx+0x54EC`, zero it and the `ctx+0x54F0/0x54F1` cell counters, → 10 |
 | 10 | `0x080C0644` | **fill the 16×16 movement grid** `[y*16+x]` over several frames (5 cells per frame via `0x080C1260` yield — the observed ~43-frame residence is the 256-cell scan) using the terrain helpers `0x08099FB0` (mark 2) and `0x08099F58` (mark 1, arg 0xff), with the unit-class gate `0x0812F0E4` OR-ing bit 0x80 for its own reachable cells; phase-stack pop (`0x080C1248`) when y>15 |
 | 0–5 | (above) | AI plan, choose, execute |
-| 8 | `0x080C1068` | end-of-turn restore: copies `ctx+0x54CA/0x54CB` (tile snapshot) and `ctx+0x54C8` (meter snapshot) back onto the unit, then conditional tails on `0x54AF`/`0x54BE` (no-op when the unit neither moved nor spent) |
+| 8 | `0x080C1068` | end-of-turn restore/commit. Head (`0x1068–0x108C`) writes `ctx+0x54CA/0x54CB` back onto the unit tile and `ctx+0x54C8` onto `unit+0x1C`, saving the *old* tile into `r6/r8` → `ctx+0x54B4/0x54B5`; because the queued `ctx+0x54CA/0x54CB` equals the unit tile at turn start (the turn-starter queued it), that strb pair is a no-op refresh. The canonical tile's *actual* change this turn came from the 9-record sync loop `0x0809F850` (live-call-attributed; see the sync-area note below). Conditional tails on `0x54AF`/`0x54BE` handle knockback/CT bookkeeping (`0x080C11E0` has a second tile-commit pair for the displaced branch) |
 
 Phases 11–13 form the **deferred-displacement route**, reached when the
 init's `0x080C95A8(0xd)`-nonzero branch (global byte `0x0200203D`) seeds
@@ -477,6 +479,76 @@ phase 0, and phase 3 hands the grid pointer to the decision builder
 `0x080C01D0` (`[sp+0xc]` at `0x080C0998`) — reachability is available at
 choose time. The tile-write / walk-site itself is never exercised in this
 battle (no walking), so that site remains the concrete STRAT9.3 target.
+
+#### The canonical tile is a phase-8-synced copy; live position lives in a snapshot area
+
+A watch on the acting unit's canonical tile (`unit+0xF6/+0xF7`) during
+the whole AI turn fires **exactly once, at phase 8** — no movement code
+writes it mid-turn. The write is the **unit-record sync loop
+`0x0809F850`** (live-call-attributed with `tools/scratch_copy_sync.py`,
+`outputs/mgba-snowball/copy-sync.json`; sequence probe
+`tools/scratch_phase8_seq.py`; combined watch+sync ordering probe
+`tools/scratch_watch_sync.py`): for each of the 9 units, in the
+container's pointer-array order (`obj+0xD6C[i]`, obj from `0x08022840`),
+it calls the IWRAM memcpy veneer (`bl 0x08142250`, `bx r3`,
+r3=`[0x0836D4BC]`) with `r0 = [[obj+0xD6C[i]]]` (the canonical unit
+record `0x02002FC4+0x108·k`) as **dst** and `r1 = obj+4+0x108·i`
+(the live snapshot slot `0x020159E8+0x108·i`, same object's parallel
+array) as **src**, length 0x108. So phase 8 **restores each canonical
+record from its live slot** — for this actor the slot held (6,5) while
+the canonical had (6,7) (stale from its previous phase-8), and the
+restore is what made the canonical tile visibly change. For every other
+unit canonical == live slot already. This is why the earlier march probe
+read the tile as constant: canonical really does not move until the
+actor's own phase 8.
+
+The **live record array at `0x020159E8`** (9 × 0x108) is the first
+9×0x108 bytes of the battle container object (`obj = 0x020159E4`, from
+`0x08022840`; the record slots live at `obj+4+0x108·i`) — this is where
+position state actually updates during play. Write-watching the actor's
+slot tile (`0x02015EFE`) caught four stop contexts this turn, all in
+phase-2/phase-8 container-refresh code:
+
+- **phase 2** (action binding): stop inside `0x080BDBAC`, a thin wrapper
+  that zeroes a 0x4504-byte region (`bl 0x814224C` at `0x080BDBB4`, size
+  `r1=0x4504`) — a per-turn reset of a ctx/unit region that contains the
+  record slots.
+- **phase 8** (×3): stops inside `0x0809DE94` — the container **refresh
+  helper** that 0x0809F850 calls in its prologue: it zeroes `[obj,
+  obj+0xE1C)` and then bubble-sorts the `obj+0xD6C` pointer list by each
+  unit's `+0x104` byte (the placement/order key, swapping `obj+0xD6C[i]`
+  elements) — twice, and once inside `0x08121EB7` (battle-flow region
+  `0x08121Exx`, the family that also drives entry/unit spawn at
+  `0x08124CE8`).
+
+The phase-2 stop's containing function is `0x080BDA30`, a **selection
+sort of coordinate-pair entries by Manhattan distance from a reference
+point** (`|x-rx|+|y-ry|`, 3-way 4-byte swaps via `0x081443FC`), i.e. a
+nearest-to-position ordering — the natural shape of an approach /
+destination chooser. It (and the neighboring `0x080BDBC4`, which does
+grid-style `x*16+y` indexing) has **no direct `bl` callers and no
+pointer-table entry** — it is reached by computed dispatch, consistent
+with the placement/move object at global `0x020158B0` (sub-API
+`0x080C7078`) that phase 11 drives.
+
+Those four stop regions are the concrete **STRAT9.3 movement-commit
+surface** to decode next: when a battle actually walks an AI unit, the
+step/destination writes should land in this record array through one of
+those helpers, and the canonical tile only catches up at the unit's own
+phase 8. This frozen battle exercises only the ranged no-walk path.
+
+**Tooling note.** mGBA write watchpoints in this build behave as
+**one-shot**: the first write to the watched range stops the CPU and the
+watchpoint is consumed — re-arm (`Z2`) after each event to keep watching
+(see `tools/scratch_watch_sync.py`). Watch stops land **several
+instructions late** (the PC/registers read at the stop can be mid-way
+through a later call in the same region — e.g. the phase-8 slot events
+surfaced inside `0x0809DE94`/`0x08121E..`, and stop PCs sit inside
+IWRAM-copy routines like `0x03005F08` ↔ ROM `0x08A38ABC`,
+byte-matched), so attribute the *region* from the return address but pin
+exact write instructions by breaking at ROM call sites or single-
+stepping. This reconciles several earlier single-event captures (e.g.
+the old walk-control run) whose register snapshots looked incoherent.
 
 Phase 3 walks the ctx's **shadow copies of the sorted arenas** — base
 `ctx+0x74 + 0x290C*regime` (`0x290C = 13 records + the count field;
@@ -701,8 +773,11 @@ candidates.
 - The context initializer is `0x080C034C(ctx, unit)` (called through
   `0x080C144C` from `0x08093456`, arg0 = the unit's battle object): it
   zeroes 0x553C bytes via the veneer copy routine, stores `ctx+4 = unit`,
-  copies unit fields (`+0xF6/+0xF7` → `ctx+0x54CA/0x54CB`), reads the
-  unit's `0x15` meter into `ctx+0x54C8`, seeds the frame counter at
+  copies unit fields (`+0xF6/+0xF7` → `ctx+0x54CA/0x54CB`, writes at
+  `0x080C041E`/`0x080C0428`, live-caught by
+  `tools/scratch_queue_tile.py`), reads the unit's `0x15` meter into
+  `ctx+0x54C8` (write at `0x080C0410` from `0x080C7EA4`), seeds the frame
+  counter at
   `ctx+0x54F4+2`, and computes turn-order branch keys (the initial
   phase is 0xB only on the `0x080C95A8(0xd)`-nonzero branch; the traced
   actor seeds phase 9 — see the full-turn-march section; bit 4 of
