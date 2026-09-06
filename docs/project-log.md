@@ -3513,8 +3513,11 @@ profile-block loads from runtime bank 0x03003A60 into 0x080CBB7C
 buffers; 0x080CBB7C resolves the ROM bank by mode byte 0x02000000+
 0x2FC2: 0x0841A560 (mode 0) / 0x0841BB40 (mode 1) / 0x0841B060 (mode
 2), all 0x20-stride. 0x03003A60 has 35+ consumers across battle code.
-Tutorial types have count 0 (no load); mechanism targets special/named
-types in real battles -- candidate per-character AI/reaction profile.
+Tutorial types have count 0 (no load). Correction: the 0x20-byte records
+in the three ROM banks are opaque pseudo-random chunks (compressed/
+encrypted asset data; 0x0841A560 and 0x0841BB40 even start identically)
+-- not plainly structured AI profiles; the runtime 0x03003A60 store needs
+a live consumer trace before naming.
 
 ### 2026-09-05 (movement layer) - canonical tile proven frozen; live snapshot area and phase-8 sync decoded
 

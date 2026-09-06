@@ -1214,11 +1214,14 @@ record banks), via `0x080CBB7C`'s copy helper (0x20 bytes, through the
 IWRAM veneer). The runtime bank has **35+ consumers** across battle/ability
 code (`0x080B5C2C`, `0x080B6808`, `0x080B7154`, `0x080D4654`,
 `0x080DB538`, `0x08115CB0`, `0x081184D0`, `0x0812662C`–`0x08126828`,
-`0x08137804`, `0x0813EA7C`, ...) — a per-slot behavior/profile store. The
-tutorial types all have count 0, so no block is loaded in this battle; the
-mechanism fires for special/named types in real battles. This whole chain
-is a strong candidate for the **per-character AI/reaction profile** the
-strategy layer would eventually want to mod.
+`0x08137804`, `0x0813EA7C`, ...). **Caution:** the 0x20-byte records in
+the three ROM banks (`0x0841A560`, `0x0841BB40`, `0x0841B060`) are
+opaque pseudo-random bytes (compressed/encrypted asset chunks — the two
+banks even share their first records), so they are *not* plainly
+structured AI profiles; the exact role of the runtime `0x03003A60` store
+needs a live consumer trace before it is named. The tutorial types all
+have count 0, so no block is loaded in this battle; the mechanism only
+fires for types with nonzero row counts.
 
 ## Supporting primitives worth naming
 
