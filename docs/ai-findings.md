@@ -549,6 +549,23 @@ step/destination writes should land in this record array through one of
 those helpers, and the canonical tile only catches up at the unit's own
 phase 8. This frozen battle exercises only the ranged no-walk path.
 
+**Teleport experiment: this battle cannot go out of range.**
+`tools/scratch_teleport_far.py` rewrites the actor's entry pixel coords
+(`entry+8/+0xC`) and canonical tile to (1,1) — 10+ tiles from every
+harm-pool target — at the first phase-9 dispatch, then traces the march
+(`outputs/mgba-snowball/teleport-far-1-1.json`). The AI's decision is
+**identical**: phase march `10×43 → 0 → 1×11 → 2 → 3 → [3,5]×4 → 4×8 →
+8`, same handler `0x080BF7C5`, ability 0, rule 0; no walk, no passive
+turn. Either the throw reaches the whole map or the targeting reads the
+actor's position from a field other than the entry pixels / canonical
+tile (both of which the experiment rewrote) — and the phase-8 commit
+restored x=6 from the turn-starter's queue, showing the rewritten fields
+are not the position of record. Either way, no reachable position in
+this tutorial can put the AI out of range, so the battle is
+*structurally* incapable of exercising an AI approach-walk — STRAT9.3's
+live observation needs a battle with genuinely ranged or melee AI units
+(e.g. a normal battle).
+
 **Tooling note.** mGBA write watchpoints in this build behave as
 **one-shot**: the first write to the watched range stops the CPU and the
 watchpoint is consumed — re-arm (`Z2`) after each event to keep watching

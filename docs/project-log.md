@@ -3553,3 +3553,14 @@ sorter (no bl/table refs -- computed dispatch, consistent with the
 placement/move object at 0x020158B0). 0x080C7078 is that object's mode
 state machine (mode halfword at +0x64, table 0x080C7098, modes 0-3 at
 0x080C70AC/0x80C70BA/0x80C70D8/0x80C7100).
+
+Teleport experiment (tools/scratch_teleport_far.py, evidence
+teleport-far-1-1.json): rewriting the actor's entry pixel coords
+(entry+8/+0xC) AND canonical tile to (1,1) -- 10+ tiles from every
+harm-pool target -- at the first phase-9 dispatch leaves the AI's
+decision byte-identical (handler 0x080BF7C5, ability 0, rule 0; march
+10x43 -> 0 -> 1x11 -> 2 -> 3 -> [3,5]x4 -> 4x8 -> 8). No walk, no
+passive turn: this tutorial battle cannot be put out of range (the throw
+reaches everywhere, or targeting reads a different position field), so
+it is structurally incapable of demonstrating an AI approach-walk.
+STRAT9.3's live observation needs a normal battle with ranged/melee AI.
