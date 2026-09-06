@@ -3543,3 +3543,13 @@ at the stop can be mid-way through a later call in the same region, with
 stop PCs inside IWRAM-copied routines (pc 0x03005F08 byte-matches ROM
 0x08A38ABC). Attribute the containing region from the return address; pin
 exact write instructions by breaking at ROM call sites or single-stepping.
+
+Follow-up decode: the container-refresh family is fully named -- 0x0809DE94
+zeroes [obj, obj+0xE1C) then bubble-sorts obj+0xD6C by each unit's +0x104
+byte; 0x0809F78C = refresh + gather first-n d6c pointers into a caller array
+(zeroing each record's +0xD4/+0xD8); 0x0809F850 = the record-restore sync.
+The phase-2 stop context 0x080BDA30 is a Manhattan-distance coordinate-pair
+sorter (no bl/table refs -- computed dispatch, consistent with the
+placement/move object at 0x020158B0). 0x080C7078 is that object's mode
+state machine (mode halfword at +0x64, table 0x080C7098, modes 0-3 at
+0x080C70AC/0x80C70BA/0x80C70D8/0x80C7100).

@@ -529,7 +529,19 @@ destination chooser. It (and the neighboring `0x080BDBC4`, which does
 grid-style `x*16+y` indexing) has **no direct `bl` callers and no
 pointer-table entry** — it is reached by computed dispatch, consistent
 with the placement/move object at global `0x020158B0` (sub-API
-`0x080C7078`) that phase 11 drives.
+`0x080C7078`) that phase 11 drives. That sub-API is a mode state machine
+on the object's `+0x64` mode halfword (jump table `0x080C7098`, modes
+0–3 → `0x080C70AC`/`0x080C70BA`/`0x080C70D8`/`0x080C7100`, each
+advancing the mode) — the placement job steps.
+
+The container-refresh helper family is now fully named: `0x0809DE94`
+zeroes `[obj, obj+0xE1C)` and bubble-sorts the `obj+0xD6C` pointer list
+by each unit's `+0x104` byte; `0x0809F78C` calls it then gathers the
+first-n `obj+0xD6C` pointers into a caller array while zeroing each
+record's `+0xD4/+0xD8` (turn-order actor collection); `0x0809F850`
+calls it then runs the record-restore copies. The phase-8 watch stops
+with `lr=0x0809DEB1` were the prologues of `0x0809F850` and
+`0x0809F78C`.
 
 Those four stop regions are the concrete **STRAT9.3 movement-commit
 surface** to decode next: when a battle actually walks an AI unit, the
