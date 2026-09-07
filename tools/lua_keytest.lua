@@ -2,7 +2,7 @@
 -- Holds key bit `keybit` (0..9) for KEY_HOLD frames starting next frame,
 -- samples 0x04000130 each frame, writes the distinct samples to a file.
 local OUT = "C:/Users/charl/Projects/ffta-decomp/outputs/lua-nav/keytest.txt"
-local KEY = 3            -- START (index into 1<<n)
+local KEY = TESTKEY and (function() local n=0; local v=TESTKEY; while v>1 do v=v/2; n=n+1 end; return n end)() or 3  -- bit index from TESTKEY mask, default START
 local HOLD = 45
 local start_frame = emu:currentFrame()
 local samples = {}

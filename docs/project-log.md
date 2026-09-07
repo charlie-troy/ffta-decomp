@@ -3677,3 +3677,54 @@ Deliverables: docs/battle-fixtures.md, configs/battle-scenarios/normal-battle.js
 tools/capture_normal_battle.py, tools/lua_watch.lua, tools/lua_cursor_tour.lua (param'd),
 battery backup outputs/saves/zophar-backup-20260907.sav. A2 (player-to-AI handoff) is
 now unblocked: battle-start.ss0 + natural-flow menu driving is the surface to instrument.
+
+## 2026-09-07 — A2 groundwork: control/allegiance surfaces + normal-battle sequencer negative result
+
+Static (tools cross-referencing + disasm):
+
+- The game's native controller seam is the **Controlled** status: getter
+  sub_080CDCA4 (unit+0xED bit 3), setter sub_080CE2F0; the paired "duration"
+  byte read by sub_080CE410 holds the CONTROLLER's unit id (the search helper
+  sub_080970E8 compares it against candidate records' +0x104 ids). All 13
+  race-named Control actions select effect 0xC1 / case 86 / this setter.
+  Allegiance stays separate: side bit 0x8000 at unit+0x28 (getter sub_080C8240).
+  Charm (+0xEB bit 5) and Confuse (+0xEB bit 4) are independent hostile-act
+  statuses. This is exactly A2's "control decision separate from team
+  membership, Charm/Confuse, and targeting allegiance" split, natively.
+- Turn-loop context (sub_0809E1E0): right after the turn manager sub_0809E05C
+  returns the next actor slot, the loop CLEARS Controlled on that actor
+  (0x0809E272, sub_080CE2F0(actor,0)) — control is consumed at turn
+  selection. The Confuse/Charm sites at 0x0809E690/0x0809E6E8 are per-turn
+  duration-decrement housekeeping, not controller logic.
+- 0x0809DA0C is a 24-entry status->id mapper (jump table over the status
+  getters, incl. Charm=0xA, Confuse=0x16, Controlled=0x18) — status-icon/id
+  mapping, not control flow.
+
+Live (normal battle, Bervenia skull encounter, A1 fixture):
+
+- NEGATIVE RESULT that invalidates a tooling assumption: the phase dispatcher
+  0x080C045C NEVER executes in the normal battle — a GDB breakpoint there sat
+  150-200 s across a full placement + battle flow with zero hits, while a
+  breakpoint on the key poll 0x0800048A hit instantly (so breakpoints work).
+  The AI evaluator sub_080C2940 also never hit while a player turn sat in its
+  menu. The snowball battle's ctx 0x020101F8 / dispatcher pairing does not
+  describe the normal battle: either the sequencer is a different code/ctx
+  instance per battle module or 0x020101F8 was snowball-specific scratch.
+  tools/probe_player_ai_control.py confirms the stale ctx (entries[0] pinned
+  at 0x02002FC4, phase 8, branch 1 across 40 samples).
+- Input channels on Windows mGBA 0.10.5: emu:setKeys delivers A/B/START
+  reliably but D-pad presses (bit 0x80) never moved a battle-menu cursor all
+  session (14-16 f holds, 45 f Lua keypoll holds, and raw GDB poll patches
+  all tried). The RAM-poll patch has an XOR trap: the retail compose is
+  r1 = r2 eor r3, so a forced mask becomes forced XOR r3 — in the battle menu
+  a forced 0x80 surfaced as 0x04 and opened the SELECT help window. lua_poll
+  patching is only safe where r3 is 0 (title/world map). mGBA crashed twice
+  under heavy GDB-interrupt + Lua console interleaving; relaunch is scripted
+  (start_mgba_title.sh) and the Scripting window reopens via UIA.
+- Turn-boundary evidence still missing: player turn auto-advances were never
+  observed (menu waits indefinitely). Next step: relaunch, verify setKeys
+  D-pad BEFORE any GDB attach (isolate stub interference), end the turn, then
+  break on sub_080C2940 to catch the real enemy-turn evaluator caller chain.
+
+New tools: tools/probe_player_ai_control.py (turn-boundary ctx sampler),
+tools/exp_dispatcher_boundary.py (dispatcher-hit recorder), both syntax-checked.
