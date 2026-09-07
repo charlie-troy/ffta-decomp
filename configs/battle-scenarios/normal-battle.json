@@ -1,0 +1,75 @@
+{
+  "scenario_id": "normal-battle",
+  "title": "Bervenia Palace skull encounter (endgame clan vs. random encounter)",
+  "created": "2026-09-07",
+  "source": {
+    "rom": "baserom.gba",
+    "save": "Zophar endgame battery save (final-battle chapter, FILE NO. 2)",
+    "savestates": {
+      "worldmap": "outputs/lua-nav/worldmap.ss0",
+      "engage_prompt": "outputs/lua-nav/engage.ss0",
+      "battle_start": "outputs/lua-nav/battle-start.ss0",
+      "battle_start_run1": "outputs/lua-nav/battle-start-r1.ss0"
+    },
+    "rom_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
+    "emulator": "mGBA 0.10.5 win64 (Qt, -g GDB stub + Scripting console)",
+    "battery_backup": "outputs/saves/zophar-backup-20260907.sav (sha1 9ceba501...)"
+  },
+  "map": {
+    "location": "Bervenia Palace area (walked to a skull encounter token)",
+    "terrain": "crystalline cave ledges with grass patches; multi-height",
+    "clock_ingame": "2h at battle start (world day 18)"
+  },
+  "parties": {
+    "clan": {
+      "size_dispatched": 6,
+      "notable": [
+        {
+          "name": "Marche",
+          "job": "Soldier",
+          "level": 50,
+          "hp": "442/442",
+          "mp": "85/85",
+          "jp": 99
+        }
+      ],
+      "note": "Only Marche is hand-placed on the dispatch screen; remaining 5 units enter via the natural flow (game auto-dispatches)."
+    },
+    "enemy": {
+      "observed_members": [
+        {
+          "name": "Schneider",
+          "level": 41,
+          "hp": "323/323",
+          "mp": "107/114"
+        }
+      ],
+      "note": "At least 1 of 7 total battle units is enemy-side; full enemy roster not yet inventoried."
+    }
+  },
+  "turn_order": {
+    "first_actor": "Marche (WT 1/7)",
+    "observed_second_actor": "Schneider (enemy, red plate, WT 1/7 next cycle)"
+  },
+  "reproducibility": {
+    "method": "load engage.ss0 -> A (enter) -> A (dismiss law NOTICE) -> A,A (place Marche) -> START -> A (confirm) -> wait for Marche turn",
+    "runs": 2,
+    "settle_pixel_diff": "1.7% (2400-point grid, >60 channel-delta threshold) -- animation noise only",
+    "rng_note": "Battle RNG differs per entry; fixture guarantees map, units, and start-of-battle state, not RNG stream."
+  },
+  "observed_enemy_turn_sequence": [
+    "turn banner with unit stats (Schneider Lv41, red enemy plate)",
+    "red move-range/target tile rendering",
+    "tile transition (unit walks to chosen tile)",
+    "ability cutscene (golden phoenix animation)",
+    "damage popup (55)",
+    "subsequent units reposition (turns roll hands-off)"
+  ],
+  "evidence_screenshots": "outputs/lua-nav/ewatch-01..40.png (enemy turn cycle), repro1-y.png / r2-final.png (settle comparison), wait1-01..05.png (Wait-command drive)",
+  "open_questions": [
+    "Full enemy roster and levels (needs R:Info sweep per unit)",
+    "Whether the clan can win this encounter hands-off (A2/A3 scope)",
+    "Frame-exact input schedule for a single-script capture (currently stage-wise console drives)"
+  ],
+  "capture_script": "tools/capture_normal_battle.py"
+}

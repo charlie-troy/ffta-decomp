@@ -1,4 +1,27 @@
 # Project log
+
+## 2026-09-06 — Orchestrator roadmap reset around playable auto-battle
+
+Charlie reaffirmed the product goal: autonomous, faster battles with highly
+customizable character tactics, preserving character setup and leveling as
+the main player activity. The active execution queue is now
+[docs/auto-battle-roadmap.md](auto-battle-roadmap.md), packets A1–A10.
+It supersedes the map-first queue and broad STRAT9.3 exploration order.
+Historical discoveries below remain valid within their stated scope.
+
+Next packet: A1, capture a reproducible normal-battle fixture using existing
+Windows mGBA tooling. Then A2 must prove a player-to-AI control handoff
+without changing allegiance. M1 is a complete hands-off battle with manual
+takeover; M2 adds per-character rules; M3 adds measured speed and usability.
+Windows companion tooling is the roadmap's proposed initial delivery route,
+pending control/scope feasibility evidence; native hardware is deferred.
+
+Current verification at `f9d9493`: worktree clean before documentation edits;
+local baserom SHA1 matches the supported USA hash; fresh
+`python tools/validate_ai_strategy.py baserom.gba` passes **9/9**, with
+435 aggressive-profile bytes and 460 deterministic-actions bytes changed.
+The full build/release gate and live emulator were not rerun for this planning
+change. Earlier counts below are historical. No gameplay code changed.
 ## 2026-09-06
 
 ### Walk-force experiment: the tutorial battle cannot walk (STRAT9.3 closed-live)
@@ -73,7 +96,7 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | STRAT9.3 — decode movement and resource policies |
+| Current work package | A1 — normal-battle fixture, then A2 player-to-AI handoff; see auto-battle-roadmap.md |
 | Last closed package | STRAT9.2 — decode target scoring and intent weights |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
@@ -3623,3 +3646,34 @@ passive turn: this tutorial battle cannot be put out of range (the throw
 reaches everywhere, or targeting reads a different position field), so
 it is structurally incapable of demonstrating an AI approach-walk.
 STRAT9.3's live observation needs a normal battle with ranged/melee AI.
+
+## 2026-09-07 — A1 normal-battle fixture captured (auto-battle roadmap)
+
+The Zophar endgame save loads in mGBA 0.10.5 (Scripting console via UIA bridge,
+`emu:setKeys` input, key bitmask A=1 B=2 SEL=4 STA=8 R=16 L=32 U=64 D=128 R=256 L=512 —
+hardware KEYINPUT order; earlier "1<<n" notes had R/L swapped).
+
+Fixture chain (outputs/lua-nav/): worldmap.ss0 -> bervenia.ss0 (Area List travel to
+Bervenia Palace, day 18) -> engage.ss0 (skull-token "Engage!" prompt, the anchor) ->
+placement.ss0/2 -> battle-start.ss0 (Marche's turn, MENU open, WT 1/7). Capture route:
+load engage.ss0, A (enter), A (dismiss law NOTICE), A A (place Marche 1/6), START
+(after settle; early START opens the roster), A (Yes), ~40 s intro -> battle. Now
+consolidated as tools/capture_normal_battle.py.
+
+Reload-twice: two identical runs settle at the same battle-start state, 2400-point grid
+diff 1.7% (water/sprite animation noise). Fixture guarantees state, not RNG stream.
+
+Enemy turns roll hands-off (ewatch-01..40, 1 shot/60 f): Schneider Lv41 HP 323/323 red
+plate WT 1/7 banner -> red move-range tile -> tile transition -> golden-phoenix ability
+cutscene -> "55" damage popup -> further repositioning. This is the in-vivo normal-battle
+evidence the snowball tutorial battle could never give (see teleport experiment below).
+
+Constraints worth remembering: battle-menu input dies after savestate reloads INTO an
+open menu (dialogs tolerate reloads; always re-enter from engage.ss0); mGBA Lua memory
+read callbacks never fire on this build (execute/write do); ROM writes via Lua are
+dropped; -g stub launches paused until a GDB client continues once.
+
+Deliverables: docs/battle-fixtures.md, configs/battle-scenarios/normal-battle.json,
+tools/capture_normal_battle.py, tools/lua_watch.lua, tools/lua_cursor_tour.lua (param'd),
+battery backup outputs/saves/zophar-backup-20260907.sav. A2 (player-to-AI handoff) is
+now unblocked: battle-start.ss0 + natural-flow menu driving is the surface to instrument.
