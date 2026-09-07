@@ -1,5 +1,10 @@
 # Remaining-work roadmap
 
+> **Priority update, 2026-09-06:** [Customizable auto-battle roadmap](auto-battle-roadmap.md)
+> is the active execution roadmap. Start with A1 (normal-battle fixture), then
+> A2 (player-to-AI handoff). Its dependencies and acceptance gates supersede
+> the historical phase ordering below. Map cleanup is deferred.
+
 How to read this: the repo's own rule (CLAUDE.md) is **widen the no-compiler
 modding surface first; match more functions last.** This roadmap follows that.
 Each phase lists the objective, why it is worth doing now, concrete steps using
@@ -20,10 +25,10 @@ of 2026-08-31), and `make rom` reproduced the
 expected 16 MB ROM SHA1. The documentation inconsistencies listed below were
 reconciled in the same batch.
 
-## Task queue — pick the top unchecked task
+## Deferred map task queue
 
-Sessions (and autonomous loops) resume here: take the first `[ ]` from the
-top unless something explicitly supersedes it.
+Do not resume from this list while auto-battle milestones remain open.
+Use the active roadmap linked above; these tasks are retained as backlog.
 
 - [ ] MAP9.1 — Close the visual residue in the map catalog: a handful of
   composite maps show thin seams between 16px metatile cells.

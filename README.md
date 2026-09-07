@@ -16,6 +16,11 @@ For tailored auto-battle behavior, start with declarative
 ability rules, job fallback priorities, status-effect gates, and a target
 tie-break policy in one guarded, previewable configuration.
 
+For implementation priorities and agent assignments, use the
+[customizable auto-battle roadmap](docs/auto-battle-roadmap.md). Existing
+profiles tune shared AI behavior; complete player-party automation and
+per-character conditional tactics are the next product milestones.
+
 > **No ROM data lives in this repository.** You supply your own dump. The build
 > verifies its SHA1 and extracts what it needs at build time. `.gitignore`
 > excludes `*.gba` and `*.bin`; keep it that way.
