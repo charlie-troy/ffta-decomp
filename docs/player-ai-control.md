@@ -1,8 +1,9 @@
 # Player/AI control boundary (A2)
 
-Status: **turn-manager instrumented in a live normal battle**; input channel
-solved; hands-off loop proven. Remaining: actor-pick decode + Controlled-seam
-experiment (A2.3).
+Status: **A2.3 answered** (v46–v48, 2026-09-09): retail player turns DO
+ctx-init the AI sequencer; the menu/AI split is a merged pipeline, not two
+bodies. Fixture-layout correction: Marche is slot **0**. Remaining: enemy-bit7
+reverse test on a non-wedged instance; A3 runner.
 
 ## Fixture chain
 
@@ -71,10 +72,64 @@ re-opens automatically. A runner only needs to re-confirm Wait each round.
 * mGBA 0.10.5 Lua read callbacks never fire; execute callbacks and
   `emu:read16/write16/setKeys` all work.
 
-## Next (A2.3)
+## A2.3 verdicts (v46–v48, 2026-09-09)
 
-1. Decode the actor pick: which unit the candidate rebuild selects and the
-   CT/tick fields at `0x02016750`.
+**Fixture layout correction (invalidates earlier slot-6 sampling).** The roster
+sits at `0x020159E8`, stride `0x108`, six live units: **slot0 = Marche**
+(name ptr `0x085671EE`, CT=45 in the fixture), slot1 = first enemy
+(`0x0856702F` — the address `boot_fixture_gdb.py` validates as "name0").
+`0x02016018` ("slot6") is a **turn-scratch record** (RAM name ptr, ct=0), not a
+unit. All "EA6/CT6" reads in v44–v46 hit a phantom; v44's bit7 flip wrote
+slot1's `+0xEA`, and its post-flip silence was a wedge, not evidence.
+
+**Dormant-boot mystery solved.** From `fix3-battle-start` the menu never
+idles into auto-battle by itself; the turn loop starts only after Marche's
+turn is committed. Wake recipe (v27's, reconstructed from v43's docstring):
+write the forward-handout marks on slot0 — `+0xE6`/`+0xDC` = Marche id
+(`+0x104`), `+0xED |= 8`, `+0xEA |= 0x80` — then drive DOWN DOWN A A with
+`enable=1` (`M3000005,1:01`). With marks the battle self-plays a full round
+instantly (6 seeds); without them 8/8 runs stayed frozen despite identical
+drives.
+
+**A2.3 Q1 — do retail player turns ctx-init the sequencer? YES.** v48: the
+player-driven commit (A-ok at t≈7.0, Marche menu pbody at t=8.9) is followed
+by a seed (`0x080C03C2`) at t=10.2. Auto-battle turns pair the same way:
+scratch-record pbody burst → seed within 1.6 s (t=54.4→55.2, t=62.0→63.6),
+including an enemy seed at t=55.2. Player-side and enemy turns share one
+action-execution path through `sub_080C034C`.
+
+**The pipeline model (replaces the two-body picture).** `0x0809E796` is a
+**merged continuation**, not an exclusive player body. It has exactly two
+in-edges (exhaustive branch scan): the bit-7 router at `0x0809E3AE→E3B8`, and
+the status-housekeeping tail at `0x0809E784/788` (`+0xDB`/r6 tests — the
+Haste/Slow tick per unit-flags.md). Every active turn flows through it:
+bit-7 units jump in directly, all others arrive after AI housekeeping. Hence
+pbody hits with `ea=0` and pb≈ai hit counts (v48) — not a contradiction.
+
+**`+0xEA` bit 7 = menu-body router (forward handout only).**
+`sub_080CDADC` = `(rec+0xEA) & 0x80`; nonzero routes the turn into the menu
+body at the pick. It is **consumed at turn start on turn records** (v48 pbody
+hits always show `ea=0` at hit time even when the roster byte was set), and
+the auto-battler sets it transiently on scratch records while navigating
+menus for player-side units (allies hit pbody with roster ea=0). Therefore
+"Marche bit7 → AI" is a category error: bit7=1 routes TO the menu body — that
+is the forward handout. A true reverse handout must target a different lever.
+
+**Wedge signature and protocol rules.** A compressed turn (CT=10) opens the
+actor's menu; with no commit and `enable=0` the battle freezes forever (CTs
+static, no new seeds) — v47/v48's control/reverse phases wedged this way.
+Rules: write `enable=1` once at attach; never leave a turn's menu undriven;
+sample ticks must call `interrupt()` (a quiet free-pump never samples); keep
+presses v27-faithful (5 frames at the `0x08000494` poll, CPU running between
+presses); attribute pbody hits by `r7` (actor slot) — `r4` is the record.
+
+## Next (A2.4)
+
+1. Enemy-bit7 reverse test on a **non-wedged** instance: commit Marche's
+   turn properly, then set slot1 `+0xEA` bit7 before its CT expires and watch
+   whether the enemy turn produces menu-body activity (auto-navigation)
+   instead of a bare seed.
 2. Controlled-seam experiment: write `0xED` bit 3 + controller id on an enemy
    unit, verify the game hands control to the player (Beastmaster mechanic).
-3. Write the reversible A3 runner on top of `gdb_force_key.py` + the fixture.
+3. Write the reversible A3 runner on top of `gdb_force_key.py` + the fixture
+   (wake marks + drive + idle re-confirm).

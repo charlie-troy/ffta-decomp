@@ -3728,3 +3728,49 @@ Live (normal battle, Bervenia skull encounter, A1 fixture):
 
 New tools: tools/probe_player_ai_control.py (turn-boundary ctx sampler),
 tools/exp_dispatcher_boundary.py (dispatcher-hit recorder), both syntax-checked.
+
+## 2026-09-09 — A2.3 answered: shared pipeline, forward-only menu handout (v44–v48)
+
+Twenty-plus runs across v28–v48; three tooling bugs, one fixture-layout bug, and
+one category error resolved along the way.
+
+- **Fixture layout corrected.** The roster sits at `0x020159E8` (stride
+  `0x108`, six units): **slot0 = Marche** (name ptr `0x085671EE`), slot1 =
+  first enemy (`0x0856702F`, the address `boot_fixture_gdb.py` validates).
+  `0x02016018` is a turn-scratch record (RAM name ptr), not a unit. All
+  earlier "slot6" sampling was a phantom; v44's bit7 flip actually wrote
+  slot1's `+0xEA`.
+- **Dormant-boot mystery solved.** `fix3-battle-start` never idles into
+  auto-battle; the turn loop starts only after Marche commits. Wake = v27's
+  forward-handout marks on slot0 (`+0xE6`/`+0xDC` = id `+0x104`, `+0xED |= 8`,
+  `+0xEA |= 0x80`) + `enable=1` + the DOWN DOWN A A route: with marks, the
+  battle self-plays a full round instantly; without, 8/8 drives did nothing.
+- **Control question (Q1): YES.** v48: player-driven commit (A-ok t≈7.0,
+  Marche menu-body hits t=8.9) → seed at `0x080C03C2` at t=10.2. Auto turns
+  pair scratch-pbody → seed within 1.6 s (t=54.4→55.2, 62.0→63.6), including
+  an enemy seed. Player and enemy actions share one sequencer-init path.
+- **Pipeline model replaces the two-body picture.** `0x0809E796` has exactly
+  two in-edges (exhaustive branch scan): the bit-7 router (`0x0809E3AE`) and
+  the status tail (`0x0809E784/788`, `+0xDB`/r6 tests). It is a merged
+  continuation for ALL active turns; bit7 units skip the AI housekeeping,
+  everyone else arrives after it. Attributing pbody hits by `r7` (= actor
+  slot; `r4` = record) confirmed enemies/allies/scratch all traverse it.
+- **`+0xEA` bit 7 = forward-only menu-body router.** `sub_080CDADC` =
+  `(rec+0xEA)&0x80`; the game consumes it at turn start on turn records
+  (pbody hits always read `ea=0`), and the auto-battler sets it transiently
+  on scratch records while menu-navigating player-side turns. "Marche bit7 →
+  AI" is a category error: bit7=1 routes TO the menu body. The real reverse
+  test (enemy bit7 → menu navigation?) was attempted but its window was
+  consumed by the menu-wedge (Marche's compressed turn left his menu open,
+  freezing the battle until the fallback drive; slot1's turn then ran
+  through pbody with bit7 already consumed).
+- **Wedge rules.** Compressed CT opens a menu; no commit + `enable=0` =
+  permanent freeze. Always `enable=1` at attach, never leave a menu
+  undriven, sample ticks must `interrupt()` (quiet free-pumps never
+  sample), v27-faithful presses (5 frames at the `0x08000494` poll, CPU
+  running between presses).
+
+New tools: tools/exp_control_v46..v48.py (v48 = layout-corrected protocol with
+per-hit r7/ea/ct truth + ctx scan), tools/exp_fixture_probe.py,
+tools/exp_deadlock_diag.py, tools/exp_visual_step.py, tools/exp_realkey_probe.py
+(syntax-checked). Output: outputs/lua-nav/controlled-v48.json (+ v46/v47).
