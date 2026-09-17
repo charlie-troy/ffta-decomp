@@ -44,6 +44,11 @@ def main(argv=None):
     ap.add_argument("--stop-at", type=float, default=45.0,
                     help="seconds after boot to drop the STOP file "
                          "(mid-battle by design; guards take ~30 s)")
+    ap.add_argument("--kill-path", action="store_true",
+                    help="C1 'CLI kill' row: no STOP; let the run reach a "
+                         "terminal bound with keep_process=False and PASS "
+                         "only if the owned pid is terminated by the real "
+                         "__exit__ cleanup")
     args = ap.parse_args(argv)
 
     out_dir = os.path.join("outputs", "autobattle", args.run_id)
@@ -70,17 +75,32 @@ def main(argv=None):
             final_state = "guard-failed"
             ok = False
         else:
-            threading.Timer(args.stop_at,
-                            lambda: open(stop_file, "w").close()).start()
-            final = rt.run()
-            # the CLI's exact handoff semantics (run_autobattle.py): flip the
-            # session's keep_process BEFORE __exit__ runs
-            paused = final == "paused"
-            keep_process = paused  # --on-stop defaults to leave-running
+            if args.kill_path:
+                print("probe: kill-path variant - no STOP; the run must "
+                      "reach a terminal bound and cleanup must terminate "
+                      "the owned pid")
+                final = rt.run()
+                paused = final == "paused"
+                keep_process = False  # the CLI's kill semantics
+            else:
+                threading.Timer(args.stop_at,
+                                lambda: open(stop_file, "w").close()).start()
+                final = rt.run()
+                # the CLI's exact handoff semantics (run_autobattle.py): flip
+                # the session's keep_process BEFORE __exit__ runs
+                paused = final == "paused"
+                keep_process = paused  # --on-stop defaults to leave-running
             session.keep_process = keep_process
             print(f"probe: final state {final} (turns={rt.turn}); "
                   f"keep_process={keep_process}")
-            if not paused:
+            if args.kill_path:
+                # a bounded terminal state (stalled) is the expected shape;
+                # what matters is that keep_process=False reached __exit__
+                ok = final in ("stalled", "completed")
+                if not ok:
+                    print(f"FAIL: kill-path run ended in unexpected state "
+                          f"{final}")
+            elif not paused:
                 print("FAIL: the run did not pause - the STOP did not take "
                       "effect mid-battle")
                 ok = False
@@ -90,13 +110,24 @@ def main(argv=None):
     finally:
         session.__exit__(None, None, None)
 
-    # __exit__ ran with keep_process=True: the emulator must still be alive
+    # __exit__ ran: with keep_process=True the emulator must survive; with
+    # keep_process=False (kill path) only the OWNED pid must be gone
     time.sleep(2.0)
     survived = pid is not None and pid_alive(pid)
     port_free = port_listener_pid(session.port) is None
-    if not survived:
+    if args.kill_path:
+        if survived:
+            print(f"FAIL: kill-path cleanup left the owned pid {pid} alive - "
+                  f"__exit__ did not terminate it")
+            ok = False
+        else:
+            print(f"PASS: kill-path cleanup terminated the owned pid {pid} "
+                  f"(port {'released' if port_free else 'still held'})")
+            ok = ok and port_free
+    elif not survived:
         print(f"FAIL: emulator pid {pid} did not survive __exit__ - the "
               f"cleanup path still terminates the process (Astra's repro)")
+        ok = False
     else:
         print(f"PASS: emulator pid {pid} survived the real CLI cleanup "
               f"path; the battle is left running for the player")
@@ -106,6 +137,7 @@ def main(argv=None):
               f"it with: taskkill /F /PID {pid})")
     receipt = {
         "schema": "handoff-probe/1",
+        "variant": "kill-path" if args.kill_path else "leave-running",
         "run_id": args.run_id,
         "final_state": final_state,
         "emulator_pid": pid,

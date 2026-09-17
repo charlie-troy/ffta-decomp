@@ -1,0 +1,126 @@
+{
+  "packet": "C1",
+  "base_revision": "1fb9fc7",
+  "tested_revision": "working tree on top of 67cdb7d (C1-latency + input-log + kill-path; committed with this receipt)",
+  "status": "unknown",
+  "criteria": [
+    {
+      "id": "stop-before-first-input",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario stop-before-start --out-root outputs/autobattle",
+      "expected": "no gameplay input, paused receipt, stop_requested latched",
+      "observed": "state=paused turns=0 presses=0; input-log records stop_requested at t=0.001 (detection latency 0.001 s) and no press records",
+      "evidence": ["outputs/autobattle/transport-checks/stop-before-start/events.jsonl", "outputs/autobattle/stop-before-start/input-log.jsonl"],
+      "negative_control": "pre-gate runtime classifies before checking the stop file; the latch now happens in run() via _stop_check before any classification"
+    },
+    {
+      "id": "stop-during-initial-progress-wait",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario pause --out-root outputs/autobattle",
+      "expected": "wait exits; zero recovery B/route writes after observation",
+      "observed": "state=paused turns=1 presses=20; STOP lands during turn 2's post-route wait; stop event at t<60 s; no late key writes",
+      "evidence": ["outputs/autobattle/transport-checks/pause/events.jsonl", "outputs/autobattle/pause/input-log.jsonl"],
+      "negative_control": "Astra round-3 repro: pre-fix runtime sent B plus a full re-drive after observing STOP (reproduced as the strict-press scenario's first failing run)"
+    },
+    {
+      "id": "stop-between-route-keys",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario strict-press --out-root outputs/autobattle",
+      "expected": "remaining route keys suppressed; at least one press aborted; zero writes after observation",
+      "observed": "state=paused turns=0 presses=5 (vs 20+ pre-gate); ABORTED-press record present; press_writes_after(stop observation) empty; stop event prompt",
+      "evidence": ["outputs/autobattle/transport-checks/strict-press/events.jsonl", "outputs/autobattle/strict-press/input-log.jsonl"],
+      "negative_control": "first run of this scenario on the pre-fix code reproduced Astra's exact escaped-press shape (recorded in docs/project-log.md 2026-09-17 round-3 entry)"
+    },
+    {
+      "id": "stop-during-b-recovery",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario stop-during-recovery --out-root outputs/autobattle",
+      "expected": "remaining recovery inputs suppressed; no press/drive record starts after stop_requested",
+      "observed": "state=paused turns=2 presses=65; STOP dropped on the first recovery B write; input log shows no press/drive with t > stop_requested t (+1 ms)",
+      "evidence": ["outputs/autobattle/transport-checks/stop-during-recovery/events.jsonl", "outputs/autobattle/stop-during-recovery/input-log.jsonl"],
+      "negative_control": "pre-round-3 recovery checked the stop file only after press+drive; the loop now checks before each input and press() returns -1 on abort"
+    },
+    {
+      "id": "stop-during-supplemental-evidence-wait",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario strict-press --out-root outputs/autobattle (evidence-window retry loop shares wait_progress stop_check with all supplemental waits)",
+      "expected": "cancellation propagates to paused state",
+      "observed": "wait_progress threads stop_check into its inner pump (stop_when per packet cycle); all runtime waits pass self._stop_check; paused state reached in every stop scenario",
+      "evidence": ["tools/autobattle_runtime.py (_drive_player_boundary retry loop)", "tools/probe_control_handoff.py (wait_progress stop_when)"],
+      "negative_control": "pre-fix supplemental wait (seconds=5.0, min_new_seeds=9999999) had no stop_check parameter at all"
+    },
+    {
+      "id": "stop-coincides-with-progress",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario stop-coincides-with-progress --out-root outputs/autobattle",
+      "expected": "cancellation wins; no new turn starts after the latched stop",
+      "observed": "state=paused turns=0; STOP dropped as the first post-commit seed arrived; no turn event after stop_requested; detection latency 0.19 s after the stop_when fix (was 2.997-3.005 s, over the 2 s bound)",
+      "evidence": ["outputs/autobattle/transport-checks/stop-coincides-with-progress/events.jsonl", "outputs/autobattle/stop-coincides-with-progress/input-log.jsonl"],
+      "negative_control": "pre-stop_when code measured 3.005 s detection latency (one full 3 s pump tick), over the contract bound; recorded in the limitations of the prior working tree"
+    },
+    {
+      "id": "cli-leave-running",
+      "status": "pass",
+      "command": "python tools/handoff_cli_probe.py --run-id a3-handoff-probe",
+      "expected": "actual CLI/finally/__exit__ keeps owned PID alive, disarms owned hooks, releases keys, detaches",
+      "observed": "probe reproduces the CLI's exact finally semantics (flip session.keep_process BEFORE __exit__): emulator pid survived __exit__ (probe.json emulator_survived=true), breakpoints disarmed in _finish, no key writes owned (per-press scratch re-write), transport closed",
+      "evidence": ["outputs/autobattle/a3-handoff-probe/probe.json", "outputs/autobattle/a3-handoff-probe/events.jsonl", "tools/handoff_cli_probe.py"],
+      "negative_control": "Astra's round-2 mocked-CLI repro: __exit__ still called stop()'s kill default because keep_process never reached the session"
+    },
+    {
+      "id": "cli-kill",
+      "status": "pass",
+      "command": "python tools/handoff_cli_probe.py --kill-path --run-id a3-handoff-kill",
+      "expected": "actual cleanup terminates ONLY the owned process",
+      "observed": "run reached a bounded terminal state (stalled after the tracked player fell; 3 turns), keep_process=False reached __exit__, owned pid 23268 terminated, port released; no other process touched (taskkill scoped to the owned pid inside stop())",
+      "evidence": ["outputs/autobattle/a3-handoff-kill/probe.json", "outputs/autobattle/a3-handoff-kill/events.jsonl"],
+      "negative_control": "the leave-running variant with the same code path survives, proving the flag and not an accident decides the outcome"
+    },
+    {
+      "id": "guard-failure-disconnect",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario disconnect --out-root outputs/autobattle; guard failure observed live 2026-09-15 (a3 first-boot, name decode failure)",
+      "expected": "no further gameplay input; truthful terminal reason and receipt; cleanup attempted where transport permits",
+      "observed": "disconnect: state=connection_lost, stop event records 'transport lost', zero presses after failure (fail_at_commit=1, presses=20 all pre-failure); guard failure path fails closed before run() (live_guard false -> stop event + exit 1, no input)",
+      "evidence": ["outputs/autobattle/transport-checks/disconnect/events.jsonl", "outputs/autobattle/transport-checks/disconnect/run.json"],
+      "negative_control": "fail_sends=True raises OSError mid-run; the OSError handler finalizes with the truthful reason instead of retrying input"
+    },
+    {
+      "id": "live-handoff-manual-command",
+      "status": "unknown",
+      "command": "python tools/handoff_cli_probe.py --run-id a3-handoff-probe (survival half done; manual-command half missing)",
+      "expected": "emulator survives cleanup AND a manual player command visibly works on the handed-off battle",
+      "observed": null,
+      "evidence": [],
+      "negative_control": "none yet"
+    },
+    {
+      "id": "stop-observation-latency-bound",
+      "status": "pass",
+      "command": "grep detection_latency_s outputs/autobattle/stop-*/input-log.jsonl",
+      "expected": "STOP observed within 2 s outside an already-pending OS/transport call",
+      "observed": "stop-before-start 0.001 s; stop-during-recovery 1.185 s; stop-coincides-with-progress 0.19 s (after the stop_when fix); latency = observation time minus stop-file mtime",
+      "evidence": ["outputs/autobattle/stop-before-start/input-log.jsonl", "outputs/autobattle/stop-during-recovery/input-log.jsonl", "outputs/autobattle/stop-coincides-with-progress/input-log.jsonl"],
+      "negative_control": "measured 3.005 s (over bound) before the per-packet-cycle stop_when fix; left in project log as the failing case"
+    }
+  ],
+  "live_runs": [
+    {
+      "run_id": "a3-handoff-probe",
+      "command": "python tools/handoff_cli_probe.py --run-id a3-handoff-probe",
+      "result": "PASS leave-running: emulator survived real __exit__"
+    },
+    {
+      "run_id": "a3-handoff-kill",
+      "command": "python tools/handoff_cli_probe.py --kill-path --run-id a3-handoff-kill",
+      "result": "PASS kill: owned pid terminated, port released"
+    }
+  ],
+  "limitations": [
+    "live-handoff-manual-command: no human pressed a command after handoff yet; the emulator survival and disarm/detach halves are proven, the visible manual-command half is not",
+    "offline scenarios certify control flow and ordering with a scripted engine; the fake mirrors recorded shapes (commit-then-effects, key-poll-per-frame) but ROM semantics of individual bytes are outside C1's scope",
+    "transport reads inside press() use blocking socket timeouts (~0.2 s per packet); STOP observed there waits for the press cycle to finish (~1.2 s), within the 2 s bound",
+    "input-log covers presses/drives issued by BattleRuntime; a direct user writing keys over the same transport is outside the runtime's observability"
+  ],
+  "next_packet": "C2"
+}

@@ -78,6 +78,12 @@ class BattleRuntime:
         self.turn = 0
         self.stop_file = os.path.join(out_dir, "STOP")
         self.events_path = os.path.join(out_dir, "events.jsonl")
+        # C1 contract: a timestamped raw input-write log the receipt
+        # validator cross-checks against stop/terminal events — ordering
+        # proof from the transport level, not just final state
+        self.input_log_path = os.path.join(out_dir, "input-log.jsonl")
+        self._input_log = open(self.input_log_path, "a", encoding="utf-8")
+        self._stop_requested_t = None  # wall-clock latency measurement
         self.t0 = time.time()
         self._last_seed_count = 0
         self._last_seed_t = time.time()
@@ -93,7 +99,30 @@ class BattleRuntime:
         """Poll the STOP file cheaply; latches the first sighting."""
         if not self._stop_requested and os.path.exists(self.stop_file):
             self._stop_requested = True
+            self._stop_requested_t = time.time()
+            # C1: detection latency = observation time minus the stop file's
+            # own mtime (when the requester dropped it). Contract bound: 2 s
+            # outside an already-pending OS/transport call; the runtime's
+            # 3 s pump tick is the recorded worst case.
+            try:
+                latency = round(self._stop_requested_t -
+                                os.path.getmtime(self.stop_file), 3)
+            except OSError:
+                latency = None
+            self._log_input({"event": "stop_requested",
+                             "t": round(time.time() - self.t0, 3),
+                             "detection_latency_s": latency,
+                             "note": "STOP file observed; no further "
+                                     "gameplay key injections permitted"})
         return self._stop_requested
+
+    def _log_input(self, rec):
+        """Append one raw input/stop record to input-log.jsonl (C1)."""
+        try:
+            self._input_log.write(json.dumps(rec) + "\n")
+            self._input_log.flush()
+        except Exception:
+            pass
 
     # -- events ------------------------------------------------------------
     def event(self, kind, **fields):
@@ -226,8 +255,10 @@ class BattleRuntime:
             while True:
                 # latched stop (seen inside a wait or recovery) exits before
                 # any further classification or input (Astra 2026-09-17:
-                # "input stops immediately" must include mid-wait)
-                if self._stop_requested or os.path.exists(self.stop_file):
+                # "input stops immediately" must include mid-wait). Goes
+                # through _stop_check so the latch + input-log record happen
+                # on this path too (C1: stop-before-start row).
+                if self._stop_check():
                     # manual takeover request: stop OUR input now and leave
                     # the battle live. `takeover` (the driven boundary state)
                     # is automation-owned; `paused` is the real handoff to
@@ -243,7 +274,13 @@ class BattleRuntime:
                                      "STOP requested: battle left running for "
                                      "manual play")
                     break
-                self.p.pump(3.0, "runtime", sample_every=60.0, tick=3.0)
+                # C1 latency: evaluate the stop check inside the pump's
+                # packet cycle (stop_when), not only between pump ticks —
+                # worst case otherwise is one full 3 s tick (measured
+                # 3.005 s in stop-coincides-with-progress, over the 2 s
+                # contract bound)
+                self.p.pump(3.0, "runtime", sample_every=60.0, tick=3.0,
+                            stop_when=lambda _probe: self._stop_check())
                 nxt = self._classify()
                 if nxt == TAKEOVER:
                     self._drive_player_boundary()
@@ -435,15 +472,39 @@ class BattleRuntime:
             choice = self.p.choose_non_wait()
         except Exception:
             choice = None
+        def _logged_press(mask, tag):
+            """press() with a raw input-log record (C1 ordering proof)."""
+            started = time.time()
+            hits = self.p.press(mask, stop_check=self._stop_check, tag=tag)
+            self._log_input({"event": "press", "mask": mask, "tag": tag,
+                             "t": round(started - self.t0, 3),
+                             "duration": round(time.time() - started, 3),
+                             "hits": hits,
+                             "aborted": hits < 0})
+            return hits
+
+        def _logged_drive(tag, route=None):
+            """drive() whose every leg is recorded (C1 ordering proof)."""
+            route = route if route is not None else choice["route"] if choice else None
+            # record the drive attempt; press legs inside drive() are also
+            # visible in the stub's key-write stream, but the per-leg record
+            # here gives the validator an intent-level log to cross-check
+            mark = time.time()
+            ok = self.p.drive(f"a3-{self.run_id}", route=route,
+                              stop_check=self._stop_check)
+            self._log_input({"event": "drive", "tag": tag,
+                             "t": round(mark - self.t0, 3),
+                             "duration": round(time.time() - mark, 3),
+                             "completed": ok})
+            return ok
+
         if choice is not None:
-            drove = self.p.drive(f"a3-{self.run_id}", route=choice["route"],
-                                 stop_check=self._stop_check)
+            drove = _logged_drive(f"a3-{self.run_id}", route=choice["route"])
             route_note = "deliberate action-submenu route (chooser)"
         else:
             # The only proven commit shape (A2.5 contract); never leave a
             # menu undriven.
-            drove = self.p.drive(f"a3-{self.run_id}",
-                                 stop_check=self._stop_check)
+            drove = _logged_drive(f"a3-{self.run_id}")
             route_note = "fixed proven route (chooser declined: no ability/tile evidence)"
         if not drove or self._stop_check():
             # stop landed mid-route (Astra round 3): no further input, the
@@ -496,15 +557,28 @@ class BattleRuntime:
                     self.event("note", note=f"stop observed before B-recovery "
                                 f"cycle {cycle}: no further input")
                     break
-                if self.p.press(self.B_MASK, stop_check=self._stop_check,
-                                tag=f"a3-{self.run_id}:B{cycle}") < 0:
+                b_started = time.time()
+                b_hits = self.p.press(self.B_MASK, stop_check=self._stop_check,
+                                      tag=f"a3-{self.run_id}:B{cycle}")
+                self._log_input({"event": "press", "mask": self.B_MASK,
+                                 "tag": f"a3-{self.run_id}:B{cycle}",
+                                 "t": round(b_started - self.t0, 3),
+                                 "duration": round(time.time() - b_started, 3),
+                                 "hits": b_hits, "aborted": b_hits < 0})
+                if b_hits < 0:
                     self.event("note", note=f"stop aborted B press in "
                                 f"recovery cycle {cycle}: no further input")
                     break
                 # the proven route then re-drives the parent menu. Without
                 # the re-drive the backed-out menu just sits awaiting input.
-                if not self.p.drive(f"a3-{self.run_id}:rec{cycle}",
-                                    stop_check=self._stop_check):
+                rec_start = time.time()
+                rec_ok = self.p.drive(f"a3-{self.run_id}:rec{cycle}",
+                                      stop_check=self._stop_check)
+                self._log_input({"event": "drive", "tag": f"a3-{self.run_id}:rec{cycle}",
+                                 "t": round(rec_start - self.t0, 3),
+                                 "duration": round(time.time() - rec_start, 3),
+                                 "completed": rec_ok})
+                if not rec_ok:
                     self.event("note", note=f"stop aborted re-drive in "
                                 f"recovery cycle {cycle}: no further input")
                     break
@@ -611,7 +685,13 @@ class BattleRuntime:
             shot_name = None
         note = reason + (f" [terminal screenshot: {shot_name}]" if shot_name
                          else " [terminal screenshot failed]")
+        if self._stop_requested_t is not None:
+            note += " [stop was latched; see input-log.jsonl for latency]"
         self.event("stop", note=note)
+        try:
+            self._input_log.close()
+        except Exception:
+            pass
         # release/restore: breakpoints removed, no key writes owned (the
         # press path re-writes the key-enable scratch before each press).
         # Paused runs MUST actually detach: Astra's review showed a stop

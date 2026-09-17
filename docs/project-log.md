@@ -4215,3 +4215,42 @@ look like garbage — now 96/50 per unit per unit-struct.md.
 **Suite**: 9 scenarios all PASS (strict-press included); takeover/defeat
 re-verified after the retry-loop change. chooser8 rerunning live under the
 unconditional demotion.
+
+
+## 2026-09-17 — C1 packet per the worker acceptance contract
+
+Adopted `docs/autobattle-worker-contract.md` (1fb9fc7): criteria receipt first,
+regressions preserved, real cleanup paths, pass/fail/unknown per criterion.
+
+**Timestamped input log.** Every runtime press/drive now appends to
+`input-log.jsonl` (event, mask, tag, t, duration, hits, aborted), and the
+stop latch records `stop_requested` with detection latency measured against
+the STOP file's mtime. The receipt validator cross-checks ordering from this
+raw transport-level log, not just final state.
+
+**Three new C1 scenarios** (contract rows that had no regression):
+stop-before-start (zero writes, paused receipt, latched stop — exposed that
+run()'s stop check bypassed the latch; routed through `_stop_check`),
+stop-during-recovery (STOP drops on the first recovery B write; no
+press/drive record may start after stop_requested), stop-coincides-with-
+progress (STOP as the first post-commit seed lands; no new turn may start).
+
+**Latency bound met.** stop-coincides-with-progress measured 3.005 s
+detection (over the 2 s contract bound): the stop landed inside a 3 s pump
+chunk that never evaluated the check mid-chunk. `stop_when` now threads the
+check into the pump's packet cycle in both the main loop and wait_progress —
+measured 0.19 s. stop-during-recovery: 1.185 s; stop-before-start: 0.001 s.
+
+**CLI kill path.** `handoff_cli_probe.py --kill-path`: no STOP, run to a
+terminal bound, keep_process=False through the real `__exit__` — owned pid
+terminated, port released, only the owned process touched. Complements the
+leave-running variant; both go through the identical cleanup code.
+
+**C1 receipt.** `docs/receipts/autobattle/C1.json`: 9/10 criteria pass with
+commands, observations, and evidence paths; one honest unknown — a human
+pressing a manual command on the handed-off emulator (survival, disarm, and
+detach halves are proven; my presses cannot serve as "manual" input).
+Suite: 12 scenarios, all PASS on the final code; tracked receipts refreshed.
+
+Next packet: C2 (validated player action) — status unchanged: the selector
+that identifies a command before execution is the remaining work.

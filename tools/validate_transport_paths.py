@@ -877,6 +877,101 @@ def run_scenario(name, out_root):
         if probe_log is not None and not any("ABORTED" in line for line in probe_log):
             errors.append("strict-press: no aborted press recorded — the STOP "
                           "may have landed in a wait instead of the input path")
+    elif name == "stop-before-start":
+        # C1 row: STOP before first input - no gameplay input at all, paused
+        open(rt.stop_file, "w").close()  # dropped BEFORE run() is called
+        state = rt.run()
+        if state != "paused":
+            errors.append(f"stop-before-start: expected paused, got {state}")
+        if rt.turn != 0:
+            errors.append(f"stop-before-start: {rt.turn} turns committed")
+        writes = session.g.key_writes()
+        if writes:
+            errors.append(f"stop-before-start: {len(writes)} key writes "
+                          f"reached the engine after a pre-run STOP: "
+                          f"{writes[:3]}")
+        stop = [e for e in _events(rt.events_path) if e["kind"] == "stop"]
+        if not stop or "manual play" not in (stop[0].get("note") or ""):
+            errors.append("stop-before-start: paused receipt required")
+        ilog = _input_log(rt.input_log_path)
+        if not any(r.get("event") == "stop_requested" for r in ilog):
+            errors.append("stop-before-start: stop_requested not latched "
+                          "in input log")
+    elif name == "stop-during-recovery":
+        # C1 row: STOP during B recovery - remaining recovery inputs are
+        # suppressed. The submenu swallow shape forces turn 2 into recovery
+        # (B press + re-drive cycles); the STOP drops as the FIRST recovery
+        # B write is observed, so cycle 2's inputs must never fire.
+        world.allow_seeds = True
+        world.menu_reopen_seconds = 5.0
+        world.after_commit = lambda w: setattr(w, "swallow_route", True)             if w.commits >= 2 else None
+        world.swallow_b = False
+        armed = {"on": True}
+        def _watch_recovery():
+            # drop the STOP once the first B press of recovery appears in
+            # the write stream (B mask = 0x02 bit in the P1= payload)
+            while armed["on"]:
+                for c in session.g.send_log:
+                    if c.startswith("P1="):
+                        val = int.from_bytes(bytes.fromhex(c.split("=")[1]),
+                                             "little")
+                        if val & 0x02:
+                            open(rt.stop_file, "w").close()
+                            armed["on"] = False
+                            return
+                time.sleep(0.05)
+        import threading as _th2
+        _th2.Thread(target=_watch_recovery, daemon=True).start()
+        state = rt.run()
+        armed["on"] = False
+        if state != "paused":
+            errors.append(f"stop-during-recovery: expected paused, got "
+                          f"{state}, events={_events(rt.events_path)[-3:]}")
+        # ordering proof from the raw log: no press may START after the
+        # stop_requested record's timestamp
+        ilog = _input_log(rt.input_log_path)
+        stop_t = next((r["t"] for r in ilog
+                       if r.get("event") == "stop_requested"), None)
+        if stop_t is None:
+            errors.append("stop-during-recovery: stop never latched")
+        else:
+            late = [r for r in ilog if r.get("event") in ("press", "drive")
+                    and r.get("t", -1) > stop_t + 0.001]
+            if late:
+                errors.append(f"stop-during-recovery: {len(late)} input "
+                              f"records started after stop_requested: "
+                              f"{late[:2]}")
+    elif name == "stop-coincides-with-progress":
+        # C1 row: STOP coincides with progress - cancellation wins; no new
+        # turn starts. Drop the STOP just as the post-commit seed arrives.
+        world.allow_seeds = True
+        world.menu_reopen_seconds = 5.0
+        armed = {"on": True}
+        def _watch_seed():
+            while armed["on"]:
+                if len(rt.p.seeds) > 0:
+                    open(rt.stop_file, "w").close()
+                    return
+                time.sleep(0.02)
+        import threading as _th3
+        _th3.Thread(target=_watch_seed, daemon=True).start()
+        state = rt.run()
+        armed["on"] = False
+        if state != "paused":
+            errors.append(f"stop-coincides-with-progress: expected paused, "
+                          f"got {state}")
+        # no NEW turn may start after the latched stop: turn events must
+        # all predate stop_requested (or none exist)
+        ilog = _input_log(rt.input_log_path)
+        stop_t = next((r["t"] for r in ilog
+                       if r.get("event") == "stop_requested"), None)
+        turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
+        if stop_t is not None and any(e.get("t", 1e9) > stop_t for e in turns):
+            errors.append("stop-coincides-with-progress: a new turn started "
+                          "after the stop was latched")
+        stops = [e for e in _events(rt.events_path) if e["kind"] == "stop"]
+        if not stops:
+            errors.append("stop-coincides-with-progress: stop event missing")
     elif name == "submenu":
         # recorded a3-natural5 shape: the post-Move re-opened menu presents
         # a submenu the plain route cannot commit (presses land, nothing
@@ -913,19 +1008,32 @@ def _events(path):
     with open(path, encoding="utf-8") as fh:
         return [json.loads(l) for l in fh if l.strip()]
 
+def _input_log(path):
+    """Raw timestamped input/stop records (C1 ordering proof)."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            return [json.loads(l) for l in fh if l.strip()]
+    except FileNotFoundError:
+        return []
+
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--scenario", default="all",
                             choices=["all", "takeover", "unknown", "disconnect",
                                      "restart", "defeat", "results", "submenu",
-                                     "pause", "strict-press"])
+                                     "pause", "strict-press",
+                                     "stop-before-start",
+                                     "stop-during-recovery",
+                                     "stop-coincides-with-progress"])
     ap.add_argument("--out-root", default=os.path.join("outputs", "autobattle",
                                                        "transport-checks"))
     args = ap.parse_args(argv)
 
     names = ["takeover", "unknown", "disconnect", "restart", "defeat",
-             "results", "submenu", "pause", "strict-press"]
+             "results", "submenu", "pause", "strict-press",
+             "stop-before-start", "stop-during-recovery",
+             "stop-coincides-with-progress"]
     if args.scenario != "all":
         names = [args.scenario]
     failures = []

@@ -40,7 +40,7 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 
 | Order | Packet | Current status | Completion unlocks |
 |---|---|---|---|
-| 1 | C1 cancellation and handoff | First two criteria done 2026-09-17 (strict-press regression + per-input gate); CLI-cleanup-path criteria already proven by `a3-handoff-probe`; live STOP→manual-choice demo remains | C2 |
+| 1 | C1 cancellation and handoff | 9/10 acceptance criteria PASS per `docs/receipts/autobattle/C1.json` (2026-09-17): all six STOP-timing rows, both CLI cleanup paths (leave-running + kill via real `__exit__`), disconnect, and the 2 s latency bound (measured 0.19–1.2 s). The one unknown: a human pressing a manual command on the handed-off emulator (survival half is proven) | C2 |
 | 2 | C2 validated player action | Active: snapshot plausibility + validated target decode landed; the identified-candidate selector and the identity→selection→execution receipt remain | C3 |
 | 3 | C3 integration and acceptance | Blocked on C1/C2 | Close A2.5/A3; start A4 or A8 |
 | Later | A4–A10 | Existing product scope retained | Follow declared dependencies |
@@ -210,10 +210,18 @@ regressions required by the contract. Reuse the existing transport.
   (Done 2026-09-17: `press()` checks before firing and returns -1 on abort;
   `drive()` aborts mid-route and skips redelivery; the B-recovery loop checks
   before EACH press and re-drive; waits already carried `stop_check`.)
-- [ ] Exercise the actual CLI and session cleanup for leave-running, kill,
+- [x] Exercise the actual CLI and session cleanup for leave-running, kill,
   guard failure, and connection loss. Preserve the known process-lifetime fix.
+  (2026-09-17: `tools/handoff_cli_probe.py` now covers BOTH paths through the
+  real `FixtureSession.__exit__` — leave-running survives the owned pid,
+  kill-path `--kill-path` terminates only it and releases the port;
+  disconnect is the transport suite's connection_lost scenario.)
 - [ ] Demonstrate live STOP → manual choice with the emulator still usable;
   record input ordering, process survival, and cleanup of owned hooks/state.
+  (Partial per C1.json: process survival, input ordering via the new
+  timestamped `input-log.jsonl`, disarm/detach all proven; the visible
+  manual command needs a human keypress on the handed-off emulator and is
+  recorded as the packet's one unknown.)
 
 Done: all C1 checks in the contract pass. Continue to C2 without review.
 

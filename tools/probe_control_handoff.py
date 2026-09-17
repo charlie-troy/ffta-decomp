@@ -836,7 +836,12 @@ class Probe:
         target = want_seeds if want_seeds is not None else start + min_new_seeds
         end = self.now() + seconds
         while self.now() < end:
-            self.pump(3.0, "progress", sample_every=60.0, tick=3.0)
+            # C1 latency: evaluate the stop check per packet cycle inside the
+            # pump as well — between 3 s pump chunks the worst case was one
+            # full chunk over the 2 s contract bound (measured 2.997 s)
+            self.pump(3.0, "progress", sample_every=60.0, tick=3.0,
+                      stop_when=(lambda _probe: stop_check())
+                      if stop_check is not None else None)
             if stop_check is not None and stop_check():
                 return False
             if len(self.seeds) >= target:
