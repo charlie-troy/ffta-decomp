@@ -1,10 +1,9 @@
 # Remaining-work roadmap
 
-> **Priority update, 2026-09-09:** [Customizable auto-battle roadmap](auto-battle-roadmap.md)
-> is the active execution roadmap. A1 is complete; start with A2.4a (fixture/guard
-> reconciliation), then A2.4b and A2.5 (causal handoff and restoration proof).
-> A3 remains blocked; a Wait loop does not establish player AI control. Its dependencies and acceptance gates supersede
-> the historical phase ordering below. Map cleanup is deferred.
+> **Priority update, 2026-09-17:** [Auto-battle roadmap](auto-battle-roadmap.md)
+> is the active queue: C1 cancellation → C2 verified player action → C3 integration.
+> Workers close packets using the [acceptance contract](autobattle-worker-contract.md)
+> and advance autonomously when its criteria pass. Historical phases below are deferred.
 
 How to read this: the repo's own rule (CLAUDE.md) is **widen the no-compiler
 modding surface first; match more functions last.** This roadmap follows that.

@@ -9,6 +9,14 @@ source of truth for the active work package, backlog order, risks, decisions,
 and dated evidence. Update it in the same change as any material discovery or
 priority change; do not leave project state only in chat.
 
+## Auto-battle assignments
+
+For auto-battle implementation, validation, or completion claims, read the
+current packet in [docs/auto-battle-roadmap.md](docs/auto-battle-roadmap.md) and
+[the worker acceptance contract](docs/autobattle-worker-contract.md). Follow
+its regression and live-evidence gates; advance within the assignment when
+they pass without waiting for orchestrator approval.
+
 ## The goal shapes what is worth doing
 
 The point is **making the game moddable, especially the battle AI**, not

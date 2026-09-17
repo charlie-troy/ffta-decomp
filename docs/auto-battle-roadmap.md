@@ -1,6 +1,11 @@
 # Customizable auto-battle roadmap
 
-Updated 2026-09-17. Baseline reviewed at `cda503c`; the closure work since (validator gate, runtime stop checks, chooser, handoff proof) landed in `a55e29f` and the closure packet that follows. A2.4a's receipt is `outputs/autobattle/A2.4a/`; A2.4b's is `outputs/autobattle/A2.4b/`. Earlier review text (2026-09-09) inspected commits, source, and recorded findings; it did not rerun the emulator or ROM gates.
+Updated 2026-09-17. Planning baseline: `398bdc0`. Current acceptance status
+is maintained here; dated discoveries remain in `docs/project-log.md`.
+For every auto-battle implementation or completion claim, follow
+[Worker acceptance contract](autobattle-worker-contract.md). It defines the
+checks needed to finish a packet and continue without orchestrator approval.
+Earlier “closed” log entries are historical claims, not dependency clearance.
 
 ## Product outcome
 
@@ -33,29 +38,30 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 
 ## Worker start and dispatch order
 
-| Order | Packet | Current state | Unlocks |
+| Order | Packet | Current status | Completion unlocks |
 |---|---|---|---|
-| 1 | A2.4a fixture and harness repair | Done 2026-09-10; receipt `outputs/autobattle/A2.4a/` | Trustworthy control experiments |
-| 2 | A2.4b causal control experiments | Active (2026-09-10); bounded negative result + design comparison | A verified lever or explicit architecture decision |
-| 3 | A2.5 reversible player-turn proof | Done with limits (2026-09-15, corrected 2026-09-16/17): boundary, delegation, and reversibility proven in `outputs/autobattle/A2.5/`; the runtime contract is frozen in `docs/player-ai-control.md`; deliberate non-Wait selection demonstrated live in `a3-chooser3` (turns 1/5/6 via the ability-evidence chooser with engine deltas; command id→name still undecoded, chooser honestly declines without evidence) | A3 runtime implementation |
-| 4 | A3 hands-off runner | Done 2026-09-16 (post-review closure same day): `a3-natural6` finished one normal battle hands-off (12 committed turns, natural `completed` at t≈888 s, zero tactical clicks; the battle ended in Marche's defeat — a failed encounter, not an automation failure); manual takeover reworked into real pause semantics; receipt validator hardened after a live adversarial check; transport suite (eight shapes) validates offline. A reliable tactical auto-battle still needs the decoded action menu | A4 identity/isolation and A8 speed |
-| Later | A4–A10 | Keep existing dependency gates | Per-character tactics and usable release |
+| 1 | C1 cancellation and handoff | Ready: process preservation fixed; input after observed STOP remains | C2 |
+| 2 | C2 validated player action | Ready for bounded decoding; depends on C1 for live runner use | C3 |
+| 3 | C3 integration and acceptance | Blocked on C1/C2 | Close A2.5/A3; start A4 or A8 |
+| Later | A4–A10 | Existing product scope retained | Follow declared dependencies |
 
-Before editing: run `git status --short` and `git log -5 --oneline`; read
-`CLAUDE.md` and this packet. Preserve any new concurrent changes. Verify local
-ROM SHA1 with `Get-FileHash -Algorithm SHA1 -LiteralPath .\baserom.gba` before
-ROM-dependent work. Inspect helpers before execution: older scripts can kill
-all emulator processes or rely on stale fixture addresses. Never attach to
-another worker's or the user's active emulator.
+A1 and A2.4a supplied normal-battle fixtures. A2.4b supplied useful negative
+control results. A3 has an unattended failed-encounter result (`a3-natural6`),
+and the CLI now preserves its process on pause. These are reusable evidence,
+not proof of player action selection or complete cancellation behavior.
 
-For each handoff, provide: base/head, owned files, exact command, fixture hash,
-run id, hypothesis, observed result, evidence paths, all interventions and their
-restoration, checks run now versus historical checks, limitations, and the
-single next packet unlocked. Keep evidence under `outputs/autobattle/<run-id>/`;
-commit only metadata/summaries without game bytes. Source syntax checks support
-tooling edits; live baseline/intervention/restoration evidence supports control
-claims. Run domain validators for affected ROM surfaces and the full release
-gate only when integrating a ROM release, not for documentation-only updates.
+**Default assignment:** complete C1 → C2 → C3, in that order, within an
+ongoing request to continue auto-battle work. Read the contract and the current
+packet only; load linked research references when that packet needs them.
+A passing packet unlocks the next packet automatically. No additional human
+or orchestrator sign-off is required for scoped, reversible implementation,
+local tests, evidence capture, or commit of owned files.
+
+The initial implementation path is external engine-legal player action
+selection through the existing Windows mGBA transport. Workers may decode the
+minimum menu/action boundary and build a small selector to prove it. This is
+not a claim that the player's turn uses retail AI. Persistent save changes,
+new platforms, and world-map automation remain outside this assignment.
 
 ## Agent work packets
 
@@ -179,117 +185,70 @@ turn start by `0x0809E272`, and when forced to survive past it the router and
 the end CT vector are unchanged. Recommended path: external engine-legal action
 selection; the `+0x8000` side-flag dispatcher remains unproven.
 
-#### A2.5 — Acceptance proof and runtime contract (after A2.4b)
+#### A2.5 / A3 — Acceptance open; close through C1–C3
 
-Own: `docs/player-ai-control.md`, the reusable probe, and evidence metadata.
+Existing runtime, CLI, fixture guard, probes, and transport tests are the
+implementation baseline. Preserve them and fix the remaining contracts.
+Detailed checks and receipt requirements live in
+[autobattle-worker-contract.md](autobattle-worker-contract.md).
 
-- [x] From the verified normal fixture, make Marche autonomously choose and
-  execute a legal non-Wait action and movement when required by its range.
-  Record the actor-specific decision -> action -> turn-end -> next-actor chain.
-  (Partially met, NOT fully: the delegated turn's action selection is the
-  engine's own retail AI and the manual route selects Wait. What IS proven:
-  a full non-Wait menu cycle exists and reads unit-specific data (a3-full2's
-  route committed a Move), movement/target legality stayed engine-side, and
-  the decision-action-turn-end-next-actor chain is recorded in the receipts'
-  seed/router/turn traces. Verified 2026-09-17 in `a3-chooser3`: the runtime
-  chooser (`choose_non_wait` over the inline ability-state scan) accepted at
-  three boundaries and drove the action-submenu route — a deliberately
-  selected non-Wait action, not the fixed Wait route — with an engine-side
-  effect delta recorded per commit; at boundaries without evidence it
-  declined fail-closed to the fixed route. Still open: the committed
-  command's id→name decode (`command_id` stays null).)
-- [x] Confirm side/alliance values and legal targeting remain unchanged, enemy
-  behavior remains retail, and a second player turn is also delegated.
-  (Receipts `a25-acceptance-repeat1.json` / `a25-acceptance.json`: enemy turns
-  observed via router+seed traces after both manual commits; second player turn
-  delegated via the same input channel; `battle_torn_down` false in both.)
-- [x] Restore manual control at a safe boundary, visibly execute a manual
-  choice, then re-enable delegation. Repeat the complete experiment twice
-  from reload; report fixture/RNG differences rather than promising determinism.
-  (Runs 19/20, 2026-09-15: manual takeover at the settled/frozen menu boundary,
-  full DOWN DOWN A A route committed visually at the open menu, re-delegation
-  completed; seed/router traces differ between runs as RNG predicts.)
-- [x] Freeze a runtime contract: detect boundary/actor, enable one turn,
-  observe completion, request takeover, restore, and detect invalid state.
-  Include expected original hook bytes if code is patched, allowed ROM hash,
-  record lifetime, owned writes, failure behavior, and reproducible commands.
-  (Frozen in `docs/player-ai-control.md` "A2.5 result": four boundary shapes,
-  the only proven commit shape, transport rules, visual-channel rules, and
-  honest limitations. No ROM code is patched — the probe owns RAM writes only,
-  all restored at exit; reproducible via `python tools/probe_control_handoff.py
-  a25 --runs 1 --seconds 150`.)
+### C1 — Cancellation and usable handoff (P0)
 
-Done: reviewer can follow the receipts to a reversible player AI turn with
-unchanged allegiance. Only this acceptance unlocks A3. A Wait-only loop stays
-an input/turn-flow diagnostic even if enemies eventually end the battle.
+Own: `tools/autobattle_runtime.py`, `tools/run_autobattle.py`,
+`tools/probe_control_handoff.py`, `tools/fixture_guard.py`,
+`tools/validate_transport_paths.py`, `tools/handoff_cli_probe.py`, and focused
+regressions required by the contract. Reuse the existing transport.
 
-**Re-scope needed (2026-09-10).** A2.4b removed both candidate engine-internal
-levers, so this packet as written has no instrument. Two options, from the
-comparison in `docs/player-ai-control.md`: (A) find and prove the battle
-caller that branches on the `+0x28` bit `0x8000` side flag, then delegate the
-chosen actor's turn internally; or (B) re-scope A2.5 to freeze the boundary
-contract for externally selected, engine-legal player actions over the proven
-`0x08000494` input channel, with A5's pure `choose_action` interface supplying
-the choice. Option B is recommended; the orchestrator owns this decision.
+- [ ] Reproduce STOP during the initial progress wait causing a subsequent
+  recovery B press and full route; add a regression that fails on the old code.
+- [ ] Implement the contract's single cancellation check at every input
+  boundary, including each key in a route, recovery, and supplemental waits.
+- [ ] Exercise the actual CLI and session cleanup for leave-running, kill,
+  guard failure, and connection loss. Preserve the known process-lifetime fix.
+- [ ] Demonstrate live STOP → manual choice with the emulator still usable;
+  record input ordering, process survival, and cleanup of owned hooks/state.
 
-### A3 — Minimal autonomous battle runner (P0)
+Done: all C1 checks in the contract pass. Continue to C2 without review.
 
-Depends on reviewed A2.5 and its frozen runtime contract. Create `tools/autobattle_runtime.py`, `tools/run_autobattle.py`, and `tools/validate_autobattle_runtime.py`; reuse the existing emulator transport.
+### C2 — Identify and deliberately execute one player action (P0)
 
-- [x] Expose CLI `run_autobattle.py --rom PATH --scenario PATH --mode retail-ai`; default to paused until the fixture and ROM guards pass.
-  (Built 2026-09-15; the live guard decodes all seven roster names before
-  input is issued and a wrong fixture fails closed — observed on the first
-  boot when name decoding was broken.)
-- [x] Implement explicit idle/running/takeover/completed/stalled states using A2's verified control boundary. Stop issuing input after completion, takeover, connection loss, or an unknown modal.
-  (`tools/autobattle_runtime.py`; boundary = `player_menu_frozen`, drive =
-  the only proven route. `completed` observed live in a3-natural6: the
-  battle-end signature held and the run closed on its own. A post-Move
-  submenu shape gets bounded B-recovery — navigation, not tactical input —
-  before an inert route is treated as an unknown modal and bounds the
-  run, per DE-020. Post-review correction: a STOP request is a real pause
-  handoff (`paused` state) — input stops, breakpoints disarm, and with the
-  CLI's `--on-stop leave-running`  the emulator survives for the player — proven 2026-09-17 through the
-  REAL `FixtureSession.__exit__` cleanup path, not a mock
-  (`tools/handoff_cli_probe.py`, receipt `outputs/autobattle/a3-handoff-probe/`:
-  STOP at t=55.5, event `state: paused`, and the emulator pid survived
-  `__exit__` with `--on-stop leave-running`). The stop file is additionally
-  checked inside long progress waits and B-recovery loops, so input stops
-  mid-wait, not only between waits. The automation-driven boundary state
-  `takeover` is NOT a manual handoff.)
-- [x] Append turn events to `outputs/autobattle/<run-id>/events.jsonl`: scenario, turn, actor, control mode, selected action/target, position before/after, and reason for stopping. Unknown fields must be null, not inferred labels.
-  (`selected_action` stays null for the fixed route — a3-full2 proved the
-  route commits whatever the open menu resolves to, so the action is NOT
-  claimed as Wait. When the chooser drives the action-submenu route —
-  demonstrated live at three boundaries in `a3-chooser3` and at all five
-  boundaries in `a3-chooser4` (turn 1's diff carries non-CT deltas for the
-  affected unit: hp/mp/tg/position; magnitude decoding is still stride-
-  suspect) — the
-  event records a structured `selected_action` of kind
-  `deliberate-non-wait-route` with `command_id: null` (the id→name mapping
-  is not decoded) plus an engine-side effect diff in the note.
-  `tools/validate_autobattle_runtime.py` enforces the schema offline and,
-  since the 2026-09-16 adversarial check, fails on any input-kind event
-  after the terminal stop.)
-- [x] Bound stall detection by no-progress frames plus a wall-clock timeout; release held keys and restore temporary hooks on exit where the connection remains available.
-  (Stall = seed silence beyond 150 s — recalibrated from a3-natural3, whose
-  healthy boundary waits reached 93 s — plus a debounced dead-player check;
-  a held defeat with seed silence enters grace: takeover and the stall bound
-  are suppressed so the engine's own defeat→results conclusion classifies
-  the run (a3-natural1 lesson). Wall timeout checked every pump and inside
-  progress waits; `disarm()` removes all breakpoints on exit; no key writes
-  are held — the key-enable scratch is re-written per press. Positions still
-  read transient garbage at boundary detection; position_after is reliable.)
-- [x] Validate disconnect, repeated start/stop, unknown-dialog, and takeover paths using recorded transport responses; then finish one normal battle with no tactical clicks.
-  (`tools/validate_transport_paths.py` drives the real `BattleRuntime`
-  against a wall-clock fake engine — 60 fps frames, recorded ~12.9 CT/s —
-  across seven recorded shapes: takeover, unknown-dialog swallow, transport
-  disconnect, repeated start/stop, mid-battle player defeat, natural
-  results end, and the post-Move submenu wedge; every artifact passes
-  `tools/validate_autobattle_runtime.py`. Live: `a3-natural6` finished one
-  normal battle with zero tactical clicks — 12 committed routes with retail
-  enemy AI between them, defeat grace at t≈880, `completed` at t≈887.8.)
+Own: probe/action decoding, runtime event attribution, scenario metadata,
+`tools/validate_autobattle_runtime.py`, and focused action tests. Add a small
+pure selector only as needed; the broader tactics language remains A5.
+Read `docs/player-ai-control.md`, `include/ffta.h`, and the specific accessors
+needed to verify field semantics. Treat prior fixed-address effects as suspect.
 
-Done 2026-09-16: one uninterrupted normal battle (`a3-natural6`, 12 turns, completed) plus the transport-path suite covering the recorded failure shapes. Closure 2026-09-17: the deliberate chooser route was accepted at every boundary of a live run (`a3-chooser4`, 5/5 with engine-side diffs; its 420 s wall budget expired inside the ending sequence with the results dialog already up — the all-1000 CT tail is end-of-battle state, and `a3-chooser5` reran it with headroom), and the manual handoff survived the real CLI cleanup path (`a3-handoff-probe`). Preserve the user's save. This milestone uses retail AI and makes no claim of sophisticated custom strategy yet.
+- [ ] Reject invalid/transient roster snapshots before policy decisions or
+  effect attribution. Validate identity, record lifetime, and field bounds.
+- [ ] Identify one legal non-Wait command and its target/destination at a
+  player boundary; choose that identified candidate rather than inferring
+  an action from the key sequence sent.
+- [ ] Tie player identity → selection → engine acceptance → execution →
+  turn end into one receipt. Add the contract's negative controls.
+- [ ] Repeat from reload twice. An action ID with verified semantics is enough;
+  human-readable name decoding is optional. Record uncertainty as unknown.
+
+Done: two valid live executions and all C2 checks pass. If the decoded action
+has no HP/MP effect, verify its specific observable result (e.g. committed
+movement) at the correct boundary. Continue to C3 without review.
+
+### C3 — Integrate and close the milestone (P0)
+
+Own: integration fixes in C1/C2 files, validators, metadata receipts,
+`docs/player-ai-control.md`, this roadmap, and the current project-log summary.
+
+- [ ] Run the contract's offline failure suite against the final implementation.
+- [ ] Complete one live battle with the verified selector; defeat is a valid
+  completion outcome. Verify results state and cease input there.
+- [ ] Demonstrate pause → manual action → automated continuation of the same
+  battle, with a documented command/interface; restarting the fixture does
+  not count as continuation. Keep connection ownership explicit.
+- [ ] Publish the criterion-to-evidence receipt and reconcile current status,
+  then commit only owned files. Preserve existing uncommitted work.
+
+Done: every required C1/C2/C3 criterion has passing evidence applicable to the
+final revision. Mark A2.5/A3 accepted and advance to A4 or A8. Any failed or
+unknown criterion keeps the packet open; keep fixing it within scope.
 
 ### A4 — Per-character assignment feasibility (P1, research gate)
 
@@ -371,18 +330,29 @@ Create a local editor in `tools/tactics_editor/` only after the policy schema an
 
 Done: Charlie can configure and launch without editing Python or navigating a debugger. Review desktop screenshots and runtime behavior before calling the workflow usable.
 
-## Delegation and cost controls
+## Autonomous execution and handoff
 
-- Give implementation agents one packet, its prerequisite evidence, and its owned files. They should not read the entire multi-thousand-line project log or undertake open-ended reverse engineering.
-- Routine agents fit A3 after hook approval, A5's pure evaluator, A8 after API discovery, and A10 after schema freeze. The orchestrator owns A2/A4 architecture decisions and reviews A7's causal evidence. Escalate uncertain semantics; do not buy repeated speculative experiments.
-- A2.4a → A2.4b → A2.5 run serially with exclusive ownership of the emulator session. Pure evaluator/editor work can run independently once interfaces are frozen. Never let two agents attach to or mutate the same mGBA process/save.
-- Limit a research slice to one hypothesis and two distinct experiments. Return a useful negative result with exact evidence if unresolved; the orchestrator chooses the next slice.
-- Require the return format: commit/base, files changed, claim, command/evidence, observed result, limitations, and next dependency unlocked. Report historical checks separately from checks run now.
-- Integrate one packet at a time. Review behavior and patch attribution; run relevant domain checks for each change and the complete release gate for an integrated ROM release. Do not replace meaningful execution evidence with tests that restate the implementation.
+Use the acceptance contract's execution loop and evidence template. Workers
+may choose implementation details, add focused probes, fix discovered defects,
+and select the next evidence-producing hypothesis within the assigned packet.
+Each research slice tests one hypothesis with at most two distinct experiments;
+then record the result and select the next hypothesis. This bounds each slice,
+not the whole task, and does not require an orchestrator reply.
 
-Suggested dispatch prompt:
+Escalate only when progress requires unavailable inputs/access, conflicting
+user requirements, destructive changes, or a product-scope decision outside
+the route above. Report the exact missing dependency and continue independent
+in-scope work where possible. Difficult debugging or a failed test is ordinary
+worker work. Preserve exclusive ownership of the emulator and its save copy.
 
-> Implement packet [ID] in docs/auto-battle-roadmap.md only. Read CLAUDE.md, docs/dead-ends.md, and the packet's named source files. Verify the checkout and prerequisite evidence first. Preserve unrelated work and local saves. Do not expand scope or infer unproven ROM semantics. Deliver the packet's tests/evidence and a project-log entry. If a dependency is missing, report the exact blocker and the smallest evidence-producing next step.
+Dispatch prompt:
+
+> Continue the first unaccepted packet in docs/auto-battle-roadmap.md. Read
+> docs/autobattle-worker-contract.md and the packet's named sources. Reproduce
+> the known failure, fix it, run its positive and adversarial checks, inspect
+> live evidence, reconcile status, and commit owned files. Continue through
+> C1–C3 without waiting for review when their criteria pass. Report observed
+> facts and unresolved criteria; never replace a criterion with a weaker proxy.
 
 ## Deferred work
 

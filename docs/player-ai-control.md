@@ -1,5 +1,10 @@
 # Player/AI control boundary (A2)
 
+> Current acceptance authority: [C1–C3 roadmap](auto-battle-roadmap.md) and
+> [worker contract](autobattle-worker-contract.md), updated 2026-09-17.
+> Earlier closure claims below retain their historical limits; non-Wait
+> attribution and cancellation acceptance remain open until those checks pass.
+
 Status: **A2.4a done (2026-09-10); A2.3's roster model is refuted in part.**
 Retail player turns DO ctx-init the AI sequencer and the menu/AI split is a
 merged pipeline — both stand. But the fixture's slot identities were inverted:

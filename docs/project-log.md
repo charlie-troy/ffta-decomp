@@ -96,7 +96,7 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | A2.4a fixture/guard reconciliation → A2.4b causal lever → A2.5 reversible player AI proof; A3 blocked |
+| Current work package | C1 cancellation → C2 valid player-action proof → C3 integration; autonomous acceptance per autobattle-worker-contract.md |
 | Last closed package | A1 normal-battle access; A2.3 pipeline question answered, full A2 acceptance still open |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
@@ -4148,3 +4148,20 @@ flowing = end-of-battle state) — receipt honestly says `stalled`, not
 
 **Remaining for A3 follow-on.** Command id→name decode; effect-diff magnitude
 stride; wall-budget handling when the ending sequence is already visibly up.
+
+
+## 2026-09-17 — Replace review ping-pong with autonomous acceptance
+
+Charlie requested a workflow that minimizes worker/orchestrator back-and-forth.
+The active roadmap now assigns C1–C3 with objective regression, integration,
+and live-evidence requirements. A2.5/A3 acceptance is open until these pass;
+process preservation and the completed failed encounter remain useful results.
+Workers choose and execute scoped fixes and bounded research slices, record
+pass/fail/unknown per criterion, and continue automatically after acceptance.
+External engine-legal selection is the initial route; weaker proxies cannot
+replace the required player action observation. Escalation is reserved for
+unavailable dependencies, conflicting requirements, destructive work, or
+out-of-scope product decisions.
+
+Added docs/autobattle-worker-contract.md and reconciled the roadmap pointers.
+This is a documentation change; runtime bugs were not changed or retested.
