@@ -233,9 +233,15 @@ class BattleRuntime:
                     # is automation-owned; `paused` is the real handoff to
                     # the player — no further input, breakpoints disarmed,
                     # emulator survival decided by the CLI's --on-stop.
-                    self._finish(PAUSED,
-                                 "STOP requested: battle left running for "
-                                 "manual play")
+                    # Round 3: the boundary handler can finalize the pause
+                    # itself when the stop lands mid-drive — in that case
+                    # _terminal_reason is already set and the stop event is
+                    # already written; finalizing twice would emit two
+                    # terminal stops (caught by the strict-press gate).
+                    if self._terminal_reason is None:
+                        self._finish(PAUSED,
+                                     "STOP requested: battle left running for "
+                                     "manual play")
                     break
                 self.p.pump(3.0, "runtime", sample_every=60.0, tick=3.0)
                 nxt = self._classify()
@@ -306,24 +312,98 @@ class BattleRuntime:
         return deltas
 
     def _decode_target(self, after):
-        """Engine-recorded recent-target ids (+0xE7) for the player record.
+        """Engine-recorded recent-target ids (+0xE7), VALIDATED against the roster.
 
-        include/ffta.h / unit-struct.md: action resolution packs the two
-        most recent distinct targets as two 4-bit unit ids. When the player
-        actor's field is nonzero after a commit, that is the engine's own
-        target evidence — decoded into selected_target (null otherwise;
-        unknown fields stay null, never inferred).
+        include/ffta.h / unit-struct.md: action resolution packs the two most
+        recent distinct targets as two 4-bit unit ids in the player actor's
+        +0xE7 byte. Astra 2026-09-17 (round 3): a raw decode alone does not
+        establish whom the action hit — a byte can also be transient roster
+        garbage (the a3 boundary lesson). A decoded id is kept only when
+            - both unit ids fall inside the allocated roster (side-checked),
+            - the named target's hp moved between the before/after
+              snapshots, and
+            - that hp delta stays within the target's max_hp (+0x1A).
+        Anything else decodes to null; unknown fields stay null, never
+        inferred.
         """
         if not after:
             return None
         ps = self.p.player_slot()
         for r in after:
-            if r["slot"] == ps and r.get("tg", 0):
-                # packed pair of 4-bit unit ids; any nonzero byte is the
-                # engine's own record (0 would mean no recent targets)
-                return {"source": "engine-recent-target-ids",
-                        "unit_ids": [r["tg"] >> 4, r["tg"] & 0xF]}
+            if r["slot"] != ps or not r.get("tg", 0):
+                continue
+            ids = [r["tg"] >> 4, r["tg"] & 0xF]
+            # validated: ids inside the roster, hp moved, delta <= max_hp
+            before = getattr(self, "_before_effects", None)
+            if before is None:
+                return None  # validation needs the before snapshot
+            b = {q["slot"]: q for q in before}
+            slots = set(b) | {q["slot"] for q in after}
+            if any(i not in slots for i in ids):
+                return None
+            from probe_control_handoff import ROSTER, STRIDE, u16
+            moved = False
+            for tid in ids:
+                row = next((q for q in after if q["slot"] == tid), None)
+                old = b.get(tid)
+                if row is None or old is None:
+                    return None
+                max_hp = u16(self.p.g, ROSTER + STRIDE * tid + 0x1A)
+                delta = row["hp"] - old["hp"]
+                # damage subtracts, healing adds: the plausible band is
+                # |delta| <= max_hp. The SECOND packed id is only a recent
+                # target — it need not react to this action — so the
+                # hp-movement requirement applies to at least ONE id; zero
+                # movement on BOTH ids means no target reacted at all.
+                if not (-max_hp <= delta <= max_hp):
+                    return None  # implausible effect: garbage, not a hit
+                moved = moved or delta != 0
+            if not moved:
+                return None
+            return {"source": "engine-recent-target-ids",
+                    "unit_ids": ids,
+                    "validated": "roster-bounded hp delta on every decoded id"}
         return None
+
+    def _plausible_marche_row(self, row):
+        """False for the roster-copy artifacts seen mid-execution.
+
+        The roster block is copied around while an action executes, so a
+        snapshot taken mid-copy reads impossible values (chooser5/6 live:
+        ct=6833 > 1000, hp=4368, mp=2569). A row is evidence-grade only
+        when its fields stay inside engine-bounded ranges: ct<=1000,
+        hp<=max_hp, mp<=max_mp. Maxes come from the live record; a 0 max
+        (defeated/teardown read) passes only with zeroed hp/mp.
+        """
+        from probe_control_handoff import ROSTER, STRIDE, u16
+        base = ROSTER + STRIDE * row["slot"]
+        max_hp = u16(self.p.g, base + 0x1A)
+        max_mp = u16(self.p.g, base + 0x1E)
+        if row["ct"] > 1000 or row["hp"] > max_hp or row["mp"] > max_mp:
+            return False
+        if not (0 <= row["x"] <= 63 and 0 <= row["y"] <= 63):
+            return False  # tile garbage (the a3 boundary lesson)
+        return True
+
+    def _marche_action_evidence(self, effect, after=None):
+        """True only when the ACTOR's own record moved, plausibly.
+
+        A non-Wait command spends the actor's MP (+0x1C), and/or is recorded
+        in the actor's +0xE7 target byte, and/or moves the actor. Deltas on
+        OTHER slots — including target hp churn — say nothing about which
+        action the player executed and must not label the turn. Astra round
+        3: the actor row must also be plausible (roster-copy garbage during
+        execution reads impossible values and is NOT evidence).
+        """
+        ps = self.p.player_slot()
+        if effect is None or ps is None:
+            return False
+        row = next((r for r in (after or []) if r["slot"] == ps), None)
+        if row is not None and not self._plausible_marche_row(row):
+            return False
+        return any(d.get("slot") == ps and
+                   any(k in d for k in ("mp", "tg", "x", "y", "hp"))
+                   for d in effect)
 
     def _drive_player_boundary(self):
         prev = self.state
@@ -349,19 +429,28 @@ class BattleRuntime:
             before_effects = self.p.effect_snapshot()
         except Exception:
             before_effects = None
+        self._before_effects = before_effects  # target validation reads this
         choice = None
         try:
             choice = self.p.choose_non_wait()
         except Exception:
             choice = None
         if choice is not None:
-            self.p.drive(f"a3-{self.run_id}", route=choice["route"])
+            drove = self.p.drive(f"a3-{self.run_id}", route=choice["route"],
+                                 stop_check=self._stop_check)
             route_note = "deliberate action-submenu route (chooser)"
         else:
             # The only proven commit shape (A2.5 contract); never leave a
             # menu undriven.
-            self.p.drive(f"a3-{self.run_id}")
+            drove = self.p.drive(f"a3-{self.run_id}",
+                                 stop_check=self._stop_check)
             route_note = "fixed proven route (chooser declined: no ability/tile evidence)"
+        if not drove or self._stop_check():
+            # stop landed mid-route (Astra round 3): no further input, the
+            # battle is handed to the player here
+            self._finish(PAUSED,
+                         "STOP requested: battle left running for manual play")
+            return
         # wall-aware progress wait; 150 s covers the healthiest recorded
         # boundary gap (92.9 s in a3-natural3) with margin — the original
         # 90 s bound sat inside natural late-game pacing and bounded a live
@@ -399,13 +488,27 @@ class BattleRuntime:
                 # and strand the unit on the map (proved offline: the first
                 # submenu run drove B twice and the re-drive landed on a
                 # closed menu with zero progress)
-                self.p.press(self.B_MASK, tag=f"a3-{self.run_id}:B{cycle}")
+                # Astra 2026-09-17 (round 3): the stop check must gate EACH
+                # input BEFORE it fires — the old shape pressed B, drove the
+                # whole re-route, and only then checked, letting a full
+                # input sequence escape after a STOP was observed.
+                if self._stop_check():
+                    self.event("note", note=f"stop observed before B-recovery "
+                                f"cycle {cycle}: no further input")
+                    break
+                if self.p.press(self.B_MASK, stop_check=self._stop_check,
+                                tag=f"a3-{self.run_id}:B{cycle}") < 0:
+                    self.event("note", note=f"stop aborted B press in "
+                                f"recovery cycle {cycle}: no further input")
+                    break
                 # the proven route then re-drives the parent menu. Without
                 # the re-drive the backed-out menu just sits awaiting input.
-                self.p.drive(f"a3-{self.run_id}:rec{cycle}")
+                if not self.p.drive(f"a3-{self.run_id}:rec{cycle}",
+                                    stop_check=self._stop_check):
+                    self.event("note", note=f"stop aborted re-drive in "
+                                f"recovery cycle {cycle}: no further input")
+                    break
                 remaining = max(10.0, self.wall_timeout - (time.time() - self.t0))
-                if self._stop_check():
-                    break  # a pause request ends recovery immediately (Astra)
                 if self.p.wait_progress(
                         seconds=min(self.B_SETTLE_SECONDS, remaining),
                         min_new_seeds=1,
@@ -431,28 +534,41 @@ class BattleRuntime:
         # Astra 2026-09-17: the first seed can precede the committed action's
         # execution — an after-snapshot there records only CT churn and a
         # Wait would be mislabeled non-Wait. The commit's evidence window is
-        # the action's EXECUTION: charge ~2 s, then one ~3 s pump. Only
-        # actor-specific deltas (mp cost / engine-recorded target / hp /
-        # tile) extend it; CT-only change does not.
-        try:
-            after_effects = self.p.effect_snapshot()
-        except Exception:
-            after_effects = None
-        effect = self._effect_diff(before_effects, after_effects)
-        actor_specific = effect is not None and any(
-            k in d for d in effect for k in ("mp", "tg", "hp", "x", "y"))
-        if not actor_specific:
-            try:
-                self.p.wait_progress(seconds=5.0, min_new_seeds=9999999)
-            except Exception:
-                pass
+        # the action's EXECUTION, and a single snapshot inside it races:
+        # chooser6's four misses were all timing (CT churn before execution
+        # or mid-copy garbage). Round 3 fix: retry the snapshot on a short
+        # cadence for a bounded window; the FIRST plausible actor-specific
+        # read wins, and the window closes on plausible CT-only reads so a
+        # genuine Wait is never mislabeled.
+        effect = None
+        actor_specific = False
+        plausible_reads = 0
+        window_end = time.time() + 12.0
+        while time.time() < window_end and not actor_specific:
             try:
                 after_effects = self.p.effect_snapshot()
             except Exception:
                 after_effects = None
-            effect = self._effect_diff(before_effects, after_effects)
-            actor_specific = effect is not None and any(
-                k in d for d in effect for k in ("mp", "tg", "hp", "x", "y"))
+            cand = self._effect_diff(before_effects, after_effects)
+            actor_specific = self._marche_action_evidence(cand, after_effects)
+            if actor_specific:
+                effect = cand
+                break
+            # close the window only on TWO consecutive all-plausible
+            # non-actor reads: a single plausible read can still predate the
+            # action's execution (menu commit precedes resolution), and one
+            # mid-copy garbage read must never close it either
+            plausible = bool(cand and after_effects and all(
+                self._plausible_marche_row(r) for r in after_effects))
+            plausible_reads = plausible_reads + 1 if plausible else 0
+            if plausible_reads >= 2:
+                effect = cand
+                break
+            try:
+                self.p.wait_progress(seconds=2.0, min_new_seeds=9999999,
+                                     stop_check=self._stop_check)
+            except Exception:
+                pass
         if effect:
             note += f"; engine deltas: {json.dumps(effect)}"
             if not actor_specific:
@@ -464,6 +580,15 @@ class BattleRuntime:
         sel_target = None
         if sel_action is not None:
             sel_target = self._decode_target(after_effects)
+            if sel_target is None:
+                # Astra round 3: the claim rides a VALIDATED target (or at
+                # minimum plausible actor-specific deltas); if the engine-side
+                # record never materialized — no target decode — the deliberate
+                # route was driven but the action is NOT proven. Demote.
+                sel_action = None
+                note += ("; deliberate route driven but no validated "
+                         "Marche action/target evidence: NOT claimed as "
+                         "non-Wait execution")
         self.event("turn", turn=self.turn, actor="Marche", actor_slot=6,
                    control_mode="external", selected_action=sel_action,
                    selected_target=sel_target,

@@ -160,6 +160,15 @@ class Probe:
         return round(time.time() - self.t0, 1)
 
     def say(self, msg):
+        # bounded in-memory log so validators can assert on press/abort
+        # behavior without parsing stdout (Astra round 3: the strict-press
+        # gate needs the ABORTED records)
+        log = getattr(self, "_log", None)
+        if log is None:
+            log = self._log = []
+        log.append(msg)
+        if len(log) > 4000:
+            del log[:2000]
         if self.verbose:
             print(msg, flush=True)
 
@@ -429,7 +438,15 @@ class Probe:
         # (press() below re-arms the key-enable byte per press when
         # (run 13 disproved key-enable gating on this channel; kept as a
         # one-flag diagnostic)
-    def press(self, mask, frames=5, pause=1.2, tag=""):
+    def press(self, mask, frames=5, pause=1.2, tag="", stop_check=None):
+        # Astra 2026-09-17 (round 3): a STOP observed before an input must
+        # abort THAT input — a post-recovery check still lets one full input
+        # sequence escape. Returns -1 when aborted (distinct from 0 hits) so
+        # callers neither mistake it for a delivered press nor redeliver it.
+        if stop_check is not None and stop_check():
+            self.say(f"  press {mask:#04x} ABORTED (stop requested) {tag} "
+                     f"t={self.now()}")
+            return -1
         g = self.g
         hits = 0
         if self.rearm_key_enable:
@@ -495,18 +512,28 @@ class Probe:
         self.say(f"  key {mask:#04x} x{hits} {tag} t={self.now()}")
         return hits
 
-    def drive(self, tag, route=None):
+    def drive(self, tag, route=None, stop_check=None):
         route = ROUTE if route is None else route
         delivered = {}
         for mask, name in route:
-            delivered[name] = self.press(mask, tag=f"{tag}:{name}")
+            delivered[name] = self.press(mask, stop_check=stop_check,
+                                         tag=f"{tag}:{name}")
+            if delivered[name] < 0:
+                # stop landed mid-route: no further legs (Astra round 3)
+                self.say(f"  drive {tag}: aborted at leg {name} (stop)")
+                return False
         # An incomplete route leaves the menu modal open and wedges the
         # sequencer (the A2.5 run 4 wedge vector). Redeliver any leg that
-        # landed zero key-poll hits.
+        # landed zero key-poll hits — but never after a stop request.
+        if stop_check is not None and stop_check():
+            self.say(f"  drive {tag}: stop requested, skipping redelivery")
+            return False
         for mask, name in route:
             if delivered[name] == 0:
                 self.say(f"  redeliver {name} ({tag})")
-                self.press(mask, tag=f"{tag}:{name}:retry")
+                self.press(mask, stop_check=stop_check,
+                           tag=f"{tag}:{name}:retry")
+        return True
 
     def sample(self, tag):
         s = {"t": self.now(), "tag": tag, "cts": self.cts(),

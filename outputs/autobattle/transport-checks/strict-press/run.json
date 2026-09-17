@@ -1,0 +1,13 @@
+{
+  "schema": "a3-run/1",
+  "run_id": "transport-strict-press",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "paused",
+  "turns": 0,
+  "seeds": 0,
+  "router_hits": 0,
+  "terminal_reason": "STOP requested: battle left running for manual play",
+  "events": "outputs/autobattle\\strict-press\\events.jsonl",
+  "emulator_handoff": "terminated"
+}

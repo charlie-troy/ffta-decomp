@@ -47,6 +47,7 @@ import os
 import shutil
 import socket
 import sys
+import threading
 import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -246,10 +247,18 @@ def sync_memory(gdb):
         hp, max_hp = (388, 442) if i == 6 else (300, 300)
         if not alive:
             hp = max_hp = 0
+        if i == 2:
+            hp = world.slot2_hp  # scripted target-hp projection (slot 2)
         gdb.mem[base + 0x18] = hp & 0xFF
         gdb.mem[base + 0x19] = hp >> 8
         gdb.mem[base + 0x1A] = max_hp & 0xFF
         gdb.mem[base + 0x1B] = max_hp >> 8
+        # max MP (+0x1E, unit-struct.md) must be projected too: the runtime's
+        # plausibility guard bounds observed mp by max_mp, and an unwired 0
+        # made every nonzero MP read look like roster garbage
+        max_mp = 96 if i == PLAYER_SLOT else 50
+        gdb.mem[base + 0x1E] = max_mp & 0xFF
+        gdb.mem[base + 0x1F] = max_mp >> 8
         # chooser projections: a nonzero tile + the INLINE ability-state
         # array at unit+0x34 (include/ffta.h layout: 12-byte header + one
         # byte per race ability) with nonzero learned entries — zeroed only
@@ -308,6 +317,9 @@ class FakeWorld:
         self.last_commit_t = None   # wall time of the most recent commit
         self.reopen_park_ct = 600   # recorded re-open parked CT (run 19)
         self.expect_action_route = False  # scenario knob: chooser route shape
+        self.slot2_hp = 300        # scripted slot-2 target hp (sync_memory)
+        self.march_mp = 60         # scripted player MP (sync_memory base)
+        self.march_tg = 0          # scripted player +0xE7 recent-target byte
         self.ending_after = None      # begin the battle end N s after commit
                                       # #M: (M, seconds) — the recorded shape:
                                       # the end sequence follows the EXECUTED
@@ -508,9 +520,16 @@ class FakeWorld:
             return
         if self.swallow_route:
             return  # unknown dialog eats the route; nothing changes
-        if self.swallow_first_route and self.commits == 0:
+        if        self.swallow_first_route and self.commits == 0:
             return  # submenu shape: the plain route cannot reach a commit
         self.commits += 1
+        # the action executes after the menu commit: apply its engine-side
+        # consequences (target hp loss, actor MP spend) synchronously - the
+        # ORDER is the recorded shape (commit, then effects), and a delayed
+        # timer raced the runtime's first evidence snapshot inside the
+        # commit-to-execution gap (takeover turn 2 closed its window on a
+        # CT-only read before the timer fired)
+        self.apply_action_evidence()
         self.menu_up = False
         self.charging = True
         self.march_ct = 0.0
@@ -541,6 +560,20 @@ class FakeWorld:
         self.ending = True
         self.end_seeds_remaining = n_seeds
         self.ending_t = self.now()
+
+    def apply_action_evidence(self):
+        """Scripted engine-side consequences of the committed action.
+
+        The engine executes the action AFTER the menu commit: the target
+        (slot 2 per the scripted +0xE7 record) loses hp — bounded by its
+        max_hp so the runtime's roster-bounded validation accepts it — and
+        the actor spends a second MP source. Astra round 3: actor-specific
+        evidence must be VALIDATED (hp delta within max_hp, ids inside the
+        roster), not just present.
+        """
+        if self.expect_action_route:
+            self.slot2_hp = max(0, self.slot2_hp - 47)  # target slot-2 hp
+            self.march_mp = max(0, self.march_mp - 4)   # 2nd-source MP cost
 
     # -- input commit model ------------------------------------------------------
     def on_key_write(self, val):
@@ -645,9 +678,19 @@ def run_scenario(name, out_root):
                 errors.append(f"takeover: turn {t.get('turn')} target ids "
                               f"{t['selected_target'].get('unit_ids')} != [2, 1] "
                               f"(engine-recorded +0xE7 pair)")
+            if t.get("selected_target") and \
+                    not t["selected_target"].get("validated"):
+                errors.append(f"takeover: turn {t.get('turn')} target must be "
+                              f"VALIDATED (Astra round 3: roster-bounded hp "
+                              f"delta), got {t['selected_target']}")
             if "mp" not in (t.get("note") or ""):
                 errors.append(f"takeover: turn {t.get('turn')} note lacks "
                               f"the mp delta (actor-specific evidence)")
+            if f'"slot": {PLAYER_SLOT}' not in (t.get("note") or "") and \
+                    f"'slot': {PLAYER_SLOT}" not in (t.get("note") or ""):
+                errors.append(f"takeover: turn {t.get('turn')} note lacks a "
+                              f"delta for the PLAYER slot — actor-specific "
+                              f"means Marche's own record moved")
     elif name == "unknown":
         # recorded shape: one clean commit, then the NEXT menu (the post-turn
         # re-open) presents an unknown dialog that swallows the following
@@ -787,6 +830,53 @@ def run_scenario(name, out_root):
         stops = [e for e in _events(rt.events_path) if e["kind"] == "stop"]
         if not stops or "manual play" not in (stops[0].get("note") or ""):
             errors.append(f"pause: stop event must record the handoff, got {stops}")
+    elif name == "strict-press":
+        # Astra round 3: after a STOP is OBSERVED, not one further key
+        # write may reach the engine — the pre-round-3 shape pressed B and
+        # re-drove the whole route before the post-recovery check ran. The
+        # stop drops DURING turn 1's post-route drive window, so the
+        # boundary handler's remaining route legs and any recovery presses
+        # must all be gated per input.
+        world.allow_seeds = True
+        world.expect_action_route = True
+        world.menu_reopen_seconds = 5.0
+        import threading as _th
+        armed = {"on": True}
+        def _watch_writes():
+            # drop the STOP as soon as the boundary drive's FIRST leg is
+            # observed in the write stream — deterministic mid-route timing
+            # (a wall-clock guess lands either before the drive or after it)
+            while armed["on"]:
+                if any(c.startswith("P1=") for c in session.g.send_log):
+                    open(rt.stop_file, "w").close()
+                    return
+                time.sleep(0.05)
+        _th.Thread(target=_watch_writes, daemon=True).start()
+        state = rt.run()
+        armed["on"] = False
+        if state != "paused":
+            errors.append(f"strict-press: expected paused, got {state}")
+        stops = [e for e in _events(rt.events_path) if e["kind"] == "stop"]
+        if not stops or stops[0].get("t", 1e9) > 60.0:
+            errors.append(f"strict-press: stop landed at "
+                          f"t={stops[0].get('t') if stops else None}; the "
+                          f"observed STOP must end the input path promptly")
+        # the core assertion: zero key writes after the STOP was observed.
+        # The probe sees the stop file within one press cycle (~1.2 s); a
+        # post-stop write would prove an input escaped the gate.
+        mark = len(session.g.send_log)
+        time.sleep(2.0)
+        world.pump(session.g)
+        late = session.g.press_writes_after(mark)
+        if late:
+            errors.append(f"strict-press: {len(late)} key writes reached the "
+                          f"engine after the STOP was observed: {late[:3]}")
+        # per-input evidence: at least one press leg must have been ABORTED
+        # by the gate (press() returns -1 and logs it) rather than executed
+        probe_log = getattr(rt.p, "_log", None)
+        if probe_log is not None and not any("ABORTED" in line for line in probe_log):
+            errors.append("strict-press: no aborted press recorded — the STOP "
+                          "may have landed in a wait instead of the input path")
     elif name == "submenu":
         # recorded a3-natural5 shape: the post-Move re-opened menu presents
         # a submenu the plain route cannot commit (presses land, nothing
@@ -829,13 +919,13 @@ def main(argv=None):
     ap.add_argument("--scenario", default="all",
                             choices=["all", "takeover", "unknown", "disconnect",
                                      "restart", "defeat", "results", "submenu",
-                                     "pause"])
+                                     "pause", "strict-press"])
     ap.add_argument("--out-root", default=os.path.join("outputs", "autobattle",
                                                        "transport-checks"))
     args = ap.parse_args(argv)
 
     names = ["takeover", "unknown", "disconnect", "restart", "defeat",
-             "results", "submenu", "pause"]
+             "results", "submenu", "pause", "strict-press"]
     if args.scenario != "all":
         names = [args.scenario]
     failures = []

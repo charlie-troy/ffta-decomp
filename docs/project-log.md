@@ -4165,3 +4165,53 @@ out-of-scope product decisions.
 
 Added docs/autobattle-worker-contract.md and reconciled the roadmap pointers.
 This is a documentation change; runtime bugs were not changed or retested.
+
+
+## 2026-09-17 — Round-3 review fixes: per-input stop gate + validated Marche evidence
+
+**Astra's round-3 findings.** (1) A STOP observed during a progress wait still
+let the runtime send B plus a full re-drive before its post-recovery stop
+check ran. (2) The "actor-specific" evidence accepted deltas from ANY unit —
+and the suspect live values (hp 319→2313, mp 120→2569) were magnitude-stride
+artifacts of reading the roster mid-copy, not engine effects.
+
+**Per-input stop gate.** `press()` now checks the stop file BEFORE firing and
+returns -1 when aborted (distinct from 0 hits); `drive()` aborts mid-route on
+the first -1 and skips redelivery. The B-recovery loop checks BEFORE each B
+press and each re-drive, and events every aborted input. New strict-press
+scenario: the STOP drops deterministically as the boundary drive's FIRST key
+write is observed (a watcher thread on the write stream — wall-clock guesses
+landed outside the drive); PASS requires paused, a prompt stop event, ZERO
+key writes after observation, and an ABORTED-press record. First run failed
+at exactly Astra's original complaint shape (presses escaped), then passed
+with the gate (5 presses, not 20+).
+
+**Validated Marche evidence.** `_decode_target` now VALIDATES: both packed
+4-bit ids inside the side-checked roster, hp movement on at least one (the
+second id is only a "recent target"), |delta| <= the target's max_hp
+(+0x1A, unit-struct.md). `_marche_action_evidence` requires the ACTOR's own
+row to move AND be plausible — ct<=1000, hp<=max_hp(+0x1A), mp<=max_mp
+(+0x1E), tile in 0..63 — which rejects the mid-copy garbage (ct 6833, hp
+4368) chooser5/6 recorded. The evidence snapshot became a bounded retry loop
+(12 s, 2 s cadence) that closes on two consecutive all-plausible CT-only
+reads; a single snapshot raced execution timing both ways.
+
+**The biggest honesty bug was mine.** The post-398bdc0 demotion only fired
+when actor-specific evidence WAS present, so deliberate-route claims with no
+evidence at all survived unproven — chooser7 recorded 13 such turns. The
+demotion is now unconditional: a deliberate route without a VALIDATED
+target is not claimed as non-Wait execution. chooser6 remains the first
+chooser run to reach `completed` terminal-to-terminal; under the stricter
+rule its and chooser7's CT-only claims demote to "route driven, action not
+proven".
+
+**Fake-world faithfulness found by the new gates.** The scripted action
+evidence applied via a 4.5 s timer that raced the runtime's evidence window
+(takeover turn 2 closed on a plausible CT-only read first); now applied
+synchronously at commit in the recorded order (commit, then effects). The
+fake also never projected max_mp (+0x1E) — reading 0 made every nonzero MP
+look like garbage — now 96/50 per unit per unit-struct.md.
+
+**Suite**: 9 scenarios all PASS (strict-press included); takeover/defeat
+re-verified after the retry-loop change. chooser8 rerunning live under the
+unconditional demotion.

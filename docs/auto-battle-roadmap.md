@@ -40,8 +40,8 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 
 | Order | Packet | Current status | Completion unlocks |
 |---|---|---|---|
-| 1 | C1 cancellation and handoff | Ready: process preservation fixed; input after observed STOP remains | C2 |
-| 2 | C2 validated player action | Ready for bounded decoding; depends on C1 for live runner use | C3 |
+| 1 | C1 cancellation and handoff | First two criteria done 2026-09-17 (strict-press regression + per-input gate); CLI-cleanup-path criteria already proven by `a3-handoff-probe`; live STOP→manual-choice demo remains | C2 |
+| 2 | C2 validated player action | Active: snapshot plausibility + validated target decode landed; the identified-candidate selector and the identity→selection→execution receipt remain | C3 |
 | 3 | C3 integration and acceptance | Blocked on C1/C2 | Close A2.5/A3; start A4 or A8 |
 | Later | A4–A10 | Existing product scope retained | Follow declared dependencies |
 
@@ -199,10 +199,17 @@ Own: `tools/autobattle_runtime.py`, `tools/run_autobattle.py`,
 `tools/validate_transport_paths.py`, `tools/handoff_cli_probe.py`, and focused
 regressions required by the contract. Reuse the existing transport.
 
-- [ ] Reproduce STOP during the initial progress wait causing a subsequent
+- [x] Reproduce STOP during the initial progress wait causing a subsequent
   recovery B press and full route; add a regression that fails on the old code.
-- [ ] Implement the contract's single cancellation check at every input
+  (Done 2026-09-17: Astra round 3 reproduced it; the strict-press transport
+  scenario reproduces it — its first run failed with exactly the escaped-press
+  shape on the old code, then passed with the gate: 5 presses, none after the
+  STOP was observed, with an ABORTED-press record.)
+- [x] Implement the contract's single cancellation check at every input
   boundary, including each key in a route, recovery, and supplemental waits.
+  (Done 2026-09-17: `press()` checks before firing and returns -1 on abort;
+  `drive()` aborts mid-route and skips redelivery; the B-recovery loop checks
+  before EACH press and re-drive; waits already carried `stop_check`.)
 - [ ] Exercise the actual CLI and session cleanup for leave-running, kill,
   guard failure, and connection loss. Preserve the known process-lifetime fix.
 - [ ] Demonstrate live STOP → manual choice with the emulator still usable;
