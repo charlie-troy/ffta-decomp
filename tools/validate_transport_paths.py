@@ -257,6 +257,14 @@ def sync_memory(gdb):
         tx, ty = (world.player_tile if not world.results else (0, 0))
         gdb.mem[base + 0xF6] = tx
         gdb.mem[base + 0xF7] = ty
+        # committed-action evidence fields (+0x1C MP, +0xE7 recent targets):
+        # projected for the PLAYER slot so post-commit effect diffs can show
+        # the actor-specific deltas a Wait can never produce
+        if i == PLAYER_SLOT:
+            mp = 0 if world.results else world.march_mp
+            gdb.mem[base + 0x1C] = mp & 0xFF
+            gdb.mem[base + 0x1D] = mp >> 8
+            gdb.mem[base + 0xE7] = 0 if world.results else world.march_tg
         for k in range(ABILITY_SCAN_MAX):
             gdb.mem[base + 0x34 + k] = 0 if world.results else (
                 0x03 if k < 12 else (0x01 if k < 16 else 0x00))
@@ -299,6 +307,17 @@ class FakeWorld:
         self.first_commit_t = None  # wall time of commit #1 (defeat anchor)
         self.last_commit_t = None   # wall time of the most recent commit
         self.reopen_park_ct = 600   # recorded re-open parked CT (run 19)
+        self.expect_action_route = False  # scenario knob: chooser route shape
+        self.ending_after = None      # begin the battle end N s after commit
+                                      # #M: (M, seconds) — the recorded shape:
+                                      # the end sequence follows the EXECUTED
+                                      # final action, not the menu commit
+        self.reopen_after_commits = None  # menu re-opens only while commits
+                                          # < N (a battle-ending action is
+                                          # followed by the end sequence,
+                                          # not another command menu)
+        self.march_mp = 60           # current MP (+0x1C); Wait costs none
+        self.march_tg = 0            # engine-recorded recent targets (+0xE7)
         self.seeds = 0
         self.fail_at_commit = None   # transport dies after N commits
         self.after_commit = None     # scenario hook (callable, world)->None
@@ -420,9 +439,23 @@ class FakeWorld:
             # engine animates the defeat, then the results shape holds
             self.mark_ending(0)
             return
+        if (self.ending_after is not None
+                and not self.ending
+                and self.commits >= self.ending_after[0]
+                and self.last_commit_t is not None
+                and t - self.last_commit_t >= self.ending_after[1]):
+            # the end sequence follows the executed final action (a finishing
+            # blow), not the menu commit — the runtime's execution evidence
+            # window gets its real chance to observe the action's effect
+            self.mark_ending(1)
+            return
         if self.ending:
             # battle end: the engine keeps acting (seeds flow) briefly,
-            # then the results shape holds
+            # then the results shape holds. Unit clocks KEEP CHARGING until
+            # the results screen (a frozen mid-charge CT plus seed silence
+            # reads exactly like a parked player menu — the runtime would
+            # drive a phantom boundary into the end sequence).
+            self.march_ct = min(self.march_ct + CT_PER_FRAME, 999.0)
             if self.end_seeds_remaining > 0:
                 if self.last_seed_t is None or t - self.last_seed_t >= SEED_INTERVAL:
                     self.last_seed_t = t
@@ -433,6 +466,8 @@ class FakeWorld:
                 self.end_results()
             return
         if (self.menu_reopen_seconds is not None
+                and (self.reopen_after_commits is None
+                     or self.commits < self.reopen_after_commits)
                 and self.last_commit_t is not None
                 and t - self.last_commit_t >= self.menu_reopen_seconds):
             # recorded re-open shape: the menu re-opens with the owner
@@ -447,11 +482,17 @@ class FakeWorld:
             # engine behavior: a saturated CT means the actor's menu is
             # about to open — a frozen CT at 1000 without a menu is not a
             # stable shape (this is what produced phantom menus before)
-            self.menu_up = True
-            self.charging = False
-            self.march_ct = 999.0  # parked while the menu is open
-            self.a_presses = 0  # fresh menu episode: edges count anew
-            self._a_prev = False
+            if (self.reopen_after_commits is not None
+                    and self.commits >= self.reopen_after_commits):
+                pass  # the final action executed: the end sequence follows,
+                      # no further command menu (a phantom menu here wedges
+                      # the runtime driving into a battle that is ending)
+            else:
+                self.menu_up = True
+                self.charging = False
+                self.march_ct = 999.0  # parked while the menu is open
+                self.a_presses = 0  # fresh menu episode: edges count anew
+                self._a_prev = False
             return
         if (self.allow_seeds
                 and not (self.swallow_route and self.menu_up)
@@ -476,6 +517,17 @@ class FakeWorld:
         self.a_presses = 0  # fresh menu episode next time it opens
         self.last_seed_t = self.now()
         t = self.now()
+        # committed action evidence (Astra 2026-09-17): the resolution path
+        # records the target ids at +0xE7 and the ability-cost path spends
+        # MP at +0x1C — CT-only deltas cannot identify a committed command.
+        # Scenarios script expect_action_route like the other recorded
+        # shapes (swallow_route, fail_at_commit); the input stream alone
+        # cannot distinguish the two routes (identical masks).
+        if self.expect_action_route:
+            self.march_tg = 0x21  # unit ids 2 and 1 packed (two 4-bit ids)
+            self.march_mp = max(0, self.march_mp - 8)  # ability MP cost
+        else:
+            self.march_tg = 0
         if self.first_commit_t is None:
             self.first_commit_t = t  # defeat counts from commit #1
         self.last_commit_t = t
@@ -531,7 +583,11 @@ def finish_run(rt, world, out_dir, final_note_override=None):
         "router_hits": rt.p.router_hits,
         "terminal_reason": rt._terminal_reason,
         "events": rt.events_path,
-        "emulator_handoff": "left-running-for-player",
+        # offline receipts document the CLI's non-pause default: every
+        # scenario runs to a terminal state, so nothing is left running.
+        # (The pause handoff semantics are asserted inside the pause scenario
+        # and live-verified by tools/handoff_cli_probe.py on real hardware.)
+        "emulator_handoff": "terminated",
     }
     with open(os.path.join(out_dir, "run.json"), "w", encoding="utf-8") as fh:
         json.dump(receipt, fh, indent=2)
@@ -555,8 +611,17 @@ def run_scenario(name, out_root):
         # re-opens after a few engine polls at an arbitrary parked CT.
         world.allow_seeds = True
         world.menu_reopen_seconds = 5.0
-        world.after_commit = lambda w: (
-            w.mark_ending(1) if w.commits >= 2 else None)
+        # Astra 2026-09-17: a deliberate non-Wait claim must ride
+        # actor-specific evidence, not CT churn. The chooser drives the
+        # action route, so the engine records target ids (+0xE7) and spends
+        # MP (+0x1C) — the turn event must carry the structured action, the
+        # decoded target, and the mp delta in its note. The battle ends only
+        # after turn 2's action executes (a finishing blow) — the recorded
+        # end shape follows the executed action, never teleporting the
+        # results screen over the evidence window.
+        world.expect_action_route = True
+        world.reopen_after_commits = 2
+        world.ending_after = (2, 12.0)
         state = rt.run()
         if state != "completed":
             errors.append(f"takeover: expected completed, got {state}")
@@ -567,6 +632,22 @@ def run_scenario(name, out_root):
         if world.a_presses >= 4:
             errors.append(f"takeover: A-presses should reset per menu episode "
                           f"(got {world.a_presses} after 2 commits)")
+        turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
+        for t in turns:
+            if not t.get("selected_action") or not t.get("selected_target"):
+                errors.append(f"takeover: turn {t.get('turn')} must record a "
+                              f"deliberate action AND a decoded target "
+                              f"(Astra's CT-churn critique); got "
+                              f"action={t.get('selected_action')} "
+                              f"target={t.get('selected_target')}")
+            if t.get("selected_target") and \
+                    t["selected_target"].get("unit_ids") != [2, 1]:
+                errors.append(f"takeover: turn {t.get('turn')} target ids "
+                              f"{t['selected_target'].get('unit_ids')} != [2, 1] "
+                              f"(engine-recorded +0xE7 pair)")
+            if "mp" not in (t.get("note") or ""):
+                errors.append(f"takeover: turn {t.get('turn')} note lacks "
+                              f"the mp delta (actor-specific evidence)")
     elif name == "unknown":
         # recorded shape: one clean commit, then the NEXT menu (the post-turn
         # re-open) presents an unknown dialog that swallows the following
@@ -675,6 +756,19 @@ def run_scenario(name, out_root):
         if rt.turn < 1:
             errors.append(f"pause: expected at least one committed turn "
                           f"before the pause, got {rt.turn}")
+        # Astra 2026-09-17: the pause must take effect INSIDE long waits, not
+        # only between them. The STOP lands ~25 s in, during turn 2's
+        # post-route wait; under the old code the run only stopped after the
+        # full 150 s wait expired. The stop event's timestamp is the proof.
+        if rt.turn != 1:
+            errors.append(f"pause: turn 2 committed after the STOP landed — "
+                          f"a long wait ignored the pause request")
+        stop_t = next((e["t"] for e in _events(rt.events_path)
+                       if e["kind"] == "stop"), None)
+        if stop_t is None or stop_t > 60.0:
+            errors.append(f"pause: stop event landed at t={stop_t}; a pause "
+                          f"inside the post-route wait must complete well "
+                          f"before the 150 s wait would expire")
         mark = len(session.g.send_log)
         vt_at_pause = world.vt
         time.sleep(1.0)

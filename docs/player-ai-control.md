@@ -372,4 +372,11 @@ roster during teardown could still fool the check (never observed). (4) Run
 boundary state, not a manual handoff: a STOP request now pauses the run
 (`paused`), disarms breakpoints, and — with the CLI's default
 `--on-stop leave-running` — leaves the emulator alive for the player.
+(2026-09-17) The handoff is proven through the real cleanup path, not a mock:
+`tools/handoff_cli_probe.py` boots a live battle, drops a STOP mid-battle,
+and lets `FixtureSession.__exit__` run with `keep_process` already flipped —
+the emulator survived the exact path Astra's review showed was broken
+(receipt `outputs/autobattle/a3-handoff-probe/`). The stop file is also
+polled inside long progress waits and B-recovery loops, so input stops
+mid-wait.
 

@@ -86,6 +86,14 @@ class BattleRuntime:
         self._dead_polls = 0  # debounce: roster copies can read 0 transiently
         self._dead_seed_mark = 0  # seed count when the current dead streak began
         self._dead_grace_t = None  # wall time the defeat debounce first held
+        self._stop_requested = False  # Astra 2026-09-17: checked INSIDE long
+        #                              waits, so a pause ends waits promptly
+
+    def _stop_check(self):
+        """Poll the STOP file cheaply; latches the first sighting."""
+        if not self._stop_requested and os.path.exists(self.stop_file):
+            self._stop_requested = True
+        return self._stop_requested
 
     # -- events ------------------------------------------------------------
     def event(self, kind, **fields):
@@ -182,8 +190,13 @@ class BattleRuntime:
         # Excluded when the whole CT vector is zero: the results screen parks
         # every CT at a stable 0 (run 20 end shape), which is also a stable
         # player CT — driving there would send a route into a non-battle UI.
-        if (not in_grace and not self._all_cts_zero()
-                and self.p.player_menu_frozen(2)):
+        # The zero-vector guard is RE-evaluated after the (slow, 9 s) frozen
+        # check: the battle end can transition charging -> results INSIDE the
+        # check's stability window, and a guard evaluated before the check
+        # would be stale — the 2026-09-17 victory-path wedge (a drive into
+        # the results screen, bounded by B-recovery) was exactly that race.
+        if (not in_grace and self.p.player_menu_frozen(2)
+                and not self._all_cts_zero()):
             return TAKEOVER
         if in_grace:
             # defeat held but the engine's conclusion never arrived: bounds
@@ -211,7 +224,10 @@ class BattleRuntime:
         self.event("start", control_mode=self.mode)
         try:
             while True:
-                if os.path.exists(self.stop_file):
+                # latched stop (seen inside a wait or recovery) exits before
+                # any further classification or input (Astra 2026-09-17:
+                # "input stops immediately" must include mid-wait)
+                if self._stop_requested or os.path.exists(self.stop_file):
                     # manual takeover request: stop OUR input now and leave
                     # the battle live. `takeover` (the driven boundary state)
                     # is automation-owned; `paused` is the real handoff to
@@ -266,7 +282,14 @@ class BattleRuntime:
         return u16(self.g, base + 0x18) == 0 and u16(self.g, base + 0x1A) == 0
 
     def _effect_diff(self, before, after):
-        """Engine-observed deltas between two effect snapshots."""
+        """Engine-observed deltas between two effect snapshots.
+
+        Diffs mp and tg (engine-recorded recent-target ids) alongside hp/ct/
+        tile: Astra 2026-09-17 — CT-only deltas cannot distinguish a
+        committed Wait from a real command, so a non-Wait claim must ride an
+        actor-specific field (the actor's MP cost and/or the engine's own
+        target record).
+        """
         if before is None or after is None:
             return None
         b = {r["slot"]: r for r in before}
@@ -276,11 +299,31 @@ class BattleRuntime:
             if old is None:
                 deltas.append({"slot": r["slot"], "new": r})
                 continue
-            changed = {k: [old[k], r[k]] for k in ("hp", "ct", "x", "y")
+            changed = {k: [old[k], r[k]] for k in ("hp", "ct", "mp", "tg", "x", "y")
                        if old[k] != r[k]}
             if changed:
                 deltas.append({"slot": r["slot"], **changed})
         return deltas
+
+    def _decode_target(self, after):
+        """Engine-recorded recent-target ids (+0xE7) for the player record.
+
+        include/ffta.h / unit-struct.md: action resolution packs the two
+        most recent distinct targets as two 4-bit unit ids. When the player
+        actor's field is nonzero after a commit, that is the engine's own
+        target evidence — decoded into selected_target (null otherwise;
+        unknown fields stay null, never inferred).
+        """
+        if not after:
+            return None
+        ps = self.p.player_slot()
+        for r in after:
+            if r["slot"] == ps and r.get("tg", 0):
+                # packed pair of 4-bit unit ids; any nonzero byte is the
+                # engine's own record (0 would mean no recent targets)
+                return {"source": "engine-recent-target-ids",
+                        "unit_ids": [r["tg"] >> 4, r["tg"] & 0xF]}
+        return None
 
     def _drive_player_boundary(self):
         prev = self.state
@@ -325,7 +368,8 @@ class BattleRuntime:
         # run mid-charge
         remaining = max(10.0, self.wall_timeout - (time.time() - self.t0))
         committed = self.p.wait_progress(seconds=min(150.0, remaining),
-                                         min_new_seeds=1)
+                                         min_new_seeds=1,
+                                         stop_check=self._stop_check)
         # Honest labels only (roadmap rule: unknown fields must be null, not
         # inferred). The route kind records WHAT was deliberately selected;
         # the effect diff records what the engine actually did. The decoded
@@ -360,9 +404,12 @@ class BattleRuntime:
                 # the re-drive the backed-out menu just sits awaiting input.
                 self.p.drive(f"a3-{self.run_id}:rec{cycle}")
                 remaining = max(10.0, self.wall_timeout - (time.time() - self.t0))
+                if self._stop_check():
+                    break  # a pause request ends recovery immediately (Astra)
                 if self.p.wait_progress(
                         seconds=min(self.B_SETTLE_SECONDS, remaining),
-                        min_new_seeds=1):
+                        min_new_seeds=1,
+                        stop_check=self._stop_check):
                     recovered = True
                     break
             if not recovered:
@@ -381,20 +428,45 @@ class BattleRuntime:
             note = "committed after B-recovery (plain route); action not decoded"
             sel_action = None  # recovery re-drives the plain route, not the chooser route
         after = self._marche_pos() or {"x": None, "y": None}
-        # engine-side effect evidence for what the committed route did
+        # Astra 2026-09-17: the first seed can precede the committed action's
+        # execution — an after-snapshot there records only CT churn and a
+        # Wait would be mislabeled non-Wait. The commit's evidence window is
+        # the action's EXECUTION: charge ~2 s, then one ~3 s pump. Only
+        # actor-specific deltas (mp cost / engine-recorded target / hp /
+        # tile) extend it; CT-only change does not.
         try:
             after_effects = self.p.effect_snapshot()
         except Exception:
             after_effects = None
         effect = self._effect_diff(before_effects, after_effects)
+        actor_specific = effect is not None and any(
+            k in d for d in effect for k in ("mp", "tg", "hp", "x", "y"))
+        if not actor_specific:
+            try:
+                self.p.wait_progress(seconds=5.0, min_new_seeds=9999999)
+            except Exception:
+                pass
+            try:
+                after_effects = self.p.effect_snapshot()
+            except Exception:
+                after_effects = None
+            effect = self._effect_diff(before_effects, after_effects)
+            actor_specific = effect is not None and any(
+                k in d for d in effect for k in ("mp", "tg", "hp", "x", "y"))
         if effect:
             note += f"; engine deltas: {json.dumps(effect)}"
+            if not actor_specific:
+                note += ("; ct-only (execution window may not have closed: "
+                         "action not identified)")
         else:
             note += "; no engine deltas decoded (action not decoded yet)"
         self.turn += 1
+        sel_target = None
+        if sel_action is not None:
+            sel_target = self._decode_target(after_effects)
         self.event("turn", turn=self.turn, actor="Marche", actor_slot=6,
                    control_mode="external", selected_action=sel_action,
-                   selected_target=None,
+                   selected_target=sel_target,
                    position_before=before, position_after=after,
                    note=note)
         self.state = prev if prev in (RUNNING,) else RUNNING

@@ -1,0 +1,8 @@
+{
+  "schema": "handoff-probe/1",
+  "run_id": "a3-handoff-probe",
+  "final_state": "paused",
+  "emulator_pid": 71696,
+  "emulator_survived": true,
+  "port_released": false
+}

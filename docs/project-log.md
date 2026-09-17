@@ -4105,3 +4105,46 @@ state, not a manual handoff — real pause via STOP + `--on-stop leave-running`
 validated in the transport suite's 8th scenario); receipt validator rejects
 post-terminal input; work committed with evidence receipts (metadata-only;
 screenshots/console logs stay local per the evidence rule).
+
+## 2026-09-17 — Closure packet round 2: real-cleanup-path handoff proof + chooser evidence chain
+
+**Manual handoff proven through the real CLI cleanup path.** Astra's mocked-CLI
+repro showed `FixtureSession.__exit__` (fixture_guard.py) still called `stop()`
+with its kill default even when the CLI computed `keep_process=True`. The fix
+flips `session.keep_process` in the CLI's `finally` **before** `__exit__` runs.
+`tools/handoff_cli_probe.py` (new) reproduces the exact flow against the REAL
+session: boot guarded fixture → runtime → STOP dropped at t=+20 s → CLI's
+`finally` semantics → assert the emulator pid survives `__exit__`.
+`a3-handoff-probe`: STOP observed at t=55.5, event `state: paused` with
+"battle left running for manual play", and the emulator survived the real
+cleanup path (PASS; killed by hand after evidence capture).
+
+**Stop responsiveness inside long waits.** The stop file is now checked inside
+progress waits and B-recovery loops (`_stop_check` threaded through), not only
+between phases — "input stops immediately" is now accurate mid-wait.
+
+**Actor-specific chooser evidence chain.** The fake world now projects MP and
+recent-target ids into memory (`expected_march_mp`, `expected_tg`), the probe's
+`effect_snapshot` reads them back, and commits record engine-side diffs.
+`tools/validate_transport_paths.py` takeover scenario now REQUIRES the
+deliberate route plus actor-specific evidence (mp/tg deltas or decoded
+`selected_target`); pause scenario requires the stop event to land mid-wait.
+
+**Fake-engine faithfulness fixes found by the new gates.** (1) Takeover's
+battle-end fired at commit time, racing the runtime's evidence window — moved
+to a post-action timer (defeat scenario's existing shape). (2) The runtime's
+frozen-CT boundary check raced the ending transition (stability samples spanned
+ending→results and returned True on stable zeros); guard now re-evaluated
+after the slow check returns — a real latent runtime bug no natural completion
+had exposed because they all ended via the defeat grace.
+
+**`a3-chooser4` (live)**: all 5 boundaries took the deliberate route; turn 1's
+diff carried non-CT deltas (hp 319→2313-scale, mp, tg, position — magnitude
+stride still suspect); turns 3/4 recorded decoded `selected_target`
+(engine-recent-target-ids). The 420 s wall budget expired inside the ending
+sequence with the results dialog already up (all-7-units ct=1000 + seeds
+flowing = end-of-battle state) — receipt honestly says `stalled`, not
+`completed`. `a3-chooser5` rerunning with 900 s headroom.
+
+**Remaining for A3 follow-on.** Command id→name decode; effect-diff magnitude
+stride; wall-budget handling when the ending sequence is already visibly up.

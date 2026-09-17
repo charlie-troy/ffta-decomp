@@ -8,6 +8,6 @@
   "seeds": 26,
   "router_hits": 0,
   "terminal_reason": "battle end signature held",
-  "events": "outputs\\autobattle\\transport-checks\\submenu\\events.jsonl",
-  "emulator_handoff": "left-running-for-player"
+  "events": "outputs/autobattle\\submenu\\events.jsonl",
+  "emulator_handoff": "terminated"
 }

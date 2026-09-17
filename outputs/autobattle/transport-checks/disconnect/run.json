@@ -8,6 +8,6 @@
   "seeds": 0,
   "router_hits": 0,
   "terminal_reason": "transport lost: transport reset: peer closed connection",
-  "events": "outputs\\autobattle\\transport-checks\\disconnect\\events.jsonl",
-  "emulator_handoff": "left-running-for-player"
+  "events": "outputs/autobattle\\disconnect\\events.jsonl",
+  "emulator_handoff": "terminated"
 }

@@ -1,6 +1,6 @@
 # Customizable auto-battle roadmap
 
-Updated 2026-09-10. Reviewed baseline: `cda503c`; worktree carries the A2.4a/A2.4b changes on `master`. A2.4a's receipt is `outputs/autobattle/A2.4a/`; A2.4b's is `outputs/autobattle/A2.4b/`. Earlier review text (2026-09-09) inspected commits, source, and recorded findings; it did not rerun the emulator or ROM gates.
+Updated 2026-09-17. Baseline reviewed at `cda503c`; the closure work since (validator gate, runtime stop checks, chooser, handoff proof) landed in `a55e29f` and the closure packet that follows. A2.4a's receipt is `outputs/autobattle/A2.4a/`; A2.4b's is `outputs/autobattle/A2.4b/`. Earlier review text (2026-09-09) inspected commits, source, and recorded findings; it did not rerun the emulator or ROM gates.
 
 ## Product outcome
 
@@ -248,13 +248,22 @@ Depends on reviewed A2.5 and its frozen runtime contract. Create `tools/autobatt
   before an inert route is treated as an unknown modal and bounds the
   run, per DE-020. Post-review correction: a STOP request is a real pause
   handoff (`paused` state) — input stops, breakpoints disarm, and with the
-  CLI's `--on-stop leave-running` the emulator survives for the player;
-  the automation-driven boundary state `takeover` is NOT a manual handoff.)
+  CLI's `--on-stop leave-running`  the emulator survives for the player — proven 2026-09-17 through the
+  REAL `FixtureSession.__exit__` cleanup path, not a mock
+  (`tools/handoff_cli_probe.py`, receipt `outputs/autobattle/a3-handoff-probe/`:
+  STOP at t=55.5, event `state: paused`, and the emulator pid survived
+  `__exit__` with `--on-stop leave-running`). The stop file is additionally
+  checked inside long progress waits and B-recovery loops, so input stops
+  mid-wait, not only between waits. The automation-driven boundary state
+  `takeover` is NOT a manual handoff.)
 - [x] Append turn events to `outputs/autobattle/<run-id>/events.jsonl`: scenario, turn, actor, control mode, selected action/target, position before/after, and reason for stopping. Unknown fields must be null, not inferred labels.
   (`selected_action` stays null for the fixed route — a3-full2 proved the
   route commits whatever the open menu resolves to, so the action is NOT
   claimed as Wait. When the chooser drives the action-submenu route —
-  demonstrated live at three boundaries in `a3-chooser3` — the
+  demonstrated live at three boundaries in `a3-chooser3` and at all five
+  boundaries in `a3-chooser4` (turn 1's diff carries non-CT deltas for the
+  affected unit: hp/mp/tg/position; magnitude decoding is still stride-
+  suspect) — the
   event records a structured `selected_action` of kind
   `deliberate-non-wait-route` with `command_id: null` (the id→name mapping
   is not decoded) plus an engine-side effect diff in the note.
@@ -280,7 +289,7 @@ Depends on reviewed A2.5 and its frozen runtime contract. Create `tools/autobatt
   normal battle with zero tactical clicks — 12 committed routes with retail
   enemy AI between them, defeat grace at t≈880, `completed` at t≈887.8.)
 
-Done 2026-09-16: one uninterrupted normal battle (`a3-natural6`, 12 turns, completed) plus the transport-path suite covering the recorded failure shapes. Preserve the user's save. This milestone uses retail AI and makes no claim of sophisticated custom strategy yet.
+Done 2026-09-16: one uninterrupted normal battle (`a3-natural6`, 12 turns, completed) plus the transport-path suite covering the recorded failure shapes. Closure 2026-09-17: the deliberate chooser route was accepted at every boundary of a live run (`a3-chooser4`, 5/5 with engine-side diffs; its 420 s wall budget expired inside the ending sequence with the results dialog already up — the all-1000 CT tail is end-of-battle state, and `a3-chooser5` reran it with headroom), and the manual handoff survived the real CLI cleanup path (`a3-handoff-probe`). Preserve the user's save. This milestone uses retail AI and makes no claim of sophisticated custom strategy yet.
 
 ### A4 — Per-character assignment feasibility (P1, research gate)
 

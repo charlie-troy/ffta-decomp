@@ -51,7 +51,13 @@ def main(argv=None):
 
     print(f"scenario {scenario.get('scenario_id')} -> run {run_id}")
     print("paused: booting guarded fixture before any input is issued")
-    with FixtureSession(args.state, rom=args.rom) as session:
+    # Astra 2026-09-17: the leave-running decision must reach the actual
+    # process cleanup, not only the receipt text — with the session created
+    # explicitly, __exit__ is guaranteed to run on every path (finally) and
+    # the paused handoff flips session.keep_process BEFORE it does.
+    session = FixtureSession(args.state, rom=args.rom)
+    try:
+        session.__enter__()
         runtime = BattleRuntime(session, scenario, run_id, out_dir,
                                 mode=args.mode,
                                 stall_seed_seconds=args.stall_seed_seconds,
@@ -73,9 +79,14 @@ def main(argv=None):
             pass
         final = runtime.run()
         # manual takeover handoff: a paused run leaves the emulator alive
-        # so the player can continue the battle from the live screen
+        # so the player can continue the battle from the live screen.
+        # This flip is the REAL decision: __exit__ (finally below) passes
+        # session.keep_process to stop(), which skips the taskkill. Every
+        # non-paused terminal state terminates the emulator even with
+        # --on-stop leave-running (the flag only governs the pause handoff).
         paused = final == "paused"
         keep_process = paused and args.on_stop == "leave-running"
+        session.keep_process = keep_process
         receipt = {
             "schema": "a3-run/1",
             "run_id": run_id,
@@ -100,6 +111,8 @@ def main(argv=None):
                   f"(emulator pid {session.pid}; --on-stop=kill to end it)")
             return 0
         return 0 if final == "completed" else 1
+    finally:
+        session.__exit__(None, None, None)
 
 
 if __name__ == "__main__":

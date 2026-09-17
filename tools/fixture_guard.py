@@ -347,6 +347,7 @@ class FixtureSession:
     """
 
     def __init__(self, state, rom=DEFAULT_ROM, emulator=DEFAULT_EMULATOR,
+                 keep_process=False,
                  save=DEFAULT_SAVE, work_dir=None, port=GDB_PORT,
                  expected_rom_sha1=EXPECTED_ROM_SHA1, verify_rom=True,
                  missing_state_ok=False, expect=None, exact_ct=False,
@@ -364,6 +365,11 @@ class FixtureSession:
         self.verify_rom = verify_rom
         self.missing_state_ok = missing_state_ok
         self.expect = expect
+        # manual pause handoff: when True, __exit__ leaves the owned
+        # emulator alive for the player (Astra 2026-09-17: the CLI computed
+        # keep_process but __exit__ always called stop() with its kill
+        # default — the receipt claimed "left running" while killing it)
+        self.keep_process = keep_process
         self.exact_ct = exact_ct
         self.boot_wait = boot_wait
         self.attach_timeout = attach_timeout
@@ -637,7 +643,7 @@ class FixtureSession:
         return self
 
     def __exit__(self, *exc):
-        self.stop()
+        self.stop(keep_process=self.keep_process)
         return False
 
     def summary(self):

@@ -731,7 +731,14 @@ class Probe:
 
         Reads the player record and every other live roster record before
         and after a commit; the runtime diffs them. Only engine-observed
-        deltas are recorded (hp/ct/tile); no effect is inferred.
+        deltas are recorded (hp/ct/mp/target-id/tile); no effect is inferred.
+
+        mp (+0x1C, unit-struct doc: the ability-cost check reads it) and
+        tg (+0xE7, "action resolution records the two most recent distinct
+        targets") make the actor-specific evidence: a non-Wait ability
+        costs the ACTOR MP and the engine records whom it targeted — CT
+        churn alone cannot distinguish a committed Wait from a real command
+        (Astra 2026-09-17).
         """
         from fixture_guard import u8, u16
         rows = []
@@ -743,6 +750,8 @@ class Probe:
             rows.append({"slot": i,
                          "hp": hp,
                          "ct": u16(self.g, base + OFF_CT),
+                         "mp": u16(self.g, base + 0x1C),
+                         "tg": u8(self.g, base + 0xE7),
                          "x": u8(self.g, base + 0xF6),
                          "y": u8(self.g, base + 0xF7)})
         return rows
@@ -788,13 +797,21 @@ class Probe:
                 return True
         return False
 
-    def wait_progress(self, seconds=45.0, want_seeds=None, min_new_seeds=1):
-        """Pump until the sequencer has produced more actions or time expires."""
+    def wait_progress(self, seconds=45.0, want_seeds=None, min_new_seeds=1,
+                      stop_check=None):
+        """Pump until the sequencer has produced more actions or time expires.
+
+        stop_check (Astra 2026-09-17): called every cycle; True ends the wait
+        immediately so a pause request takes effect INSIDE long waits instead
+        of only after them.
+        """
         start = len(self.seeds)
         target = want_seeds if want_seeds is not None else start + min_new_seeds
         end = self.now() + seconds
         while self.now() < end:
             self.pump(3.0, "progress", sample_every=60.0, tick=3.0)
+            if stop_check is not None and stop_check():
+                return False
             if len(self.seeds) >= target:
                 return True
         return len(self.seeds) >= target
