@@ -1,0 +1,13 @@
+{
+  "schema": "a3-run/1",
+  "run_id": "transport-defeat",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "completed",
+  "turns": 1,
+  "seeds": 5,
+  "router_hits": 0,
+  "terminal_reason": "battle end signature held",
+  "events": "outputs\\autobattle\\transport-checks\\defeat\\events.jsonl",
+  "emulator_handoff": "left-running-for-player"
+}

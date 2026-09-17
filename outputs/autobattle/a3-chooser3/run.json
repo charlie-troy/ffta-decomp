@@ -1,0 +1,13 @@
+{
+  "schema": "a3-run/1",
+  "run_id": "a3-chooser3",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 7,
+  "seeds": 26,
+  "router_hits": 853,
+  "terminal_reason": "player unit defeated (hp block zeroed); battle end did not arrive within budget",
+  "events": "outputs/autobattle\\a3-chooser3\\events.jsonl",
+  "emulator_handoff": "terminated"
+}

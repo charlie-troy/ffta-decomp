@@ -1,75 +1,112 @@
 {
   "scenario_id": "normal-battle",
-  "title": "Bervenia Palace skull encounter (endgame clan vs. random encounter)",
+  "title": "Bervenia Palace skull encounter: solo protagonist vs a five-member enemy clan, Judge present",
   "created": "2026-09-07",
+  "updated": "2026-09-10",
+  "revision_note": "A2.4a (2026-09-10) corrected the roster model after live reads: the fixture holds seven units (five enemy clan members, the neutral Judge, and the player), slot0 is an enemy (Jon), and the player is slot6 with an EWRAM name pointer. Earlier claims that the battle fielded six clan members, that slot6 was a turn-scratch record, or that Marche is slot0, are refuted. See docs/battle-fixtures.md and outputs/autobattle/A2.4a/summary.md.",
+  "verified_by": {
+    "packet": "A2.4a",
+    "date": "2026-09-10",
+    "guard": "tools/fixture_guard.py",
+    "entry_point": "python tools/boot_fixture_gdb.py battle-start.ss0",
+    "evidence": "outputs/autobattle/A2.4a/ (inventory-variants.json, baseline.json, control.json, reject.json, summary.md)"
+  },
   "source": {
     "rom": "baserom.gba",
-    "save": "Zophar endgame battery save (final-battle chapter, FILE NO. 2)",
-    "savestates": {
-      "worldmap": "outputs/lua-nav/worldmap.ss0",
-      "engage_prompt": "outputs/lua-nav/engage.ss0",
-      "battle_start": "outputs/lua-nav/battle-start.ss0",
-      "battle_start_run1": "outputs/lua-nav/battle-start-r1.ss0"
-    },
     "rom_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
-    "emulator": "mGBA 0.10.5 win64 (Qt, -g GDB stub + Scripting console)",
-    "battery_backup": "outputs/saves/zophar-backup-20260907.sav (sha1 9ceba501...)"
+    "save": "Zophar endgame battery save (final-battle chapter, FILE NO. 2)",
+    "save_sha1": "9ceba5014809ca068d9d3cc952c571562a8e11a5",
+    "save_backup": "outputs/save-backups/baserom-20260906-preA1.sav (same sha1)",
+    "emulator": "mGBA 0.10.5 win64 (build 26b7884bc25a5933960f3cdcd98bac1ae14d42e2, Qt, -g GDB stub + Scripting console)",
+    "gdb_stub_port": 2345,
+    "port_note": "mGBA 0.10.5 has no CLI or config override for the stub port (GDBController::setPort is only reachable from the GDB window UI), so only one guarded instance can run at a time. tools/fixture_guard.py refuses to start when the port already has a listener."
   },
-  "map": {
-    "location": "Bervenia Palace area (walked to a skull encounter token)",
-    "terrain": "crystalline cave ledges with grass patches; multi-height",
-    "clock_ingame": "2h at battle start (world day 18)"
-  },
-  "parties": {
-    "clan": {
-      "size_dispatched": 6,
-      "notable": [
-        {
-          "name": "Marche",
-          "job": "Soldier",
-          "level": 50,
-          "hp": "442/442",
-          "mp": "85/85",
-          "jp": 99
-        }
-      ],
-      "note": "Only Marche is hand-placed on the dispatch screen; remaining 5 units enter via the natural flow (game auto-dispatches)."
+  "savestates": {
+    "verified_battle_start": {
+      "path": "outputs/lua-nav/battle-start.ss0",
+      "sha256": "4da58bfe0e162210383c28aa8f66659fca33c91c69da0e965b87b3b7a730abe5",
+      "guard": "pass",
+      "note": "Primary fixture (A1 capture); live state identical to fix3."
     },
-    "enemy": {
-      "observed_members": [
-        {
-          "name": "Schneider",
-          "level": 41,
-          "hp": "323/323",
-          "mp": "107/114"
-        }
-      ],
-      "note": "At least 1 of 7 total battle units is enemy-side; full enemy roster not yet inventoried."
-    }
+    "verified_battle_start_run1": {
+      "path": "outputs/lua-nav/battle-start-r1.ss0",
+      "sha256": "4d87b5db2ef5f358b48a12706a1831d9d8a791b4bba0e04f3fadc8a1ff2e389e",
+      "guard": "pass",
+      "note": "A1 reproducibility run; same roster, PC in IWRAM rather than the key poll."
+    },
+    "verified_battle_start_fix3": {
+      "path": "outputs/lua-nav/fix3-battle-start.ss0",
+      "sha256": "591f64c6760f9898f5a21ad6aafc09eb77cab7bb64aa95db651a76ab06ad4dab",
+      "guard": "pass",
+      "note": "Live state byte-identical to battle-start.ss0; was the old boot helper's default."
+    },
+    "rejected": {
+      "a2-battle-start.ss0": "sha256 ac80bafab261a245092b45f2d51cf4ec07e7fa3738d632e8cae9e1ea89bcc1f0 -- guard reject: roster array empty, slot0 name undecodable. A2.3-era experiments must be re-attributed.",
+      "a2b-battle-start.ss0": "guard reject; no roster",
+      "a2run-battle-start.ss0": "guard reject; no roster",
+      "fix2-battle-start.ss0": "guard reject; no battle struct",
+      "dp-battle-start.ss0": "guard reject; no roster",
+      "engage.ss0": "sha256 0e821b87ab09a9d70855955e97407cd1317ea752fe9c125546d19544a3b2ba76 -- prompt state, no battle"
+    },
+    "untracked": "Savestates are never committed; the ignored outputs/lua-nav directory is the only local store."
+  },
+  "battle_roster": {
+    "struct_addr": "0x020159e4",
+    "roster_addr": "0x020159e8",
+    "stride": "0x108",
+    "count": 7,
+    "count_note": "The count covers all seven units including the player; there is no turn-scratch slot inside the array. Only the record past the count is sentinel/empty.",
+    "units": [
+      {"slot": 0, "name": "Jon", "id": 0, "job": 41, "level": 40, "hp": "319/319", "side_bit_0x8000": true, "role": "enemy clan"},
+      {"slot": 1, "name": "Velasquez", "id": 1, "job": 5, "level": 42, "hp": "300/300", "side_bit_0x8000": true, "role": "enemy clan"},
+      {"slot": 2, "name": "Godfrey", "id": 2, "job": 40, "level": 40, "hp": "303/303", "side_bit_0x8000": true, "role": "enemy clan"},
+      {"slot": 3, "name": "Schneider", "id": 3, "job": 36, "level": 41, "hp": "323/323", "mp": "107/114", "side_bit_0x8000": true, "role": "enemy clan"},
+      {"slot": 4, "name": "Carson", "id": 4, "job": 22, "level": 40, "hp": "231/231", "side_bit_0x8000": true, "role": "enemy clan"},
+      {"slot": 5, "name": "Judge", "id": 5, "job": 104, "level": 10, "hp": "10/10", "side_bit_0x8000": false, "unaffiliated_bit_0x1000": true, "role": "neutral Judge"},
+      {"slot": 6, "name": "Marche", "id": 6, "name_ptr": "0x02001f1c (EWRAM)", "type": 2, "job": 2, "level": 50, "hp": "388/442", "mp": "85/85", "side_bit_0x8000": false, "role": "player"}
+    ],
+    "ai_mirror_array": {
+      "addr": "0x02002fc4",
+      "contents": "The six AI units (ids 0-5, Marche absent) in a different order with different CT values.",
+      "relevance": "Sequencer context pointers captured at 0x080C03C2 reference this copy, not the roster array; attribute actors by decoded name."
+    },
+    "judge_note": "The Judge is present for all seven units; its actions have not been observed.",
+    "player_count": 1,
+    "enemy_count": 5,
+    "neutral_count": 1
   },
   "turn_order": {
-    "first_actor": "Marche (WT 1/7)",
-    "observed_second_actor": "Schneider (enemy, red plate, WT 1/7 next cycle)"
+    "first_observer": "Battle start opens with the player's menu (Marche, solo) and WT display 1/7.",
+    "ct_at_baseline": [45, 464, 850, 821, 515, 315, 0],
+    "note": "No unit holds CT >= 1000 in the fixture; the fixture is the pre-turn input state, not a mid-charge slice."
   },
   "reproducibility": {
-    "method": "load engage.ss0 -> A (enter) -> A (dismiss law NOTICE) -> A,A (place Marche) -> START -> A (confirm) -> wait for Marche turn",
+    "method": "boot the savestate on a fresh -g instance, halt, guard, then drive DOWN DOWN A A and watch the sequencer seeds",
     "runs": 2,
-    "settle_pixel_diff": "1.7% (2400-point grid, >60 channel-delta threshold) -- animation noise only",
-    "rng_note": "Battle RNG differs per entry; fixture guarantees map, units, and start-of-battle state, not RNG stream."
+    "result": "identical baseline (PC, CT vector, slot0 id/ea) and identical outcome on both reloads",
+    "rng_note": "Fixture guarantees state, not RNG stream."
+  },
+  "guard_expectations": {
+    "slot0_name": "0x085671ee",
+    "slot0_id": 0,
+    "struct_count": 7,
+    "live_units": 7,
+    "player_name_text": "Marche",
+    "side_bit_0x8000_set": 5,
+    "unaffiliated": 1
   },
   "observed_enemy_turn_sequence": [
-    "turn banner with unit stats (Schneider Lv41, red enemy plate)",
-    "red move-range/target tile rendering",
-    "tile transition (unit walks to chosen tile)",
-    "ability cutscene (golden phoenix animation)",
-    "damage popup (55)",
-    "subsequent units reposition (turns roll hands-off)"
+    "player menu open at battle start for the solo protagonist (slot6)",
+    "menu route DOWN DOWN A A commits the turn",
+    "sequencer seed at 0x080C03C2 with contexts naming Carson / Jon / Schneider",
+    "Godfrey and Schneider CT reset to 0 as their turns are consumed",
+    "Marche CT charges 0 -> 257 between turns"
   ],
-  "evidence_screenshots": "outputs/lua-nav/ewatch-01..40.png (enemy turn cycle), repro1-y.png / r2-final.png (settle comparison), wait1-01..05.png (Wait-command drive)",
   "open_questions": [
-    "Full enemy roster and levels (needs R:Info sweep per unit)",
-    "Whether the clan can win this encounter hands-off (A2/A3 scope)",
-    "Frame-exact input schedule for a single-script capture (currently stage-wise console drives)"
+    "Why does a2-battle-start.ss0 not hold the battle roster it was cited for?",
+    "Do the five enemy clan units and the Judge all act within one round?",
+    "Is the 0x8000 side bit demonstrably the AI-controlled side, by an executed branch rather than by exclusion?",
+    "Whether the clan can win this encounter hands-off is A3 scope"
   ],
   "capture_script": "tools/capture_normal_battle.py"
 }

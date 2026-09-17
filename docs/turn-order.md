@@ -99,6 +99,36 @@ The last step is the one piece whose game meaning is not pinned: it writes a
 negative offset to a secondary structure once per ineligible unit. The exact
 role of `+0xd6c` and the `-100` is left open rather than guessed.
 
+## The per-actor status gate (`sub_0809E1E0`)
+
+The turn manager only chooses an actor. The driver around it, `sub_0809E1E0`
+(1,614 bytes, called from the battle-side advance helpers at `0x0809E830`,
+`0x0809F78C` and `0x0809F850`), then runs a fixed per-actor sequence on the
+chosen record `r4 = &units[r7]` before the turn is handed to the caller:
+
+1. `0x0809E272` clears **Controlled** (`+0xED` bit 3) on the new actor
+   (`sub_080CE2F0(actor, 0)`). The controller id it was paired with lives in
+   `+0xE6`, which this clear does not touch.
+2. `0x0809E276` runs the **Stop** countdown: if `sub_080CDADC` (`+0xEA` bit 7)
+   is set, the duration at `+0xDC` is read, decremented, and stored back; at
+   zero, bit 7 is cleared and a flag bit is raised in the per-slot dword table
+   at `battle+0xDD4`.
+3. From `0x0809E3BA` it ticks the remaining status durations (Shell, Protect,
+   Silence, Immobilize, Disable, Addle, ...) and clears transient status bits,
+   raising the corresponding `battle+0xDD4` flag when a status expires.
+4. `0x0809E3AE` re-reads `+0xEA` bit 7. Clear -> the block in (3) runs; set ->
+   `0x0809E3B8` jumps straight to the tail at `0x0809E796`, skipping it.
+
+Step 4 is the branch A2.3 called the "menu-body router"; A2.4b showed it is
+side-agnostic (enemies, the Judge and the player all take the same path when
+bit 7 is clear) and that it is the Stop skip. `0x0809E796` is a common tail:
+every turn reaches it whichever way the branch went.
+
+This matters for modding because the *bit itself* is a clean, reversible
+one-turn lever over turn flow — `+0xEA |= 0x80` with `+0xDC = 1` skips one
+actor's acting turn and the game's own countdown restores the byte — while it
+is **not** a player/AI control seam.
+
 ## What this contributes
 
 - **Turn-order code identified**, the last static piece of Phase 1.

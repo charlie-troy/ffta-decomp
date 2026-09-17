@@ -96,8 +96,8 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | A1 — normal-battle fixture, then A2 player-to-AI handoff; see auto-battle-roadmap.md |
-| Last closed package | STRAT9.2 — decode target scoring and intent weights |
+| Current work package | A2.4a fixture/guard reconciliation → A2.4b causal lever → A2.5 reversible player AI proof; A3 blocked |
+| Last closed package | A1 normal-battle access; A2.3 pipeline question answered, full A2 acceptance still open |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
@@ -130,7 +130,7 @@ status and backlog tables are living sections and should be kept current.
 | DEC8.1 | P3 | Pending | Match more C functions | Only pull forward when a modding goal requires code changes |
 | STRAT9.1 | P0 | Complete | Compose existing AI controls into player-authored strategy profiles | Ordered guarded rules, preview/apply, two presets, strict attribution, execution validation, and user documentation |
 | STRAT9.2 | P0 | Complete | Decode target scoring and intent weights | Behavior-backed target choices exposed as profile controls; closed 2026-09-05 with the negative result that the impact score's magnitude has no downstream consumer (sign-only), so the shipped levers are the full control surface |
-| STRAT9.3 | P1 | Active | Decode movement and resource policies | Verified movement intent and MP/HP/CT conservation controls join the profile contract. Scoped 2026-09-05: the 16x16 movement range grid is built in phases 9-10 before the AI plan and handed to the decision builder; the walk-site itself is the open target |
+| STRAT9.3 | P1 | Deferred to A7 | Decode movement and resource policies | Verified movement intent and MP/HP/CT conservation controls join the profile contract. Scoped 2026-09-05: the 16x16 movement range grid is built in phases 9-10 before the AI plan and handed to the decision builder; the walk-site itself is the open target |
 | STRAT9.4 | P1 | Pending | Assign strategies at useful runtime scopes | Per-unit/job/clan/battle feasibility is proven before adding storage or hooks |
 | STRAT9.5 | P1 | Pending | Validate contrasting profiles in full auto battles | Fixed multi-turn replays demonstrate action, target, and movement differences |
 
@@ -3774,3 +3774,334 @@ New tools: tools/exp_control_v46..v48.py (v48 = layout-corrected protocol with
 per-hit r7/ea/ct truth + ctx scan), tools/exp_fixture_probe.py,
 tools/exp_deadlock_diag.py, tools/exp_visual_step.py, tools/exp_realkey_probe.py
 (syntax-checked). Output: outputs/lua-nav/controlled-v48.json (+ v46/v47).
+
+
+## 2026-09-09 — Commit review and worker queue reconciliation
+
+Reviewed `123ea91`, `bc1378c`, `1334849`, and `cda503c`; fetched origin and
+confirmed clean `master` at `origin/master` (`cda503c`) before editing docs.
+A1 is delivered and A2.3 answers shared-pipeline semantics. No reviewed receipt
+establishes autonomous player tactical selection plus safe manual restoration.
+The Wait loop and shared seed/continuation hits cannot close that gate.
+
+The current dispatch is **A2.4a** in `auto-battle-roadmap.md`: reconcile fixture
+variants, conflicting roster counts, stale boot signatures (slot1 called name0,
+phantom slot6), process ownership, and a live reload baseline. Then A2.4b isolates
+a control lever; A2.5 requires reversible player AI execution before A3 starts.
+The roadmap now assigns owned files, experiment limits, write/restoration
+receipts, acceptance checks, and explicit blocked downstream dependencies.
+This queue supersedes earlier “Next A1” and “write A3 runner” suggestions.
+
+Validation: documentation/source review only; no emulator, ROM, save, or gameplay
+code changed. Historical validation results remain historical; no fresh runtime
+acceptance or release-gate pass is claimed.
+
+
+## 2026-09-10 — A2.4a: fixture and harness repaired; the roster was inverted
+
+Base `cda503c` plus the orchestrator's uncommitted roadmap-packet docs. Owned
+files: `tools/boot_fixture_gdb.py`, new `tools/fixture_guard.py`, new
+`tools/verify_fixture_baseline.py`, `configs/battle-scenarios/normal-battle.json`,
+`docs/battle-fixtures.md`; corrections in `docs/player-ai-control.md` and this
+entry. Evidence (untracked, no game bytes): `outputs/autobattle/A2.4a/`.
+
+**Claim.** One command now boots a verified live battle fixture for the next
+worker, and the fixture's roster is the opposite of A2.3's model: slot0 is an
+*enemy* and the player is slot6.
+
+Commands (ROM SHA1 `4ac05441f4de70a4ec3dd932116346c61b8783d9`, mGBA 0.10.5
+win64 build `26b7884bc25a5933960f3cdcd98bac1ae14d42e2`):
+
+```
+python tools/boot_fixture_gdb.py battle-start.ss0
+python tools/verify_fixture_baseline.py inventory --fixtures <9 variants>
+python tools/verify_fixture_baseline.py baseline --runs 2
+python tools/verify_fixture_baseline.py control
+python tools/verify_fixture_baseline.py reject
+```
+
+**Observed.**
+
+* Fixture inventory over nine `*-battle-start`/`engage` states: only
+  `battle-start.ss0`, `battle-start-r1.ss0` and `fix3-battle-start.ss0` hold the
+  battle roster. `a2-battle-start.ss0` — the fixture the v36/v44–v48 work was
+  written against — fails the guard (empty roster array, undecodable slot0
+  name), as do `a2b-`, `a2run-`, `fix2-` and `dp-battle-start.ss0` and
+  `engage.ss0`.
+* Live roster (`0x020159E8`, stride `0x108`, count 7): enemies **Jon, Velasquez,
+  Godfrey, Schneider, Carson** (0x8000 set), the neutral Judge (0x1000), and
+  **Marche at slot6** (EWRAM name pointer `0x02001F1C`, id 6, level 50,
+  HP 388/442). A2.3's "slot0 = Marche (0x085671EE)" is refuted: that pointer
+  decodes to `Jon`. Slot6 is a real unit, not turn scratch — a ROM-pointer-only
+  live-unit rule is what mislabelled the RAM-named player.
+* Boot guard repaired: the old `NAME0_ADDR = 0x02015AF0` sampled slot1
+  (Velasquez) and `MID6_ADDR = 0x0201611C` sampled Marche's unit id. The guard
+  now checks slot0 identity, contiguous live roster bounds, count/unit
+  agreement, and a named player, all read-only.
+* Harness repaired: `taskkill /IM mgba.exe` is gone from the owned tools; the
+  session refuses to start when the stub port already has a listener (mGBA
+  0.10.5 hardcodes port 2345 for `-g`, verified against the 0.10.5 source),
+  copies ROM and battery save into a scratch directory, relaunches its own
+  process on the known `-g` boot flake, and keeps one GDB connection through
+  boot and experiment via `FixtureSession`.
+* Reload baseline x2 identical: PC `0x08000428`, CT
+  `[45, 464, 850, 821, 515, 315, 0, 0]`, DOWN DOWN A A commits the player turn,
+  seeds at `0x080C03C2` name Carson/Jon/Schneider, Godfrey and Schneider CT → 0,
+  Marche CT 0 → 257. Outcome `progress_enemy_action_only`. Only write: the
+  key-enable byte, restored.
+* No-input control: zero seeds, CT vector unchanged for 25 s
+  (`dormant_awaits_player_input`). The baseline's progress is caused by the
+  driven commit, not idle auto-battle.
+* Guard rejection proven for a wrong fixture and a missing state, with zero
+  writes recorded before the decision.
+
+**Checks run now.** Python syntax checks on the three tools; the five commands
+above executed live against the verified fixture. **Historical checks** (not
+rerun): `python tools/validate_ai_strategy.py baserom.gba` 9/9,
+`python tools/validate_ai.py` 10/10, and the byte-identical ROM rebuild. No ROM
+byte, save byte or gameplay file was changed, so no domain validator or release
+gate applies to this packet.
+
+**Interventions and restoration.** Enable byte `0x03000005`: `00 -> 01` on
+attach, `01 -> 00` at exit. Two `M` writes total per baseline run, both
+recorded in `baseline.json` with old/new values. The wake-mark recipe was
+*removed* from the baseline: A2.4a shows it writes to an enemy unit.
+
+**Limitations.** `a2-battle-start.ss0` holds no roster and must not be cited
+further; the A2.3 verdicts that stand are the shared-pipeline/ctx-init ones, not
+any slot-identity statement. `0x8000 = AI-controlled side` is supported by
+`docs/unit-flags.md`, the AI mirror array at `0x02002FC4` excluding Marche, and
+Marche's clear bit — but it was not proven by an executed branch. The Judge's
+actions were never observed. Two matching reloads show state reproducibility,
+not RNG determinism. The roadmap's worker table still marks A2.4a ready; the
+orchestrator owns that status line.
+
+**Next packet unlocked.** A2.4b, with the corrected layout (player = slot6, id
+6; enemies = slots 0–4) and name-based actor attribution.
+
+
+## 2026-09-10 — A2.4b: both candidate control levers are dead; the choice is now architectural
+
+Base `cda503c` plus the A2.4a uncommitted changes. Owned files: new
+`tools/probe_control_handoff.py`, `docs/player-ai-control.md`; additional
+corrections in `docs/dead-ends.md`, `docs/turn-order.md`, and this entry.
+Evidence (untracked, no game bytes): `outputs/autobattle/A2.4b/`. The A2.4a
+row in `docs/auto-battle-roadmap.md` is now marked done and A2.4b active.
+
+**Claim.** Neither candidate player-to-AI lever survives: the `+0xEA` bit 7
+router is the **Stop** skip (side-agnostic, reached by the player too), and
+Controlled (`+0xED` bit 3 + `+0xE6` controller id) is cleared at its own
+consumer's turn start and changes nothing when it does survive. Per the packet,
+the deliverable is a bounded negative result plus the design comparison of
+sequencer delegation versus external engine-legal action selection.
+
+Commands (ROM SHA1 `4ac05441f4de70a4ec3dd932116346c61b8783d9`, mGBA 0.10.5
+win64 build `26b7884bc25a5933960f3cdcd98bac1ae14d42e2`, fixture
+`battle-start.ss0` SHA-256 `4da58bfe0e162210383c28aa8f66659fca33c91c69da0e965b87b3b7a730abe5`):
+
+```
+python tools/probe_control_handoff.py natural --seconds 30
+python tools/probe_control_handoff.py slice1  --seconds 40 --json outputs/autobattle/A2.4b/slice1-bit7.json
+python tools/probe_control_handoff.py slice2  --target first-enemy --seconds 40 \
+    --json outputs/autobattle/A2.4b/slice2-controlled-pc.json
+```
+
+**Observed.**
+
+* Static decode: `sub_0809E1E0` is the turn loop; at `0x0809E3AE` it calls
+  `sub_080CDADC`, which is the `+0xEA` bit 7 **Stop** getter, then branches at
+  `0x0809E3B6`/`0x0809E3B8` to the common tail `0x0809E796`. `0x0809E272`
+  clears `+0xED` bit 3 Controlled at the actor's turn start; the Control ability
+  handler at `0x0813363C` sets that bit with the controller id in `+0xE6`.
+* Slice 1 (three reloads): natural — 42/42 router hits take `ai_path_0x0809E3BA`
+  with `+0xEA = 0`, across all seven units including Marche and the Judge; tail
+  hits equal router hits, so `0x0809E796` is shared, not a menu. Intervention —
+  `+0xEA |= 0x80` with `+0xDC = 1` on the first enemy at its router moved
+  exactly that one turn to `shortcut_0x0809E3B8` (1 of 43), opened no menu,
+  needed no extra input, and skipped the actor's acting turn (its CT ended at
+  959 vs 0). The game's own countdown cleared the bit; the third reload
+  reproduced the natural run exactly.
+* Slice 2 (three placements): boot write wiped before the turn loop read it;
+  write immediately before `0x0809E272` consumed in the same instruction
+  (`ed_after = 0`); write immediately after survived to the router (`ed = 8`,
+  `e6 = 6`) yet the branch stayed `ai_path`, the enemy acted, and the end CT
+  vector was byte-identical to the natural baseline.
+* Design comparison recorded in `docs/player-ai-control.md`: Option A
+  (sequencer delegation) needs the caller that branches on the `+0x8000` side
+  flag, which is still unproven, and gives no per-character policy surface;
+  Option B (external engine-legal action selection through the proven
+  `0x08000494` input channel, with A5's pure `choose_action` interface) matches
+  the roadmap's stated separation of policy from transport, writes nothing
+  persistent, and is recommended. A2.5 should be re-scoped accordingly or the
+  orchestrator should commission the `+0x8000` dispatcher proof first.
+
+**Checks run now.** Python syntax checks on the new probe; the three live
+commands above, with per-run JSON receipts.
+
+**Historical checks** (not rerun): `tools/validate_ai_strategy.py` 9/9,
+`tools/validate_ai.py` 10/10, the byte-identical ROM rebuild, and the A2.4a
+`inventory`/`baseline`/`control`/`reject` runs. This packet changed no ROM byte,
+no save byte, and no gameplay file, so no domain validator or release gate
+applies.
+
+**Interventions and restoration.** Key enable `0x03000005`: `00 -> 01` on
+attach, `01 -> 00` at exit, every run. Slice 1 additionally wrote `+0xEA` bit 7
+and `+0xDC = 1` on one enemy (`0x02015DEA`, `0x02015DDC`) and slice 2 wrote
+`+0xED` bit 3 and `+0xE6` on one enemy; all six values are recorded with old and
+new bytes in the run JSONs. The Stop was consumed by the game before run end
+(no restore write performed); all other intervention bytes were overwritten by
+fresh reloads, and the third slice-1 run proves the reload is clean. No CT was
+written or compressed. The battery save is byte-identical (SHA1
+`9ceba5014809ca068d9d3cc952c571562a8e11a5`).
+
+**Limitations.** A2.3's `+0xEA` bit7-as-menu claim is refuted, but the packet's
+original "menu body" question is answered only negatively: the interactive
+pick's call path was not located. The router hits observed here come from two
+battle-side advance helpers (`0x0809F78C` reached from `0x08027536`/`0x08099AA0`,
+and `0x0809F850` reached from `0x08093014`), and the turn-order preview helper
+`0x0809E830` never ran; the router code is shared by all callers, so the bit7
+direction is general. Stage coordinates and the committed action/target remain
+undecoded and are reported as absent. Two natural runs and one restored run
+agree exactly, which is reproducibility, not RNG determinism.
+
+**Next packet unlocked.** None by proof: the queue now needs an architecture
+decision. Recommended is A2.5 re-scoped to "freeze the boundary contract for
+externally selected, engine-legal player actions" (Option B); the alternative is
+a bounded proof of the `+0x8000` side-flag dispatcher before any runtime hook.
+
+
+## 2026-09-15 — A2.5 acceptance passed twice: the reversible player-turn cycle is proven
+
+**Result.** Two runs from fixture reload completed the full A2.5 chain and both
+classified `valid_engine_legal_player_action`: engine-delegated player turn,
+engine-driven enemy progression, manual takeover at the boundary, a visible
+manual choice (full DOWN DOWN A A route, screenshots show the command menu
+open with the route committed), and re-enabled delegation for the second
+player turn. Receipts: `outputs/autobattle/A2.5/a25-acceptance-repeat1.json`
+(battle alive at end) and `outputs/autobattle/A2.5/a25-acceptance.json`
+(17 seeds; battle concluded naturally shortly after re-delegation). The
+runtime contract is frozen in `docs/player-ai-control.md` ("A2.5 result").
+
+**Two tooling discoveries were prerequisites.** (1) The visual channel had
+been void for whole runs: this workstation opens mGBA on the secondary
+portrait monitor, where the GL surface does not composite into CopyFromScreen
+— every in-run screenshot captured desktop pixels. `FixtureSession` now moves
+the window to the primary monitor at boot; screenshots are validated by
+distinct-row hashing. (2) The re-opened command menu freezes its owner's
+roster CT at an arbitrary value (0, 305, 600, 812 observed), not the 188
+park of a first menu — `player_menu_frozen` detects menus by value-agnostic
+stability. Single-key injections (frames=1) never register with a menu, and
+an A on the Move cursor opens the move-target modal (the run 4 wedge), so the
+full route is the only proven commit shape.
+
+**Battle end vs teardown.** At natural battle end all CTs read 0 and the
+final frame gains a magenta cast while the fixed-address roster keeps
+nonzero max_hp — so `battle_torn_down()` correctly stays False, and the old
+run-6 "teardown" is confirmed a misread roster copy during action execution.
+
+**Limitations.** Manual choices are Wait-only (the proven route); non-Wait
+choices need A5's chooser wired in. The boundary watches Marche only.
+Battle-end classification rests on frame+seed evidence, not an engine flag.
+
+**Next packet unlocked.** A3 (minimal autonomous battle runner) is unblocked
+by the frozen contract: create `tools/autobattle_runtime.py`,
+`tools/run_autobattle.py`, `tools/validate_autobattle_runtime.py` on the A2
+transport, with idle/running/takeover/completed/stalled states and
+`events.jsonl` turn records.
+
+
+## 2026-09-15 (later) — A3 first slice: runtime, CLI, validator; 9-turn hands-off run
+
+**Built.** `tools/autobattle_runtime.py` (state machine on the frozen A2.5
+contract), `tools/run_autobattle.py` (CLI, paused until the live guard
+decodes the roster), `tools/validate_autobattle_runtime.py` (offline
+events/receipt validator; fails on unknown fields and inferred labels).
+
+**Live evidence.** `outputs/autobattle/a3-full3/`: nine player menus detected
+and driven autonomously over 8.6 minutes while retail enemy AI ran between
+them (seeds 1-20, 18 menu-commit routes, zero human input, bounded stop by
+seed-silence wall). `a3-smoke1` proved the guard fails closed (name decode
+bug aborted the run before any input); `a3-full1`/`a3-full2` bounded
+correctly at their wall budgets.
+
+**Honesty corrections made during A3.** (1) The runtime initially logged
+`selected_action="wait"`; a3-full2 proved the route commits whatever the
+open menu resolves to (one turn moved Marche), so the action is now null
+with a note - the committed action is not decoded yet. (2) Boundary
+`position_before` sometimes reads a transient garbage tile (roster copy
+mid-execution); `position_after` is the reliable one. (3) The wall timeout
+must be checked inside progress waits, not only at loop top, or a single
+90 s wait overruns the budget.
+
+**Remaining for A3.** Observe a natural `completed` end within budget
+(battles outlast 500 s while Marche only ever Waits); decode the committed
+action/target from RAM (or wire A5's chooser) so `selected_action` can be
+filled honestly; then A4 identity/isolation and A8 speed per the roadmap.
+
+
+## 2026-09-16 — A3 complete: natural `completed` run + transport-path suite
+
+**Live deliverable.** `outputs/autobattle/a3-natural6/`: one uninterrupted
+normal battle finished hands-off — 12 committed player routes with retail
+enemy AI between them, defeat grace engaged at t≈880 (Marche fell; takeover
+and the stall bound held off so the engine's own defeat→results conclusion
+classified the run), natural `completed` at t≈887.8, terminal screenshot
+captured, zero tactical clicks. `validate_autobattle_runtime.py` passes on
+the receipt.
+
+**Transport-path suite.** New `tools/validate_transport_paths.py` drives the
+real `BattleRuntime` against a fake mGBA transport modeling a wall-clock
+engine (60 fps frames, recorded ~12.9 CT/s, per-frame edge-detected input
+FIFO — each `P1=` write covers exactly one engine poll). Seven recorded
+shapes all hold the receipts contract: takeover, unknown-dialog swallow
+(B-recovery fails, run bounds honestly, no presses after the stop), transport
+disconnect, repeated start/stop lifecycles, mid-battle player defeat, natural
+results end, and the post-Move submenu wedge (B backs out exactly once per
+recovery cycle, re-drive commits).
+
+**Fake-model lessons (each one a real bug class).** (1) The CT projection had
+an off-by-one that pinned Marche's slot at a permanent 0 — a stable zero also
+reads as a parked menu, so the frozen check saw phantom boundaries mid-charge.
+(2) A defeat scheduled in the fake short-circuited the alive branch, so the
+hp block never zeroed and the grace path was untestable. (3) A frame-per-probe-
+read clock ran ~1,650× real time and warped every cadence the runtime
+classifies on; wall-clock frames fixed the whole family. (4) Key input needed
+a true one-write-per-poll FIFO with per-frame edge detection; B must be
+edge-detected like A or one held press closes two menu layers.
+
+**Runtime fixes shipped.** Bounded B-recovery (one B + re-drive per cycle,
+≤3 cycles) before declaring an unknown modal; recalibrated stall bounds to
+150 s (a3-natural3's healthy boundary waits reached 93 s); terminal
+screenshot on every stop path; defeat grace restructured so it suppresses
+only takeover and the stall bound, never the completed checks; honest
+labeling throughout (committed actions stay null with notes).
+
+**Remaining for A3 follow-on / next packets.** Decode the committed
+action/target from RAM (or wire A5's chooser) so `selected_action` can be
+filled honestly; then A4 identity/isolation and A8 speed per the roadmap.
+
+## 2026-09-17 — Closure packet: live non-Wait chooser verification + review fixes committed
+
+**Live deliberate non-Wait selection proven.** `a3-chooser3`: 7 committed
+turns; turns 1, 5, and 6 drove the chooser's action-submenu route after the
+inline ability-state scan (`[unit+0x34]`, 12-byte header + per-race entries)
+found Marche's learned entries — each with a structured `selected_action`
+(kind `deliberate-non-wait-route`, `command_id: null` until the id→name
+decode exists) and an engine-side effect delta. Turns 2–4, 7 honestly
+declined (no evidence at that boundary) and fell back to the fixed route.
+Run bounded honestly when Marche fell late (hp zeroed; battle end did not
+arrive within budget). Two earlier attempts document the debugging chain:
+`a3-chooser1` (invented ABILITIES address — declined everywhere), 
+`a3-chooser2` (`+0x34` read as pointer — actually an inline array per
+`include/ffta.h`).
+
+**Contract validator hardening verified.** The adversarial check (input
+boundary injected after the terminal stop) now fails with exit 1.
+
+**Review packet closed.** All four of Astra's findings addressed: A2.5
+claims corrected (deliberate non-Wait now demonstrated; id→name decode
+named as the remaining gap); takeover renamed honestly (automation boundary
+state, not a manual handoff — real pause via STOP + `--on-stop leave-running`
+validated in the transport suite's 8th scenario); receipt validator rejects
+post-terminal input; work committed with evidence receipts (metadata-only;
+screenshots/console logs stay local per the evidence rule).

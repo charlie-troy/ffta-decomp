@@ -1,0 +1,12 @@
+{
+  "schema": "a3-run/1",
+  "run_id": "a3-natural6",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "completed",
+  "turns": 12,
+  "seeds": 25,
+  "router_hits": 1252,
+  "terminal_reason": "battle end signature held",
+  "events": "outputs/autobattle\\a3-natural6\\events.jsonl"
+}
