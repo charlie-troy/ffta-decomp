@@ -1,0 +1,49 @@
+{
+  "run": "c2-menu-probe6",
+  "t_elapsed_s": 48.6,
+  "steps": [
+    {
+      "after_move_cmd_cursor": 1,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0
+    }
+  ],
+  "commit": {
+    "planned": [
+      4,
+      11
+    ],
+    "before": [
+      4,
+      10
+    ],
+    "executed": [
+      4,
+      11
+    ],
+    "executed_as_read": true,
+    "ct_after": 1000,
+    "cmd_cursor_final": 2
+  },
+  "confirmed_pairs": [
+    [
+      "0200ffc9",
+      "0200ffca"
+    ],
+    [
+      "0200ffc9",
+      "02010059"
+    ],
+    [
+      "02010058",
+      "0200ffca"
+    ],
+    [
+      "02010058",
+      "02010059"
+    ]
+  ]
+}

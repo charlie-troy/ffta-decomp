@@ -4284,3 +4284,35 @@ Full 13-scenario transport suite PASS on final code; all receipts pass the
 strengthened contract validator. `docs/receipts/autobattle/C1.json` updated:
 11/11 criteria PASS, status `pass`. Roadmap C1 rows updated. Next: C2
 identified-action selector.
+
+## 2026-09-17 — C2 identified-action selector (criterion receipt + controls)
+
+Decode first, then select. Six probe rounds (c2_menu_probe..6) pinned the open
+player menu's live state in RAM: the command cursor at 0x0202ddd9 (0=Move,
+1=Action, 2=Wait; two full down/up cycles agree) and the move-target cursor at
+0x0200ffc9/ffca (+ mirror 0x02010058/59; 4-byte-apart shadow pairs dropped out
+at the engine-verified end-to-end commit). Commit semantics captured: a
+destination-A moves the unit and RE-OPENS the command menu (cursor re-inits at
+Action); the roster tile updates only at turn commit; Wait closes with select+
+confirm; out-of-range destinations are refused by the engine itself (probe4).
+
+The runtime's identified branch now plans from these reads: at a boundary it
+requires cmd_cursor=Move + a readable target cursor, drives leg-by-leg with a
+RAM re-read between legs (destination identified BEFORE the confirming input),
+finishes the proven Wait commit, then verifies the roster tile reached the
+RAM-read destination — the claim rides the engine's observable result, not the
+key sequence.
+
+Two live reloads under final code: c2-live4 and c2-live5 each committed turn 1
+as identified Move (4,10)->(4,11) with tile verification. Offline: the fake
+transport engine gained an explicit cursor law (probe6 shapes) plus two
+controls — `identified-move` (positive) and `identified-move-wrong` (engine
+executes a different tile than the cursor named → claim demoted, turn still
+commits honestly). Full 15-scenario suite PASS.
+
+c2-live3 caught a real defect: a failed identified drive WITHOUT a latched
+STOP (non-standard menu shape, legs landed no stops) classified the run
+`paused` and double-terminated (stop-paused then stop-completed, caught by the
+one-terminal-stop rule). Fixed: no-STOP failed drive now bounds like the
+unknown-modal path. Receipt: docs/receipts/autobattle/C2.json (all C2 criteria
+pass; ability-submenu decode remains a recorded candidate pair).

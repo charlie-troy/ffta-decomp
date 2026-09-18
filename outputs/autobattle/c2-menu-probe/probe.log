@@ -1,0 +1,33 @@
+[    2.1s] waiting up to 150s for the player menu to open (player_menu_settled, allow_zero)
+[    2.1s] cts=[45, 464, 850, 821, 515, 315, 0, 0] player_ct=0
+[   14.1s] menu settled (parked CT); starting sweeps
+[   15.8s] phase cycle1-a: 197202 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle1-a.png)
+[   17.3s] press cycle1 down1: hits=5
+[   21.2s] phase cycle1-b: 197287 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle1-b.png)
+[   22.6s] press cycle1 down2: hits=5
+[   26.6s] phase cycle1-c: 197391 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle1-c.png)
+[   28.0s] press cycle1 up2: hits=5
+[   31.9s] phase cycle1-d: 197087 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle1-d.png)
+[   33.3s] press cycle1 up1: hits=5
+[   37.2s] phase cycle1-e: 197247 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle1-e.png)
+[   37.3s] cycle1: 55 moved-and-moved-again, 11 returned to baseline
+[   39.2s] phase cycle2-a: 197363 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle2-a.png)
+[   40.6s] press cycle2 down1: hits=5
+[   44.4s] phase cycle2-b: 197189 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle2-b.png)
+[   45.9s] press cycle2 down2: hits=5
+[   49.7s] phase cycle2-c: 197276 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle2-c.png)
+[   51.1s] press cycle2 up2: hits=5
+[   55.1s] phase cycle2-d: 197021 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle2-d.png)
+[   56.5s] press cycle2 up1: hits=5
+[   60.4s] phase cycle2-e: 197298 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-cycle2-e.png)
+[   60.5s] cycle2: 53 moved-and-moved-again, 16 returned to baseline
+[   61.9s] press sub down1: hits=5
+[   65.8s] phase sub-a: 197342 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-sub-a.png)
+[   67.2s] press sub open: hits=5
+[   71.2s] phase sub-b: 197287 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-sub-b.png)
+[   72.6s] press sub down: hits=5
+[   76.8s] phase sub-c: 197301 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-sub-c.png)
+[   78.2s] press sub cancel: hits=5
+[   82.1s] phase sub-d: 197190 plausible bytes (shot outputs\autobattle\c2-menu-probe\menu-sub-d.png)
+[   82.1s] submenu: 76 candidates, 13 restored
+[   82.1s] SURVIVORS (both cycles, same trajectory): ['0202ddd9']

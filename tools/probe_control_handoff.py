@@ -112,6 +112,19 @@ ROUTE_TAKEOVER = ROUTE
 # pacing as ROUTE); only the submenu's resolved command is not decoded yet.
 ROUTE_ACTION = [(0x80, "DOWN1"), (0x80, "DOWN2"), (0x01, "A-open"),
                 (0x01, "A-confirm")]
+
+# -- C2 identified-candidate decode (c2-menu-probe 1-6, 2026-09-18) -------
+# Command-menu cursor: u8 at 0x0202ddd9; 0=Move, 1=Action, 2=Wait. Found by
+# two-cycle differential sweeps (trajectory [0,1,2,1,0] reproduced twice).
+CMD_CURSOR = 0x0202ddd9
+# Move-target cursor: x/y u8 pair (verified end-to-end by probe6: the unit
+# executed exactly the RAM-read destination (4,10)->(4,11) and the pair read
+# the destination at the commit). Two adjacent-byte instances exist (the
+# menu-state copies); the 4-byte-apart instances are shadow copies that do
+# not survive commits.
+TARGET_X = 0x0200ffc9
+TARGET_Y = 0x0200ffca
+MOVE_CMD, ACTION_CMD, WAIT_CMD = 0, 1, 2
 PARK_CT_MAX = 300   # menu-open park marker observed at 188; charging passes
                     # through this band in ~2 s, so only a STABLE low CT is
                     # the parked (menu awaiting input) state
@@ -767,6 +780,201 @@ class Probe:
             return None
         return {"route": ROUTE_ACTION, "command_menu": "action-submenu",
                 "chosen_from": abilities[0], "tile": list(tile)}
+
+    # -- C2 identified-candidate selector ---------------------------------
+    def read_cmd_cursor(self):
+        """Decoded command-menu cursor (0=Move, 1=Action, 2=Wait), or None.
+
+        CPU must be halted for a reliable read (call after pump()/press()).
+        """
+        v = u8(self.g, CMD_CURSOR)
+        return v if v is not None and v <= 2 else None
+
+    def read_target_cursor(self):
+        """Decoded move-target cursor (x, y), or None when implausible.
+
+        Map tiles are bounded (<64, unit-struct doc: tile u8s); the menu
+        copies read transiently garbage during redraws, so a plausibility
+        bound protects the caller from mid-copy reads. (0, 0) reads as
+        "no cursor" too: uninitialized/cleared menu memory — on live
+        hardware an open target mode reads the unit's tile (probe3/4),
+        never the corner.
+        """
+        x, y = u8(self.g, TARGET_X), u8(self.g, TARGET_Y)
+        if x is None or y is None or not (0 <= x < 64 and 0 <= y < 64):
+            return None
+        if x == 0 and y == 0:
+            return None
+        return (x, y)
+
+    def plan_identified_move(self):
+        """A C2 identified candidate at an open player menu, or None.
+
+        Identified from RAM: the command cursor must read Move (0) and the
+        move-target cursor must be readable. When the target cursor already
+        names a DIFFERENT tile, that tile is the destination. When it reads
+        the unit's own tile (the menu-open state — target mode is not open
+        yet), dest is None: the driver will step one tile, READ the reached
+        tile from RAM, and confirm there — the destination is still read
+        from RAM before the confirming input, never inferred from the key
+        sequence (probe6 flow, engine-verified).
+        """
+        tile = self.player_tile()
+        if tile in (None, (0, 0)):
+            return None
+        if self.read_cmd_cursor() != MOVE_CMD:
+            return None
+        dest = self.read_target_cursor()
+        if dest is None:
+            return None
+        return {"kind": "identified-move", "command_id": MOVE_CMD,
+                "dest": list(dest) if dest != tile else None,
+                "from": list(tile)}
+
+    def commit_identified_move(self, plan, stop_check=None, max_nav=8,
+                               log_leg=None):
+        """Execute an identified-move plan leg-by-leg, reading RAM between legs.
+
+        Returns (completed, dest_used, log). Every leg is guarded by
+        stop_check BEFORE it fires (Astra round-3 rule). Navigation is
+        cursor-driven and re-read after every press so it can never wrap
+        past the intended command or tile.
+
+        probe5/6 lessons baked in: (1) confirming a destination MOVES the
+        unit and RE-OPENS the command menu — the turn is still open, so the
+        driver finishes it with the proven Wait commit; (2) when the plan's
+        dest is None (menu-open state), the driver steps to an adjacent
+        tile (bounded direction search with a RAM read after each press)
+        and confirms at the READ tile.
+        """
+        g = self.g
+        log = []
+        dest_used = None
+
+        def add(leg, detail):
+            log.append({"leg": leg, **detail})
+
+        def _guarded_press(mask, tag):
+            started = time.time()
+            hits = self.press(mask, stop_check=stop_check, tag=tag)
+            if log_leg:
+                log_leg({"event": "press", "mask": mask, "tag": tag,
+                         "t": round(started - self.t0, 3),
+                         "duration": round(time.time() - started, 3),
+                         "hits": hits, "aborted": hits < 0})
+            return hits
+
+        def nav_cmd(target_cmd, what):
+            guard = 0
+            while self.read_cmd_cursor() != target_cmd:
+                if stop_check is not None and stop_check():
+                    add("abort", {"at": what})
+                    return False
+                guard += 1
+                if guard > max_nav:
+                    add("abort", {"at": what + "-bound"})
+                    return False
+                if _guarded_press(0x80, f"c2:{what}-down") < 0:
+                    add("abort", {"at": what + "-stop"})
+                    return False
+                time.sleep(1.2)
+            return True
+
+        # 1. command cursor -> Move (0)
+        if not nav_cmd(MOVE_CMD, "cmd-nav"):
+            return False, None, log
+        add("cmd-nav", {"cursor": self.read_cmd_cursor()})
+
+        # 2. open target mode
+        if stop_check is not None and stop_check():
+            add("abort", {"at": "pre-open"})
+            return False, None, log
+        if _guarded_press(0x01, "c2:open-target") < 0:
+            add("abort", {"at": "open-stop"})
+            return False, None, log
+        time.sleep(1.6)
+        add("open-target", {"cursor": self.read_target_cursor()})
+
+        # 3. reach the destination
+        start_tile = self.read_target_cursor()
+        if plan["dest"] is None:
+            # bounded direction search: step, READ, keep the first tile
+            # that differs from the start — the destination is identified
+            # by this read, before any confirming input
+            for mask, name in ((0x80, "down"), (0x10, "right"),
+                               (0x40, "up"), (0x20, "left")):
+                if stop_check is not None and stop_check():
+                    add("abort", {"at": "dest-search"})
+                    return False, None, log
+                if _guarded_press(mask, f"c2:step-{name}") < 0:
+                    add("abort", {"at": "dest-search-stop"})
+                    return False, None, log
+                time.sleep(1.2)
+                cur = self.read_target_cursor()
+                add("dest-step", {"tried": name, "cursor": cur})
+                if cur is not None and cur != start_tile:
+                    dest_used = cur
+                    break
+            if dest_used is None:
+                add("abort", {"at": "dest-search-exhausted"})
+                return False, None, log
+        else:
+            dest_used = tuple(plan["dest"])
+            guard = 0
+            while self.read_target_cursor() != dest_used:
+                if stop_check is not None and stop_check():
+                    add("abort", {"at": "target-nav"})
+                    return False, None, log
+                guard += 1
+                if guard > max_nav * 4:
+                    add("abort", {"at": "target-nav-bound"})
+                    return False, None, log
+                cur = self.read_target_cursor()
+                if cur is None:
+                    add("abort", {"at": "target-cursor-unreadable"})
+                    return False, None, log
+                step = None
+                if cur[0] < dest_used[0]:
+                    step = 0x10          # RIGHT
+                elif cur[0] > dest_used[0]:
+                    step = 0x20          # LEFT
+                elif cur[1] < dest_used[1]:
+                    step = 0x80          # DOWN
+                elif cur[1] > dest_used[1]:
+                    step = 0x40          # UP
+                if _guarded_press(step, f"c2:target-{step:#04x}") < 0:
+                    add("abort", {"at": "target-nav-stop"})
+                    return False, None, log
+                time.sleep(1.2)
+        add("target-identified", {"dest": list(dest_used),
+                                  "identified_from": "RAM target cursor "
+                                                     "read before confirm"})
+
+        # 4. confirm at the identified destination
+        if stop_check is not None and stop_check():
+            add("abort", {"at": "pre-confirm"})
+            return False, dest_used, log
+        if _guarded_press(0x01, "c2:confirm-move") < 0:
+            add("abort", {"at": "confirm-stop"})
+            return False, dest_used, log
+        time.sleep(1.6)
+        add("confirm-move", {"cursor": self.read_target_cursor(),
+                            "cmd_cursor": self.read_cmd_cursor()})
+
+        # 5. the move re-opened the command menu (probe5): finish the turn
+        #    with Wait so the engine owns the board again.
+        if not nav_cmd(WAIT_CMD, "wait-nav"):
+            return False, dest_used, log
+        if _guarded_press(0x01, "c2:select-wait") < 0:
+            add("abort", {"at": "select-wait-stop"})
+            return False, dest_used, log
+        time.sleep(1.2)
+        if _guarded_press(0x01, "c2:confirm-wait") < 0:
+            add("abort", {"at": "confirm-wait-stop"})
+            return False, dest_used, log
+        time.sleep(1.6)
+        add("wait-commit", {"cmd_cursor": self.read_cmd_cursor()})
+        return True, dest_used, log
 
     def effect_snapshot(self):
         """Decoded engine-side effect evidence for the last committed turn.

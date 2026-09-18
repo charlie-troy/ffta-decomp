@@ -1,0 +1,31 @@
+[   14.1s] menu settled
+[   14.1s] Marche start tile: (4, 10) ct=0
+[   15.6s] press exercise down: hits=5
+[   18.6s] press exercise up: hits=5
+[   21.6s] press open-target: hits=5
+[   23.2s] after open: x=[4, 4, 4, 4] y=[10, 10, 10, 10]
+[   26.2s] press down1: hits=5
+[   27.8s] after down: x=[4, 4, 4, 4] y=[11, 11, 11, 11]  (dest should be (4,11))
+[   29.4s] drive-confirm A (runtime commit path)
+[   30.9s] drive ok=True
+[   38.4s] t=   38.4 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   44.5s] t=   44.5 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   50.5s] t=   50.5 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   56.5s] t=   56.5 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   62.5s] t=   62.5 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   68.6s] t=   68.6 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   74.6s] t=   74.6 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   80.6s] t=   80.6 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   86.6s] t=   86.6 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   92.7s] t=   92.7 tile=(4, 10) ct=0 cmd=1 seeds=0
+[   98.7s] t=   98.7 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  104.7s] t=  104.7 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  110.7s] t=  110.7 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  116.7s] t=  116.7 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  122.7s] t=  122.7 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  128.7s] t=  128.7 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  134.8s] t=  134.8 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  140.8s] t=  140.8 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  146.8s] t=  146.8 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  152.8s] t=  152.8 tile=(4, 10) ct=0 cmd=1 seeds=0
+[  154.4s] OUTCOME: unknown (dest (4, 11))

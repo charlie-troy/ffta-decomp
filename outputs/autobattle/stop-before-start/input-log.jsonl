@@ -1,1 +1,1 @@
-{"event": "stop_requested", "t": 0.001, "detection_latency_s": 0.001, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "stop_requested", "t": 0.001, "detection_latency_s": 0.0, "note": "STOP file observed; no further gameplay key injections permitted"}

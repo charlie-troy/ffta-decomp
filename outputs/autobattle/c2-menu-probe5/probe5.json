@@ -1,0 +1,211 @@
+{
+  "run": "c2-menu-probe5",
+  "t_elapsed_s": 155.1,
+  "cursor_watch": [
+    {
+      "t": 38.4,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 44.5,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 50.5,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 56.5,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 62.5,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 68.6,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 74.6,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 80.6,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 86.6,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 92.7,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 98.7,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 104.7,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 110.7,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 116.7,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 122.7,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 128.7,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 134.8,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 140.8,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 146.8,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    },
+    {
+      "t": 152.8,
+      "tile": [
+        4,
+        10
+      ],
+      "ct": 0,
+      "cmd_cursor": 1,
+      "seeds": 0
+    }
+  ],
+  "outcome": "unknown",
+  "dest": [
+    4,
+    11
+  ]
+}

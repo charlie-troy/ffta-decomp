@@ -54,6 +54,12 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from autobattle_runtime import BattleRuntime  # noqa: E402
 from validate_autobattle_runtime import validate  # noqa: E402
+from probe_control_handoff import (CMD_CURSOR as _CMD_CURSOR,  # noqa: E402
+                                   TARGET_X as _TARGET_X,
+                                   TARGET_Y as _TARGET_Y,
+                                   MOVE_CMD as _MOVE_CMD,
+                                   ACTION_CMD as _ACTION_CMD,
+                                   WAIT_CMD as _WAIT_CMD)
 
 BP_KEY = 0x08000494
 BP_SEED = 0x080C03C2
@@ -275,6 +281,35 @@ def sync_memory(gdb):
         # array at unit+0x34 (include/ffta.h layout: 12-byte header + one
         # byte per race ability) with nonzero learned entries — zeroed only
         # on the results shape (choose_non_wait must decline there)
+        # C2 cursor projection: the menu command copy and the move-target
+        # copy ride their recorded addresses only while the fake's
+        # identified-move law is on; (0, 0) clears them when closed so the
+        # probe's plausibility guard reads "no cursor" (it must never infer
+        # an open menu from stale bytes)
+        if world.identified_move:
+            if world.menu_up:
+                if world._cmd_cursor is None:
+                    world._cmd_cursor = _MOVE_CMD
+                gdb.mem[_CMD_CURSOR] = world._cmd_cursor
+                if world._target_cursor is not None:
+                    gx, gy = world._target_cursor
+                else:
+                    # menu-open, target mode closed: the move-target copy
+                    # reads the unit's own tile (probe3) — never (0, 0),
+                    # which the probe's plausibility guard treats as "no
+                    # cursor"
+                    gx, gy = world._march_tile
+                gdb.mem[_TARGET_X] = gx
+                gdb.mem[_TARGET_Y] = gy
+            else:
+                gdb.mem[_CMD_CURSOR] = 0
+                gdb.mem[_TARGET_X] = 0
+                gdb.mem[_TARGET_Y] = 0
+        # the player roster tile follows the cursor law's executed move so
+        # the runtime's engine-side verification (roster tile == the RAM-
+        # read destination) is enforced against a real state change
+        if world.identified_move:
+            world.player_tile = (world._march_tile[0], world._march_tile[1])
         tx, ty = (world.player_tile if not world.results else (0, 0))
         gdb.mem[base + 0xF6] = tx
         gdb.mem[base + 0xF7] = ty
@@ -354,7 +389,22 @@ class FakeWorld:
         self.b_closes = 0            # B presses that backed out of a menu layer
         self.swallow_b = False       # unknown dialog: B does not back out
         self.swallow_first_route = False  # submenu shape eats the first route
-        self.player_tile = (4, 10)   # chooser evidence: nonzero recorded tile
+        self.player_tile = (4, 10)   # cursor law: target copy init tile
+        # C2 identified-move law: when set, the fake presents the DECODED
+        # menu state — the command cursor rides the open menu (Move on
+        # open), the move-target copy initializes at the unit's tile when
+        # target mode opens, cursor keys move it, and a confirm executes
+        # the READ cursor destination (probe6 engine-verified shape).
+        self.identified_move = False
+        self.wrong_move = False      # engine executes a DIFFERENT tile
+        self.wrong_tile = (9, 9)     # the tile a wrong_move executes to
+        self._march_tile = [4, 10]   # projected roster tile (sync_memory)
+        self._cmd_cursor = None      # None = menu copy not initialized yet
+        self._target_cursor = None   # None = target mode not open
+        self._moved = False          # move executed; menu re-opened, turn open
+        self._wait_confirm = False  # Wait selected; next A confirms (probe6:
+                                    # the engine wants two As to close a turn)
+        self._dir_prev = 0          # direction bits held last frame (edges)
 
     # -- time ---------------------------------------------------------------
     def now(self):
@@ -420,9 +470,17 @@ class FakeWorld:
         # consumed frame — timing-free and faithful.
         val = self._key_fifo.pop(0) if self._key_fifo else 0
         a_seen = bool(val & 0x01)
-        if a_seen and not self._a_prev:
+        a_edge = a_seen and not self._a_prev
+        if a_edge:
             self.a_presses += 1
-            self._maybe_commit()
+            if self.identified_move:
+                # C2 identified-move law: the commit shape follows the
+                # DECODED cursor state (probe6), not a bare press count —
+                # a bare count would commit at the move-confirm A, four
+                # presses before the identified turn actually closes
+                self._identified_a()
+            else:
+                self._maybe_commit()
         self._a_prev = a_seen
         # B is pure menu-back navigation on the key-DOWN edge, consumed one
         # poll per write exactly like A (one B press = one navigation
@@ -447,9 +505,86 @@ class FakeWorld:
             self._a_prev = False
             self.b_closes += 1
         self._b_prev = b_seen
+        # C2 cursor law: direction keys move the REAL cursors — the command
+        # cursor in the command menu, the (x, y) target cursor in target
+        # mode. Rising-edge per direction (one step per press), matching
+        # the recorded menu feel and the driver's short presses.
+        if self.identified_move and self.menu_up:
+            d = val & 0xF0
+            for bit, name in ((0x80, "down"), (0x10, "right"),
+                              (0x40, "up"), (0x20, "left")):
+                if (d & bit) and not (self._dir_prev & bit):
+                    self._identified_dir(name)
+            self._dir_prev = d
         # the engine polls keys every frame while a menu is up: the key
         # breakpoint hits and a stop reaches the probe
         self.session.g.queue.append((BP_KEY, "T05keypoll"))
+
+    # -- C2 identified-move cursor law ---------------------------------------
+    def _identified_dir(self, name):
+        """One direction step on the DECODED cursor (command or target)."""
+        if self._target_cursor is not None:
+            if name == "down":
+                self._target_cursor[1] += 1
+            elif name == "up":
+                self._target_cursor[1] -= 1
+            elif name == "right":
+                self._target_cursor[0] += 1
+            elif name == "left":
+                self._target_cursor[0] -= 1
+        else:
+            self._cmd_cursor = ((self._cmd_cursor or 0)
+                                + {"down": 1, "up": -1}.get(name, 0)) % 3
+
+    def _identified_a(self):
+        """Consume one A edge per the DECODED cursor state (probe5/6 shape)."""
+        if self._moved:
+            # command menu re-opened after the move (probe5): the command
+            # copy re-initialized at Action; A on Wait selects then confirms
+            # (probe6's two-A shape closes the turn), A elsewhere re-opens
+            # target mode at the unit's tile
+            if self._target_cursor is None:
+                if self._cmd_cursor == _WAIT_CMD:
+                    if self._wait_confirm:
+                        self._commit_turn()
+                    else:
+                        self._wait_confirm = True
+                else:
+                    self._target_cursor = [self._march_tile[0],
+                                           self._march_tile[1]]
+                    self._wait_confirm = False
+            return
+        if self._target_cursor is None:
+            # A on the command menu: from Move it opens target mode at the
+            # unit's tile (probe3); other commands open other UIs the
+            # identified driver never touches
+            if self._cmd_cursor == _MOVE_CMD:
+                self._target_cursor = [self._march_tile[0], self._march_tile[1]]
+            return
+        # confirming the destination: execute at the READ cursor tile —
+        # the engine never executes an inferred tile
+        dest = tuple(self._target_cursor)
+        self._march_tile = list(self.wrong_tile if self.wrong_move else dest)
+        self._moved = True
+        self._target_cursor = None
+        self._cmd_cursor = _ACTION_CMD  # the re-opened menu lands on Action
+        self._wait_confirm = False
+
+    def _commit_turn(self):
+        self.commits += 1
+        self.menu_up = False
+        self.charging = True
+        self.march_ct = 0.0
+        self.a_presses = 0
+        self._moved = False
+        self._wait_confirm = False
+        self._cmd_cursor = None
+        self._target_cursor = None
+        self.last_commit_t = self.now()
+        if self.first_commit_t is None:
+            self.first_commit_t = self.last_commit_t
+        if self.after_commit:
+            self.after_commit(self)
 
     def _frame_charging(self):
         self.march_ct = min(self.march_ct + CT_PER_FRAME, 1000)
@@ -1059,6 +1194,81 @@ def run_scenario(name, out_root):
         errors.extend(errs)
         print(f"  [{name}] state=stalled turns=0 (real CLI main path)")
         return receipt, errors
+    elif name == "identified-move":
+        # C2 positive control: the DECODED menu drives an identified move —
+        # the destination is read from RAM before the confirming input, the
+        # roster tile must reach exactly that destination, and the turn
+        # event carries the identified action+target claim. One turn, then
+        # the max_turns bound (the fake's law keeps the menu closed after
+        # the commit, so the bound is the only classifier outcome).
+        world.identified_move = True
+        world.allow_seeds = True
+        rt.max_turns = 1   # bound right after the committed turn (the fake's
+                           # law keeps the menu closed; seeds would otherwise
+                           # run to the wall timeout)
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"identified-move: expected stalled (max_turns=1 "
+                          f"bound after the committed turn), got {state}")
+        if world.commits != 1:
+            errors.append(f"identified-move: expected 1 engine commit, "
+                          f"got {world.commits}")
+        if tuple(world._march_tile) != (4, 11):
+            errors.append(f"identified-move: the engine executed tile "
+                          f"{tuple(world._march_tile)}, expected the "
+                          f"identified destination (4, 11)")
+        turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
+        if len(turns) != 1:
+            errors.append(f"identified-move: expected 1 turn event, "
+                          f"got {len(turns)}")
+        else:
+            t = turns[0]
+            act = t.get("selected_action") or {}
+            if act.get("kind") != "identified-move" or act.get("command_id") != 0:
+                errors.append(f"identified-move: the turn action is not "
+                              f"claimed as an identified Move: {act}")
+            tgt = t.get("selected_target") or {}
+            if tgt.get("kind") != "tile" or list(tgt.get("dest") or []) != [4, 11]:
+                errors.append(f"identified-move: the turn target is not the "
+                              f"identified destination: {tgt}")
+            if "verified" not in (t.get("note") or ""):
+                errors.append(f"identified-move: the note must record the "
+                              f"engine-side tile verification: {t.get('note')}")
+    elif name == "identified-move-wrong":
+        # C2 negative control: the engine executes a DIFFERENT tile than the
+        # RAM cursor named (the dishonest-engine case). The runtime must
+        # DEMOTE — no identified action/target claim may survive — while the
+        # turn itself still commits (the input was fine; only the claim
+        # rides engine-side verification).
+        world.identified_move = True
+        world.wrong_move = True
+        world.allow_seeds = True
+        rt.max_turns = 1
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"identified-move-wrong: expected stalled, got {state}")
+        if world.commits != 1:
+            errors.append(f"identified-move-wrong: expected 1 commit, "
+                          f"got {world.commits}")
+        if tuple(world._march_tile) != tuple(world.wrong_tile):
+            errors.append("identified-move-wrong: the fake did not execute "
+                          "its wrong tile — the control does not exercise "
+                          "the demotion path")
+        turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
+        if len(turns) != 1:
+            errors.append(f"identified-move-wrong: expected 1 turn event, "
+                          f"got {len(turns)}")
+        else:
+            t = turns[0]
+            if t.get("selected_action") is not None or \
+                    t.get("selected_target") is not None:
+                errors.append(f"identified-move-wrong: the claim SURVIVED an "
+                              f"engine that executed a different tile — "
+                              f"action={t.get('selected_action')} "
+                              f"target={t.get('selected_target')}")
+            if "NOT claimed" not in (t.get("note") or ""):
+                errors.append(f"identified-move-wrong: the demotion must be "
+                              f"recorded in the turn note: {t.get('note')}")
     elif name == "submenu":
         # recorded a3-natural5 shape: the post-Move re-opened menu presents
         # a submenu the plain route cannot commit (presses land, nothing
@@ -1130,7 +1340,8 @@ def main(argv=None):
                                      "stop-before-start",
                                      "stop-during-recovery",
                                      "stop-coincides-with-progress",
-                                     "guard-failure"])
+                                     "guard-failure", "identified-move",
+                                     "identified-move-wrong"])
     ap.add_argument("--out-root", default=os.path.join("outputs", "autobattle",
                                                        "transport-checks"))
     args = ap.parse_args(argv)
@@ -1138,7 +1349,8 @@ def main(argv=None):
     names = ["takeover", "unknown", "disconnect", "restart", "defeat",
              "results", "submenu", "pause", "strict-press",
              "stop-before-start", "stop-during-recovery",
-             "stop-coincides-with-progress"]
+             "stop-coincides-with-progress", "guard-failure",
+             "identified-move", "identified-move-wrong"]
     if args.scenario != "all":
         names = [args.scenario]
     failures = []

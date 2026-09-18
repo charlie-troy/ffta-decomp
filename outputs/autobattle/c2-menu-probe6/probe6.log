@@ -1,0 +1,15 @@
+[   14.1s] menu settled
+[   14.1s] Marche start tile: (4, 10) ct=0
+[   15.6s] press exercise down: hits=5
+[   18.6s] press exercise up: hits=5
+[   21.6s] press open-target: hits=5
+[   24.6s] press down-to-dest: hits=5
+[   29.3s] press move: hits=5
+[   30.9s] after move: cmd_cursor=1 tile=(4, 10) ct=0
+[   33.9s] press nav-down-0: hits=5
+[   35.5s] cursor before Wait confirm: 2
+[   36.9s] press select-wait: hits=5
+[   39.9s] press confirm-wait: hits=5
+[   43.2s] waiting for turn commit (tile update)
+[   47.8s] executed tile: (4, 11) (planned (4, 11)) ct=1000
+[   47.9s] CONFIRMED move-target cursor pairs: [['0200ffc9', '0200ffca'], ['0200ffc9', '02010059'], ['02010058', '0200ffca'], ['02010058', '02010059']]

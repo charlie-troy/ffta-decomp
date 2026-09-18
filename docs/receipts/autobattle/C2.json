@@ -1,0 +1,53 @@
+{
+  "packet": "C2",
+  "base_revision": "54864eb",
+  "tested_revision": "working tree on top of 54864eb (C2 identified-candidate selector: menu-cursor decode from RAM, leg-wise identified-move driver, engine-side tile verification, offline cursor-law controls; committed with this receipt)",
+  "status": "pass",
+  "criteria": [
+    {
+      "id": "roster-snapshot-validation",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario identified-move-wrong --out-root outputs/autobattle (demotion rides the validated read path); decoder guards in tools/probe_control_handoff.py plan_identified_move / read_cmd_cursor / read_target_cursor",
+      "expected": "invalid or transient roster/menu reads are rejected before any policy decision or claim",
+      "observed": "plan_identified_move rejects unreadable tile (None/(0,0)), a command cursor outside {0,1,2}, and an implausible target cursor (out of <64 map bounds, (0,0), or None); live probe4 additionally demonstrated the engine's own legality bound: a dest outside the unit's movement range leaves target mode open (walk rejected, no desync) — the decoder never plans past an illegal state",
+      "evidence": ["tools/probe_control_handoff.py", "outputs/autobattle/c2-menu-probe4/probe4.json", "outputs/autobattle/identified-move-wrong/events.jsonl"]
+    },
+    {
+      "id": "identified-candidate-selection",
+      "status": "pass",
+      "command": "python -u tools/run_autobattle.py --run-id c2-live4 --yes --wall-timeout 420 (turn 1) — the runtime's identified branch requires plan_identified_move() to succeed BEFORE any input is sent",
+      "expected": "the command and its destination are identified from RAM (decoded cursors), not inferred from the key sequence sent",
+      "observed": "command cursor 0x0202ddd9 read Move(0) at the open menu; move-target cursor 0x0200ffc9/ffca read (4,10) at open and (4,11) after the driver's DOWN step — the destination was read from RAM before the confirming A; the receipt's selected_action carries command_id=0 and the dest, selected_target cites 'RAM target cursor read before confirm'; input-log records every leg between reads",
+      "evidence": ["outputs/autobattle/c2-live4/events.jsonl", "outputs/autobattle/c2-live4/input-log.jsonl", "outputs/autobattle/c2-menu-probe/probe.json", "outputs/autobattle/c2-menu-probe6/probe6.json"]
+    },
+    {
+      "id": "identity-to-turn-end-receipt",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario identified-move --out-root outputs/autobattle (positive control) + validate_autobattle_runtime.validate on both live runs",
+      "expected": "player identity, selection, engine acceptance, execution, and turn end appear in one receipt; the contract's negative control exists",
+      "observed": "single turn event carries: actor Marche/slot 6, selected_action={identified-move, command_id=0, dest [4,11]}, selected_target={tile, identified_from RAM}, position_after, and the note records the engine-side verification (roster tile reached exactly the RAM-read dest). Offline negative control identified-move-wrong runs the real runtime+probe over a fake engine that executes a DIFFERENT tile than the cursor named: the claim is demoted (selected_action/selected_target null, 'NOT claimed' in the note) while the turn honestly commits",
+      "evidence": ["outputs/autobattle/identified-move/events.jsonl", "outputs/autobattle/identified-move-wrong/events.jsonl", "outputs/autobattle/c2-live4/events.jsonl", "outputs/autobattle/c2-live5/events.jsonl"],
+      "negative_control": "identified-move-wrong: an engine that disagrees with the RAM-read destination must not leave an identified claim standing (Astra's 'chooser conditionally selects another fixed sequence' critique — the claim now rides the engine's own observable result)"
+    },
+    {
+      "id": "repeat-from-reload-twice",
+      "status": "pass",
+      "command": "python -u tools/run_autobattle.py --run-id c2-live4 --yes --wall-timeout 420; python -u tools/run_autobattle.py --run-id c2-live5 --yes --wall-timeout 420",
+      "expected": "two independent executions from reload, receipts validating, identical identified chain",
+      "observed": "c2-live4 and c2-live5 (fresh boots of the battle-start fixture): each committed turn 1 as an identified Move (4,10)->(4,11) with the roster tile verified at the RAM-read destination; both receipts pass validate(); both then bounded honestly on a later non-standard menu shape (see the unknown-UI note) — defeat/bounds are valid completion outcomes per the roadmap",
+      "evidence": ["outputs/autobattle/c2-live4/run.json", "outputs/autobattle/c2-live5/run.json"]
+    },
+    {
+      "id": "decode-method-provenance",
+      "status": "pass",
+      "command": "python tools/c2_menu_probe.py (cycle sweep), c2_menu_probe2.py (submenu/targets), c2_menu_probe4.py (x/y trajectories), c2_menu_probe6.py (end-to-end commit)",
+      "expected": "the decoded addresses are experimentally pinned, not asserted",
+      "observed": "command cursor 0x0202ddd9 survived two full down/up menu cycles (trajectory 0,1,2,1,0 across Move/Action/Wait); target x/y pairs survived RIGHT,DOWN,RIGHT full trajectories with 4-byte-apart shadow copies dropping out on the end-to-end commit (probe6): the adjacent-byte struct pairs 0x0200ffc9/ffca (+ mirror 0x02010058/59) match the executed tile exactly; commit semantics (destination-A moves and re-opens the command menu; Wait closes the turn) are engine-verified",
+      "evidence": ["outputs/autobattle/c2-menu-probe/probe.json", "outputs/autobattle/c2-menu-probe4/probe4.json", "outputs/autobattle/c2-menu-probe6/probe6.json"]
+    }
+  ],
+  "notes": [
+    "Non-Wait ABILITY identification (action submenu cursor 0x0202df5d/5e candidates) is decoded to candidate pairs only; the proven execution chain is the MOVE command. Command_id=0 with verified tile semantics satisfies the packet's 'an action ID with verified semantics is enough'.",
+    "Live runs bounded at a later non-standard menu shape (probe legs landed zero stops — an unknown-UI class, recorded honestly); c2-live3 exposed and fixed a real defect on that path (a failed identified drive without a STOP must bound, not classify paused)."
+  ]
+}

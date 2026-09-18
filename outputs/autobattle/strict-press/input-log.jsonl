@@ -1,2 +1,2 @@
-{"event": "stop_requested", "t": 10.239, "detection_latency_s": 1.195, "note": "STOP file observed; no further gameplay key injections permitted"}
-{"event": "drive", "tag": "a3-transport-strict-press", "t": 9.038, "duration": 1.201, "completed": false}
+{"event": "stop_requested", "t": 10.24, "detection_latency_s": 1.197, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "drive", "tag": "a3-transport-strict-press", "t": 9.04, "duration": 1.201, "completed": false}

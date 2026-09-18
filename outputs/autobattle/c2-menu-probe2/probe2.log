@@ -1,0 +1,23 @@
+[    2.1s] waiting up to 150s for the menu (player_menu_settled, allow_zero)
+[   14.1s] menu settled; starting focused sweeps
+[   15.6s] press A to-Action: hits=5
+[   19.0s] phase A-pre: cmd_cursor=1 (shot outputs\autobattle\c2-menu-probe2\p2-A-pre.png)
+[   20.5s] press A open-submenu: hits=5
+[   24.1s] phase A-open: cmd_cursor=1 (shot outputs\autobattle\c2-menu-probe2\p2-A-open.png)
+[   25.5s] press A down1: hits=5
+[   29.0s] phase A-down1: cmd_cursor=1 (shot outputs\autobattle\c2-menu-probe2\p2-A-down1.png)
+[   30.5s] press A down2: hits=5
+[   34.1s] phase A-down2: cmd_cursor=1 (shot outputs\autobattle\c2-menu-probe2\p2-A-down2.png)
+[   35.5s] press A cancel-submenu: hits=5
+[   39.0s] phase A-after-cancel: cmd_cursor=1 (shot outputs\autobattle\c2-menu-probe2\p2-A-after-cancel.png)
+[   39.0s] expA: 8 progression candidates; cancel returns cmd cursor to Action: True
+[   40.4s] press B to-Move: hits=5
+[   43.5s] press B open-target: hits=5
+[   47.0s] phase B-open: cmd_cursor=0 (shot outputs\autobattle\c2-menu-probe2\p2-B-open.png)
+[   48.4s] press B down: hits=5
+[   51.9s] phase B-down: cmd_cursor=0 (shot outputs\autobattle\c2-menu-probe2\p2-B-down.png)
+[   53.3s] press B right: hits=5
+[   56.8s] phase B-right: cmd_cursor=0 (shot outputs\autobattle\c2-menu-probe2\p2-B-right.png)
+[   58.3s] press B cancel-target: hits=5
+[   61.9s] phase B-after-cancel: cmd_cursor=0 (shot outputs\autobattle\c2-menu-probe2\p2-B-after-cancel.png)
+[   61.9s] expB: 16 x-candidates, 36 y-candidates

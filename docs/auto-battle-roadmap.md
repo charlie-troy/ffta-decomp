@@ -236,15 +236,35 @@ pure selector only as needed; the broader tactics language remains A5.
 Read `docs/player-ai-control.md`, `include/ffta.h`, and the specific accessors
 needed to verify field semantics. Treat prior fixed-address effects as suspect.
 
-- [ ] Reject invalid/transient roster snapshots before policy decisions or
+- [x] Reject invalid/transient roster snapshots before policy decisions or
   effect attribution. Validate identity, record lifetime, and field bounds.
-- [ ] Identify one legal non-Wait command and its target/destination at a
+  (Done 2026-09-17: `plan_identified_move` rejects unreadable/(0,0) tiles, a
+  command cursor outside {0,1,2}, and implausible target cursors (out of map
+  bounds, (0,0), None); live probe4 showed the engine itself rejects out-of-
+  range destinations — the decoder never plans past an illegal state.)
+- [x] Identify one legal non-Wait command and its target/destination at a
   player boundary; choose that identified candidate rather than inferring
   an action from the key sequence sent.
-- [ ] Tie player identity → selection → engine acceptance → execution →
+  (Done 2026-09-17: menu cursors decoded from live RAM — command cursor
+  0x0202ddd9 (Move=0/Action=1/Wait=2, two-cycle differential sweep) and move-
+  target cursor 0x0200ffc9/ffca (+ mirror 0x02010058/59, end-to-end commit
+  probe6). The runtime's identified branch reads cmd+target cursors, plans,
+  and drives leg-by-leg with RAM re-reads between legs; the destination is
+  read before the confirming input.)
+- [x] Tie player identity → selection → engine acceptance → execution →
   turn end into one receipt. Add the contract's negative controls.
-- [ ] Repeat from reload twice. An action ID with verified semantics is enough;
+  (Done 2026-09-17: one turn event carries actor, selected_action
+  {identified-move, command_id, dest}, selected_target (RAM-read), and the
+  engine-side verification (roster tile reached the RAM-read dest). Offline
+  fake-engine law replays the recorded cursor semantics; negative control
+  `identified-move-wrong` (engine executes a different tile than the cursor
+  named) demotes the claim — receipt `docs/receipts/autobattle/C2.json`.)
+- [x] Repeat from reload twice. An action ID with verified semantics is enough;
   human-readable name decoding is optional. Record uncertainty as unknown.
+  (Done 2026-09-17: c2-live4 + c2-live5, fresh reloads under the final code —
+  both committed turn 1 as identified Move (4,10)->(4,11) with tile
+  verification; ability-submenu decode remains a candidate pair (uncertainty
+  recorded); c2-live3's failed-drive-was-paused defect found and fixed.)
 
 Done: two valid live executions and all C2 checks pass. If the decoded action
 has no HP/MP effect, verify its specific observable result (e.g. committed

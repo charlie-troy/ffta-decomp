@@ -2,8 +2,10 @@
 
 > Current acceptance authority: [C1–C3 roadmap](auto-battle-roadmap.md) and
 > [worker contract](autobattle-worker-contract.md), updated 2026-09-17.
-> Earlier closure claims below retain their historical limits; non-Wait
-> attribution and cancellation acceptance remain open until those checks pass.
+> Earlier closure claims below retain their historical limits; cancellation
+> and usable handoff (C1) and identified non-Wait selection (C2) are now
+> accepted per their criterion receipts
+> (`docs/receipts/autobattle/C1.json`, `C2.json`).
 
 Status: **A2.4a done (2026-09-10); A2.3's roster model is refuted in part.**
 Retail player turns DO ctx-init the AI sequencer and the menu/AI split is a
@@ -343,6 +345,34 @@ fixed-address roster keeps nonzero max_hp, so `battle_torn_down()` (whole-block
 hp/max_hp wipe) correctly stays False. Teardown and battle-end are different
 states; neither is a menu wedge. Run 6's old "teardown" was a misread roster
 copy during action execution.
+
+**Menu cursors (C2 decode, 2026-09-17 — the open menu is readable, not
+blind).** Differential RAM sweeps over repeated menu cycles pinned the player
+menu's live state; the A3 runtime's identified-candidate branch
+(`plan_identified_move`/`commit_identified_move` in
+`tools/probe_control_handoff.py`) selects from these reads instead of
+inferring an action from the key sequence it sends:
+
+- Command cursor `0x0202ddd9` (u8): 0=Move, 1=Action, 2=Wait. Trajectory
+  0,1,2,1,0 reproduced across two independent down/up cycles; neighbor
+  `0x0202ddd8` reads 7 (adjacent menu field, undecoded).
+- Move-target cursor x/y `0x0200ffc9`/`0x0200ffca` (adjacent-byte struct
+  pair; mirror `0x02010058`/`0x02010059`). Values track every step
+  ((4,10) at menu open → (4,11) after one DOWN); 4-byte-apart shadow pairs
+  found in the same sweeps dropped out at the end-to-end commit.
+- Commit semantics (probe5/6, engine-verified): confirming a destination
+  MOVES the unit and RE-OPENS the command menu (cursor re-initializes at
+  Action); the roster tile updates only at turn commit; a Wait turn closes
+  with select A + confirm A. Confirming the unit's own tile re-opens the
+  menu without moving (the zero-move pitfall).
+- Legality: a destination outside the unit's movement range leaves target
+  mode open (probe4) — the engine rejects the walk; the decoder must not
+  plan past an illegal state.
+
+Receipts: `outputs/autobattle/c2-menu-probe*/`, live identified executions
+`outputs/autobattle/c2-live4/`, `c2-live5/`, negative control
+`identified-move-wrong` in the transport suite,
+`docs/receipts/autobattle/C2.json`.
 
 **Transport rules.** With the battle sequencer running, breakpoints fire
 continuously; stale T05 stop-replies can race Z0 inserts and presses abort

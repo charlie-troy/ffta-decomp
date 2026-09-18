@@ -479,6 +479,121 @@ class BattleRuntime:
         except Exception:
             before_effects = None
         self._before_effects = before_effects  # target validation reads this
+
+        # -- C2 identified-candidate path -----------------------------------
+        # When the open menu's decoded command cursor reads Move and the
+        # decoded target cursor is readable, THAT is the candidate: the
+        # command and the destination are identified from RAM before the
+        # confirming input, never inferred from the key sequence. The driver
+        # navigates the real cursors (re-reading RAM between legs) and
+        # finishes the turn with the proven Wait commit (probe5/6: the move
+        # re-opens the command menu, so the turn only closes after Wait).
+        plan = None
+        try:
+            plan = self.p.plan_identified_move()
+        except Exception:
+            plan = None
+        if plan is not None:
+            drove, dest_used, _leglog = self.p.commit_identified_move(
+                plan, stop_check=self._stop_check,
+                log_leg=lambda rec: self._log_input(rec))
+            if self._stop_check():
+                # a latched STOP owns this exit: no turn event after the
+                # stop record, hand the battle over here
+                self._finish(PAUSED,
+                             "STOP requested: battle left running for "
+                             "manual play")
+                return
+            if not drove:
+                # failed drive WITHOUT a latched stop (c2-live3: a non-
+                # standard menu shape whose legs all landed hits=0): this is
+                # an unknown UI, not a manual handoff — pausing here
+                # mislabeled the run `paused` AND double-terminated (the
+                # loop then classified the still-live battle to completion).
+                # Bound honestly like the unknown-modal path instead.
+                self._saw_unknown_modal = True
+                self.event("note", actor="Marche", actor_slot=6,
+                           note="identified-move drive failed without a "
+                                "stop (non-standard menu shape, legs "
+                                "landed no stops): bounding run — battle "
+                                "left on the open menu for manual play")
+                self.state = RUNNING
+                return
+            route_note = ("identified-move: cmd_cursor=Move and target "
+                          "cursor read from RAM before input")
+            sel_action = {"kind": "identified-move",
+                          "command_id": plan["command_id"],
+                          "dest": list(dest_used) if dest_used else None,
+                          "from": plan["from"]}
+            sel_target = None
+            if dest_used is not None:
+                sel_target = {"kind": "tile", "dest": list(dest_used),
+                              "identified_from":
+                                  "RAM target cursor read before confirm"}
+            # the Wait commit ends the turn: same wall-aware progress wait
+            # as the route paths
+            committed = self.p.wait_progress(
+                seconds=min(150.0, max(10.0, self.wall_timeout -
+                                       (time.time() - self.t0))),
+                min_new_seeds=1, stop_check=self._stop_check)
+            if self._stop_check():
+                # stop landed inside the post-commit wait (C1 rule: no turn
+                # event after the latched stop; hand the battle over here,
+                # mirroring the route path's recovery exit)
+                self._finish(PAUSED,
+                             "STOP requested: battle left running for "
+                             "manual play")
+                return
+            # C2 verification: movement IS the observable result. The roster
+            # tile updates at commit, which wait_progress's seed condition
+            # may precede — verify on a bounded retry loop.
+            dest = tuple(dest_used) if dest_used else None
+            tile_verified = None
+            if dest is not None:
+                deadline = time.time() + 20.0
+                while time.time() < deadline:
+                    if self._stop_check():
+                        break
+                    pos = self._marche_pos()
+                    if pos and (pos["x"], pos["y"]) == dest:
+                        tile_verified = pos
+                        break
+                    try:
+                        self.p.wait_progress(seconds=2.0,
+                                             min_new_seeds=9999999,
+                                             stop_check=self._stop_check)
+                    except Exception:
+                        pass
+            if self._stop_check():
+                self._finish(PAUSED,
+                             "STOP requested: battle left running for "
+                             "manual play")
+                return
+            after = self._marche_pos() or {"x": None, "y": None}
+            if dest is not None and tile_verified is not None:
+                route_note += (f"; roster tile verified at "
+                               f"({tile_verified['x']}, "
+                               f"{tile_verified['y']}) == RAM-read dest "
+                               f"(verified)")
+            else:
+                # engine disagreed (or dest never identified): demote
+                # honestly — identified and driven, but the observable
+                # result is not proven.
+                sel_action = None
+                sel_target = None
+                route_note += ("; identified-move driven but the roster "
+                               "tile did not reach the identified "
+                               "destination: NOT claimed (engine disagreed "
+                               "with the RAM-read destination)")
+            self.turn += 1
+            self.event("turn", turn=self.turn, actor="Marche", actor_slot=6,
+                       control_mode="external", selected_action=sel_action,
+                       selected_target=sel_target,
+                       position_before=before, position_after=after,
+                       note=f"committed via {route_note}")
+            self.state = prev if prev in (RUNNING,) else RUNNING
+            return
+
         choice = None
         try:
             choice = self.p.choose_non_wait()

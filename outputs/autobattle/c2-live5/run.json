@@ -1,0 +1,13 @@
+{
+  "schema": "a3-run/1",
+  "run_id": "c2-live5",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 1,
+  "seeds": 5,
+  "router_hits": 146,
+  "terminal_reason": "no-progress bound reached",
+  "events": "outputs/autobattle\\c2-live5\\events.jsonl",
+  "emulator_handoff": "terminated"
+}

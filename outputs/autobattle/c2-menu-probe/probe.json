@@ -1,0 +1,442 @@
+{
+  "run": "c2-menu-probe",
+  "t_elapsed_s": 83.3,
+  "trajectory": [
+    {
+      "phase": "cycle1-a",
+      "n": 197202,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle1-a.png",
+      "t": 15.8
+    },
+    {
+      "phase": "cycle1-b",
+      "n": 197287,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle1-b.png",
+      "t": 21.2
+    },
+    {
+      "phase": "cycle1-c",
+      "n": 197391,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle1-c.png",
+      "t": 26.6
+    },
+    {
+      "phase": "cycle1-d",
+      "n": 197087,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle1-d.png",
+      "t": 31.9
+    },
+    {
+      "phase": "cycle1-e",
+      "n": 197247,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle1-e.png",
+      "t": 37.2
+    },
+    {
+      "phase": "cycle2-a",
+      "n": 197363,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle2-a.png",
+      "t": 39.2
+    },
+    {
+      "phase": "cycle2-b",
+      "n": 197189,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle2-b.png",
+      "t": 44.4
+    },
+    {
+      "phase": "cycle2-c",
+      "n": 197276,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle2-c.png",
+      "t": 49.7
+    },
+    {
+      "phase": "cycle2-d",
+      "n": 197021,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle2-d.png",
+      "t": 55.1
+    },
+    {
+      "phase": "cycle2-e",
+      "n": 197298,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-cycle2-e.png",
+      "t": 60.4
+    },
+    {
+      "phase": "sub-a",
+      "n": 197342,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-sub-a.png",
+      "t": 65.8
+    },
+    {
+      "phase": "sub-b",
+      "n": 197287,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-sub-b.png",
+      "t": 71.2
+    },
+    {
+      "phase": "sub-c",
+      "n": 197301,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-sub-c.png",
+      "t": 76.8
+    },
+    {
+      "phase": "sub-d",
+      "n": 197190,
+      "shot": "outputs\\autobattle\\c2-menu-probe\\menu-sub-d.png",
+      "t": 82.1
+    }
+  ],
+  "cycle1": [
+    {
+      "addr": "02007fee",
+      "a": 1,
+      "b": 0,
+      "c": 1,
+      "d": 1,
+      "e": 1
+    },
+    {
+      "addr": "02008b58",
+      "a": 3,
+      "b": 4,
+      "c": 0,
+      "d": null,
+      "e": 3
+    },
+    {
+      "addr": "02008d94",
+      "a": 3,
+      "b": 5,
+      "c": 1,
+      "d": null,
+      "e": 3
+    },
+    {
+      "addr": "0201fdb2",
+      "a": 1,
+      "b": 0,
+      "c": 1,
+      "d": 1,
+      "e": 1
+    },
+    {
+      "addr": "0201fdb3",
+      "a": 2,
+      "b": 0,
+      "c": 2,
+      "d": 2,
+      "e": 2
+    },
+    {
+      "addr": "0201ff90",
+      "a": 1,
+      "b": 3,
+      "c": 1,
+      "d": 3,
+      "e": 1
+    },
+    {
+      "addr": "0202ddd9",
+      "a": 0,
+      "b": 1,
+      "c": 2,
+      "d": 1,
+      "e": 0
+    },
+    {
+      "addr": "0300006c",
+      "a": 4,
+      "b": 0,
+      "c": 4,
+      "d": 4,
+      "e": 4
+    },
+    {
+      "addr": "03007ddf",
+      "a": 0,
+      "b": 3,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "03007de2",
+      "a": 0,
+      "b": 2,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "03007e09",
+      "a": 0,
+      "b": 1,
+      "c": 0,
+      "d": 6,
+      "e": 0
+    }
+  ],
+  "cycle2": [
+    {
+      "addr": "02008563",
+      "a": 2,
+      "b": 0,
+      "c": 2,
+      "d": 0,
+      "e": 2
+    },
+    {
+      "addr": "02008600",
+      "a": 0,
+      "b": 2,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "02008680",
+      "a": 0,
+      "b": 2,
+      "c": 6,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "02008700",
+      "a": 0,
+      "b": 7,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "02008a1e",
+      "a": 2,
+      "b": 6,
+      "c": 3,
+      "d": 7,
+      "e": 2
+    },
+    {
+      "addr": "02008bcc",
+      "a": 2,
+      "b": 3,
+      "c": 1,
+      "d": null,
+      "e": 2
+    },
+    {
+      "addr": "0201fef2",
+      "a": 0,
+      "b": 3,
+      "c": 1,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "0201fef9",
+      "a": 0,
+      "b": 4,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "0201fefa",
+      "a": 0,
+      "b": 2,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "0201fefb",
+      "a": 0,
+      "b": 2,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "020298b4",
+      "a": 1,
+      "b": 0,
+      "c": 1,
+      "d": 1,
+      "e": 1
+    },
+    {
+      "addr": "0202ddd9",
+      "a": 0,
+      "b": 1,
+      "c": 2,
+      "d": 1,
+      "e": 0
+    },
+    {
+      "addr": "0300000e",
+      "a": 0,
+      "b": 2,
+      "c": 0,
+      "d": 1,
+      "e": 0
+    },
+    {
+      "addr": "030057d3",
+      "a": 0,
+      "b": 2,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "030058a2",
+      "a": 0,
+      "b": 1,
+      "c": 0,
+      "d": 0,
+      "e": 0
+    },
+    {
+      "addr": "03007d38",
+      "a": 0,
+      "b": 1,
+      "c": 2,
+      "d": 1,
+      "e": 0
+    }
+  ],
+  "submenu": [
+    {
+      "addr": "02008612",
+      "closed": 0,
+      "open": 1,
+      "down": 0,
+      "restored": 1
+    },
+    {
+      "addr": "02008663",
+      "closed": 0,
+      "open": 2,
+      "down": 0,
+      "restored": 2
+    },
+    {
+      "addr": "020086a3",
+      "closed": 2,
+      "open": 0,
+      "down": 2,
+      "restored": 0
+    },
+    {
+      "addr": "02008723",
+      "closed": 0,
+      "open": 2,
+      "down": 0,
+      "restored": 2
+    },
+    {
+      "addr": "02008f7b",
+      "closed": 2,
+      "open": 0,
+      "down": 5,
+      "restored": 0
+    },
+    {
+      "addr": "0201fef0",
+      "closed": 2,
+      "open": 1,
+      "down": 2,
+      "restored": 1
+    },
+    {
+      "addr": "0300000e",
+      "closed": 2,
+      "open": 1,
+      "down": 2,
+      "restored": 1
+    },
+    {
+      "addr": "03005823",
+      "closed": 0,
+      "open": 2,
+      "down": 0,
+      "restored": 2
+    },
+    {
+      "addr": "03007cc8",
+      "closed": 0,
+      "open": 2,
+      "down": 0,
+      "restored": 2
+    },
+    {
+      "addr": "03007d36",
+      "closed": 1,
+      "open": 2,
+      "down": 1,
+      "restored": 2
+    },
+    {
+      "addr": "03007d3a",
+      "closed": 0,
+      "open": 2,
+      "down": 0,
+      "restored": 2
+    },
+    {
+      "addr": "03007d3e",
+      "closed": 2,
+      "open": 0,
+      "down": 2,
+      "restored": 0
+    },
+    {
+      "addr": "03007f95",
+      "closed": 4,
+      "open": 0,
+      "down": 4,
+      "restored": 0
+    }
+  ],
+  "survivors": [
+    {
+      "addr": "0202ddd9",
+      "trajectory": [
+        0,
+        1,
+        2,
+        1,
+        0
+      ],
+      "context": [
+        0,
+        84,
+        0,
+        0,
+        0,
+        16,
+        0,
+        7,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "context_lo": "0202ddd1"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+[    2.1s] waiting up to 150s for the menu
+[   14.1s] menu settled
+[   14.1s] Marche start tile: (4, 10) ct=0
+[   15.6s] press exercise down: hits=5
+[   18.6s] press exercise up: hits=5
+[   21.6s] press open-target: hits=5
+[   25.1s] phase T0-open swept
+[   26.6s] press right1: hits=5
+[   30.0s] phase T1-right swept
+[   31.5s] press down1: hits=5
+[   35.1s] phase T2-down swept
+[   36.6s] press right2: hits=5
+[   40.0s] phase T3-right swept
+[   40.3s] x cands: ['0200f3b8', '0200f3c0', '0200ffc9', '02010058']
+[   40.3s] y cands: ['0200f3bc', '0200f3c4', '0200ffca', '02010059']
+[   41.8s] press confirm-move: hits=5
+[   43.4s] move confirmed; waiting for execution (tile change + ct charge)
+[  135.2s] executed tile: (4, 10) (planned (6, 11)) ct=0
+[  135.3s] CONFIRMED cursor pairs (final == executed tile): []
