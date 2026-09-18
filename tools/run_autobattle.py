@@ -70,7 +70,34 @@ def main(argv=None):
                 return 2
         if not runtime.live_guard():
             runtime.state = "stalled"
-            runtime.event("stop", reason="live guard failed before start")
+            # Astra round 4 gap 3: the guard failure itself must reach the
+            # receipt. The run DID start (boot, guards) even though run()
+            # never did, so the start event is emitted here — without it
+            # the receipt cannot satisfy the one-start lifecycle rule.
+            runtime.event("start", control_mode=args.mode,
+                          input_log="input-log.jsonl")
+            # This event's note is the run's terminal reason, and run.json
+            # is written on THIS path too — the old shape returned before
+            # any receipt, leaving only stdout text behind.
+            runtime.event("stop", note="stalled: live guard failed before start")
+            guard_receipt = {
+                "schema": "a3-run/1",
+                "run_id": run_id,
+                "scenario": scenario.get("scenario_id"),
+                "mode": args.mode,
+                "final_state": "stalled",
+                "turns": 0,
+                "seeds": 0,
+                "router_hits": runtime.p.router_hits,
+                "terminal_reason": "live guard failed before start",
+                "events": runtime.events_path,
+                "emulator_handoff": "terminated",
+            }
+            with open(os.path.join(out_dir, "run.json"), "w",
+                      encoding="utf-8") as fh:
+                json.dump(guard_receipt, fh, indent=2)
+            print(f"final state: stalled (guard failure); receipt "
+                  f"{out_dir}/run.json")
             return 1
         stop_file = os.path.join(out_dir, "STOP")
         try:

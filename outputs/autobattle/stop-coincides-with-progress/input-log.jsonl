@@ -1,0 +1,2 @@
+{"event": "drive", "tag": "a3-transport-stop-coincides-with-progress", "t": 9.038, "duration": 4.809, "completed": true}
+{"event": "stop_requested", "t": 17.063, "detection_latency_s": 0.196, "note": "STOP file observed; no further gameplay key injections permitted"}

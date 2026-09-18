@@ -85,6 +85,9 @@ class BattleRuntime:
         self._input_log = open(self.input_log_path, "a", encoding="utf-8")
         self._stop_requested_t = None  # wall-clock latency measurement
         self.t0 = time.time()
+        # shared wall clock with the probe's write log (validator rule: a
+        # write is "after stop_requested" relative to the SAME t0)
+        self.p.t0 = self.t0
         self._last_seed_count = 0
         self._last_seed_t = time.time()
         self._terminal_reason = None
@@ -123,6 +126,14 @@ class BattleRuntime:
             self._input_log.flush()
         except Exception:
             pass
+
+    def log_manual_write(self, val):
+        """Record a NON-automation key write (C1 gap 4: after the runner
+        detaches from a paused handoff, input the player — human or agent —
+        sends through the emulator is manual, and the validator must not
+        fail it as escaped automation input)."""
+        self._log_input({"event": "manual_key_write", "val": val,
+                         "t": round(time.time() - self.t0, 3)})
 
     # -- events ------------------------------------------------------------
     def event(self, kind, **fields):
@@ -250,7 +261,8 @@ class BattleRuntime:
     # -- main loop ---------------------------------------------------------
     def run(self):
         self.state = RUNNING
-        self.event("start", control_mode=self.mode)
+        self.event("start", control_mode=self.mode,
+                   input_log="input-log.jsonl")
         try:
             while True:
                 # latched stop (seen inside a wait or recovery) exits before

@@ -4254,3 +4254,33 @@ Suite: 12 scenarios, all PASS on the final code; tracked receipts refreshed.
 
 Next packet: C2 (validated player action) — status unchanged: the selector
 that identifies a command before execution is the remaining work.
+
+## 2026-09-17 — C1 round-4 closure (Astra review of 67cdb7d/c31ba09)
+
+All four round-4 gaps closed, each with a failing-first regression where one
+applies:
+
+1. **Input-log validation is real now.** `validate_autobattle_runtime.py`
+   reads `input-log.jsonl` (when present) and FAILS the receipt if any
+   successful press starts after the stop latch OR the terminal stop event.
+   Adversarial check: a hand-injected post-STOP press into a passing run's
+   log makes validation fail; removing the injection passes.
+2. **Cancellation timing measured from STOP observation, not run() return.**
+   The probe now keeps a raw timestamped key-write log; suite rules use
+   `press_writes_after()` against raw write timestamps. A write escaping
+   before run() returns can no longer hide behind the late assertion.
+3. **Guard-failure receipts.** The CLI writes a truthful run.json (start +
+   stop events with the failure reason in the schema-supported `note`
+   field) before exiting 1. The `guard-failure` scenario drives the real
+   `run_autobattle.main()` and asserts receipt contents; its first run
+   failed exactly the pre-fix shape (no run.json, dropped reason).
+4. **Manual handoff closed without a human.** Astra round 4: agent-driven
+   player input is sufficient. `tools/manual_input_probe.py` boots a real
+   battle, STOPs mid-run, detaches via the real `__exit__` (keep_process),
+   then sends START/DOWN through the mGBA window (SendInput, never the stub
+   key path): screen visibly changes, stub write count unchanged (20→20).
+
+Full 13-scenario transport suite PASS on final code; all receipts pass the
+strengthened contract validator. `docs/receipts/autobattle/C1.json` updated:
+11/11 criteria PASS, status `pass`. Roadmap C1 rows updated. Next: C2
+identified-action selector.

@@ -8,6 +8,6 @@
   "seeds": 5,
   "router_hits": 0,
   "terminal_reason": "battle end signature held",
-  "events": "outputs/autobattle\\takeover\\events.jsonl",
+  "events": "outputs\\autobattle\\transport-checks\\takeover\\events.jsonl",
   "emulator_handoff": "terminated"
 }

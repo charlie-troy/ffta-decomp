@@ -1,0 +1,8 @@
+{"event": "drive", "tag": "a3-transport-unknown", "t": 9.111, "duration": 4.815, "completed": true}
+{"event": "drive", "tag": "a3-transport-unknown", "t": 32.181, "duration": 4.809, "completed": true}
+{"event": "press", "mask": 2, "tag": "a3-transport-unknown:B1", "t": 188.392, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "drive", "tag": "a3-transport-unknown:rec1", "t": 189.594, "duration": 4.816, "completed": true}
+{"event": "press", "mask": 2, "tag": "a3-transport-unknown:B2", "t": 254.971, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "drive", "tag": "a3-transport-unknown:rec2", "t": 256.173, "duration": 4.819, "completed": true}
+{"event": "press", "mask": 2, "tag": "a3-transport-unknown:B3", "t": 321.488, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "drive", "tag": "a3-transport-unknown:rec3", "t": 322.69, "duration": 4.814, "completed": true}

@@ -24,6 +24,13 @@ KNOWN_FIELDS = {"t", "kind", "scenario", "turn", "actor", "actor_slot",
 # kinds whose presence after the terminal stop means the run kept driving:
 # boundaries, turns, and notes about recovery cycles are all input activity
 INPUT_EVENT_KINDS = {"boundary", "turn", "note"}
+# C1 gap 1: the validator READS the raw write log (Astra round 4: the old
+# validator never opened input-log.jsonl, so an injected log containing a
+# successful post-STOP press passed validation). A "manual_key_write"
+# record is input the player/agent sent AFTER the runner detached from a
+# paused handoff — it is not automation input and never counts as a leak.
+MANUAL_WRITE_EVENT = "manual_key_write"
+STOP_EVENTS = ("stop_requested", "stop_observed")
 
 
 def fail(msg, errors):
@@ -138,6 +145,55 @@ def validate(out_dir):
              "events exist", errors)
     if run.get("mode") != "retail-ai":
         fail(f"unexpected mode {run.get('mode')!r}", errors)
+
+    # C1 gap 1: cross-check the raw write log. A stopped/terminal run must
+    # show NO automation key write after the stop was latched. Records with
+    # a start time BEFORE the latch may legitimately END after it (a press
+    # cycle already in flight when STOP was observed) — the per-input gate
+    # lets an in-flight press finish but never STARTS a new one.
+    ilog_path = os.path.join(out_dir, "input-log.jsonl")
+    if os.path.exists(ilog_path):
+        ilog = []
+        with open(ilog_path, encoding="utf-8") as fh:
+            for ln, line in enumerate(fh, 1):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    ilog.append(json.loads(line))
+                except json.JSONDecodeError as exc:
+                    fail(f"input-log line {ln}: not JSON ({exc})", errors)
+        stops_il = [r for r in ilog if r.get("event") in STOP_EVENTS]
+        # threshold: the stop LATCH when one exists, otherwise the terminal
+        # stop event's timestamp — so runs that ended without a STOP file
+        # (completed/stalled) are still guarded against post-terminal input
+        # (Astra round 4 gap 1: the old validator never read this log at
+        # all, so an injected post-STOP press passed validation)
+        stop_t = None
+        if stops_il:
+            stop_t = stops_il[0].get("t")
+        else:
+            stop_t = stops[0].get("t") if stops else None
+        if stop_t is not None:
+            leaks = []
+            for r in ilog:
+                if r.get("event") in ("press", "drive"):
+                    if r.get("aborted") or r.get("completed") is False:
+                        continue  # the gate caught it: no input fired
+                    if r.get("t", 0) > stop_t + 0.001:
+                        leaks.append(r)
+                elif r.get("event") == MANUAL_WRITE_EVENT:
+                    continue  # manual input after a detached handoff
+            if leaks:
+                fail(f"input-log: {len(leaks)} successful press/drive "
+                     f"started after the stop was latched (t={stop_t}): "
+                     f"{[r.get('tag') or r.get('event') for r in leaks[:3]]}",
+                     errors)
+            if run.get("final_state") == "paused" and not stops_il:
+                fail("paused run.json but input-log.jsonl never latched "
+                     "the stop", errors)
+    elif events and events[0].get("input_log"):
+        fail(f"missing {ilog_path} (start event records it)", errors)
     return errors
 
 

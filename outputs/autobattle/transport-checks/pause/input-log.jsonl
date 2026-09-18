@@ -1,0 +1,3 @@
+{"event": "drive", "tag": "a3-transport-pause", "t": 9.16, "duration": 4.811, "completed": true}
+{"event": "stop_requested", "t": 25.073, "detection_latency_s": 0.065, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "drive", "tag": "a3-transport-pause", "t": 31.181, "duration": 0.0, "completed": false}

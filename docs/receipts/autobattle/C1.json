@@ -1,8 +1,8 @@
 {
   "packet": "C1",
   "base_revision": "1fb9fc7",
-  "tested_revision": "working tree on top of 67cdb7d (C1-latency + input-log + kill-path; committed with this receipt)",
-  "status": "unknown",
+  "tested_revision": "working tree on top of c31ba09 (round-4 fixes: validator reads input-log, observation-time cancellation rule, guard-failure receipt, agent-driven manual input; committed with this receipt)",
+  "status": "pass",
   "criteria": [
     {
       "id": "stop-before-first-input",
@@ -27,7 +27,7 @@
       "status": "pass",
       "command": "python tools/validate_transport_paths.py --scenario strict-press --out-root outputs/autobattle",
       "expected": "remaining route keys suppressed; at least one press aborted; zero writes after observation",
-      "observed": "state=paused turns=0 presses=5 (vs 20+ pre-gate); ABORTED-press record present; press_writes_after(stop observation) empty; stop event prompt",
+      "observed": "state=paused turns=0 presses=5 (vs 20+ pre-gate); ABORTED-press record present; zero key writes timestamped after stop_requested in the RAW write stream (observation-time rule, not run() return); stop event prompt",
       "evidence": ["outputs/autobattle/transport-checks/strict-press/events.jsonl", "outputs/autobattle/strict-press/input-log.jsonl"],
       "negative_control": "first run of this scenario on the pre-fix code reproduced Astra's exact escaped-press shape (recorded in docs/project-log.md 2026-09-17 round-3 entry)"
     },
@@ -36,7 +36,7 @@
       "status": "pass",
       "command": "python tools/validate_transport_paths.py --scenario stop-during-recovery --out-root outputs/autobattle",
       "expected": "remaining recovery inputs suppressed; no press/drive record starts after stop_requested",
-      "observed": "state=paused turns=2 presses=65; STOP dropped on the first recovery B write; input log shows no press/drive with t > stop_requested t (+1 ms)",
+      "observed": "state=paused turns=2 presses=65; STOP dropped on the first recovery B write; zero key writes timestamped after stop_requested in the RAW write stream (round-4 gap 2: the rule is measured from STOP observation, not run() return, so a write escaping before return cannot hide)",
       "evidence": ["outputs/autobattle/transport-checks/stop-during-recovery/events.jsonl", "outputs/autobattle/stop-during-recovery/input-log.jsonl"],
       "negative_control": "pre-round-3 recovery checked the stop file only after press+drive; the loop now checks before each input and press() returns -1 on abort"
     },
@@ -79,20 +79,20 @@
     {
       "id": "guard-failure-disconnect",
       "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario disconnect --out-root outputs/autobattle; guard failure observed live 2026-09-15 (a3 first-boot, name decode failure)",
-      "expected": "no further gameplay input; truthful terminal reason and receipt; cleanup attempted where transport permits",
-      "observed": "disconnect: state=connection_lost, stop event records 'transport lost', zero presses after failure (fail_at_commit=1, presses=20 all pre-failure); guard failure path fails closed before run() (live_guard false -> stop event + exit 1, no input)",
-      "evidence": ["outputs/autobattle/transport-checks/disconnect/events.jsonl", "outputs/autobattle/transport-checks/disconnect/run.json"],
-      "negative_control": "fail_sends=True raises OSError mid-run; the OSError handler finalizes with the truthful reason instead of retrying input"
+      "command": "python tools/validate_transport_paths.py --scenario disconnect --out-root outputs/autobattle; python tools/validate_transport_paths.py --scenario guard-failure --out-root outputs/autobattle; guard failure observed live 2026-09-15 (a3 first-boot, name decode failure)",
+      "expected": "no further gameplay input; truthful terminal reason AND a complete receipt on the guard-failure path (Astra round 4 gap 3: the CLI exited before writing run.json and passed a `reason` kwarg the event schema drops)",
+      "observed": "disconnect: state=connection_lost, stop event records 'transport lost', zero presses after failure; guard-failure scenario drives the REAL run_autobattle.main() with the faked session: exit code 1, run.json written on the guard-failure path (final_state=stalled, turns=0), the failure reason rides the stop event note, a start event precedes the stop so the lifecycle validator accepts the receipt, and no input records exist",
+      "evidence": ["outputs/autobattle/transport-checks/transport-guard-failure/run.json", "outputs/autobattle/transport-checks/transport-guard-failure/events.jsonl", "outputs/autobattle/transport-checks/disconnect/events.jsonl"],
+      "negative_control": "pre-fix CLI returned before any receipt and emitted stop with a dropped `reason` kwarg; the scenario's first run failed exactly that way (missing run.json + 4 accumulated stop events)"
     },
     {
       "id": "live-handoff-manual-command",
-      "status": "unknown",
-      "command": "python tools/handoff_cli_probe.py --run-id a3-handoff-probe (survival half done; manual-command half missing)",
-      "expected": "emulator survives cleanup AND a manual player command visibly works on the handed-off battle",
-      "observed": null,
-      "evidence": [],
-      "negative_control": "none yet"
+      "status": "pass",
+      "command": "python tools/manual_input_probe.py --run-id a3-manual-input-probe --stop-at 45",
+      "expected": "emulator survives cleanup AND a manual player command visibly works on the handed-off battle (Astra round 4: agent-driven player input through the window is sufficient; no human required)",
+      "observed": "runner paused at turns=1, keep_process=True reached the real __exit__, emulator pid survived; the agent then sent player input through the WINDOW (SendInput: START,DOWN,DOWN - the mGBA keyboard bindings, never the GDB stub); the screen visibly changed (manual-before.png vs manual-after.png differ) and the stub write log shows zero writes after handoff (20 before = 20 after), so the detached session did not fight the player",
+      "evidence": ["outputs/autobattle/a3-manual-input-probe/probe.json", "outputs/autobattle/a3-manual-input-probe/manual-before.png", "outputs/autobattle/a3-manual-input-probe/manual-after.png", "tools/sendkey_window.ps1"],
+      "negative_control": "the stub key-write count is sampled at handoff and after player input: any post-handoff stub write would mean the detached runner still drove input (fought the player) and fail the probe"
     },
     {
       "id": "stop-observation-latency-bound",
@@ -113,14 +113,18 @@
     {
       "run_id": "a3-handoff-kill",
       "command": "python tools/handoff_cli_probe.py --kill-path --run-id a3-handoff-kill",
-      "result": "PASS kill: owned pid terminated, port released"
+      "result": "PASS kill: owned pid 79864 terminated, port released (rerun on final round-4 code)"
+    },
+    {
+      "run_id": "a3-manual-input-probe",
+      "command": "python tools/manual_input_probe.py --run-id a3-manual-input-probe --stop-at 45",
+      "result": "PASS manual input: agent-driven player input via window visibly worked; zero stub writes after handoff"
     }
   ],
   "limitations": [
-    "live-handoff-manual-command: no human pressed a command after handoff yet; the emulator survival and disarm/detach halves are proven, the visible manual-command half is not",
     "offline scenarios certify control flow and ordering with a scripted engine; the fake mirrors recorded shapes (commit-then-effects, key-poll-per-frame) but ROM semantics of individual bytes are outside C1's scope",
     "transport reads inside press() use blocking socket timeouts (~0.2 s per packet); STOP observed there waits for the press cycle to finish (~1.2 s), within the 2 s bound",
-    "input-log covers presses/drives issued by BattleRuntime; a direct user writing keys over the same transport is outside the runtime's observability"
+    "the manual-input proof uses START/DOWN (menu/cursor) rather than a tactical command: C2's identified-action selector is the packet that proves deliberate tactical selection end to end"
   ],
   "next_packet": "C2"
 }

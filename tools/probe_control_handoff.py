@@ -159,6 +159,20 @@ class Probe:
     def now(self):
         return round(time.time() - self.t0, 1)
 
+    def note_key_write(self, val, hits):
+        # timestamped raw-write record: the runtime input log only covers
+        # press()/drive() INTENT, so a validator cross-checking writes
+        # against stop events needs the actual packet stream too
+        # (Astra round 4, gap 1/2). Writes without a wrapping press —
+        # e.g. manually injected input during a handed-off session — are
+        # tagged so the validator can scope its post-stop rule correctly.
+        try:
+            log = self.key_write_log
+        except AttributeError:
+            log = self.key_write_log = []
+        log.append({"t": round(time.time() - self.t0, 3), "val": val,
+                    "hits": hits, "manual": False})
+
     def say(self, msg):
         # bounded in-memory log so validators can assert on press/abort
         # behavior without parsing stdout (Astra round 3: the strict-press
@@ -493,6 +507,7 @@ class Probe:
                 if regs[15] == BP_KEY:
                     val = (regs[1] | mask) & 0x3FF
                     g.send("P1=" + val.to_bytes(4, "little").hex())
+                    self.note_key_write(val, hits + 1)
                     hits += 1
                 g.cont()
         finally:

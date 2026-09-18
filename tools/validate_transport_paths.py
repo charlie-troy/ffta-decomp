@@ -95,6 +95,7 @@ class FakeGdb:
         self.stop_pc = None
         self.fail_sends = False
         self.send_log = []
+        self.write_times = []  # (wall_t, cmd) for every send — C1 gap 2
 
     # -- transport failure injection --------------------------------------
     def _check(self):
@@ -128,6 +129,7 @@ class FakeGdb:
     def send(self, cmd):
         self._check()
         self.send_log.append(cmd)
+        self.write_times.append((time.time(), cmd))
         if cmd.startswith("Z0,"):
             addr = int(cmd.split(",")[1], 16)
             self.armed.add(addr)
@@ -157,10 +159,14 @@ class FakeGdb:
 
     # -- test observability ----------------------------------------------------
     def key_writes(self):
-        return [c for c in self.send_log if c.startswith("P1=")]
+        # timestamped pairs: the C1 cancellation rule asserts against the
+        # WRITE stream (STOP-observation ordering), not against run() return
+        return [(ts, c) for (ts, c) in self.write_times
+                if c.startswith("P1=")]
 
     def press_writes_after(self, mark):
-        return [c for c in self.send_log[mark:] if c.startswith("P1=")]
+        return [(ts, c) for (ts, c) in self.write_times[mark:]
+                if c.startswith("P1=")]
 
 
 class FakeSession:
@@ -194,6 +200,12 @@ class FakeSession:
 
     def read_rom_bytes(self):
         return self._rom
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
 
     def write_bytes(self, addr, data, note=""):
         self.write_ledger.append({"addr": addr, "data": bytes(data),
@@ -871,6 +883,17 @@ def run_scenario(name, out_root):
         if late:
             errors.append(f"strict-press: {len(late)} key writes reached the "
                           f"engine after the STOP was observed: {late[:3]}")
+        # Astra round 4 gap 2: the timing rule must be measured from the
+        # STOP OBSERVATION (stop_requested in the input log), not from
+        # run() returning — a write that escaped between observation and
+        # return would be invisible to a post-return mark
+        ilog = _input_log(rt.input_log_path)
+        stop_t = next((r["t"] for r in ilog
+                       if r.get("event") == "stop_requested"), None)
+        if stop_t is None:
+            errors.append("strict-press: stop never latched in input log")
+        else:
+            _writes_after_stop(session, rt, stop_t, errors, "strict-press")
         # per-input evidence: at least one press leg must have been ABORTED
         # by the gate (press() returns -1 and logs it) rather than executed
         probe_log = getattr(rt.p, "_log", None)
@@ -885,7 +908,7 @@ def run_scenario(name, out_root):
             errors.append(f"stop-before-start: expected paused, got {state}")
         if rt.turn != 0:
             errors.append(f"stop-before-start: {rt.turn} turns committed")
-        writes = session.g.key_writes()
+        writes = [c for _, c in session.g.key_writes()]
         if writes:
             errors.append(f"stop-before-start: {len(writes)} key writes "
                           f"reached the engine after a pre-run STOP: "
@@ -935,12 +958,8 @@ def run_scenario(name, out_root):
         if stop_t is None:
             errors.append("stop-during-recovery: stop never latched")
         else:
-            late = [r for r in ilog if r.get("event") in ("press", "drive")
-                    and r.get("t", -1) > stop_t + 0.001]
-            if late:
-                errors.append(f"stop-during-recovery: {len(late)} input "
-                              f"records started after stop_requested: "
-                              f"{late[:2]}")
+            _writes_after_stop(session, rt, stop_t, errors,
+                               "stop-during-recovery")
     elif name == "stop-coincides-with-progress":
         # C1 row: STOP coincides with progress - cancellation wins; no new
         # turn starts. Drop the STOP just as the post-commit seed arrives.
@@ -969,9 +988,77 @@ def run_scenario(name, out_root):
         if stop_t is not None and any(e.get("t", 1e9) > stop_t for e in turns):
             errors.append("stop-coincides-with-progress: a new turn started "
                           "after the stop was latched")
+        # Astra round 4 gap 2: the same rule on the RAW WRITE stream —
+        # any automation key write timestamped after stop_requested fails,
+        # even if run() returned long before it was noticed
+        if stop_t is not None:
+            _writes_after_stop(session, rt, stop_t, errors,
+                               "stop-coincides-with-progress")
         stops = [e for e in _events(rt.events_path) if e["kind"] == "stop"]
         if not stops:
             errors.append("stop-coincides-with-progress: stop event missing")
+    elif name == "guard-failure":
+        # Astra round 4 gap 3: the CLI's guard-failure path returned BEFORE
+        # writing run.json and passed a `reason` kwarg the event schema
+        # drops — the failure left only stdout text behind. Drive the REAL
+        # run_autobattle.main() with the faked session (guard failure
+        # induced by clearing the player's roster name pointer) and require
+        # the same receipt the normal path writes.
+        import run_autobattle as _ra
+        from probe_control_handoff import ROSTER, STRIDE as _STRIDE
+        from fixture_guard import OFF_NAME as _OFF_NAME
+        cli_dir = os.path.join(out_root, f"transport-{name}")
+        if os.path.isdir(cli_dir):
+            shutil.rmtree(cli_dir)  # events append across runs: start clean
+        orig_ctor = _ra.FixtureSession
+        _ra.FixtureSession = lambda state, rom=None: session
+        try:
+            base = ROSTER + _STRIDE * 6 + _OFF_NAME
+            for i in range(4):
+                session.g.mem[base + i] = 0  # player name pointer gone
+            rc = _ra.main(["--rom", "fake.gba", "--state", "fake.ss0",
+                           "--scenario", "configs/battle-scenarios/normal-battle.json",
+                           "--yes", "--out-root", out_root,
+                           "--run-id", f"transport-{name}",
+                           "--wall-timeout", "60"])
+        finally:
+            _ra.FixtureSession = orig_ctor
+        if rc != 1:
+            errors.append(f"guard-failure: CLI exit code {rc}, expected 1")
+        # the CLI's run-id lands in its own dir (transport-guard-failure);
+        # the harness's rt (built by run_scenario) points at out_dir, which
+        # never receives a receipt on this path
+        rpath = os.path.join(cli_dir, "run.json")
+        if os.path.abspath(cli_dir) != os.path.abspath(out_dir):
+            print(f"  [{name}] note: CLI receipt in {cli_dir}, harness rt "
+                  f"dir {out_dir} stays empty (guard failed before run)")
+        receipt = None
+        if not os.path.exists(rpath):
+            errors.append("guard-failure: no run.json written on the "
+                          "guard-failure path (CLI exits before the receipt)")
+        else:
+            with open(rpath, encoding="utf-8") as fh:
+                receipt = json.load(fh)
+            if receipt.get("final_state") != "stalled":
+                errors.append(f"guard-failure: run.json final_state "
+                              f"{receipt.get('final_state')!r}")
+            if receipt.get("turns") != 0:
+                errors.append(f"guard-failure: turns={receipt.get('turns')}")
+        ev_path = os.path.join(cli_dir, "events.jsonl")
+        stops = [e for e in _events(ev_path) if e["kind"] == "stop"]
+        if not stops:
+            errors.append("guard-failure: no stop event")
+        elif "guard" not in (stops[0].get("note") or ""):
+            errors.append(f"guard-failure: the guard failure reason must ride "
+                          f"the stop event note (not a dropped kwarg): {stops[0]}")
+        ilog = _input_log(os.path.join(cli_dir, "input-log.jsonl"))
+        if any(r.get("event") in ("press", "drive") for r in ilog):
+            errors.append("guard-failure: input records exist although the "
+                          "guard never passed (no input precedes the guard)")
+        errs = validate(cli_dir)
+        errors.extend(errs)
+        print(f"  [{name}] state=stalled turns=0 (real CLI main path)")
+        return receipt, errors
     elif name == "submenu":
         # recorded a3-natural5 shape: the post-Move re-opened menu presents
         # a submenu the plain route cannot commit (presses land, nothing
@@ -1004,6 +1091,23 @@ def run_scenario(name, out_root):
     return receipt, errors
 
 
+
+def _writes_after_stop(session, rt, stop_t, errors, label):
+    """C1 gap 2: the cancellation rule measured from STOP OBSERVATION.
+
+    Every automation key write whose packet timestamp is after the
+    stop_requested record fails — regardless of when run() returned. The
+    raw write stream (session.g.key_writes(), wall-clock tagged) is the
+    ground truth, not the intent-level input log.
+    """
+    late = [(round(ts - rt.t0, 3), c) for (ts, c) in session.g.key_writes()
+            if (ts - rt.t0) > stop_t + 0.001]
+    if late:
+        errors.append(f"{label}: {len(late)} key writes are timestamped "
+                      f"after stop_requested t={stop_t} (observation-time "
+                      f"rule, not run() return): {late[:3]}")
+    return late
+
 def _events(path):
     with open(path, encoding="utf-8") as fh:
         return [json.loads(l) for l in fh if l.strip()]
@@ -1025,7 +1129,8 @@ def main(argv=None):
                                      "pause", "strict-press",
                                      "stop-before-start",
                                      "stop-during-recovery",
-                                     "stop-coincides-with-progress"])
+                                     "stop-coincides-with-progress",
+                                     "guard-failure"])
     ap.add_argument("--out-root", default=os.path.join("outputs", "autobattle",
                                                        "transport-checks"))
     args = ap.parse_args(argv)

@@ -1,0 +1,6 @@
+{"event": "drive", "tag": "a3-transport-stop-during-recovery", "t": 9.051, "duration": 4.811, "completed": true}
+{"event": "drive", "tag": "a3-transport-stop-during-recovery", "t": 32.118, "duration": 4.811, "completed": true}
+{"event": "drive", "tag": "a3-transport-stop-during-recovery", "t": 61.122, "duration": 4.81, "completed": true}
+{"event": "press", "mask": 2, "tag": "a3-transport-stop-during-recovery:B1", "t": 217.491, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "stop_requested", "t": 218.692, "detection_latency_s": 1.189, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "drive", "tag": "a3-transport-stop-during-recovery:rec1", "t": 218.692, "duration": 0.0, "completed": false}
