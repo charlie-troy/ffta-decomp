@@ -1,0 +1,13 @@
+{
+  "schema": "a3-run/1",
+  "run_id": "transport-identified-move-invalid",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 0,
+  "seeds": 0,
+  "router_hits": 0,
+  "terminal_reason": "no-progress bound reached",
+  "events": "outputs/autobattle/transport-checks\\identified-move-invalid\\events.jsonl",
+  "emulator_handoff": "terminated"
+}

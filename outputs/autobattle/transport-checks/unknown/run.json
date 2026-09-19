@@ -4,10 +4,10 @@
   "scenario": "normal-battle",
   "mode": "retail-ai",
   "final_state": "stalled",
-  "turns": 1,
-  "seeds": 1,
+  "turns": 0,
+  "seeds": 0,
   "router_hits": 0,
   "terminal_reason": "no-progress bound reached",
-  "events": "outputs\\autobattle\\transport-checks\\unknown\\events.jsonl",
+  "events": "outputs/autobattle/transport-checks\\unknown\\events.jsonl",
   "emulator_handoff": "terminated"
 }

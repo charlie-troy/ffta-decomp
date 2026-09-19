@@ -5,9 +5,9 @@
   "mode": "retail-ai",
   "final_state": "paused",
   "turns": 1,
-  "seeds": 1,
+  "seeds": 2,
   "router_hits": 0,
   "terminal_reason": "STOP requested: battle left running for manual play",
-  "events": "outputs\\autobattle\\transport-checks\\pause\\events.jsonl",
+  "events": "outputs/autobattle/transport-checks\\pause\\events.jsonl",
   "emulator_handoff": "terminated"
 }

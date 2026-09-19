@@ -203,13 +203,16 @@ regressions required by the contract. Reuse the existing transport.
   recovery B press and full route; add a regression that fails on the old code.
   (Done 2026-09-17: Astra round 3 reproduced it; the strict-press transport
   scenario reproduces it — its first run failed with exactly the escaped-press
-  shape on the old code, then passed with the gate: 5 presses, none after the
-  STOP was observed, with an ABORTED-press record.)
+  shape on the old code, then passed with the gate. Round 6: the identified
+  flow gates BETWEEN legs, so a between-legs STOP suppresses the next press
+  attempt entirely — the scenario asserts no press STARTS after stop_requested
+  instead of an ABORTED record.)
 - [x] Implement the contract's single cancellation check at every input
   boundary, including each key in a route, recovery, and supplemental waits.
-  (Done 2026-09-17: `press()` checks before firing and returns -1 on abort;
-  `drive()` aborts mid-route and skips redelivery; the B-recovery loop checks
-  before EACH press and re-drive; waits already carried `stop_check`.)
+  (Done 2026-09-17; round 6: B-recovery and fixed-route fallback are GONE —
+  the identified-only boundary drives only RAM-identified candidates, and the
+  identified drive's inter-leg settles poll the stop gate every 100 ms,
+  restoring the 2 s observation bound that fixed sleeps broke to 2.8 s.)
 - [x] Exercise the actual CLI and session cleanup for leave-running, kill,
   guard failure, and connection loss. Preserve the known process-lifetime fix.
   (2026-09-17: `tools/handoff_cli_probe.py` now covers BOTH paths through the
@@ -218,15 +221,18 @@ regressions required by the contract. Reuse the existing transport.
   disconnect is the transport suite's connection_lost scenario.)
 - [x] Demonstrate live STOP → manual choice with the emulator still usable;
   record input ordering, process survival, and cleanup of owned hooks/state.
-  (Done 2026-09-17: process survival, input ordering via the timestamped
-  `input-log.jsonl`, disarm/detach all proven; the visible manual command is
-  proven agent-side by `tools/manual_input_probe.py` — the runner detaches,
-  the agent sends real player input through the mGBA window via SendInput
-  (never the GDB stub), the screen visibly changes, and the stub write log
-  shows zero post-handoff writes. Astra round 4 confirmed an agent-driven
-  player is sufficient; a human is not required.)
+  (Done 2026-09-17; round 6: the manual command is proven by IDENTITY, not a
+  screenshot — `tools/manual_input_probe.py` (schema /3) re-attaches read-only,
+  resumes the core (the stub halts on connect and serves stale reads while
+  running — r6c's recorded lesson), waits for the genuine player-command
+  window from RAM (decoded cursor at 0 with Marche's roster CT frozen), sends
+  one window SendInput DOWN, and requires the DECODED command cursor to move
+  (live: 0→1 Move→Action). Zero stub key writes after handoff. Astra round 4
+  confirmed an agent-driven player is sufficient; a human is not required.)
 
-Done: all C1 checks in the contract pass. Continue to C2 without review.
+Done: all C1 checks in the contract pass (round-6 update 2026-09-18: identified-
+only boundary, decoded-command manual proof, abortable settles). Continue to C2
+without review.
 
 ### C2 — Identify and deliberately execute one player action (P0)
 
@@ -253,22 +259,29 @@ needed to verify field semantics. Treat prior fixed-address effects as suspect.
   read before the confirming input.)
 - [x] Tie player identity → selection → engine acceptance → execution →
   turn end into one receipt. Add the contract's negative controls.
-  (Done 2026-09-17: one turn event carries actor, selected_action
-  {identified-move, command_id, dest}, selected_target (RAM-read), and the
-  engine-side verification (roster tile reached the RAM-read dest). Offline
-  fake-engine law replays the recorded cursor semantics; negative control
-  `identified-move-wrong` (engine executes a different tile than the cursor
-  named) demotes the claim — receipt `docs/receipts/autobattle/C2.json`.)
+  (Done 2026-09-17; round 6: planner rejection PREVENTS input — the boundary
+  handler is identified-only, the chooser/fixed-route/B-recovery fallback is
+  deleted, and a rejected candidate ends the run honestly with zero presses
+  (negative control `identified-move-invalid`); one turn event carries actor,
+  selected_action {identified-move, command_id, dest}, selected_target
+  (RAM-read), and the engine-side verification (roster tile reached the
+  RAM-read dest). Negative control `identified-move-wrong` (engine executes a
+  different tile than the cursor named) demotes the claim — receipt
+  `docs/receipts/autobattle/C2.json`.)
 - [x] Repeat from reload twice. An action ID with verified semantics is enough;
   human-readable name decoding is optional. Record uncertainty as unknown.
-  (Done 2026-09-17: c2-live4 + c2-live5, fresh reloads under the final code —
-  both committed turn 1 as identified Move (4,10)->(4,11) with tile
-  verification; ability-submenu decode remains a candidate pair (uncertainty
-  recorded); c2-live3's failed-drive-was-paused defect found and fixed.)
+  (Done 2026-09-17 under c2-live4/c2-live5; re-proven 2026-09-18 under the
+  final round-6 code — c2-live6 committed TWO identified verified moves in one
+  run ((4,10)->(4,11) then (4,11)->(5,11)) and c2-live7 one plus an honest
+  bound at a later non-standard menu; ability-submenu decode remains a
+  candidate pair (uncertainty recorded); c2-live3's failed-drive-was-paused
+  defect found and fixed.)
 
-Done: two valid live executions and all C2 checks pass. If the decoded action
-has no HP/MP effect, verify its specific observable result (e.g. committed
-movement) at the correct boundary. Continue to C3 without review.
+Done: two valid live executions and all C2 checks pass (round-6 update
+2026-09-18: the boundary is identified-only — rejection prevents input).
+If the decoded action has no HP/MP effect, verify its specific observable
+result (e.g. committed movement) at the correct boundary. Continue to C3
+without review.
 
 ### C3 — Integrate and close the milestone (P0)
 

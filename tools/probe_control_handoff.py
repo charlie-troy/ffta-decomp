@@ -827,6 +827,14 @@ class Probe:
         dest = self.read_target_cursor()
         if dest is None:
             return None
+        # Astra round-6 gap 3 context: a menu parked on Action (re-opened
+        # post-move) reads a cursor != Move here and is rejected BEFORE any
+        # input — the c2-live3 false-positive class (four zero-hit legs).
+        # Destination reachability is NOT pre-checked with input: the
+        # engine's own verdict is the confirm-A (refused destinations keep
+        # target mode, probe4), and the runtime demotes when the roster
+        # tile disagrees. Every rejection on this path must be silent-free:
+        # callers treat None as "prevent input", never "try another route".
         return {"kind": "identified-move", "command_id": MOVE_CMD,
                 "dest": list(dest) if dest != tile else None,
                 "from": list(tile)}
@@ -854,6 +862,23 @@ class Probe:
         def add(leg, detail):
             log.append({"leg": leg, **detail})
 
+        def settle(seconds):
+            """Inter-leg settle, abortable mid-sleep (round-6 latency rule).
+
+            The fixed time.sleep() between legs delayed the next stop gate
+            by up to 1.6 s on top of the in-flight press cycle, pushing
+            observed STOP latency to ~2.8 s — over the contract's 2 s
+            bound. Polling the gate every 100 ms restores the bound.
+            Returns False (with the gate latched) if the stop fired.
+            """
+            end = time.time() + seconds
+            while True:
+                if stop_check is not None and stop_check():
+                    return False
+                if time.time() >= end:
+                    return True
+                time.sleep(0.1)
+
         def _guarded_press(mask, tag):
             started = time.time()
             hits = self.press(mask, stop_check=stop_check, tag=tag)
@@ -877,7 +902,9 @@ class Probe:
                 if _guarded_press(0x80, f"c2:{what}-down") < 0:
                     add("abort", {"at": what + "-stop"})
                     return False
-                time.sleep(1.2)
+                if not settle(1.2):
+                    add("abort", {"at": what + "-settle-stop"})
+                    return False
             return True
 
         # 1. command cursor -> Move (0)
@@ -892,7 +919,9 @@ class Probe:
         if _guarded_press(0x01, "c2:open-target") < 0:
             add("abort", {"at": "open-stop"})
             return False, None, log
-        time.sleep(1.6)
+        if not settle(1.6):
+            add("abort", {"at": "open-settle-stop"})
+            return False, None, log
         add("open-target", {"cursor": self.read_target_cursor()})
 
         # 3. reach the destination
@@ -909,7 +938,9 @@ class Probe:
                 if _guarded_press(mask, f"c2:step-{name}") < 0:
                     add("abort", {"at": "dest-search-stop"})
                     return False, None, log
-                time.sleep(1.2)
+                if not settle(1.2):
+                    add("abort", {"at": "dest-search-settle-stop"})
+                    return False, None, log
                 cur = self.read_target_cursor()
                 add("dest-step", {"tried": name, "cursor": cur})
                 if cur is not None and cur != start_tile:
@@ -945,7 +976,9 @@ class Probe:
                 if _guarded_press(step, f"c2:target-{step:#04x}") < 0:
                     add("abort", {"at": "target-nav-stop"})
                     return False, None, log
-                time.sleep(1.2)
+                if not settle(1.2):
+                    add("abort", {"at": "target-nav-settle-stop"})
+                    return False, None, log
         add("target-identified", {"dest": list(dest_used),
                                   "identified_from": "RAM target cursor "
                                                      "read before confirm"})
@@ -957,7 +990,9 @@ class Probe:
         if _guarded_press(0x01, "c2:confirm-move") < 0:
             add("abort", {"at": "confirm-stop"})
             return False, dest_used, log
-        time.sleep(1.6)
+        if not settle(1.6):
+            add("abort", {"at": "confirm-settle-stop"})
+            return False, dest_used, log
         add("confirm-move", {"cursor": self.read_target_cursor(),
                             "cmd_cursor": self.read_cmd_cursor()})
 
@@ -968,11 +1003,15 @@ class Probe:
         if _guarded_press(0x01, "c2:select-wait") < 0:
             add("abort", {"at": "select-wait-stop"})
             return False, dest_used, log
-        time.sleep(1.2)
+        if not settle(1.2):
+            add("abort", {"at": "select-wait-settle-stop"})
+            return False, dest_used, log
         if _guarded_press(0x01, "c2:confirm-wait") < 0:
             add("abort", {"at": "confirm-wait-stop"})
             return False, dest_used, log
-        time.sleep(1.6)
+        if not settle(1.6):
+            add("abort", {"at": "wait-commit-settle-stop"})
+            return False, dest_used, log
         add("wait-commit", {"cmd_cursor": self.read_cmd_cursor()})
         return True, dest_used, log
 

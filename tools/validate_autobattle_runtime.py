@@ -20,7 +20,7 @@ KNOWN_KINDS = {"start", "guard", "boundary", "turn", "note", "stop"}
 KNOWN_FIELDS = {"t", "kind", "scenario", "turn", "actor", "actor_slot",
                 "control_mode", "selected_action", "selected_target",
                 "position_before", "position_after", "state", "seeds",
-                "router_hits", "note"}
+                "router_hits", "note", "input_log"}
 # kinds whose presence after the terminal stop means the run kept driving:
 # boundaries, turns, and notes about recovery cycles are all input activity
 INPUT_EVENT_KINDS = {"boundary", "turn", "note"}
@@ -152,48 +152,66 @@ def validate(out_dir):
     # cycle already in flight when STOP was observed) — the per-input gate
     # lets an in-flight press finish but never STARTS a new one.
     ilog_path = os.path.join(out_dir, "input-log.jsonl")
-    if os.path.exists(ilog_path):
-        ilog = []
-        with open(ilog_path, encoding="utf-8") as fh:
-            for ln, line in enumerate(fh, 1):
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    ilog.append(json.loads(line))
-                except json.JSONDecodeError as exc:
-                    fail(f"input-log line {ln}: not JSON ({exc})", errors)
-        stops_il = [r for r in ilog if r.get("event") in STOP_EVENTS]
-        # threshold: the stop LATCH when one exists, otherwise the terminal
-        # stop event's timestamp — so runs that ended without a STOP file
-        # (completed/stalled) are still guarded against post-terminal input
-        # (Astra round 4 gap 1: the old validator never read this log at
-        # all, so an injected post-STOP press passed validation)
-        stop_t = None
-        if stops_il:
-            stop_t = stops_il[0].get("t")
-        else:
-            stop_t = stops[0].get("t") if stops else None
-        if stop_t is not None:
-            leaks = []
-            for r in ilog:
-                if r.get("event") in ("press", "drive"):
-                    if r.get("aborted") or r.get("completed") is False:
-                        continue  # the gate caught it: no input fired
-                    if r.get("t", 0) > stop_t + 0.001:
-                        leaks.append(r)
-                elif r.get("event") == MANUAL_WRITE_EVENT:
-                    continue  # manual input after a detached handoff
-            if leaks:
-                fail(f"input-log: {len(leaks)} successful press/drive "
-                     f"started after the stop was latched (t={stop_t}): "
-                     f"{[r.get('tag') or r.get('event') for r in leaks[:3]]}",
-                     errors)
-            if run.get("final_state") == "paused" and not stops_il:
-                fail("paused run.json but input-log.jsonl never latched "
-                     "the stop", errors)
-    elif events and events[0].get("input_log"):
-        fail(f"missing {ilog_path} (start event records it)", errors)
+    if not os.path.exists(ilog_path):
+        # round 6 gap 1: a MISSING input log must fail when the run is the
+        # kind that owns input at all — automation runs always write the log
+        # (the runtime opens it at construction). A TURN event implies
+        # committed input; a boundary is only a detection (zero-input runs
+        # carry boundaries too), so it does not count. The bare guard-
+        # failure stream (no input possible) legitimately has an empty log.
+        claims_input = any(e.get("kind") == "turn" for e in events)
+        if events and run and claims_input:
+            fail(f"missing {ilog_path} — a run that committed turns must "
+                 "carry its raw write log", errors)
+        return errors
+    ilog = []
+    with open(ilog_path, encoding="utf-8") as fh:
+        for ln, line in enumerate(fh, 1):
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                ilog.append(json.loads(line))
+            except json.JSONDecodeError as exc:
+                fail(f"input-log line {ln}: not JSON ({exc})", errors)
+    stops_il = [r for r in ilog if r.get("event") in STOP_EVENTS]
+    # a TRUNCATED log is the same cheat as a deleted one: a run that
+    # committed turns must carry at least the input records that auditing
+    # those commits requires (boundary-only streams may be empty — zero
+    # input is legitimate evidence FOR zero input)
+    claims_input = any(e.get("kind") == "turn" for e in events)
+    if claims_input and not ilog:
+        fail("input-log.jsonl is empty but the run records committed turns "
+             "— the raw write log cannot be missing for an input-owning run",
+             errors)
+    # threshold: the stop LATCH when one exists, otherwise the terminal
+    # stop event's timestamp — so runs that ended without a STOP file
+    # (completed/stalled) are still guarded against post-terminal input
+    # (Astra round 4 gap 1: the old validator never read this log at
+    # all, so an injected post-STOP press passed validation)
+    stop_t = None
+    if stops_il:
+        stop_t = stops_il[0].get("t")
+    else:
+        stop_t = stops[0].get("t") if stops else None
+    if stop_t is not None:
+        leaks = []
+        for r in ilog:
+            if r.get("event") in ("press", "drive"):
+                if r.get("aborted") or r.get("completed") is False:
+                    continue  # the gate caught it: no input fired
+                if r.get("t", 0) > stop_t + 0.001:
+                    leaks.append(r)
+            elif r.get("event") == MANUAL_WRITE_EVENT:
+                continue  # manual input after a detached handoff
+        if leaks:
+            fail(f"input-log: {len(leaks)} successful press/drive "
+                 f"started after the stop was latched (t={stop_t}): "
+                 f"{[r.get('tag') or r.get('event') for r in leaks[:3]]}",
+                 errors)
+        if run.get("final_state") == "paused" and not stops_il:
+            fail("paused run.json but input-log.jsonl never latched "
+                 "the stop", errors)
     return errors
 
 

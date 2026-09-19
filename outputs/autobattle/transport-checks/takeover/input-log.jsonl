@@ -1,2 +1,12 @@
-{"event": "drive", "tag": "a3-transport-takeover", "t": 9.046, "duration": 4.812, "completed": true}
-{"event": "drive", "tag": "a3-transport-takeover", "t": 29.257, "duration": 4.81, "completed": true}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.041, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.853, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.263, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.076, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.485, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.89, "duration": 1.206, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 36.762, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 39.575, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 41.986, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 44.799, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 47.209, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 49.615, "duration": 1.205, "hits": 5, "aborted": false}

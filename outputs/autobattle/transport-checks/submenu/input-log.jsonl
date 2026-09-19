@@ -1,4 +1,5 @@
-{"event": "drive", "tag": "a3-transport-submenu", "t": 9.074, "duration": 4.81, "completed": true}
-{"event": "press", "mask": 2, "tag": "a3-transport-submenu:B1", "t": 165.083, "duration": 1.201, "hits": 5, "aborted": false}
-{"event": "drive", "tag": "a3-transport-submenu:rec1", "t": 166.284, "duration": 4.812, "completed": true}
-{"event": "drive", "tag": "a3-transport-submenu", "t": 252.781, "duration": 4.809, "completed": true}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.041, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.853, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 16, "tag": "c2:step-right", "t": 14.263, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 64, "tag": "c2:step-up", "t": 16.673, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 32, "tag": "c2:step-left", "t": 19.083, "duration": 1.2, "hits": 5, "aborted": false}

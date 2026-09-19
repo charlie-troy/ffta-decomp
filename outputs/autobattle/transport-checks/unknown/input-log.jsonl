@@ -1,8 +1,5 @@
-{"event": "drive", "tag": "a3-transport-unknown", "t": 9.111, "duration": 4.815, "completed": true}
-{"event": "drive", "tag": "a3-transport-unknown", "t": 32.181, "duration": 4.809, "completed": true}
-{"event": "press", "mask": 2, "tag": "a3-transport-unknown:B1", "t": 188.392, "duration": 1.201, "hits": 5, "aborted": false}
-{"event": "drive", "tag": "a3-transport-unknown:rec1", "t": 189.594, "duration": 4.816, "completed": true}
-{"event": "press", "mask": 2, "tag": "a3-transport-unknown:B2", "t": 254.971, "duration": 1.201, "hits": 5, "aborted": false}
-{"event": "drive", "tag": "a3-transport-unknown:rec2", "t": 256.173, "duration": 4.819, "completed": true}
-{"event": "press", "mask": 2, "tag": "a3-transport-unknown:B3", "t": 321.488, "duration": 1.201, "hits": 5, "aborted": false}
-{"event": "drive", "tag": "a3-transport-unknown:rec3", "t": 322.69, "duration": 4.814, "completed": true}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.044, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.856, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 16, "tag": "c2:step-right", "t": 14.267, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 64, "tag": "c2:step-up", "t": 16.677, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 32, "tag": "c2:step-left", "t": 19.087, "duration": 1.2, "hits": 5, "aborted": false}

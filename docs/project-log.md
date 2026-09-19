@@ -4316,3 +4316,43 @@ STOP (non-standard menu shape, legs landed no stops) classified the run
 one-terminal-stop rule). Fixed: no-STOP failed drive now bounds like the
 unknown-modal path. Receipt: docs/receipts/autobattle/C2.json (all C2 criteria
 pass; ability-submenu decode remains a recorded candidate pair).
+
+## 2026-09-18 — Round 6: Astra's three acceptance gaps closed
+
+Astra's review of 54864eb/cabf6f7 accepted the identified-Move evidence but
+held three gaps: (1) missing input logs still passed validation, (2) the
+manual-handoff proof accepted any screenshot change, (3) a planner rejection
+could still fall back to menu inputs. All three are closed with reproduction
+first:
+
+- Gap 3 (input prevention): the boundary handler is now identified-ONLY —
+  `plan_identified_move()` returning None ends the run honestly with ZERO
+  presses. The chooser, fixed route, and B-recovery machinery are deleted
+  (the fake's two-A `_maybe_commit` and `expect_action_route` law with them;
+  the identified cursor law gained B-backout and unknown-dialog swallow
+  gates). Offline control `identified-move-invalid` proves presses=0 on a
+  rejected state; all 16 suite scenarios migrated and PASS.
+- Gap 1 (input-log enforcement): reproduced Astra's exact repro (deleted
+  input-log.jsonl from a copied live receipt — validator PASSED, wrong),
+  then fixed `validate_autobattle_runtime` to FAIL a missing/empty log for
+  any run that committed turns. Also found the `start` event's `input_log`
+  field was silently dropped by the event schema (Astra's round-4 dropped-
+  `reason` bug class again) — `event()` now raises on schema-unknown kwargs.
+- Gap 2 (decoded manual command): `manual_input_probe.py` (schema /3) waits
+  for the genuine player-command window from RAM (decoded cursor parked with
+  Marche's roster CT frozen), sends ONE window SendInput DOWN, and requires
+  the DECODED cursor to move. Live r6d: window detected at +34.2 s (cursor
+  0), DOWN moved it 0->1, zero stub writes after handoff. Two honest
+  failures recorded on the way (r6b: no menu open, DOWN was a real no-op;
+  r6c: the stub halts on connect and serves stale reads while the CPU runs —
+  a monitor must interrupt->read->cont; r6b/r6c screenshots do not count as
+  evidence).
+- Latency: the identified drive's fixed inter-leg sleeps pushed STOP
+  observation to ~2.8 s (over the 2 s bound) — settles now poll the gate
+  every 100 ms (1.174/1.196 s measured).
+- Live re-proof under final code: c2-live6 committed TWO identified verified
+  moves in one run ((4,10)->(4,11), (4,11)->(5,11)); c2-live7 one plus an
+  honest bound. Both receipts validate.
+
+Receipts: docs/receipts/autobattle/C1.json + C2.json (round-6 updates).
+Commit: round-6 worker fixes.

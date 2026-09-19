@@ -119,9 +119,13 @@ non-Wait action — was never demonstrated: the manual route selects Wait and
 the delegated turn's selection is the engine's retail AI. What the receipts
 do prove is the reversible delegation cycle (boundary detect → external
 commit → engine runs → boundary returns). Deliberate non-Wait selection is
-now implemented in the runtime (`choose_non_wait` picking the action-submenu
-route with effect-diff evidence recorded per turn) and is pending live
-verification; it must not be re-marked done on receipt evidence alone.
+now implemented in the runtime as the IDENTIFIED-ONLY boundary (round 6): every
+player turn is selected from RAM — the decoded command cursor must read Move
+and the target cursor must be readable before ANY input is issued; a rejection
+prevents input entirely (chooser routes, fixed routes, and B-recovery are
+deleted, since selecting by key sequence is exactly the unfalsifiable claim
+the contract bans). Live verification: c2-live4/5/6/7 (verified identified
+moves, twice from reload under final code).
 
 ## mGBA environment notes
 
@@ -412,6 +416,7 @@ boundary state, not a manual handoff: a STOP request now pauses the run
 and lets `FixtureSession.__exit__` run with `keep_process` already flipped —
 the emulator survived the exact path Astra's review showed was broken
 (receipt `outputs/autobattle/a3-handoff-probe/`). The stop file is also
-polled inside long progress waits and B-recovery loops, so input stops
-mid-wait.
+polled inside long progress waits and between every identified-drive leg
+(the settles poll the gate every 100 ms — round 6 restored the 2 s
+observation bound), so input stops mid-wait.
 

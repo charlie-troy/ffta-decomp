@@ -1,1 +1,6 @@
-{"event": "drive", "tag": "a3-transport-defeat", "t": 9.045, "duration": 4.813, "completed": true}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.042, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.854, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.264, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.076, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.487, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.893, "duration": 1.206, "hits": 5, "aborted": false}

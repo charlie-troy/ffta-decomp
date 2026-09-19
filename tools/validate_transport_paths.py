@@ -302,6 +302,9 @@ def sync_memory(gdb):
                 gdb.mem[_TARGET_X] = gx
                 gdb.mem[_TARGET_Y] = gy
             else:
+                # menu closed: the copies read cleared bytes (0) so the
+                # probe's plausibility guard reads "no cursor" — a stale
+                # nonzero copy must never reopen an identified state
                 gdb.mem[_CMD_CURSOR] = 0
                 gdb.mem[_TARGET_X] = 0
                 gdb.mem[_TARGET_Y] = 0
@@ -363,7 +366,8 @@ class FakeWorld:
         self.first_commit_t = None  # wall time of commit #1 (defeat anchor)
         self.last_commit_t = None   # wall time of the most recent commit
         self.reopen_park_ct = 600   # recorded re-open parked CT (run 19)
-        self.expect_action_route = False  # scenario knob: chooser route shape
+        self.expect_action_route = False  # DEPRECATED (chooser law removed):
+        # scenarios must use the identified-move law; this flag is inert
         self.slot2_hp = 300        # scripted slot-2 target hp (sync_memory)
         self.march_mp = 60         # scripted player MP (sync_memory base)
         self.march_tg = 0          # scripted player +0xE7 recent-target byte
@@ -490,20 +494,25 @@ class FakeWorld:
         # map); while charging/results it is inert. An unknown dialog
         # ignores B entirely.
         b_seen = bool(val & 0x02)
-        if (b_seen and not self._b_prev and self.menu_up
-                and not self.swallow_b):
-            if self.swallow_first_route and self.commits == 0:
-                # submenu layer: B returns to the parent command menu
-                self.swallow_first_route = False
-            else:
-                # closing the menu parks the unit at CT 1000 — ready to be
-                # re-selected; the recorded parked-menu CT stays <= 999
-                self.menu_up = False
-                self.charging = True
-                self.march_ct = CT_REOPEN_AT
-            self.a_presses = 0      # fresh menu episode
-            self._a_prev = False
-            self.b_closes += 1
+        if b_seen and not self._b_prev and self.menu_up:
+            if self.identified_move:
+                # B is menu-back navigation in the identified law too: the
+                # runtime's identified flow never sends it, but a stop-gated
+                # manual layer or a future B use must still navigate honestly
+                self._identified_b()
+            elif not self.swallow_b:
+                if self.swallow_first_route and self.commits == 0:
+                    # submenu layer: B returns to the parent command menu
+                    self.swallow_first_route = False
+                else:
+                    # closing the menu parks the unit at CT 1000 — ready to
+                    # be re-selected; the recorded parked-menu CT stays <= 999
+                    self.menu_up = False
+                    self.charging = True
+                    self.march_ct = CT_REOPEN_AT
+                self.a_presses = 0      # fresh menu episode
+                self._a_prev = False
+                self.b_closes += 1
         self._b_prev = b_seen
         # C2 cursor law: direction keys move the REAL cursors — the command
         # cursor in the command menu, the (x, y) target cursor in target
@@ -523,6 +532,8 @@ class FakeWorld:
     # -- C2 identified-move cursor law ---------------------------------------
     def _identified_dir(self, name):
         """One direction step on the DECODED cursor (command or target)."""
+        if self.swallow_route:
+            return  # unknown dialog: presses land, nothing changes
         if self._target_cursor is not None:
             if name == "down":
                 self._target_cursor[1] += 1
@@ -538,6 +549,8 @@ class FakeWorld:
 
     def _identified_a(self):
         """Consume one A edge per the DECODED cursor state (probe5/6 shape)."""
+        if self.swallow_route:
+            return  # unknown dialog: the press lands but no UI answers it
         if self._moved:
             # command menu re-opened after the move (probe5): the command
             # copy re-initialized at Action; A on Wait selects then confirms
@@ -570,6 +583,28 @@ class FakeWorld:
         self._cmd_cursor = _ACTION_CMD  # the re-opened menu lands on Action
         self._wait_confirm = False
 
+    def _identified_b(self):
+        """B backs out of the identified UI one layer (menu-back navigation).
+
+        Target mode closes to the command menu (cursor unchanged); the
+        command menu closes to the map (the unit re-parks at the reopen CT
+        exactly like the old law's B-close). B can never commit anything —
+        it is navigation, which is why the runtime never needed it for the
+        identified flow and the old B-recovery machinery is gone.
+        """
+        if self._target_cursor is not None:
+            self._target_cursor = None
+            # the command menu is still on whatever command was selected
+            return
+        self.menu_up = False
+        self.charging = True
+        self.march_ct = CT_REOPEN_AT
+        self.a_presses = 0
+        self._a_prev = False
+        self._moved = False
+        self._wait_confirm = False
+        self.b_closes += 1
+
     def _commit_turn(self):
         self.commits += 1
         self.menu_up = False
@@ -583,6 +618,8 @@ class FakeWorld:
         self.last_commit_t = self.now()
         if self.first_commit_t is None:
             self.first_commit_t = self.last_commit_t
+        if self.commits == self.fail_at_commit:
+            self.session.g.fail_sends = True
         if self.after_commit:
             self.after_commit(self)
 
@@ -662,38 +699,23 @@ class FakeWorld:
             self.session.g.queue.append((BP_SEED, "T05seed"))
 
     def _maybe_commit(self):
-        # second A onset of the proven route commits the menu (A2.5 contract)
+        # second A onset of the proven route commits the menu (A2.5 contract).
+        # Retained ONLY for the old-law scenarios that still use a_presses;
+        # identified-move turns commit through the cursor law (_identified_a).
         if self.a_presses < 2 or not self.menu_up:
             return
         if self.swallow_route:
             return  # unknown dialog eats the route; nothing changes
-        if        self.swallow_first_route and self.commits == 0:
+        if self.swallow_first_route and self.commits == 0:
             return  # submenu shape: the plain route cannot reach a commit
         self.commits += 1
-        # the action executes after the menu commit: apply its engine-side
-        # consequences (target hp loss, actor MP spend) synchronously - the
-        # ORDER is the recorded shape (commit, then effects), and a delayed
-        # timer raced the runtime's first evidence snapshot inside the
-        # commit-to-execution gap (takeover turn 2 closed its window on a
-        # CT-only read before the timer fired)
-        self.apply_action_evidence()
         self.menu_up = False
         self.charging = True
         self.march_ct = 0.0
+        self.march_tg = 0
         self.a_presses = 0  # fresh menu episode next time it opens
         self.last_seed_t = self.now()
         t = self.now()
-        # committed action evidence (Astra 2026-09-17): the resolution path
-        # records the target ids at +0xE7 and the ability-cost path spends
-        # MP at +0x1C — CT-only deltas cannot identify a committed command.
-        # Scenarios script expect_action_route like the other recorded
-        # shapes (swallow_route, fail_at_commit); the input stream alone
-        # cannot distinguish the two routes (identical masks).
-        if self.expect_action_route:
-            self.march_tg = 0x21  # unit ids 2 and 1 packed (two 4-bit ids)
-            self.march_mp = max(0, self.march_mp - 8)  # ability MP cost
-        else:
-            self.march_tg = 0
         if self.first_commit_t is None:
             self.first_commit_t = t  # defeat counts from commit #1
         self.last_commit_t = t
@@ -708,26 +730,23 @@ class FakeWorld:
         self.end_seeds_remaining = n_seeds
         self.ending_t = self.now()
 
-    def apply_action_evidence(self):
-        """Scripted engine-side consequences of the committed action.
-
-        The engine executes the action AFTER the menu commit: the target
-        (slot 2 per the scripted +0xE7 record) loses hp — bounded by its
-        max_hp so the runtime's roster-bounded validation accepts it — and
-        the actor spends a second MP source. Astra round 3: actor-specific
-        evidence must be VALIDATED (hp delta within max_hp, ids inside the
-        roster), not just present.
-        """
-        if self.expect_action_route:
-            self.slot2_hp = max(0, self.slot2_hp - 47)  # target slot-2 hp
-            self.march_mp = max(0, self.march_mp - 4)   # 2nd-source MP cost
-
     # -- input commit model ------------------------------------------------------
     def on_key_write(self, val):
         self.presses += 1
         # one P1= write covers exactly one upcoming engine key-poll (the
         # probe intercepts a single poll per stop); queued, not overwritten,
-        # so a write can never outlive its frame and fire later
+        # so a write can never outlive its frame and fire later.
+        # BUT a HELD key never re-edges a menu: the probe's press() writes
+        # the mask once and then answers subsequent key-poll breakpoints
+        # with the SAME mask until the release. Coalescing consecutive
+        # identical masks into one FIFO entry reproduces that physical law
+        # (one held key = one navigation event). Without this, an answer
+        # burst that straddles two engine polls re-arms the edge detector
+        # and the same held key fires the menu twice — the turn-2
+        # open-target press executed a move at the stale read (takeover
+        # diag4 trace).
+        if self._key_fifo and self._key_fifo[-1] == val:
+            return
         self._key_fifo.append(val)
 
     def end_results(self):
@@ -791,15 +810,14 @@ def run_scenario(name, out_root):
         # re-opens after a few engine polls at an arbitrary parked CT.
         world.allow_seeds = True
         world.menu_reopen_seconds = 5.0
-        # Astra 2026-09-17: a deliberate non-Wait claim must ride
-        # actor-specific evidence, not CT churn. The chooser drives the
-        # action route, so the engine records target ids (+0xE7) and spends
-        # MP (+0x1C) — the turn event must carry the structured action, the
-        # decoded target, and the mp delta in its note. The battle ends only
-        # after turn 2's action executes (a finishing blow) — the recorded
-        # end shape follows the executed action, never teleporting the
-        # results screen over the evidence window.
-        world.expect_action_route = True
+        # Astra 2026-09-17 + round 6: a deliberate claim must ride RAM-
+        # identified selection. Under the identified-only contract every
+        # boundary is driven from the DECODED cursor state: the destination
+        # is read from RAM before the confirming input, and the turn event
+        # carries the identified action+target with engine-side tile
+        # verification. The battle ends only after turn 2's action — the
+        # recorded end shape follows the executed action.
+        world.identified_move = True
         world.reopen_after_commits = 2
         world.ending_after = (2, 12.0)
         state = rt.run()
@@ -809,45 +827,34 @@ def run_scenario(name, out_root):
             errors.append(f"takeover: expected 2 committed turns, got {rt.turn}")
         if world.commits != 2:
             errors.append(f"takeover: expected 2 engine commits, got {world.commits}")
-        if world.a_presses >= 4:
-            errors.append(f"takeover: A-presses should reset per menu episode "
-                          f"(got {world.a_presses} after 2 commits)")
         turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
         for t in turns:
-            if not t.get("selected_action") or not t.get("selected_target"):
-                errors.append(f"takeover: turn {t.get('turn')} must record a "
-                              f"deliberate action AND a decoded target "
-                              f"(Astra's CT-churn critique); got "
-                              f"action={t.get('selected_action')} "
-                              f"target={t.get('selected_target')}")
-            if t.get("selected_target") and \
-                    t["selected_target"].get("unit_ids") != [2, 1]:
-                errors.append(f"takeover: turn {t.get('turn')} target ids "
-                              f"{t['selected_target'].get('unit_ids')} != [2, 1] "
-                              f"(engine-recorded +0xE7 pair)")
-            if t.get("selected_target") and \
-                    not t["selected_target"].get("validated"):
-                errors.append(f"takeover: turn {t.get('turn')} target must be "
-                              f"VALIDATED (Astra round 3: roster-bounded hp "
-                              f"delta), got {t['selected_target']}")
-            if "mp" not in (t.get("note") or ""):
-                errors.append(f"takeover: turn {t.get('turn')} note lacks "
-                              f"the mp delta (actor-specific evidence)")
-            if f'"slot": {PLAYER_SLOT}' not in (t.get("note") or "") and \
-                    f"'slot': {PLAYER_SLOT}" not in (t.get("note") or ""):
-                errors.append(f"takeover: turn {t.get('turn')} note lacks a "
-                              f"delta for the PLAYER slot — actor-specific "
-                              f"means Marche's own record moved")
+            act = t.get("selected_action") or {}
+            tgt = t.get("selected_target") or {}
+            if act.get("kind") != "identified-move" or \
+                    act.get("command_id") != _MOVE_CMD:
+                errors.append(f"takeover: turn {t.get('turn')} action must be "
+                              f"an identified Move (RAM cursor), got {act}")
+            if tgt.get("kind") != "tile" or not tgt.get("dest"):
+                errors.append(f"takeover: turn {t.get('turn')} must record the "
+                              f"RAM-read destination, got {tgt}")
+            if "verified" not in (t.get("note") or ""):
+                errors.append(f"takeover: turn {t.get('turn')} note lacks the "
+                              f"engine-side tile verification: {(t.get('note') or '')[:160]}")
+            after = t.get("position_after") or {}
+            if tgt.get("dest") and \
+                    [after.get("x"), after.get("y")] != list(tgt["dest"]):
+                errors.append(f"takeover: turn {t.get('turn')} position_after "
+                              f"{after} != the identified destination "
+                              f"{tgt['dest']} (the engine executed the move)")
     elif name == "unknown":
-        # recorded shape: one clean commit, then the NEXT menu (the post-turn
-        # re-open) presents an unknown dialog that swallows the following
-        # route (presses land, nothing commits, no seeds). B-recovery must
-        # fail (the dialog ignores B) and the run must bound with no presses
-        # after the stop (DE-020).
-        world.allow_seeds = True   # commit #1 must close turn 1 honestly
-        world.menu_reopen_seconds = 5.0  # dialog rides the next re-open
-        world.after_commit = lambda w: setattr(w, "swallow_route", True)
-        world.swallow_b = True  # an unknown dialog ignores B as well
+        # DE-020 recorded shape, migrated to the identified-only contract:
+        # the first menu presents an unknown dialog that swallows the
+        # identified flow's presses (they land, no UI answers them, nothing
+        # commits, seeds stay silent). The contract has no recovery input,
+        # so the run must bound with zero further writes and zero turns.
+        world.identified_move = True
+        world.swallow_route = True
         state = rt.run()
         if state != "stalled":
             errors.append(f"unknown: expected stalled, got {state}")
@@ -857,9 +864,11 @@ def run_scenario(name, out_root):
         late = session.g.press_writes_after(mark)
         if late:
             errors.append(f"unknown: {len(late)} key writes after the bound")
-        if rt.turn != 1:
-            errors.append(f"unknown: expected exactly 1 bounded turn, got {rt.turn}")
+        if rt.turn != 0:
+            errors.append(f"unknown: expected 0 turns (the dialog swallowed "
+                          f"the identified flow), got {rt.turn}")
     elif name == "disconnect":
+        world.identified_move = True  # the commit needs the identified flow
         world.fail_at_commit = 1  # transport dies right after the first commit
         state = rt.run()
         if state != "connection_lost":
@@ -878,6 +887,7 @@ def run_scenario(name, out_root):
             world2 = FakeWorld()
             session2 = FakeSession(world2)
             world2.allow_seeds = True
+            world2.identified_move = True
             world2.after_commit = lambda w: w.mark_ending(1)
             rt2 = make_runtime(world2, f"transport-restart-{i}",
                                os.path.join(out_root, f"restart-{i}"))
@@ -898,6 +908,7 @@ def run_scenario(name, out_root):
         # recorded a3-natural1 shape: mid-battle player defeat ends the battle
         # naturally (seed silence -> results shape). The runtime must not
         # drive the dead actor's ghost menu and must still classify completed.
+        world.identified_move = True  # turn 1 commits via the identified flow
         world.allow_seeds = True
         world.defeat_after_commit = 18.0  # recorded: fell ~18 s after the
                                           # route committed (a3-natural1)
@@ -917,6 +928,7 @@ def run_scenario(name, out_root):
                           f"({kinds.count('turn')} turn events)")
     elif name == "results":
         # one committed turn, then the all-zero results shape held
+        world.identified_move = True  # turn 1 commits via the identified flow
         world.allow_seeds = True
         world.after_commit = lambda w: w.mark_ending(1)
         state = rt.run()
@@ -934,12 +946,22 @@ def run_scenario(name, out_root):
         # renamed the automation end `stalled (external takeover)` while
         # keeping the emulator owned; `takeover` in the runtime is the
         # automation-driven boundary, not a handoff.
+        world.identified_move = True
         world.allow_seeds = True
         world.menu_reopen_seconds = 5.0
         import threading
         def _drop_stop():
+            # turn 1 must be RECORDED (rt.turn >= 1: the turn event fired,
+            # so the engine commit AND its tile verification finished) and
+            # turn 2's menu already up before the STOP drops. The identified
+            # flow paces its own drive (RAM re-reads between legs), so a
+            # wall-clock guess lands before turn 1 — the old 25 s timer did
+            # exactly that — and a world-side commit check races the
+            # post-commit verification window.
+            while not (rt.turn >= 1 and world.menu_up):
+                time.sleep(0.1)
             open(rt.stop_file, "w").close()
-        threading.Timer(25.0, _drop_stop).start()  # turn 1 commits ~14 s in
+        threading.Thread(target=_drop_stop, daemon=True).start()
         state = rt.run()
         if state != "paused":
             errors.append(f"pause: expected paused, got {state}")
@@ -984,8 +1006,7 @@ def run_scenario(name, out_root):
         # stop drops DURING turn 1's post-route drive window, so the
         # boundary handler's remaining route legs and any recovery presses
         # must all be gated per input.
-        world.allow_seeds = True
-        world.expect_action_route = True
+        world.identified_move = True
         world.menu_reopen_seconds = 5.0
         import threading as _th
         armed = {"on": True}
@@ -1029,12 +1050,22 @@ def run_scenario(name, out_root):
             errors.append("strict-press: stop never latched in input log")
         else:
             _writes_after_stop(session, rt, stop_t, errors, "strict-press")
-        # per-input evidence: at least one press leg must have been ABORTED
-        # by the gate (press() returns -1 and logs it) rather than executed
-        probe_log = getattr(rt.p, "_log", None)
-        if probe_log is not None and not any("ABORTED" in line for line in probe_log):
-            errors.append("strict-press: no aborted press recorded — the STOP "
-                          "may have landed in a wait instead of the input path")
+        # per-input evidence: the identified flow gates BETWEEN legs, so a
+        # STOP that lands between presses suppresses the next attempt
+        # entirely (no write, no abort record) — the raw-write ordering
+        # check above is the proof. Require: after stop_requested, at most
+        # the one in-flight press may complete and NO new press may START.
+        # (The old assertion demanded a mid-press ABORTED record; the
+        # identified law's coalesced held-key writes made that window
+        # timing-dependent, and a between-legs stop is the honest shape.)
+        ilog2 = _input_log(rt.input_log_path)
+        presses_after = [r for r in ilog2
+                         if r.get("event") == "press"
+                         and stop_t is not None and r.get("t", 1e9) > stop_t
+                         and not r.get("aborted")]
+        if presses_after:
+            errors.append(f"strict-press: {len(presses_after)} press(es) "
+                          f"STARTED after stop_requested: {presses_after[:2]}")
     elif name == "stop-before-start":
         # C1 row: STOP before first input - no gameplay input at all, paused
         open(rt.stop_file, "w").close()  # dropped BEFORE run() is called
@@ -1055,35 +1086,45 @@ def run_scenario(name, out_root):
         if not any(r.get("event") == "stop_requested" for r in ilog):
             errors.append("stop-before-start: stop_requested not latched "
                           "in input log")
-    elif name == "stop-during-recovery":
-        # C1 row: STOP during B recovery - remaining recovery inputs are
-        # suppressed. The submenu swallow shape forces turn 2 into recovery
-        # (B press + re-drive cycles); the STOP drops as the FIRST recovery
-        # B write is observed, so cycle 2's inputs must never fire.
+    elif name == "stop-during-drive":
+        # C1 row (renamed from stop-during-recovery: the identified-only
+        # contract has no B-recovery; the risk window is now the identified
+        # drive's remaining legs). The menu presents the identified Move
+        # state, but a second menu after commit 1 is an unknown dialog
+        # (swallow_route) whose drive legs cannot commit; the STOP drops as
+        # the FIRST key write after that point is observed, so the
+        # drive's remaining presses must never fire.
+        world.identified_move = True
         world.allow_seeds = True
         world.menu_reopen_seconds = 5.0
-        world.after_commit = lambda w: setattr(w, "swallow_route", True)             if w.commits >= 2 else None
-        world.swallow_b = False
+        world.after_commit = lambda w: setattr(w, "swallow_route", True)
         armed = {"on": True}
         def _watch_recovery():
-            # drop the STOP once the first B press of recovery appears in
-            # the write stream (B mask = 0x02 bit in the P1= payload)
+            # drop the STOP on the first NEW key write AFTER commit 1 —
+            # turn 2's dialog drive has begun, with legs still ahead of it.
+            # Compare against the write count snapshotted at commit time:
+            # turn 1's own presses are already in the log, and a press's
+            # answer burst pushes the P1= write out of any small tail
+            # window within milliseconds, so both a whole-log scan without
+            # a mark and a tail slice get the timing wrong.
+            p1_mark = None
             while armed["on"]:
-                for c in session.g.send_log:
-                    if c.startswith("P1="):
-                        val = int.from_bytes(bytes.fromhex(c.split("=")[1]),
-                                             "little")
-                        if val & 0x02:
-                            open(rt.stop_file, "w").close()
-                            armed["on"] = False
-                            return
+                if world.commits >= 1:
+                    if p1_mark is None:
+                        p1_mark = sum(1 for c in session.g.send_log
+                                      if c.startswith("P1="))
+                    elif sum(1 for c in session.g.send_log
+                             if c.startswith("P1=")) > p1_mark:
+                        open(rt.stop_file, "w").close()
+                        armed["on"] = False
+                        return
                 time.sleep(0.05)
         import threading as _th2
         _th2.Thread(target=_watch_recovery, daemon=True).start()
         state = rt.run()
         armed["on"] = False
         if state != "paused":
-            errors.append(f"stop-during-recovery: expected paused, got "
+            errors.append(f"stop-during-drive: expected paused, got "
                           f"{state}, events={_events(rt.events_path)[-3:]}")
         # ordering proof from the raw log: no press may START after the
         # stop_requested record's timestamp
@@ -1091,13 +1132,14 @@ def run_scenario(name, out_root):
         stop_t = next((r["t"] for r in ilog
                        if r.get("event") == "stop_requested"), None)
         if stop_t is None:
-            errors.append("stop-during-recovery: stop never latched")
+            errors.append("stop-during-drive: stop never latched")
         else:
             _writes_after_stop(session, rt, stop_t, errors,
-                               "stop-during-recovery")
+                               "stop-during-drive")
     elif name == "stop-coincides-with-progress":
         # C1 row: STOP coincides with progress - cancellation wins; no new
         # turn starts. Drop the STOP just as the post-commit seed arrives.
+        world.identified_move = True
         world.allow_seeds = True
         world.menu_reopen_seconds = 5.0
         armed = {"on": True}
@@ -1270,30 +1312,66 @@ def run_scenario(name, out_root):
                 errors.append(f"identified-move-wrong: the demotion must be "
                               f"recorded in the turn note: {t.get('note')}")
     elif name == "submenu":
-        # recorded a3-natural5 shape: the post-Move re-opened menu presents
-        # a submenu the plain route cannot commit (presses land, nothing
-        # commits). The runtime's bounded B-escape backs out (navigation,
-        # not a tactical input) and the re-drive then commits normally.
-        world.allow_seeds = True
-        world.swallow_first_route = True
-        world.after_commit = lambda w: (w.mark_ending(1) if w.commits >= 2 else None)
+        # REWRITTEN for the identified-only contract (round 6): the old
+        # submenu shape exercised B-recovery, which is banned — recovery
+        # drives un-identified routes. The recorded risk it covered (a
+        # non-standard menu the committed shape cannot close) is now the
+        # honest-bound path: the runtime may navigate BACK (B) — because
+        # that is menu navigation, not a tactical selection — and must
+        # otherwise stop pressing. The fake presents a menu the identified
+        # shape cannot commit (swallow_route: A presses are swallowed), so
+        # the run must bound with zero turns and no writes after the bound.
+        world.identified_move = True
+        world.swallow_route = True
         state = rt.run()
-        if state != "completed":
-            errors.append(f"submenu: expected completed, got {state}")
-        if world.b_closes < 1:
-            errors.append(f"submenu: B never closed the wedged submenu "
-                          f"(b_closes={world.b_closes})")
-        if rt.turn != 2:
-            errors.append(f"submenu: expected 2 committed turns (route+recovery), "
-                          f"got {rt.turn}")
-        notes = [e for e in _events(rt.events_path) if e["kind"] == "note"]
-        if not any("B-recovery" in (e.get("note") or "") for e in notes):
-            errors.append(f"submenu: B-recovery was not recorded: {notes}")
+        if state != "stalled":
+            errors.append(f"submenu: expected stalled (honest bound on an "
+                          f"unidentifiable menu), got {state}")
+        if rt.turn != 0:
+            errors.append(f"submenu: {rt.turn} turns committed although the "
+                          f"menu shape never committed — recovery input is "
+                          f"banned (identified-only contract)")
+        mark = len(session.g.send_log)
+        time.sleep(0.5)
+        late = session.g.press_writes_after(mark)
+        if late:
+            errors.append(f"submenu: {len(late)} key writes after the bound")
+    elif name == "identified-move-invalid":
+        # Astra round-6 gap 3 (negative control): the engine is parked on
+        # Action... no — on WAIT (a re-opened post-move menu, the c2-live3
+        # false-positive class) with a stale target copy. The planner MUST
+        # reject it — and a rejection prevents input entirely: no chooser
+        # route, no fixed route, nothing. The run then bounds honestly.
+        world.allow_seeds = True
+        world.menu_reopen_seconds = 5.0
+        world.identified_move = True
+        world._cmd_cursor = _WAIT_CMD   # cursor on Wait: the plan reads != Move
+        world._target_cursor = [5, 9]   # stale target copy: a "readable" x/y
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"identified-move-invalid: expected stalled "
+                          f"(honest bound), got {state}")
+        notes = [(e.get("note") or "") for e in _events(rt.events_path)]
+        if not any("plan rejected" in n for n in notes):
+            errors.append("identified-move-invalid: no planner-rejection "
+                          f"note recorded: {notes}")
+        # the input contract: the rejection must have prevented EVERY key
+        # write (raw stream, not the intent log)
+        writes = session.g.key_writes()
+        if writes:
+            errors.append(f"identified-move-invalid: {len(writes)} key "
+                          "writes escaped after the planner rejected the "
+                          "snapshot (rejection must prevent input, not "
+                          f"fall back): {writes[:3]}")
     else:
         raise ValueError(f"unknown scenario {name}")
 
     receipt = finish_run(rt, world, out_dir)
     errs = validate(out_dir)
+    # Astra round-6 gap 1: the receipt-vs-artifacts contract applies to
+    # scenario outputs too — including an empty log for a run that recorded
+    # no input (the file itself must exist from run start)
+    errs = validate_run_receipt(receipt, out_dir, errs)
     if errs:
         errors.extend(errs)
     print(f"  [{name}] state={receipt['final_state']} turns={receipt['turns']} "
@@ -1331,6 +1409,48 @@ def _input_log(path):
         return []
 
 
+def validate_run_receipt(receipt, run_dir, errors=None):
+    """Lifecycle checks a run receipt must satisfy against its own artifacts.
+
+    Astra round-6 gap 1: every run that CLAIMS external input in its event
+    stream must have a NON-EMPTY input log on disk. The scenario runners
+    verify their own scripted assertions AND this contract; a harness that
+    removes the log from a receipt's directory now fails here. A run with
+    legitimately zero input (planner rejection, pre-input stop) keeps its
+    empty log: it is the evidence FOR zero input.
+    """
+    errors = [] if errors is None else errors
+    label = receipt.get("run_id", run_dir)
+    input_log_path = os.path.join(run_dir, "input-log.jsonl")
+    claims_input = False
+    try:
+        with open(os.path.join(run_dir, "events.jsonl"),
+                  encoding="utf-8") as fh:
+            for line in fh:
+                if not line.strip():
+                    continue
+                rec = json.loads(line)
+                if (rec.get("control_mode") == "external"
+                        and rec.get("kind") != "boundary"
+                        or rec.get("selected_action") is not None):
+                    # boundary events only ANNOUNCE detected menu ownership
+                    # (they precede the plan decision by design); input is
+                    # claimed by turn/action records — those require the log
+                    claims_input = True
+                    break
+    except FileNotFoundError:
+        pass
+    if not os.path.exists(input_log_path):
+        errors.append(f"{label}: input-log.jsonl missing from the run "
+                      f"directory (input claims are unverifiable without "
+                      f"it)")
+    elif os.path.getsize(input_log_path) == 0 and claims_input:
+        errors.append(f"{label}: input-log.jsonl is empty but the run "
+                      f"claims external input (input ordering claims are "
+                      f"unverifiable without it)")
+    return errors
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--scenario", default="all",
@@ -1338,19 +1458,21 @@ def main(argv=None):
                                      "restart", "defeat", "results", "submenu",
                                      "pause", "strict-press",
                                      "stop-before-start",
-                                     "stop-during-recovery",
+                                     "stop-during-drive",
                                      "stop-coincides-with-progress",
                                      "guard-failure", "identified-move",
-                                     "identified-move-wrong"])
+                                     "identified-move-wrong",
+                                     "identified-move-invalid"])
     ap.add_argument("--out-root", default=os.path.join("outputs", "autobattle",
                                                        "transport-checks"))
     args = ap.parse_args(argv)
 
     names = ["takeover", "unknown", "disconnect", "restart", "defeat",
              "results", "submenu", "pause", "strict-press",
-             "stop-before-start", "stop-during-recovery",
+             "stop-before-start", "stop-during-drive",
              "stop-coincides-with-progress", "guard-failure",
-             "identified-move", "identified-move-wrong"]
+             "identified-move", "identified-move-wrong",
+             "identified-move-invalid"]
     if args.scenario != "all":
         names = [args.scenario]
     failures = []

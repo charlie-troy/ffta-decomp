@@ -47,6 +47,11 @@ EVENT_SCHEMA = {
     "selected_action": None, "selected_target": None,
     "position_before": None, "position_after": None,
     "state": None, "seeds": None, "router_hits": None, "note": None,
+    # round 6: the start event must CARRY the input-log filename — the
+    # receipt validator's missing-log check keys off it, and the old
+    # silently-dropped-field behavior is exactly the bug class Astra
+    # flagged in round 4 (a passed kwarg that never reaches the artifact).
+    "input_log": None,
 }
 
 
@@ -54,12 +59,6 @@ class BattleRuntime:
     # roster tile offsets (A2.5 contract, probe_control_handoff constants)
     _TILE_X = 0xF6
     _TILE_Y = 0xF7
-    # B is pure menu-back navigation on the key-poll channel: it can never
-    # commit a choice, so bounded B-escape cycles are recovery, not tactical
-    # clicks (the A3 no-tactical-clicks contract stays intact)
-    B_MASK = 0x02
-    B_RECOVERY_LIMIT = 3      # escape cycles before declaring an unknown modal
-    B_SETTLE_SECONDS = 60.0   # post-redrive commit lands within ~40 s (recorded)
     """Drive one battle from the verified fixture with bounded stopping."""
 
     def __init__(self, session, scenario, run_id, out_dir,
@@ -147,8 +146,13 @@ class BattleRuntime:
             "router_hits": self.p.router_hits,
         })
         for k, v in fields.items():
-            if k in rec:
-                rec[k] = v
+            if k not in rec:
+                # round 6: a kwarg that the schema would silently drop is a
+                # caller bug — Astra round 4 caught `reason` vanishing this
+                # way. Fail loudly at the call site instead.
+                raise TypeError(f"event() got an unexpected field {k!r} "
+                                f"(not in EVENT_SCHEMA)")
+            rec[k] = v
         with open(self.events_path, "a", encoding="utf-8") as fh:
             fh.write(json.dumps(rec) + "\n")
         if self.p.verbose:
@@ -336,124 +340,6 @@ class BattleRuntime:
         base = ROSTER + STRIDE * ps
         return u16(self.g, base + 0x18) == 0 and u16(self.g, base + 0x1A) == 0
 
-    def _effect_diff(self, before, after):
-        """Engine-observed deltas between two effect snapshots.
-
-        Diffs mp and tg (engine-recorded recent-target ids) alongside hp/ct/
-        tile: Astra 2026-09-17 — CT-only deltas cannot distinguish a
-        committed Wait from a real command, so a non-Wait claim must ride an
-        actor-specific field (the actor's MP cost and/or the engine's own
-        target record).
-        """
-        if before is None or after is None:
-            return None
-        b = {r["slot"]: r for r in before}
-        deltas = []
-        for r in after:
-            old = b.get(r["slot"])
-            if old is None:
-                deltas.append({"slot": r["slot"], "new": r})
-                continue
-            changed = {k: [old[k], r[k]] for k in ("hp", "ct", "mp", "tg", "x", "y")
-                       if old[k] != r[k]}
-            if changed:
-                deltas.append({"slot": r["slot"], **changed})
-        return deltas
-
-    def _decode_target(self, after):
-        """Engine-recorded recent-target ids (+0xE7), VALIDATED against the roster.
-
-        include/ffta.h / unit-struct.md: action resolution packs the two most
-        recent distinct targets as two 4-bit unit ids in the player actor's
-        +0xE7 byte. Astra 2026-09-17 (round 3): a raw decode alone does not
-        establish whom the action hit — a byte can also be transient roster
-        garbage (the a3 boundary lesson). A decoded id is kept only when
-            - both unit ids fall inside the allocated roster (side-checked),
-            - the named target's hp moved between the before/after
-              snapshots, and
-            - that hp delta stays within the target's max_hp (+0x1A).
-        Anything else decodes to null; unknown fields stay null, never
-        inferred.
-        """
-        if not after:
-            return None
-        ps = self.p.player_slot()
-        for r in after:
-            if r["slot"] != ps or not r.get("tg", 0):
-                continue
-            ids = [r["tg"] >> 4, r["tg"] & 0xF]
-            # validated: ids inside the roster, hp moved, delta <= max_hp
-            before = getattr(self, "_before_effects", None)
-            if before is None:
-                return None  # validation needs the before snapshot
-            b = {q["slot"]: q for q in before}
-            slots = set(b) | {q["slot"] for q in after}
-            if any(i not in slots for i in ids):
-                return None
-            from probe_control_handoff import ROSTER, STRIDE, u16
-            moved = False
-            for tid in ids:
-                row = next((q for q in after if q["slot"] == tid), None)
-                old = b.get(tid)
-                if row is None or old is None:
-                    return None
-                max_hp = u16(self.p.g, ROSTER + STRIDE * tid + 0x1A)
-                delta = row["hp"] - old["hp"]
-                # damage subtracts, healing adds: the plausible band is
-                # |delta| <= max_hp. The SECOND packed id is only a recent
-                # target — it need not react to this action — so the
-                # hp-movement requirement applies to at least ONE id; zero
-                # movement on BOTH ids means no target reacted at all.
-                if not (-max_hp <= delta <= max_hp):
-                    return None  # implausible effect: garbage, not a hit
-                moved = moved or delta != 0
-            if not moved:
-                return None
-            return {"source": "engine-recent-target-ids",
-                    "unit_ids": ids,
-                    "validated": "roster-bounded hp delta on every decoded id"}
-        return None
-
-    def _plausible_marche_row(self, row):
-        """False for the roster-copy artifacts seen mid-execution.
-
-        The roster block is copied around while an action executes, so a
-        snapshot taken mid-copy reads impossible values (chooser5/6 live:
-        ct=6833 > 1000, hp=4368, mp=2569). A row is evidence-grade only
-        when its fields stay inside engine-bounded ranges: ct<=1000,
-        hp<=max_hp, mp<=max_mp. Maxes come from the live record; a 0 max
-        (defeated/teardown read) passes only with zeroed hp/mp.
-        """
-        from probe_control_handoff import ROSTER, STRIDE, u16
-        base = ROSTER + STRIDE * row["slot"]
-        max_hp = u16(self.p.g, base + 0x1A)
-        max_mp = u16(self.p.g, base + 0x1E)
-        if row["ct"] > 1000 or row["hp"] > max_hp or row["mp"] > max_mp:
-            return False
-        if not (0 <= row["x"] <= 63 and 0 <= row["y"] <= 63):
-            return False  # tile garbage (the a3 boundary lesson)
-        return True
-
-    def _marche_action_evidence(self, effect, after=None):
-        """True only when the ACTOR's own record moved, plausibly.
-
-        A non-Wait command spends the actor's MP (+0x1C), and/or is recorded
-        in the actor's +0xE7 target byte, and/or moves the actor. Deltas on
-        OTHER slots — including target hp churn — say nothing about which
-        action the player executed and must not label the turn. Astra round
-        3: the actor row must also be plausible (roster-copy garbage during
-        execution reads impossible values and is NOT evidence).
-        """
-        ps = self.p.player_slot()
-        if effect is None or ps is None:
-            return False
-        row = next((r for r in (after or []) if r["slot"] == ps), None)
-        if row is not None and not self._plausible_marche_row(row):
-            return False
-        return any(d.get("slot") == ps and
-                   any(k in d for k in ("mp", "tg", "x", "y", "hp"))
-                   for d in effect)
-
     def _drive_player_boundary(self):
         prev = self.state
         self.state = TAKEOVER
@@ -468,18 +354,6 @@ class BattleRuntime:
         self.event("boundary", actor="Marche", actor_slot=6,
                    control_mode="external", position_before=before,
                    note=shot)
-        # Deliberate selection: when live engine evidence supports it, the
-        # chooser picks the action-submenu route instead of the fixed
-        # Wait-shape route. Whatever the menu resolves to, the commit's
-        # meaning is recorded as an engine-side effect diff below — never
-        # an assumed label.
-        before_effects = None
-        try:
-            before_effects = self.p.effect_snapshot()
-        except Exception:
-            before_effects = None
-        self._before_effects = before_effects  # target validation reads this
-
         # -- C2 identified-candidate path -----------------------------------
         # When the open menu's decoded command cursor reads Move and the
         # decoded target cursor is readable, THAT is the candidate: the
@@ -493,309 +367,132 @@ class BattleRuntime:
             plan = self.p.plan_identified_move()
         except Exception:
             plan = None
-        if plan is not None:
-            drove, dest_used, _leglog = self.p.commit_identified_move(
-                plan, stop_check=self._stop_check,
-                log_leg=lambda rec: self._log_input(rec))
-            if self._stop_check():
-                # a latched STOP owns this exit: no turn event after the
-                # stop record, hand the battle over here
-                self._finish(PAUSED,
-                             "STOP requested: battle left running for "
-                             "manual play")
-                return
-            if not drove:
-                # failed drive WITHOUT a latched stop (c2-live3: a non-
-                # standard menu shape whose legs all landed hits=0): this is
-                # an unknown UI, not a manual handoff — pausing here
-                # mislabeled the run `paused` AND double-terminated (the
-                # loop then classified the still-live battle to completion).
-                # Bound honestly like the unknown-modal path instead.
-                self._saw_unknown_modal = True
-                self.event("note", actor="Marche", actor_slot=6,
-                           note="identified-move drive failed without a "
-                                "stop (non-standard menu shape, legs "
-                                "landed no stops): bounding run — battle "
-                                "left on the open menu for manual play")
-                self.state = RUNNING
-                return
-            route_note = ("identified-move: cmd_cursor=Move and target "
-                          "cursor read from RAM before input")
-            sel_action = {"kind": "identified-move",
-                          "command_id": plan["command_id"],
-                          "dest": list(dest_used) if dest_used else None,
-                          "from": plan["from"]}
-            sel_target = None
-            if dest_used is not None:
-                sel_target = {"kind": "tile", "dest": list(dest_used),
-                              "identified_from":
-                                  "RAM target cursor read before confirm"}
-            # the Wait commit ends the turn: same wall-aware progress wait
-            # as the route paths
-            committed = self.p.wait_progress(
-                seconds=min(150.0, max(10.0, self.wall_timeout -
-                                       (time.time() - self.t0))),
-                min_new_seeds=1, stop_check=self._stop_check)
-            if self._stop_check():
-                # stop landed inside the post-commit wait (C1 rule: no turn
-                # event after the latched stop; hand the battle over here,
-                # mirroring the route path's recovery exit)
-                self._finish(PAUSED,
-                             "STOP requested: battle left running for "
-                             "manual play")
-                return
-            # C2 verification: movement IS the observable result. The roster
-            # tile updates at commit, which wait_progress's seed condition
-            # may precede — verify on a bounded retry loop.
-            dest = tuple(dest_used) if dest_used else None
-            tile_verified = None
-            if dest is not None:
-                deadline = time.time() + 20.0
-                while time.time() < deadline:
-                    if self._stop_check():
-                        break
-                    pos = self._marche_pos()
-                    if pos and (pos["x"], pos["y"]) == dest:
-                        tile_verified = pos
-                        break
-                    try:
-                        self.p.wait_progress(seconds=2.0,
-                                             min_new_seeds=9999999,
-                                             stop_check=self._stop_check)
-                    except Exception:
-                        pass
-            if self._stop_check():
-                self._finish(PAUSED,
-                             "STOP requested: battle left running for "
-                             "manual play")
-                return
-            after = self._marche_pos() or {"x": None, "y": None}
-            if dest is not None and tile_verified is not None:
-                route_note += (f"; roster tile verified at "
-                               f"({tile_verified['x']}, "
-                               f"{tile_verified['y']}) == RAM-read dest "
-                               f"(verified)")
-            else:
-                # engine disagreed (or dest never identified): demote
-                # honestly — identified and driven, but the observable
-                # result is not proven.
-                sel_action = None
-                sel_target = None
-                route_note += ("; identified-move driven but the roster "
-                               "tile did not reach the identified "
-                               "destination: NOT claimed (engine disagreed "
-                               "with the RAM-read destination)")
-            self.turn += 1
-            self.event("turn", turn=self.turn, actor="Marche", actor_slot=6,
-                       control_mode="external", selected_action=sel_action,
-                       selected_target=sel_target,
-                       position_before=before, position_after=after,
-                       note=f"committed via {route_note}")
-            self.state = prev if prev in (RUNNING,) else RUNNING
+        if plan is None:
+            # Astra round-6 gap 3: an invalid snapshot must PREVENT input.
+            # A planner rejection is a rejected candidate, not a degraded
+            # one: driving a fixed route from here would select by key
+            # sequence (the exact unfalsifiable claim the contract bans).
+            self.event("note", actor="Marche", actor_slot=6,
+                       note="identified-move plan rejected: menu state "
+                            "not identified from RAM — no input issued "
+                            "(candidate rejected, battle left on the "
+                            "open menu)")
+            self._saw_unknown_modal = True
+            self.state = prev
             return
-
-        choice = None
-        try:
-            choice = self.p.choose_non_wait()
-        except Exception:
-            choice = None
-        def _logged_press(mask, tag):
-            """press() with a raw input-log record (C1 ordering proof)."""
-            started = time.time()
-            hits = self.p.press(mask, stop_check=self._stop_check, tag=tag)
-            self._log_input({"event": "press", "mask": mask, "tag": tag,
-                             "t": round(started - self.t0, 3),
-                             "duration": round(time.time() - started, 3),
-                             "hits": hits,
-                             "aborted": hits < 0})
-            return hits
-
-        def _logged_drive(tag, route=None):
-            """drive() whose every leg is recorded (C1 ordering proof)."""
-            route = route if route is not None else choice["route"] if choice else None
-            # record the drive attempt; press legs inside drive() are also
-            # visible in the stub's key-write stream, but the per-leg record
-            # here gives the validator an intent-level log to cross-check
-            mark = time.time()
-            ok = self.p.drive(f"a3-{self.run_id}", route=route,
-                              stop_check=self._stop_check)
-            self._log_input({"event": "drive", "tag": tag,
-                             "t": round(mark - self.t0, 3),
-                             "duration": round(time.time() - mark, 3),
-                             "completed": ok})
-            return ok
-
-        if choice is not None:
-            drove = _logged_drive(f"a3-{self.run_id}", route=choice["route"])
-            route_note = "deliberate action-submenu route (chooser)"
-        else:
-            # The only proven commit shape (A2.5 contract); never leave a
-            # menu undriven.
-            drove = _logged_drive(f"a3-{self.run_id}")
-            route_note = "fixed proven route (chooser declined: no ability/tile evidence)"
-        if not drove or self._stop_check():
-            # stop landed mid-route (Astra round 3): no further input, the
-            # battle is handed to the player here
+        drove, dest_used, _leglog = self.p.commit_identified_move(
+            plan, stop_check=self._stop_check,
+            log_leg=lambda rec: self._log_input(rec))
+        if self._stop_check():
+            # a latched STOP owns this exit: no turn event after the
+            # stop record, hand the battle over here
             self._finish(PAUSED,
-                         "STOP requested: battle left running for manual play")
+                         "STOP requested: battle left running for "
+                         "manual play")
             return
-        # wall-aware progress wait; 150 s covers the healthiest recorded
-        # boundary gap (92.9 s in a3-natural3) with margin — the original
-        # 90 s bound sat inside natural late-game pacing and bounded a live
-        # run mid-charge
-        remaining = max(10.0, self.wall_timeout - (time.time() - self.t0))
-        committed = self.p.wait_progress(seconds=min(150.0, remaining),
-                                         min_new_seeds=1,
-                                         stop_check=self._stop_check)
-        # Honest labels only (roadmap rule: unknown fields must be null, not
-        # inferred). The route kind records WHAT was deliberately selected;
-        # the effect diff records what the engine actually did. The decoded
-        # command id/name stays null — that mapping is not built yet.
-        note = f"committed via {route_note}; effect diff follows"
-        sel_action = None
-        if choice is not None:
-            sel_action = {"kind": "deliberate-non-wait-route",
-                          "command_id": None,
-                          "route": "action-submenu"}
-        if not committed:
-            # a3-natural5 evidence: the post-Move re-opened menu can present
-            # a different UI shape (a submenu) that the plain route cannot
-            # commit — presses land, nothing commits, and the engine idles
-            # awaiting input. B backs out of submenus without committing,
-            # so bounded B-escape cycles plus a re-drive are recovery.
-            # After B_RECOVERY_LIMIT fruitless cycles the shape is a true
-            # unknown modal and the run bounds honestly (DE-020).
-            recovered = False
-            for cycle in range(1, self.B_RECOVERY_LIMIT + 1):
-                self.event("note", note=f"no sequencer progress after route: "
-                            f"B-recovery cycle {cycle}/{self.B_RECOVERY_LIMIT} "
-                            f"(backing out of a possible submenu; no tactical "
-                            f"input)")
-                # exactly one B: from a submenu it returns to the parent
-                # command menu; a second B would close the parent entirely
-                # and strand the unit on the map (proved offline: the first
-                # submenu run drove B twice and the re-drive landed on a
-                # closed menu with zero progress)
-                # Astra 2026-09-17 (round 3): the stop check must gate EACH
-                # input BEFORE it fires — the old shape pressed B, drove the
-                # whole re-route, and only then checked, letting a full
-                # input sequence escape after a STOP was observed.
-                if self._stop_check():
-                    self.event("note", note=f"stop observed before B-recovery "
-                                f"cycle {cycle}: no further input")
-                    break
-                b_started = time.time()
-                b_hits = self.p.press(self.B_MASK, stop_check=self._stop_check,
-                                      tag=f"a3-{self.run_id}:B{cycle}")
-                self._log_input({"event": "press", "mask": self.B_MASK,
-                                 "tag": f"a3-{self.run_id}:B{cycle}",
-                                 "t": round(b_started - self.t0, 3),
-                                 "duration": round(time.time() - b_started, 3),
-                                 "hits": b_hits, "aborted": b_hits < 0})
-                if b_hits < 0:
-                    self.event("note", note=f"stop aborted B press in "
-                                f"recovery cycle {cycle}: no further input")
-                    break
-                # the proven route then re-drives the parent menu. Without
-                # the re-drive the backed-out menu just sits awaiting input.
-                rec_start = time.time()
-                rec_ok = self.p.drive(f"a3-{self.run_id}:rec{cycle}",
-                                      stop_check=self._stop_check)
-                self._log_input({"event": "drive", "tag": f"a3-{self.run_id}:rec{cycle}",
-                                 "t": round(rec_start - self.t0, 3),
-                                 "duration": round(time.time() - rec_start, 3),
-                                 "completed": rec_ok})
-                if not rec_ok:
-                    self.event("note", note=f"stop aborted re-drive in "
-                                f"recovery cycle {cycle}: no further input")
-                    break
-                remaining = max(10.0, self.wall_timeout - (time.time() - self.t0))
-                if self.p.wait_progress(
-                        seconds=min(self.B_SETTLE_SECONDS, remaining),
-                        min_new_seeds=1,
-                        stop_check=self._stop_check):
-                    recovered = True
-                    break
-            if not recovered:
-                # strongest unknown-modal signal without a frame; bound the
-                # run instead of pressing further (DE-020)
-                self._saw_unknown_modal = True
-                after = self._marche_pos() or {"x": None, "y": None}
-                self.event("note", turn=self.turn, actor="Marche",
-                           actor_slot=6, control_mode="external",
-                           position_before=before, position_after=after,
-                           note="route and B-recovery produced no sequencer "
-                                "progress: bounding run (committed action "
-                                "not decoded)")
-                self.state = RUNNING
-                return
-            note = "committed after B-recovery (plain route); action not decoded"
-            sel_action = None  # recovery re-drives the plain route, not the chooser route
-        after = self._marche_pos() or {"x": None, "y": None}
-        # Astra 2026-09-17: the first seed can precede the committed action's
-        # execution — an after-snapshot there records only CT churn and a
-        # Wait would be mislabeled non-Wait. The commit's evidence window is
-        # the action's EXECUTION, and a single snapshot inside it races:
-        # chooser6's four misses were all timing (CT churn before execution
-        # or mid-copy garbage). Round 3 fix: retry the snapshot on a short
-        # cadence for a bounded window; the FIRST plausible actor-specific
-        # read wins, and the window closes on plausible CT-only reads so a
-        # genuine Wait is never mislabeled.
-        effect = None
-        actor_specific = False
-        plausible_reads = 0
-        window_end = time.time() + 12.0
-        while time.time() < window_end and not actor_specific:
-            try:
-                after_effects = self.p.effect_snapshot()
-            except Exception:
-                after_effects = None
-            cand = self._effect_diff(before_effects, after_effects)
-            actor_specific = self._marche_action_evidence(cand, after_effects)
-            if actor_specific:
-                effect = cand
-                break
-            # close the window only on TWO consecutive all-plausible
-            # non-actor reads: a single plausible read can still predate the
-            # action's execution (menu commit precedes resolution), and one
-            # mid-copy garbage read must never close it either
-            plausible = bool(cand and after_effects and all(
-                self._plausible_marche_row(r) for r in after_effects))
-            plausible_reads = plausible_reads + 1 if plausible else 0
-            if plausible_reads >= 2:
-                effect = cand
-                break
-            try:
-                self.p.wait_progress(seconds=2.0, min_new_seeds=9999999,
-                                     stop_check=self._stop_check)
-            except Exception:
-                pass
-        if effect:
-            note += f"; engine deltas: {json.dumps(effect)}"
-            if not actor_specific:
-                note += ("; ct-only (execution window may not have closed: "
-                         "action not identified)")
-        else:
-            note += "; no engine deltas decoded (action not decoded yet)"
-        self.turn += 1
+        if not drove:
+            # failed drive WITHOUT a latched stop (c2-live3: a non-
+            # standard menu shape whose legs all landed hits=0): this is
+            # an unknown UI, not a manual handoff — pausing here
+            # mislabeled the run `paused` AND double-terminated (the
+            # loop then classified the still-live battle to completion).
+            # Bound honestly like the unknown-modal path instead.
+            self._saw_unknown_modal = True
+            self.event("note", actor="Marche", actor_slot=6,
+                       note="identified-move drive failed without a "
+                            "stop (non-standard menu shape, legs "
+                            "landed no stops): bounding run — battle "
+                            "left on the open menu for manual play")
+            self.state = RUNNING
+            return
+        route_note = ("identified-move: cmd_cursor=Move and target "
+                      "cursor read from RAM before input")
+        sel_action = {"kind": "identified-move",
+                      "command_id": plan["command_id"],
+                      "dest": list(dest_used) if dest_used else None,
+                      "from": plan["from"]}
         sel_target = None
-        if sel_action is not None:
-            sel_target = self._decode_target(after_effects)
-            if sel_target is None:
-                # Astra round 3: the claim rides a VALIDATED target (or at
-                # minimum plausible actor-specific deltas); if the engine-side
-                # record never materialized — no target decode — the deliberate
-                # route was driven but the action is NOT proven. Demote.
-                sel_action = None
-                note += ("; deliberate route driven but no validated "
-                         "Marche action/target evidence: NOT claimed as "
-                         "non-Wait execution")
+        if dest_used is not None:
+            sel_target = {"kind": "tile", "dest": list(dest_used),
+                          "identified_from":
+                              "RAM target cursor read before confirm"}
+        # the Wait commit ends the turn: same wall-aware progress wait
+        # as the route paths
+        committed = self.p.wait_progress(
+            seconds=min(150.0, max(10.0, self.wall_timeout -
+                                   (time.time() - self.t0))),
+            min_new_seeds=1, stop_check=self._stop_check)
+        if not committed:
+            # the identified Wait commit shape did not close the turn (the
+            # engine refused or the menu changed shape): bounding honestly,
+            # with NO recovery input — recovery drives un-identified routes,
+            # which the contract bans from a rejected/unidentified state.
+            self._saw_unknown_modal = True
+            self.event("note", actor="Marche", actor_slot=6,
+                       note="identified-move commit shape produced no "
+                            "sequencer progress: bounding run — battle "
+                            "left on the open menu for manual play (no "
+                            "recovery input: recovery routes are not "
+                            "RAM-identified)")
+            self.state = RUNNING
+            return
+        if self._stop_check():
+            # stop landed inside the post-commit wait (C1 rule: no turn
+            # event after the latched stop; hand the battle over here,
+            # mirroring the route path's recovery exit)
+            self._finish(PAUSED,
+                         "STOP requested: battle left running for "
+                         "manual play")
+            return
+        # C2 verification: movement IS the observable result. The roster
+        # tile updates at commit, which wait_progress's seed condition
+        # may precede — verify on a bounded retry loop.
+        dest = tuple(dest_used) if dest_used else None
+        tile_verified = None
+        if dest is not None:
+            deadline = time.time() + 20.0
+            while time.time() < deadline:
+                if self._stop_check():
+                    break
+                pos = self._marche_pos()
+                if pos and (pos["x"], pos["y"]) == dest:
+                    tile_verified = pos
+                    break
+                try:
+                    self.p.wait_progress(seconds=2.0,
+                                         min_new_seeds=9999999,
+                                         stop_check=self._stop_check)
+                except Exception:
+                    pass
+        if self._stop_check():
+            self._finish(PAUSED,
+                         "STOP requested: battle left running for "
+                         "manual play")
+            return
+        after = self._marche_pos() or {"x": None, "y": None}
+        if dest is not None and tile_verified is not None:
+            route_note += (f"; roster tile verified at "
+                           f"({tile_verified['x']}, "
+                           f"{tile_verified['y']}) == RAM-read dest "
+                           f"(verified)")
+        else:
+            # engine disagreed (or dest never identified): demote
+            # honestly — identified and driven, but the observable
+            # result is not proven.
+            sel_action = None
+            sel_target = None
+            route_note += ("; identified-move driven but the roster "
+                           "tile did not reach the identified "
+                           "destination: NOT claimed (engine disagreed "
+                           "with the RAM-read destination)")
+        self.turn += 1
         self.event("turn", turn=self.turn, actor="Marche", actor_slot=6,
                    control_mode="external", selected_action=sel_action,
                    selected_target=sel_target,
                    position_before=before, position_after=after,
-                   note=note)
+                   note=f"committed via {route_note}")
         self.state = prev if prev in (RUNNING,) else RUNNING
+        return
 
     def _finish(self, state, reason):
         self.state = state

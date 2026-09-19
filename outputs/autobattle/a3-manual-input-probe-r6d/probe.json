@@ -1,0 +1,148 @@
+{
+  "schema": "manual-input-probe/3",
+  "run_id": "a3-manual-input-probe-r6d",
+  "emulator_pid": 60452,
+  "emulator_survived": true,
+  "paused_before_handoff": true,
+  "read_only_reattach": true,
+  "monitor_resumed_cpu": true,
+  "menu_open_detected": true,
+  "menu_open_at_s": 34.2,
+  "cursor_at_detach": 2,
+  "cursor_at_open": 0,
+  "player_input_sent": "DOWN (window SendInput)",
+  "cursor_after": 1,
+  "decoded_command": {
+    "addr": "0x0202ddd9",
+    "before": 0,
+    "after": 1
+  },
+  "decoded_command_changed": true,
+  "screen_changed": true,
+  "stub_writes_at_handoff": 30,
+  "stub_writes_after_player_input": 30,
+  "stub_fought_back": false,
+  "menu_wait_log": [
+    {
+      "t": 2.0,
+      "cursor": 2,
+      "ct": 0,
+      "prev_cursor": 2,
+      "prev_ct": 420
+    },
+    {
+      "t": 4.0,
+      "cursor": 2,
+      "ct": 0,
+      "prev_cursor": 2,
+      "prev_ct": 0
+    },
+    {
+      "t": 6.0,
+      "cursor": 2,
+      "ct": 494,
+      "prev_cursor": 2,
+      "prev_ct": 0
+    },
+    {
+      "t": 8.0,
+      "cursor": 2,
+      "ct": 0,
+      "prev_cursor": 2,
+      "prev_ct": 494
+    },
+    {
+      "t": 10.1,
+      "cursor": 2,
+      "ct": 0,
+      "prev_cursor": 2,
+      "prev_ct": 0
+    },
+    {
+      "t": 12.1,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 2,
+      "prev_ct": 0
+    },
+    {
+      "t": 14.1,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 16.1,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 18.1,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 20.2,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 22.2,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 24.2,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 26.2,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 28.2,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 30.2,
+      "cursor": 0,
+      "ct": 0,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 32.2,
+      "cursor": 0,
+      "ct": 188,
+      "prev_cursor": 0,
+      "prev_ct": 0
+    },
+    {
+      "t": 34.2,
+      "cursor": 0,
+      "ct": 188,
+      "prev_cursor": 0,
+      "prev_ct": 188
+    }
+  ],
+  "before": "outputs\\autobattle\\a3-manual-input-probe-r6d\\manual-before.png",
+  "after": "outputs\\autobattle\\a3-manual-input-probe-r6d\\manual-after.png"
+}
