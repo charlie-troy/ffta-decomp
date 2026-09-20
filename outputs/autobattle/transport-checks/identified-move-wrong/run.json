@@ -8,6 +8,6 @@
   "seeds": 13,
   "router_hits": 0,
   "terminal_reason": "no-progress bound reached",
-  "events": "outputs/autobattle/transport-checks\\identified-move-wrong\\events.jsonl",
+  "events": "outputs\\autobattle\\transport-checks\\identified-move-wrong\\events.jsonl",
   "emulator_handoff": "terminated"
 }

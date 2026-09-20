@@ -1,0 +1,56 @@
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 19.973, "duration": 1.46, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 23.06, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 25.677, "duration": 1.469, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 28.771, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 31.39, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 34.007, "duration": 1.433, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 134.614, "duration": 1.461, "hits": 5, "aborted": false}
+{"event": "stop_requested", "t": 136.075, "detection_latency_s": 1.324, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "resume", "t": 138.9}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 158.783, "duration": 1.462, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 161.872, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 16, "tag": "c2:step-right", "t": 164.512, "duration": 1.41, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 167.132, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 170.162, "duration": 1.414, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 174.792, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 179.461, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 184.092, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 188.752, "duration": 1.41, "hits": 5, "aborted": false}
+{"event": "press", "mask": 2, "tag": "c3:backout-0", "t": 191.372, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:backout-echo-0", "t": 194.402, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 2, "tag": "c3:backout-1", "t": 197.02, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:backout-echo-1", "t": 200.043, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav2-down", "t": 202.659, "duration": 1.41, "hits": 5, "aborted": false}
+{"event": "finish", "kind": "identified-wait", "reason": "occupied-tile b-ladder repair: the planned move was cancelled; the turn closed via the Wait tail"}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 205.274, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 207.89, "duration": 1.432, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 245.277, "duration": 1.461, "hits": 5, "aborted": false}
+{"event": "press", "mask": 2, "tag": "c3:panel-b", "t": 247.943, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down-2", "t": 250.963, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 324.941, "duration": 1.459, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 328.007, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 16, "tag": "c2:step-right", "t": 330.626, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 333.244, "duration": 1.47, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 336.336, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 338.985, "duration": 1.414, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 341.602, "duration": 1.434, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 412.133, "duration": 1.461, "hits": 5, "aborted": false}
+{"event": "press", "mask": 2, "tag": "c3:panel-b", "t": 414.799, "duration": 1.201, "hits": 0, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down-2", "t": 417.608, "duration": 1.201, "hits": 0, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 455.19, "duration": 1.464, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 458.278, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 16, "tag": "c2:step-right", "t": 460.895, "duration": 1.414, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 463.514, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 466.542, "duration": 1.436, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 471.198, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 475.828, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 480.468, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 485.128, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 2, "tag": "c3:backout-0", "t": 487.751, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:backout-echo-0", "t": 490.776, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 2, "tag": "c3:backout-1", "t": 493.419, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:backout-echo-1", "t": 496.449, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav2-down", "t": 499.069, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "finish", "kind": "identified-wait", "reason": "occupied-tile b-ladder repair: the planned move was cancelled; the turn closed via the Wait tail"}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 501.709, "duration": 1.414, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 504.327, "duration": 1.413, "hits": 5, "aborted": false}

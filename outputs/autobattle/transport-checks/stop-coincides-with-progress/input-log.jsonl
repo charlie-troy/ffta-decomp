@@ -1,7 +1,7 @@
-{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.041, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.852, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.261, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.074, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.485, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.889, "duration": 1.206, "hits": 5, "aborted": false}
-{"event": "stop_requested", "t": 24.907, "detection_latency_s": 0.18, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.042, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.854, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.265, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.078, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.489, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.895, "duration": 1.206, "hits": 5, "aborted": false}
+{"event": "stop_requested", "t": 24.913, "detection_latency_s": 0.191, "note": "STOP file observed; no further gameplay key injections permitted"}

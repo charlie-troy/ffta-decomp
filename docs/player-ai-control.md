@@ -419,4 +419,22 @@ the emulator survived the exact path Astra's review showed was broken
 polled inside long progress waits and between every identified-drive leg
 (the settles poll the gate every 100 ms — round 6 restored the 2 s
 observation bound), so input stops mid-wait.
+(2026-09-20) The full handoff loop is closed live (`c3-live-b2`, receipt
+`docs/receipts/autobattle/C3.json`): leg 1 paused via STOP and left the
+emulator running; the manual layer (`tools/c3_manual_layer.py`) adopted the
+handed-off pid and committed one identified move + Wait **through the window
+channel only** — SendInput key events, zero stub writes — using one held
+monitor connection under the stub's one-client law (interrupt → one read →
+cont per observation, cross-validated fields, clean close before resume).
+The layer's laws, learned live: a turn STARTS in move-target mode (ring
+under the unit, command-menu byte sticky 0 — do not wait for a menu that
+isn't there); an echo-verified key is the only proof the UI is answering
+(stable CT alone is not: menus park at any frozen CT value); an illegal
+step leaves the target cursor frozen (probe the next direction, bounded);
+confirming onto an occupied tile opens the occupant's panel (B dismisses
+one layer: panel → target mode → menu); the roster tile mirrors the walked
+tile only at turn close, so the commit proof is the CT leaving its parked
+value (charging again). Leg 2 `--resume` adopted the same pid without a
+reboot, continued from the manually walked tile, and drove the same battle
+to completion.
 

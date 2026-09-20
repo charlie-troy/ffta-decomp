@@ -646,6 +646,48 @@ class FixtureSession:
         self.stop(keep_process=self.keep_process)
         return False
 
+    def adopt_existing(self, verify_rom=True):
+        """Attach to an ALREADY-RUNNING emulator this session can verify.
+
+        C3 same-battle resume: a paused handoff (stop() with keep_process)
+        leaves the owned emulator alive with the battle on screen. The
+        resuming runner re-attaches to the GDB stub, verifies the ROM hash
+        and the live roster (guards), and adopts the process WITHOUT
+        booting — a fixture restart would roll the battle back to the
+        boot state and NOT count as continuation (C3 criterion 3).
+        Ownership is verified the same way the leave-running handoff is
+        recorded: the adopter must carry the pid recorded in the run's
+        receipt (verified by the CLI caller), never a foreign emulator.
+        Sets keep_process so a subsequent paused exit leaves it alive again.
+        """
+        owner = port_listener_pid(self.port)
+        if owner is None:
+            raise FixtureError(
+                f"GDB port {self.port} has no listener — nothing to adopt "
+                "(the handed-off emulator is gone; a restart would NOT "
+                "continue the same battle)")
+        self.pid = owner
+        if verify_rom:
+            sha = rom_sha1(self.rom)
+            if sha != self.expected_rom_sha1:
+                raise FixtureError(
+                    f"ROM SHA1 mismatch: {sha} != {self.expected_rom_sha1}")
+        self._attach()
+        self.receipt = guard(self.g, expect=self.expect,
+                             exact_ct=False, rom=self.read_rom_bytes())
+        # exact_ct stays False: a mid-battle roster reads whatever CT the
+        # engine charged to (the boot-time CT expectation does not hold)
+        if not self.receipt["ok"]:
+            raise FixtureError(
+                "adopted emulator failed the roster guard: "
+                + "; ".join(f"{c['check']}={c['detail']}" for c in
+                            self.receipt["checks"]
+                            if c["severity"] == "required" and not c["ok"]))
+        self.keep_process = True
+        self.log(f"adopted running emulator pid {self.pid} port {self.port} "
+                 f"(roster guard ok; NOT rebooted)")
+        return self.receipt
+
     def summary(self):
         return {
             "state": self.state,

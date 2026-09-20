@@ -288,13 +288,23 @@ without review.
 Own: integration fixes in C1/C2 files, validators, metadata receipts,
 `docs/player-ai-control.md`, this roadmap, and the current project-log summary.
 
-- [ ] Run the contract's offline failure suite against the final implementation.
-- [ ] Complete one live battle with the verified selector; defeat is a valid
+- [x] Run the contract's offline failure suite against the final implementation.
+  (22/22 PASS on the committed code, 2026-09-20 — `outputs/autobattle/transport-checks/`.)
+- [x] Complete one live battle with the verified selector; defeat is a valid
   completion outcome. Verify results state and cease input there.
-- [ ] Demonstrate pause → manual action → automated continuation of the same
+  (`c3-live-a`: final_state=completed after 4 identified turns — 2 verified
+  moves + 2 identified waits; input ceased at the battle-end signature.)
+- [x] Demonstrate pause → manual action → automated continuation of the same
   battle, with a documented command/interface; restarting the fixture does
   not count as continuation. Keep connection ownership explicit.
-- [ ] Publish the criterion-to-evidence receipt and reconcile current status,
+  (`c3-live-b2`: leg 1 paused and left pid 784 running; the manual layer
+  committed move (4,11)→(5,11) + Wait through the window channel only
+  (SendInput, zero stub writes, one held monitor connection per the
+  take-22 law); leg 2 `--resume` adopted the same pid, continued from the
+  manually walked tile (boundary position_before=(5,11)), and drove the
+  same battle to completion. Receipt:
+  `docs/receipts/autobattle/C3.json`.)
+- [x] Publish the criterion-to-evidence receipt and reconcile current status,
   then commit only owned files. Preserve existing uncommitted work.
 
 Done: every required C1/C2/C3 criterion has passing evidence applicable to the

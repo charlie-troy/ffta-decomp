@@ -8,6 +8,6 @@
   "seeds": 0,
   "router_hits": 0,
   "terminal_reason": "live guard failed before start",
-  "events": "outputs/autobattle/transport-checks\\transport-guard-failure\\events.jsonl",
+  "events": "outputs\\autobattle\\transport-checks\\transport-guard-failure\\events.jsonl",
   "emulator_handoff": "terminated"
 }

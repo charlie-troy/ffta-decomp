@@ -1,2 +1,7 @@
-{"event": "drive", "tag": "a3-transport-stop-coincides-with-progress", "t": 9.039, "duration": 4.809, "completed": true}
-{"event": "stop_requested", "t": 17.064, "detection_latency_s": 0.185, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.042, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.855, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.266, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.077, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.488, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.894, "duration": 1.205, "hits": 5, "aborted": false}
+{"event": "stop_requested", "t": 24.913, "detection_latency_s": 0.196, "note": "STOP file observed; no further gameplay key injections permitted"}

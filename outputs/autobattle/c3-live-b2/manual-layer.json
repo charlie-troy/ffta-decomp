@@ -1,0 +1,77 @@
+{
+  "schema": "c3-manual-layer/2",
+  "pid": 784,
+  "port": 2345,
+  "leg1_final_state": "paused",
+  "menu_open_at_s": 0.7,
+  "tile_before": [
+    4,
+    11
+  ],
+  "tile_after": [
+    5,
+    11
+  ],
+  "manual_move_committed": true,
+  "keys_sent": [
+    "DOWN",
+    "RIGHT",
+    "A",
+    "DOWN",
+    "A",
+    "A"
+  ],
+  "input_channel": "window SendInput (no stub writes)",
+  "monitor_reads": 25,
+  "monitor_faults": 0,
+  "monitor_reconnects": 0,
+  "trace": [
+    {
+      "t": 0.4,
+      "cursor": 0,
+      "ct": 580,
+      "keyinput": 151
+    },
+    {
+      "t": 0.7,
+      "cursor": 0,
+      "ct": 580,
+      "keyinput": 151,
+      "stable": true
+    },
+    {
+      "t": 6.2,
+      "stage": "step",
+      "dir": "DOWN",
+      "pre": [
+        4,
+        11
+      ],
+      "post": [
+        4,
+        11
+      ]
+    },
+    {
+      "t": 10.1,
+      "stage": "step",
+      "dir": "RIGHT",
+      "pre": [
+        4,
+        11
+      ],
+      "post": [
+        5,
+        11
+      ]
+    },
+    {
+      "t": 17.4,
+      "key": "DOWN",
+      "pre": 1,
+      "post": 2
+    }
+  ],
+  "menu_open": true,
+  "manual_turn_committed": true
+}

@@ -4356,3 +4356,38 @@ first:
 
 Receipts: docs/receipts/autobattle/C1.json + C2.json (round-6 updates).
 Commit: round-6 worker fixes.
+
+## 2026-09-20 — C3 closed: live integration (complete battle + manual handoff continuation)
+
+- Offline suite: all 22 scenarios PASS on the final code (identified-move
+  family, boundary re-arm family, stop family, pause/resume, transport laws).
+- Live complete battle: `c3-live-a` reached final_state=completed after 4
+  identified turns (2 verified moves + 2 identified waits); input ceased at
+  the battle-end signature; terminal shot shows the concluded encounter
+  (defeat = valid completion per the round-3 precedent).
+- Live handoff loop (`c3-live-b2`): leg 1 paused via STOP, left pid 784
+  running (`left-running-for-player`); `tools/c3_manual_layer.py` adopted
+  the pid and committed move (4,11)->(5,11) + Wait through the WINDOW
+  channel only (SendInput, zero stub writes), echo-verified at each stage;
+  leg 2 `--resume` adopted the same pid, continued from the manually walked
+  tile (boundary position_before=(5,11)), drove turns 2-4, and the same
+  battle completed.
+- Manual-layer laws learned live and encoded: turn-start target mode (the
+  command menu does not exist at turn start — the cmd byte is sticky 0);
+  menus park at any frozen CT (stability, not value, is the window
+  signature; the echo is the answer-proof); illegal steps leave the target
+  cursor frozen (bounded direction probing); confirm-on-occupied opens the
+  occupant panel (B dismisses one layer); the roster tile mirrors at turn
+  close, so the commit proof is CT leaving its parked value.
+- Monitor hardening after the 2026-09-20 desync: the stub can answer a read
+  with a late stale packet, silently shifting every later read (garbage
+  that validates nowhere). One read per interrupt, fields cross-validated,
+  all-implausible sample => reconnect; close before handoff.
+- Operational lesson (stub one-client law): an outer command timeout that
+  kills a process mid-GDB-conversation wedges the stub for that emulator
+  session permanently (refusals persist; taskkill was needed). Every
+  stub-connected run must bound itself below any outer kill.
+- Receipt: docs/receipts/autobattle/C3.json (pass-with-limitation: the
+  manual step direction is echo-probed, not planned; boxed-in units fall
+  back to the occupied-tile ladder, proven 2026-09-19).
+Commit: round-7 C3 closure.

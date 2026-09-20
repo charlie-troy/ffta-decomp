@@ -1,0 +1,14 @@
+{
+  "schema": "a3-run/1",
+  "run_id": "c3-live-b2",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "completed",
+  "turns": 4,
+  "seeds": 10,
+  "router_hits": 411,
+  "terminal_reason": "battle end signature held [resumed after manual handoff; leg 1 ended paused]",
+  "events": "outputs/autobattle\\c3-live-b2\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "resumed": true
+}

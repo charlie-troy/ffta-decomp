@@ -1,6 +1,0 @@
-{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.044, "duration": 1.201, "hits": 5, "aborted": false}
-{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.851, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.257, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.064, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.469, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.87, "duration": 1.205, "hits": 5, "aborted": false}

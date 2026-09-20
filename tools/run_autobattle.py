@@ -40,29 +40,76 @@ def main(argv=None):
                          "with a STOP file (manual takeover): leave-running "
                          "detaches and leaves the battle for the player; "
                          "kill ends it (default: leave-running)")
+    ap.add_argument("--resume", metavar="RUN_ID", default=None,
+                    help="continue the battle of a previously paused run: "
+                         "adopt the ALREADY-RUNNING emulator (no reboot — "
+                         "a restart would not continue the same battle), "
+                         "append to the same events/input logs, and drive "
+                         "the battle to its end. The pid must match the "
+                         "paused run's recorded handoff pid.")
     args = ap.parse_args(argv)
 
     with open(args.scenario, encoding="utf-8") as fh:
         scenario = json.load(fh)
 
-    run_id = args.run_id or time.strftime("a3-%Y%m%d-%H%M%S")
-    out_dir = os.path.join(args.out_root, run_id)
+    resumed_run = None
+    if args.resume:
+        # same run id, same artifacts: one battle, two runner legs
+        run_id = args.resume
+        out_dir = os.path.join(args.out_root, run_id)
+        if not os.path.isfile(os.path.join(out_dir, "run.json")):
+            print(f"FAIL: --resume {run_id}: no paused receipt at "
+                  f"{out_dir}/run.json")
+            return 2
+        with open(os.path.join(out_dir, "run.json"), encoding="utf-8") as fh:
+            resumed_run = json.load(fh)
+        if resumed_run.get("final_state") != "paused" or \
+                resumed_run.get("emulator_handoff") != "left-running-for-player":
+            print(f"FAIL: --resume {run_id}: receipt is "
+                  f"{resumed_run.get('final_state')}/"
+                  f"{resumed_run.get('emulator_handoff')!r}, not a paused "
+                  "left-running handoff")
+            return 2
+        if resumed_run.get("resumed"):
+            print(f"FAIL: --resume {run_id}: this run already resumed once "
+                  "(one manual handoff per battle is the audited shape)")
+            return 2
+    else:
+        run_id = args.run_id or time.strftime("a3-%Y%m%d-%H%M%S")
+        out_dir = os.path.join(args.out_root, run_id)
     os.makedirs(out_dir, exist_ok=True)
 
-    print(f"scenario {scenario.get('scenario_id')} -> run {run_id}")
-    print("paused: booting guarded fixture before any input is issued")
+    print(f"scenario {scenario.get('scenario_id')} -> run {run_id}"
+          + (" [RESUME]" if args.resume else ""))
+    if not args.resume:
+        print("paused: booting guarded fixture before any input is issued")
     # Astra 2026-09-17: the leave-running decision must reach the actual
     # process cleanup, not only the receipt text — with the session created
     # explicitly, __exit__ is guaranteed to run on every path (finally) and
     # the paused handoff flips session.keep_process BEFORE it does.
     session = FixtureSession(args.state, rom=args.rom)
+    if args.resume:
+        try:
+            session.adopt_existing()
+        except Exception as exc:
+            print(f"FAIL: could not adopt the running emulator: {exc}")
+            return 2
+        handoff_pid = (resumed_run.get("manual_handoff") or {}).get("pid")
+        if handoff_pid and session.pid != handoff_pid:
+            print(f"FAIL: adopted pid {session.pid} but the paused receipt "
+                  f"handed off pid {handoff_pid} — refusing to resume a "
+                  "different emulator")
+            session.__exit__(None, None, None)
+            return 2
     try:
-        session.__enter__()
+        if not args.resume:
+            session.__enter__()
         runtime = BattleRuntime(session, scenario, run_id, out_dir,
                                 mode=args.mode,
                                 stall_seed_seconds=args.stall_seed_seconds,
                                 wall_timeout=args.wall_timeout,
-                                max_turns=args.max_turns)
+                                max_turns=args.max_turns,
+                                resume=bool(args.resume))
         if not args.yes:
             ans = input("guards will run now; continue? [y/N] ").strip().lower()
             if ans != "y":
@@ -91,7 +138,11 @@ def main(argv=None):
                 "router_hits": runtime.p.router_hits,
                 "terminal_reason": "live guard failed before start",
                 "events": runtime.events_path,
-                "emulator_handoff": "terminated",
+                # honest even on the adopt path: an adopted session keeps
+                # its process, a booted one is terminated by __exit__
+                "emulator_handoff": ("left-running-for-player"
+                                     if session.keep_process
+                                     else "terminated"),
             }
             with open(os.path.join(out_dir, "run.json"), "w",
                       encoding="utf-8") as fh:
@@ -104,6 +155,10 @@ def main(argv=None):
             os.remove(stop_file)
         except OSError:
             pass
+        if args.resume:
+            # continue the turn count of leg 1 so run.json's total and the
+            # events' turn numbers describe ONE battle
+            runtime.turn = int(resumed_run.get("turns") or 0)
         final = runtime.run()
         # manual takeover handoff: a paused run leaves the emulator alive
         # so the player can continue the battle from the live screen.
@@ -128,6 +183,20 @@ def main(argv=None):
             "emulator_handoff": ("left-running-for-player" if keep_process
                                  else "terminated"),
         }
+        if args.resume:
+            receipt["resumed"] = True
+            # runtime.turn was preset to leg 1's count: it IS the battle's
+            # running total (and matches the events' turn numbering, which
+            # the receipt validator cross-checks)
+            receipt["turns"] = runtime.turn
+            receipt["terminal_reason"] = (
+                (runtime._terminal_reason or "")
+                + " [resumed after manual handoff; leg 1 ended paused]")
+        if paused and keep_process:
+            # C3 resume precondition: the NEXT leg must verify it adopts
+            # THIS emulator, not any running mGBA (pid check in --resume)
+            receipt["manual_handoff"] = {"pid": session.pid,
+                                         "port": session.port}
 
         with open(os.path.join(out_dir, "run.json"), "w",
                   encoding="utf-8") as fh:

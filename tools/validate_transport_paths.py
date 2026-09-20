@@ -213,6 +213,13 @@ class FakeSession:
     def __exit__(self, *exc):
         return False
 
+    # round-7: the CLI's guard-failure receipt reads keep_process (adopted
+    # sessions keep their emulator); FakeSession never owns a real process.
+    keep_process = False
+
+    def adopt_existing(self):
+        raise RuntimeError("FakeSession has no live emulator to adopt")
+
     def write_bytes(self, addr, data, note=""):
         self.write_ledger.append({"addr": addr, "data": bytes(data),
                                   "note": note})
@@ -402,6 +409,16 @@ class FakeWorld:
         self.identified_move = False
         self.wrong_move = False      # engine executes a DIFFERENT tile
         self.wrong_tile = (9, 9)     # the tile a wrong_move executes to
+        self.occupied_dest = False   # c3 probe4 law: confirm onto an
+                                     # OCCUPIED tile opens the unit info
+                                     # panel (not a walk); the panel eats
+                                     # D-pads and B dismisses one layer
+        self.panel_first_reopen = False  # c3-live-a5 law: the FIRST
+                                         # re-open is preceded by a
+                                         # transition panel (menu not yet
+                                         # open; echo lands, byte frozen)
+        self._panel_layers = 0       # 0=menu, 1=target-under-panel,
+                                     # 2=panel+target (byte frozen)
         self._march_tile = [4, 10]   # projected roster tile (sync_memory)
         self._cmd_cursor = None      # None = menu copy not initialized yet
         self._target_cursor = None   # None = target mode not open
@@ -525,6 +542,29 @@ class FakeWorld:
                 if (d & bit) and not (self._dir_prev & bit):
                     self._identified_dir(name)
             self._dir_prev = d
+        # C3: a FRESH menu episode (engine-opened, not re-opened after a
+        # move) presents the cursor where the engine last left it — the
+        # recorded re-open shape parks on Action (probe5), but a menu the
+        # engine opened from the map initializes on Move. The identified-
+        # wait control needs the REAL fresh-menu law (cmd cursor 0) with
+        # the unit's tile in the target copy — exactly what a live C3
+        # resume leg reads after the manual handoff.
+        if (self.identified_move and self._cmd_cursor is None
+                and not self._panel_layers):
+            self._cmd_cursor = _MOVE_CMD
+            self._moved = False
+            self._wait_confirm = False
+        if self._panel_layers and self.identified_move:
+            # c3-live-a5 offline law: the turn-transition info panel sits
+            # over a NOT-YET-OPEN menu copy. The panel eats D-pads, and the
+            # byte it covers holds the STICKY last value, so an echo probe
+            # can't move it — but each B lands (the panel is dismissible)
+            # and dismissing the last layer opens the menu for real, which
+            # the next echo proves. (c3 probe4 live read: B landed, byte
+            # unchanged, menu genuinely opened later — the panel, not a
+            # dead UI.)
+            self.session.g.queue.append((BP_KEY, "T05keypoll"))
+            return
         # the engine polls keys every frame while a menu is up: the key
         # breakpoint hits and a stop reaches the probe
         self.session.g.queue.append((BP_KEY, "T05keypoll"))
@@ -534,6 +574,8 @@ class FakeWorld:
         """One direction step on the DECODED cursor (command or target)."""
         if self.swallow_route:
             return  # unknown dialog: presses land, nothing changes
+        if self._panel_layers:
+            return  # occupied-tile info panel: eats D-pads (c3 probe4)
         if self._target_cursor is not None:
             if name == "down":
                 self._target_cursor[1] += 1
@@ -568,30 +610,57 @@ class FakeWorld:
                     self._wait_confirm = False
             return
         if self._target_cursor is None:
-            # A on the command menu: from Move it opens target mode at the
-            # unit's tile (probe3); other commands open other UIs the
-            # identified driver never touches
-            if self._cmd_cursor == _MOVE_CMD:
+            if self._cmd_cursor == _WAIT_CMD:
+                # probe6's two-A Wait shape, generalized (C3): the engine's
+                # Wait commit works from ANY identified menu whose cursor
+                # reads Wait — fresh or re-opened. Select arms the confirm;
+                # the second A closes the turn.
+                if self._wait_confirm:
+                    self._commit_turn()
+                else:
+                    self._wait_confirm = True
+            elif self._moved or self._cmd_cursor == _MOVE_CMD:
+                # A on Move opens target mode at the unit's tile (probe3);
+                # on a re-opened post-move menu, choosing a command
+                # re-opens target mode (probe5). A on Action of a menu no
+                # move has reached is an unknown UI: nothing answers it.
                 self._target_cursor = [self._march_tile[0], self._march_tile[1]]
+                self._wait_confirm = False
+            self._moved = False
             return
         # confirming the destination: execute at the READ cursor tile —
         # the engine never executes an inferred tile
         dest = tuple(self._target_cursor)
+        if self.occupied_dest:
+            # c3 probe4 law: the destination tile is OCCUPIED (an enemy
+            # moved there during the enemy phase). No walk happens; A on
+            # an occupied tile opens the unit info panel, which eats
+            # D-pads. Two B presses dismiss back to the command menu
+            # (panel -> move-target mode -> menu); the cmd byte stays
+            # sticky-frozen at Move until the menu answers a D-pad again.
+            self._panel_layers = 2
+            self._target_cursor = None
+            self._cmd_cursor = _MOVE_CMD
+            self._wait_confirm = False
+            return
         self._march_tile = list(self.wrong_tile if self.wrong_move else dest)
         self._moved = True
         self._target_cursor = None
         self._cmd_cursor = _ACTION_CMD  # the re-opened menu lands on Action
         self._wait_confirm = False
-
     def _identified_b(self):
         """B backs out of the identified UI one layer (menu-back navigation).
 
-        Target mode closes to the command menu (cursor unchanged); the
-        command menu closes to the map (the unit re-parks at the reopen CT
-        exactly like the old law's B-close). B can never commit anything —
-        it is navigation, which is why the runtime never needed it for the
-        identified flow and the old B-recovery machinery is gone.
+        With the occupied-tile panel up (c3 probe4 law), B dismisses one
+        layer per press: panel -> move-target mode -> command menu (the
+        cmd byte stays sticky-frozen at its last value until the menu
+        layer is back and a D-pad lands).
         """
+        if self._panel_layers:
+            self._panel_layers -= 1
+            if self._panel_layers == 0:
+                self._moved = True   # the turn is still open: menu is back
+            return
         if self._target_cursor is not None:
             self._target_cursor = None
             # the command menu is still on whatever command was selected
@@ -666,6 +735,27 @@ class FakeWorld:
                      or self.commits < self.reopen_after_commits)
                 and self.last_commit_t is not None
                 and t - self.last_commit_t >= self.menu_reopen_seconds):
+            if ((self.occupied_dest and self.commits == 0)
+                    or (self.panel_first_reopen and self.commits == 1)):
+                # c3-live-a5 transition law: before the FIRST re-open the
+                # engine parks the unit and holds the turn-transition info
+                # panel for a few seconds; the menu copy is NOT open yet
+                # (the byte stays sticky-frozen under the panel). Two Bs
+                # dismiss the panel and the menu opens for real.
+                self.menu_up = True
+                self.charging = False
+                self.march_ct = float(self.reopen_park_ct)
+                self._panel_layers = 2
+                # the byte under the panel is STICKY at the engine's last
+                # menu state (c3-live-a5 read Action) — the fresh-episode
+                # init below must not reset it to Move while the panel is
+                # up, or the move planner would drive blind into the panel
+                self._cmd_cursor = _ACTION_CMD
+                self._moved = False
+                self._wait_confirm = False
+                self.a_presses = 0
+                self._a_prev = False
+                return
             # recorded re-open shape: the menu re-opens with the owner
             # parked at an arbitrary CT (600 observed in run 19)
             self.menu_up = True
@@ -770,14 +860,15 @@ def make_runtime(world, run_id, out_dir, **kw):
     return rt
 
 
-def finish_run(rt, world, out_dir, final_note_override=None):
+def finish_run(rt, world, out_dir, final_note_override=None,
+               resumed=False, leg1_turns=0, manual_handoff=None):
     receipt = {
         "schema": "a3-run/1",
         "run_id": rt.run_id,
         "scenario": rt.scenario_id,
         "mode": rt.mode,
         "final_state": rt.state,
-        "turns": rt.turn,
+        "turns": leg1_turns + rt.turn if resumed else rt.turn,
         "seeds": len(rt.p.seeds),
         "router_hits": rt.p.router_hits,
         "terminal_reason": rt._terminal_reason,
@@ -788,6 +879,20 @@ def finish_run(rt, world, out_dir, final_note_override=None):
         # and live-verified by tools/handoff_cli_probe.py on real hardware.)
         "emulator_handoff": "terminated",
     }
+    if resumed:
+        # mirror the live CLI receipt: the battle is one battle, leg 1
+        # ended `paused` with the emulator left running, and this leg is
+        # the recorded continuation (the validator's resume rule keys on
+        # exactly these fields). rt.turn is the battle's RUNNING TOTAL
+        # (the caller preset it to leg 1's count) — do not add leg1 again.
+        receipt["resumed"] = True
+        receipt["turns"] = rt.turn
+        if manual_handoff:
+            receipt["manual_handoff"] = manual_handoff
+        if rt._terminal_reason:
+            receipt["terminal_reason"] = (rt._terminal_reason
+                                          + " [resumed after manual "
+                                            "handoff; leg 1 ended paused]")
     with open(os.path.join(out_dir, "run.json"), "w", encoding="utf-8") as fh:
         json.dump(receipt, fh, indent=2)
     return receipt
@@ -1311,6 +1416,56 @@ def run_scenario(name, out_root):
             if "NOT claimed" not in (t.get("note") or ""):
                 errors.append(f"identified-move-wrong: the demotion must be "
                               f"recorded in the turn note: {t.get('note')}")
+    elif name == "identified-move-occupied":
+        # C3 b-ladder control (c3-live-a attempts 2/3 + probe4 law): the
+        # confirmed destination tile is OCCUPIED — no walk happens, the
+        # unit info panel eats D-pads (cmd byte sticky-frozen, no echo),
+        # and B dismisses one layer per press back to the command menu.
+        # The driver's b-ladder must repair with echo-gated Bs (channel
+        # liveness proven by echo hits>0) and close the turn with the
+        # Wait tail; the CANCELLED move must NOT be claimed (only the
+        # engine-observed Wait commit is the turn's outcome).
+        world.identified_move = True
+        world.occupied_dest = True
+        world.allow_seeds = True
+        rt.max_turns = 1
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"identified-move-occupied: expected stalled "
+                          f"(max_turns=1 bound after the repaired turn), "
+                          f"got {state}")
+        if world.commits != 1:
+            errors.append(f"identified-move-occupied: expected 1 commit "
+                          f"(the post-repair Wait), got {world.commits}")
+        # no walk happened: the roster tile stays at the origin
+        if tuple(world._march_tile) != (4, 10):
+            errors.append(f"identified-move-occupied: the fake walked to "
+                          f"{tuple(world._march_tile)} despite the occupied "
+                          f"tile — the control does not exercise the panel")
+        turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
+        if len(turns) != 1:
+            errors.append(f"identified-move-occupied: expected 1 turn "
+                          f"event, got {len(turns)}")
+        else:
+            t = turns[0]
+            act = t.get("selected_action") or {}
+            if act.get("kind") != "identified-wait":
+                errors.append(f"identified-move-occupied: the repaired turn "
+                              f"must claim the WAIT it actually committed, "
+                              f"not the cancelled move: {act}")
+            if t.get("selected_target") is not None:
+                errors.append(f"identified-move-occupied: a Wait commit "
+                              f"carries no target claim: "
+                              f"{t.get('selected_target')}")
+        ilog = _input_log(rt.input_log_path)
+        bs = [r for r in ilog if str(r.get("tag", "")).startswith("c3:backout-")
+              and "echo" not in str(r.get("tag"))]
+        if not bs:
+            errors.append(f"identified-move-occupied: no b-ladder presses "
+                          f"in the input log — the repair never ran")
+        if len(bs) > 3:
+            errors.append(f"identified-move-occupied: {len(bs)} b-ladder "
+                          f"presses exceeds the bounded ladder (3)")
     elif name == "submenu":
         # REWRITTEN for the identified-only contract (round 6): the old
         # submenu shape exercised B-recovery, which is banned — recovery
@@ -1337,15 +1492,17 @@ def run_scenario(name, out_root):
         if late:
             errors.append(f"submenu: {len(late)} key writes after the bound")
     elif name == "identified-move-invalid":
-        # Astra round-6 gap 3 (negative control): the engine is parked on
-        # Action... no — on WAIT (a re-opened post-move menu, the c2-live3
-        # false-positive class) with a stale target copy. The planner MUST
-        # reject it — and a rejection prevents input entirely: no chooser
-        # route, no fixed route, nothing. The run then bounds honestly.
+        # Astra round-6 gap 3 (negative control), recast for the C3 law:
+        # the menu copy reads an UNKNOWN command byte (7) — garbage from a
+        # redraw, a submenu, or a dialog. Neither the move planner nor the
+        # C3 wait fallback may accept it: the rejection must prevent input
+        # entirely — no chooser route, no fixed route, nothing. (The old
+        # WAIT-cursor shape is no longer a rejection: identified-wait
+        # closes exactly that menu, which identified-wait-control proves.)
         world.allow_seeds = True
         world.menu_reopen_seconds = 5.0
         world.identified_move = True
-        world._cmd_cursor = _WAIT_CMD   # cursor on Wait: the plan reads != Move
+        world._cmd_cursor = 7           # unknown command byte: not 0/1/2
         world._target_cursor = [5, 9]   # stale target copy: a "readable" x/y
         state = rt.run()
         if state != "stalled":
@@ -1363,10 +1520,270 @@ def run_scenario(name, out_root):
                           "writes escaped after the planner rejected the "
                           "snapshot (rejection must prevent input, not "
                           f"fall back): {writes[:3]}")
+    elif name == "identified-wait-control":
+        # C3 offline control (offline counterpart of criterion 1): a menu
+        # is open but NO move is plannable — the re-opened post-move shape
+        # (probe5: the command copy re-initializes on ACTION) with no move
+        # planned. The move planner rejects it (cursor != Move); the C3
+        # identified-WAIT fallback must still close it: the command id is
+        # read from RAM before any input, the driver navigates to Wait,
+        # and the probe6 two-A shape commits the turn.
+        world.identified_move = True
+        world.allow_seeds = True
+        world.menu_up = True
+        world.charging = False
+        world._cmd_cursor = _ACTION_CMD  # re-opened post-move shape (probe5)
+        world._target_cursor = None
+        rt.max_turns = 1
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"identified-wait-control: expected stalled "
+                          f"(max_turns bound after the committed turn), "
+                          f"got {state}")
+        if world.commits != 1:
+            errors.append(f"identified-wait-control: expected 1 engine "
+                          f"commit (the Wait closed the turn), got "
+                          f"{world.commits}")
+        if tuple(world._march_tile) != (4, 10):
+            errors.append(f"identified-wait-control: the unit moved to "
+                          f"{tuple(world._march_tile)} — a Wait commits no "
+                          "move")
+        turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
+        if len(turns) != 1:
+            errors.append(f"identified-wait-control: expected 1 turn event, "
+                          f"got {len(turns)}")
+        else:
+            act = turns[0].get("selected_action") or {}
+            if act.get("kind") != "identified-wait" or \
+                    act.get("command_id") != _ACTION_CMD:
+                errors.append(f"identified-wait-control: the turn is not "
+                              f"claimed as identified-wait from the RAM-read "
+                              f"command id: {act}")
+    elif name == "identified-wait-noecho":
+        # c3-live-a turn-3 failure, as an offline negative control: the
+        # sticky cursor byte reads Action but NO menu is up (post-commit
+        # animation freeze that the frozen-CT classifier misread as a
+        # boundary). One DOWN must ECHO in the decoded cursor byte before
+        # the Wait drive trusts the byte; here the UI cannot answer
+        # (swallow_route: presses land, nothing changes), so after the
+        # echo probe the driver must fire NOTHING further and the run must
+        # bound honestly with zero commits.
+        world.identified_move = True
+        world.allow_seeds = True
+        world.menu_up = False
+        world.charging = False
+        world.swallow_route = True
+        world._cmd_cursor = _ACTION_CMD  # sticky byte from the last menu
+        world._target_cursor = None
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"identified-wait-noecho: expected stalled "
+                          f"(honest bound after the silent UI), got {state}")
+        if world.commits != 0:
+            errors.append(f"identified-wait-noecho: expected 0 commits, "
+                          f"got {world.commits}")
+        # A hits=0 press is ATTEMPTED but never reaches the engine (the
+        # channel is silent — that is the live failure being modeled). Under
+        # the re-arm law the Wait driver probes echo + panel-B + echo2 per
+        # boundary, bounded by the 3-strikes cap: 9 press attempts total,
+        # ZERO delivered engine writes, and the honest 3-boundary bound.
+        ilog = _input_log(rt.input_log_path)
+        if len(ilog) > 9:
+            errors.append(f"identified-wait-noecho: {len(ilog)} press "
+                          f"attempts exceed the 3-boundary re-arm cap")
+        if any(r.get("hits", 0) not in (0, None) for r in ilog):
+            errors.append(f"identified-wait-noecho: a press landed (hits>0) "
+                          f"but the control models a silent channel")
+        notes = [(e.get("note") or "") for e in _events(rt.events_path)]
+        if not any("never answered after 3" in n for n in notes):
+            errors.append(f"identified-wait-noecho: the 3-boundary bound "
+                          f"note was not recorded: {notes}")
+        if world.commits != 0:
+            errors.append(f"identified-wait-noecho: expected 0 commits, "
+                          f"got {world.commits}")
+    elif name == "boundary-panel":
+        # c3-live-a5 positive control: the FIRST re-open sits behind a
+        # turn-transition info panel — the frozen-CT classifier fires
+        # while the menu is NOT yet open, the echo lands but the byte
+        # cannot move (panel eats D-pads; the covered byte is sticky).
+        # The Wait driver probes one panel-B; the re-arm law must then
+        # WAIT for the real menu (no kill) and commit the turn when the
+        # echo finally works. The run's only honest ending is the
+        # max_turns bound AFTER the committed turn.
+        world.identified_move = True
+        world.panel_first_reopen = True
+        world.allow_seeds = True
+        world.menu_reopen_seconds = 25.0   # the panel must still be up when
+                                           # the classifier re-polls: a 4 s
+                                           # panel expires inside the
+                                           # post-commit wait and the shape
+                                           # never reaches the boundary
+        rt.max_turns = 2   # the panel precedes re-open #2: one full drive
+                           # must commit first, then the panel shape runs
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"boundary-panel: expected stalled (max_turns=2 "
+                          f"bound after the panel-repaired turn), "
+                          f"got {state}")
+        if world.commits != 2:
+            errors.append(f"boundary-panel: expected 2 commits (the panel "
+                          f"re-arm must end in a committed turn), "
+                          f"got {world.commits}")
+        ilog = _input_log(rt.input_log_path)
+        pb = [r for r in ilog if r.get("tag") == "c3:panel-b"]
+        if not pb:
+            errors.append(f"boundary-panel: no panel-B probe in the input "
+                          f"log — the transition-panel shape never ran")
+        notes = [(e.get("note") or "") for e in _events(rt.events_path)]
+        if not any("re-arming the menu boundary" in n for n in notes):
+            errors.append(f"boundary-panel: the re-arm note was not "
+                          f"recorded: {notes}")
+    elif name == "boundary-dead":
+        # c3-live-a5 negative control: a genuinely dead UI (swallow) at
+        # every boundary. The re-arm law must bound honestly after 3
+        # consecutive failed boundaries — zero commits, and the total
+        # echo attempts bounded (no infinite echo ladder against a dead
+        # channel).
+        world.identified_move = True
+        world.allow_seeds = True
+        world.swallow_route = True
+        world.menu_reopen_seconds = 4.0
+        state = rt.run()
+        if state != "stalled":
+            errors.append(f"boundary-dead: expected stalled (honest "
+                          f"bound), got {state}")
+        if world.commits != 0:
+            errors.append(f"boundary-dead: expected 0 commits, "
+                          f"got {world.commits}")
+        ilog = _input_log(rt.input_log_path)
+        echoes = [r for r in ilog if str(r.get("tag", "")).startswith("c2:")]
+        if not echoes:
+            errors.append("boundary-dead: no drive presses recorded — the "
+                          "negative control did not exercise the ladder")
+        # each of the 3 failed boundaries drove exactly its bounded leg set
+        # (open-target + 4 dest-search steps); a 4th boundary or extra
+        # presses would mean the re-arm loop is unbounded against a dead UI
+        if len(ilog) > 15:
+            errors.append(f"boundary-dead: {len(ilog)} input records exceed "
+                          f"the 3-boundary cap — the re-arm loop is "
+                          f"unbounded against a dead UI")
+        notes = [(e.get("note") or "") for e in _events(rt.events_path)]
+        if not any("never answered after 3" in n for n in notes):
+            errors.append(f"boundary-dead: the 3-boundary bound note was "
+                          f"not recorded: {notes}")
+    elif name == "resume-after-pause":
+        # C3 offline control (offline counterpart of criteria 2+3): leg 1
+        # drives one identified turn, a STOP pauses with the emulator
+        # alive; leg 2 resumes on the SAME world/events/logs, the player
+        # (manual write) closes the open menu, and the automated
+        # continuation commits the NEXT turn of the SAME battle. The
+        # validator's resume rule must accept exactly this shape.
+        import threading as _th2
+        world.identified_move = True
+        world.allow_seeds = True
+        world.menu_reopen_seconds = 4.0
+        # leg 2 must reach a TERMINAL state for the validator's resumed
+        # lifecycle check: menus stop re-opening after the battle's 3rd
+        # commit and the end sequence follows the executed final action
+        # (the takeover scenario's recorded complete-battle shape)
+        world.reopen_after_commits = 3
+        world.ending_after = (3, 12.0)
+        def _drop_stop2():
+            while not (rt.turn >= 1 and world.menu_up):
+                time.sleep(0.05)
+            open(rt.stop_file, "w").close()
+        _th2.Thread(target=_drop_stop2, daemon=True).start()
+        state1 = rt.run()
+        if state1 != "paused":
+            errors.append(f"resume-after-pause: leg 1 must pause, got "
+                          f"{state1}")
+        if rt.turn != 1:
+            errors.append(f"resume-after-pause: leg 1 committed "
+                          f"{rt.turn} turns, expected exactly 1 before "
+                          "the pause")
+        handoff_pid = 424242
+        # -- leg 2: resume on the SAME world (the adopted battle) --------
+        try:
+            os.remove(rt.stop_file)   # leg 1's STOP must not latch leg 2
+        except OSError:
+            pass
+        rt2 = make_runtime(world, f"transport-{name}", out_dir, resume=True)
+        rt2.turn = 1                     # continuation of leg 1's count
+        # the player acts during the handoff gap: one window write, the
+        # manual record (never an automation press)
+        rt2.log_manual_write(0x01)
+        rt2.run()
+        # the same battle must have advanced: one more turn committed by
+        # the automated continuation
+        if rt2.turn <= 1:
+            errors.append(f"resume-after-pause: the resumed leg committed "
+                          f"no turn of the same battle (rt2.turn={rt2.turn})")
+        if world.commits < 2:
+            errors.append(f"resume-after-pause: expected >=2 engine commits "
+                          f"across both legs (same battle), got "
+                          f"{world.commits}")
+        evs = _events(rt2.events_path)
+        stops = [e for e in evs if e["kind"] == "stop"]
+        starts = [e for e in evs if e["kind"] == "start"]
+        if len(stops) < 2 or stops[0].get("state") != "paused" or \
+                stops[-1].get("state") not in ("completed", "stalled"):
+            errors.append(f"resume-after-pause: event lifecycle is not "
+                          f"paused-then-terminal: "
+                          f"{[(e.get('kind'), e.get('state')) for e in evs]}")
+        if len(starts) != 2 or not (starts[1].get("note") or "").startswith("resume:"):
+            errors.append("resume-after-pause: leg 2 must emit a start event "
+                          "whose note says it continues the paused handoff")
+        turn_events = [e for e in evs if e["kind"] == "turn"]
+        if len(turn_events) < 2 or any(
+                (e.get("turn") or 0) < 2 for e in turn_events[1:]):
+            errors.append(f"resume-after-pause: leg 2's turn must carry the "
+                          f"continuation number (turn >= 2), got "
+                          f"{[(e.get('turn')) for e in turn_events]}")
+        # receipt: mirror the live CLI's resumed receipt, then the strict
+        # validator must ACCEPT it (regression-first: the round-6 validator
+        # rejected two starts; the resume rule must accept this shape)
+        receipt = finish_run(rt2, world, out_dir, resumed=True,
+                             leg1_turns=1,
+                             manual_handoff={"pid": handoff_pid,
+                                             "port": 2345})
+        if receipt["turns"] != rt2.turn:
+            errors.append(f"resume-after-pause: receipt turns "
+                          f"{receipt['turns']} != the battle's running "
+                          f"total {rt2.turn}")
+        errs = validate(out_dir)
+        if errs:
+            errors.extend(f"resume-after-pause receipt: {e}" for e in errs)
+        # adversarial check: a receipt claiming `resumed` WITHOUT leg 1's
+        # paused stop must FAIL (the resume claim is auditable)
+        ev_lines = [json.loads(l) for l in open(rt2.events_path,
+                                                encoding="utf-8") if l.strip()]
+        true_lines = list(ev_lines)
+        fake = [e for e in ev_lines if e["kind"] != "stop"]
+        with open(rt2.events_path, "w", encoding="utf-8") as fh:
+            for e in fake:
+                fh.write(json.dumps(e) + "\n")
+        errs2 = validate(out_dir)
+        if not errs2:
+            errors.append("resume-after-pause: the validator ACCEPTED a "
+                          "resumed receipt with no paused leg-1 stop — the "
+                          "resume rule is not enforced")
+        # restore the true stream: the common tail re-validates after the
+        # scenario body, and the tampered file would fail it
+        with open(rt2.events_path, "w", encoding="utf-8") as fh:
+            for e in true_lines:
+                fh.write(json.dumps(e) + "\n")
+        # the receipt is final (resumed shape); the common tail must not
+        # overwrite it with leg 1's stub receipt
+        rt._final_receipt_done = True
     else:
         raise ValueError(f"unknown scenario {name}")
 
-    receipt = finish_run(rt, world, out_dir)
+    if getattr(rt, "_final_receipt_done", False):
+        # the scenario wrote its own final receipt (C3 resumed shape)
+        with open(os.path.join(out_dir, "run.json"), encoding="utf-8") as fh:
+            receipt = json.load(fh)
+    else:
+        receipt = finish_run(rt, world, out_dir)
     errs = validate(out_dir)
     # Astra round-6 gap 1: the receipt-vs-artifacts contract applies to
     # scenario outputs too — including an empty log for a run that recorded
@@ -1462,7 +1879,12 @@ def main(argv=None):
                                      "stop-coincides-with-progress",
                                      "guard-failure", "identified-move",
                                      "identified-move-wrong",
-                                     "identified-move-invalid"])
+                                     "identified-move-invalid",
+                                     "identified-move-occupied",
+                                     "identified-wait-control",
+                                     "identified-wait-noecho",
+                                     "boundary-panel", "boundary-dead",
+                                     "resume-after-pause"])
     ap.add_argument("--out-root", default=os.path.join("outputs", "autobattle",
                                                        "transport-checks"))
     args = ap.parse_args(argv)
@@ -1472,7 +1894,9 @@ def main(argv=None):
              "stop-before-start", "stop-during-drive",
              "stop-coincides-with-progress", "guard-failure",
              "identified-move", "identified-move-wrong",
-             "identified-move-invalid"]
+             "identified-move-invalid", "identified-move-occupied",
+             "identified-wait-control", "boundary-panel", "boundary-dead",
+             "resume-after-pause"]
     if args.scenario != "all":
         names = [args.scenario]
     failures = []

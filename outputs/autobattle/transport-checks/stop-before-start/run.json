@@ -8,6 +8,6 @@
   "seeds": 0,
   "router_hits": 0,
   "terminal_reason": "STOP requested: battle left running for manual play",
-  "events": "outputs/autobattle/transport-checks\\stop-before-start\\events.jsonl",
+  "events": "outputs\\autobattle\\transport-checks\\stop-before-start\\events.jsonl",
   "emulator_handoff": "terminated"
 }

@@ -63,7 +63,8 @@ class BattleRuntime:
 
     def __init__(self, session, scenario, run_id, out_dir,
                  mode="retail-ai", stall_seed_seconds=150.0,
-                 wall_timeout=600.0, max_turns=None, verbose=True):
+                 wall_timeout=600.0, max_turns=None, verbose=True,
+                 resume=False):
         self.s = session
         self.p = Probe(session, verbose=verbose)
         self.scenario = scenario
@@ -77,20 +78,55 @@ class BattleRuntime:
         self.turn = 0
         self.stop_file = os.path.join(out_dir, "STOP")
         self.events_path = os.path.join(out_dir, "events.jsonl")
+        # C3 resume: a resumed leg APPENDS to the same events/input logs
+        # (one battle, two runner legs) and re-bases the shared wall clock
+        # so all cross-checks (stop latency, write ordering) stay on one
+        # timeline. `t` is rounded to 0.1 s — a fractional resume base
+        # would make leg-2's first event sort before leg-1's last.
+        self.resume = bool(resume)
+        if self.resume:
+            # Re-base on the LAST recorded event t (not the first stop): leg
+            # 2's t=0 must sit strictly after leg 1's final event or the
+            # validator's monotonic-timestamp rule trips on the appended
+            # records. t is rounded to 0.1 s, so the +1.0 guard clears the
+            # rounding slop with room to spare.
+            max_t = 0.0
+            try:
+                with open(self.events_path, encoding="utf-8") as fh:
+                    for line in fh:
+                        line = line.strip()
+                        if line:
+                            rec = json.loads(line)
+                            t = rec.get("t")
+                            if isinstance(t, (int, float)):
+                                max_t = max(max_t, float(t))
+            except (OSError, ValueError):
+                max_t = 0.0
+            self.t0 = time.time() - (max_t + 1.0)
+        else:
+            self.t0 = time.time()
         # C1 contract: a timestamped raw input-write log the receipt
         # validator cross-checks against stop/terminal events — ordering
         # proof from the transport level, not just final state
         self.input_log_path = os.path.join(out_dir, "input-log.jsonl")
         self._input_log = open(self.input_log_path, "a", encoding="utf-8")
+        if self.resume:
+            self._log_input({"event": "resume",
+                             "t": round(time.time() - self.t0, 3)})
         self._stop_requested_t = None  # wall-clock latency measurement
-        self.t0 = time.time()
         # shared wall clock with the probe's write log (validator rule: a
         # write is "after stop_requested" relative to the SAME t0)
         self.p.t0 = self.t0
+        # boundary bounds: the re-arming menu wait may not run past the
+        # wall budget (resume rebases t0, so the probe must see the same
+        # clock) and may not press past a latched stop
+        self.p.wall_seconds = self.wall_timeout
+        self.p.bound_t0 = 0.0
         self._last_seed_count = 0
         self._last_seed_t = time.time()
         self._terminal_reason = None
         self._saw_unknown_modal = False
+        self._failed_boundaries = 0  # consecutive echo-failed drives (c3-live-a5)
         self._dead_polls = 0  # debounce: roster copies can read 0 transiently
         self._dead_seed_mark = 0  # seed count when the current dead streak began
         self._dead_grace_t = None  # wall time the defeat debounce first held
@@ -265,8 +301,18 @@ class BattleRuntime:
     # -- main loop ---------------------------------------------------------
     def run(self):
         self.state = RUNNING
-        self.event("start", control_mode=self.mode,
-                   input_log="input-log.jsonl")
+        if self.resume:
+            # C3 resume leg: marks the continuation of ONE battle whose
+            # first leg ended `paused` — the validator's resume rule keys
+            # on this and on the final receipt's `resumed: true`.
+            self.event("start", control_mode=self.mode,
+                       input_log="input-log.jsonl",
+                       note="resume: continuation of a battle whose first "
+                            "leg ended paused (manual handoff returned "
+                            "control)")
+        else:
+            self.event("start", control_mode=self.mode,
+                       input_log="input-log.jsonl")
         try:
             while True:
                 # latched stop (seen inside a wait or recovery) exits before
@@ -368,6 +414,67 @@ class BattleRuntime:
         except Exception:
             plan = None
         if plan is None:
+            # C3: a KNOWN command cursor (0/1/2) with an unplannable move
+            # is still an IDENTIFIED menu — Wait closes the turn from any
+            # command. This is the complete-battle fallback: menus parked
+            # on Action (re-opened post-move, the c2-live3 "non-standard"
+            # shape) and post-handoff menus now close honestly instead of
+            # bounding the run. The plan is still read from RAM before any
+            # input; an unknown cursor byte rejects exactly as before.
+            try:
+                waitplan = self.p.plan_identified_wait()
+            except Exception:
+                waitplan = None
+            if waitplan is not None:
+                self.event("note", actor="Marche", actor_slot=6,
+                           control_mode="external",
+                           note="identified-wait candidate (sticky cursor "
+                                f"byte {waitplan['command_id']}) — echo-gated "
+                                "Wait commit: the first DOWN must move the "
+                                "decoded cursor or the menu is not open and "
+                                "no further input fires")
+                wdone, _wlog = self.p.commit_identified_wait(
+                    waitplan, stop_check=self._stop_check,
+                    log_leg=lambda rec: self._log_input(rec))
+                if wdone:
+                    self._failed_boundaries = 0
+                    self._record_identified_turn(
+                        plan_kind="identified-wait", plan=waitplan,
+                        dest_used=None, drove=wdone, before=before,
+                        fail_log=_wlog)
+                    return
+                if self._stop_check():
+                    self._record_identified_turn(
+                        plan_kind="identified-wait", plan=waitplan,
+                        dest_used=None, drove=wdone, before=before,
+                        fail_log=_wlog)
+                    return
+                # c3-live-a5 law: a landed echo with no byte change is a
+                # panel over a NOT-YET-OPEN menu as often as a dead UI —
+                # one panel-B is probed inside the driver; after that, the
+                # honest handling is to WAIT for the menu (re-arm the
+                # boundary), not to kill the run. Bounded by wall budget,
+                # re-arm count, and consecutive failed drives (3 in a row
+                # = the menu never really opens: bound for manual play).
+                self._failed_boundaries += 1
+                if self._failed_boundaries >= 3:
+                    self._saw_unknown_modal = True
+                    self.event("note", actor="Marche", actor_slot=6,
+                               note="menu never answered after 3 "
+                                    "echo-ladder boundaries: bounding run "
+                                    "— battle left on the open menu for "
+                                    "manual play")
+                    self.state = prev
+                    return
+                self.event("note", actor="Marche", actor_slot=6,
+                           note="menu not answering (echo landed, byte "
+                                "frozen): turn-transition panel suspected "
+                                "— re-arming the menu boundary (no further "
+                                "input until a real menu echoes)"
+                                + (f" [last leg: {_wlog[-1]}]" if _wlog
+                                   else ""))
+                self.state = prev
+                return
             # Astra round-6 gap 3: an invalid snapshot must PREVENT input.
             # A planner rejection is a rejected candidate, not a degraded
             # one: driving a fixed route from here would select by key
@@ -380,34 +487,97 @@ class BattleRuntime:
             self._saw_unknown_modal = True
             self.state = prev
             return
+        # The driver publishes what ACTUALLY closed the turn as a `finish`
+        # leg (probe4: an occupied-tile repair cancels the planned move
+        # and closes via the Wait tail) — the claim must name the finish,
+        # never the cancelled plan (c3-live round 7 honesty rule).
+        finish = {"kind": "identified-move", "reason": None}
+
+        def _move_leg(rec):
+            self._log_input(rec)
+            if rec.get("event") == "finish":
+                finish["kind"] = rec.get("kind") or finish["kind"]
+                finish["reason"] = rec.get("reason")
+
         drove, dest_used, _leglog = self.p.commit_identified_move(
             plan, stop_check=self._stop_check,
-            log_leg=lambda rec: self._log_input(rec))
-        if self._stop_check():
-            # a latched STOP owns this exit: no turn event after the
-            # stop record, hand the battle over here
-            self._finish(PAUSED,
-                         "STOP requested: battle left running for "
-                         "manual play")
+            log_leg=_move_leg)
+        if drove:
+            self._failed_boundaries = 0
+            if finish["kind"] == "identified-wait":
+                plan = {"kind": "identified-wait",
+                        "command_id": 2, "from": plan["from"]}
+                dest_used = None       # the move was cancelled: no tile claim
+            self._record_identified_turn(plan_kind=finish["kind"],
+                                         plan=plan, dest_used=dest_used,
+                                         drove=drove, before=before,
+                                         fail_log=_leglog)
             return
-        if not drove:
-            # failed drive WITHOUT a latched stop (c2-live3: a non-
-            # standard menu shape whose legs all landed hits=0): this is
-            # an unknown UI, not a manual handoff — pausing here
-            # mislabeled the run `paused` AND double-terminated (the
-            # loop then classified the still-live battle to completion).
-            # Bound honestly like the unknown-modal path instead.
+        if self._stop_check():
+            # a latched STOP owns this exit: the recorder finishes paused
+            self._record_identified_turn(plan_kind=finish["kind"],
+                                         plan=plan, dest_used=dest_used,
+                                         drove=drove, before=before,
+                                         fail_log=_leglog)
+            return
+        # c3-live-a5 law, move path: a landed echo with a frozen byte is a
+        # transition panel over a NOT-YET-OPEN menu as often as a dead UI
+        # (the driver's dest-search legs all echo-landed here). Re-arm the
+        # boundary under the same bounded 3-strikes law as the Wait path;
+        # the driver's own b-ladder already probed one panel-B inside the
+        # failed drive.
+        self._failed_boundaries += 1
+        if self._failed_boundaries >= 3:
             self._saw_unknown_modal = True
             self.event("note", actor="Marche", actor_slot=6,
-                       note="identified-move drive failed without a "
-                            "stop (non-standard menu shape, legs "
-                            "landed no stops): bounding run — battle "
-                            "left on the open menu for manual play")
+                       note="menu never answered after 3 echo-ladder "
+                            "boundaries: bounding run — battle left on the "
+                            "open menu for manual play")
+            self.state = prev
+            return
+        self.event("note", actor="Marche", actor_slot=6,
+                   note="identified-move drive did not close the turn "
+                        "(echo landed, byte frozen): turn-transition "
+                        "panel suspected — re-arming the menu boundary "
+                        "(no further input until a real menu echoes)"
+                        + (f" [last leg: {_leglog[-1]}]" if _leglog else ""))
+        self.state = prev
+
+    def _record_identified_turn(self, plan_kind, plan, dest_used, drove,
+                                before, fail_log=None):
+        """Finish an identified boundary turn and record it (C3).
+
+        Shared by the identified-move and identified-wait paths: a latched
+        STOP owns the exit (paused handoff), a failed drive without a stop
+        is an unidentified UI (bounded, no recovery input — c2-live3
+        lesson), and a turn event may only claim what the engine's own
+        board state verified.
+        """
+        if not drove:
+            if self._stop_check():
+                # a latched STOP owns this exit: no turn event after the
+                # stop record, hand the battle over here
+                self._finish(PAUSED,
+                             "STOP requested: battle left running for "
+                             "manual play")
+                return
+            self._saw_unknown_modal = True
+            self.event("note", actor="Marche", actor_slot=6,
+                       note=f"{plan_kind} drive failed without a stop "
+                            "(menu shape did not answer the identified "
+                            "legs): bounding run — battle left on the "
+                            "open menu for manual play"
+                            + (f" [last leg: {fail_log[-1]}]"
+                               if fail_log else ""))
             self.state = RUNNING
             return
-        route_note = ("identified-move: cmd_cursor=Move and target "
-                      "cursor read from RAM before input")
-        sel_action = {"kind": "identified-move",
+        if plan_kind == "identified-move":
+            route_note = ("identified-move: cmd_cursor=Move and target "
+                          "cursor read from RAM before input")
+        else:
+            route_note = (f"identified-wait: cmd cursor "
+                          f"{plan['command_id']} read from RAM before input")
+        sel_action = {"kind": plan_kind,
                       "command_id": plan["command_id"],
                       "dest": list(dest_used) if dest_used else None,
                       "from": plan["from"]}
@@ -423,13 +593,21 @@ class BattleRuntime:
                                    (time.time() - self.t0))),
             min_new_seeds=1, stop_check=self._stop_check)
         if not committed:
-            # the identified Wait commit shape did not close the turn (the
+            # C1 rule: a latched STOP owns the exit — the wait returns
+            # False on stop too, and a paused handoff must win over the
+            # bounding note (no "battle left on the open menu" mislabel).
+            if self._stop_check():
+                self._finish(PAUSED,
+                             "STOP requested: battle left running for "
+                             "manual play")
+                return
+            # the identified commit shape did not close the turn (the
             # engine refused or the menu changed shape): bounding honestly,
             # with NO recovery input — recovery drives un-identified routes,
             # which the contract bans from a rejected/unidentified state.
             self._saw_unknown_modal = True
             self.event("note", actor="Marche", actor_slot=6,
-                       note="identified-move commit shape produced no "
+                       note=f"{plan_kind} commit shape produced no "
                             "sequencer progress: bounding run — battle "
                             "left on the open menu for manual play (no "
                             "recovery input: recovery routes are not "
@@ -438,8 +616,7 @@ class BattleRuntime:
             return
         if self._stop_check():
             # stop landed inside the post-commit wait (C1 rule: no turn
-            # event after the latched stop; hand the battle over here,
-            # mirroring the route path's recovery exit)
+            # event after the latched stop; hand the battle over here)
             self._finish(PAUSED,
                          "STOP requested: battle left running for "
                          "manual play")
@@ -475,10 +652,10 @@ class BattleRuntime:
                            f"({tile_verified['x']}, "
                            f"{tile_verified['y']}) == RAM-read dest "
                            f"(verified)")
-        else:
-            # engine disagreed (or dest never identified): demote
-            # honestly — identified and driven, but the observable
-            # result is not proven.
+        elif dest is not None:
+            # engine disagreed with a CLAIMED move: demote honestly —
+            # identified and driven, but the observable result is not
+            # proven. A wait commit carries no tile claim to demote.
             sel_action = None
             sel_target = None
             route_note += ("; identified-move driven but the roster "
@@ -491,8 +668,7 @@ class BattleRuntime:
                    selected_target=sel_target,
                    position_before=before, position_after=after,
                    note=f"committed via {route_note}")
-        self.state = prev if prev in (RUNNING,) else RUNNING
-        return
+        self.state = RUNNING
 
     def _finish(self, state, reason):
         self.state = state

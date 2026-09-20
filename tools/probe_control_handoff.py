@@ -163,6 +163,11 @@ class Probe:
                              "phase": "awaiting-first-enemy-turn"}
         self.preview_hits = 0
         self.rearm_key_enable = False  # one-flag key-enable re-arm diagnostic
+        # boundary bounds (c3-live-a5 re-arm law): set by the runtime so a
+        # re-arming menu wait cannot outrun the run's wall budget or press
+        # past a latched stop
+        self.wall_seconds = None
+        self.bound_t0 = 0.0
         # routes: re-write 0x03000005=1 before each press so the engine's
         # scratch clear (observed between the turn-ready flash and the menu
         # park) cannot gate the injected keys mid-route.
@@ -839,6 +844,145 @@ class Probe:
                 "dest": list(dest) if dest != tile else None,
                 "from": list(tile)}
 
+    def plan_identified_wait(self):
+        """An identified-Wait candidate at an open player menu, or None.
+
+        C3 complete-battle fallback: not every open menu shows the Move
+        cursor (re-opened menus park on Action; other units' turns park
+        theirs wherever they were). When the command cursor reads a KNOWN
+        command id (0/1/2), the menu UI itself is identified even though a
+        move is unplannable — and Wait is selectable from any command by
+        navigating down (the command list wraps, probe6's two-A shape then
+        closes the turn). The plan never issues input itself; rejection
+        (unknown cursor byte) still prevents input.
+
+        c3-live-a caveat recorded on the plan: the cursor byte is sticky
+        between menus, so `command_id` names the LAST menu's state — the
+        driver's echo probe (first DOWN must change the byte) is what
+        proves a menu is actually open before the turn is driven.
+        """
+        cursor = self.read_cmd_cursor()
+        if cursor not in (MOVE_CMD, ACTION_CMD, WAIT_CMD):
+            return None
+        return {"kind": "identified-wait", "command_id": cursor,
+                "from": self.player_tile()}
+
+    def commit_identified_wait(self, plan, stop_check=None, max_nav=8,
+                               log_leg=None):
+        """Select and confirm Wait from the identified open menu.
+
+        Shares the driver's guarded-press discipline (stop gate before
+        every press, settle between, bounded nav) but never touches target
+        mode: down until the cursor reads Wait, then the probe6 two-A
+        commit. Returns (completed, log).
+        """
+        log = []
+
+        def add(leg, detail):
+            log.append({"leg": leg, **detail})
+
+        def settle(seconds):
+            end = time.time() + seconds
+            while True:
+                if stop_check is not None and stop_check():
+                    return False
+                if time.time() >= end:
+                    return True
+                time.sleep(0.1)
+
+        def _guarded_press(mask, tag):
+            started = time.time()
+            hits = self.press(mask, stop_check=stop_check, tag=tag)
+            if log_leg:
+                log_leg({"event": "press", "mask": mask, "tag": tag,
+                         "t": round(started - self.t0, 3),
+                         "duration": round(time.time() - started, 3),
+                         "hits": hits, "aborted": hits < 0})
+            return hits
+
+        # c3-live-a lesson: the command cursor byte is STICKY between menus
+        # (it holds the last menu's value, e.g. Move after a committed
+        # move), so cursor-in-(0,1,2) is NOT proof a menu is open. The
+        # proof is an echo: at a real menu one DOWN changes the decoded
+        # byte; if it does not, the UI is not answering and no further
+        # input may fire (a blind drive against a stale byte wedges the
+        # engine exactly as the c3-live-a turn-3 drive did).
+        cursor_before = self.read_cmd_cursor()
+        if _guarded_press(0x80, "c3:echo-down") < 0:
+            add("abort", {"at": "echo-down-stop"})
+            return False, log
+        if not settle(1.2):
+            add("abort", {"at": "echo-settle-stop"})
+            return False, log
+        cursor_echo = self.read_cmd_cursor()
+        add("echo-probe", {"before": cursor_before, "after": cursor_echo})
+        if cursor_echo is None or cursor_echo == cursor_before:
+            # A landed echo (hits>0) with no byte change has two meanings
+            # (c3-live-a5): a DEAD UI — bound, do not drive — or a
+            # turn-transition info panel eating D-pads over a not-yet-open
+            # menu, which ONE B dismisses (each B's hits prove the panel
+            # is dismissible). Probe B once; a second echo failing marks
+            # the dead-UI bound.
+            hits = _guarded_press(0x02, "c3:panel-b")
+            if hits < 0:
+                add("abort", {"at": "panel-b-stop"})
+                return False, log
+            if not settle(1.6):
+                add("abort", {"at": "panel-b-settle-stop"})
+                return False, log
+            add("panel-b", {"hits": hits})
+            cursor_before = self.read_cmd_cursor()
+            if _guarded_press(0x80, "c3:echo-down-2") < 0:
+                add("abort", {"at": "echo2-down-stop"})
+                return False, log
+            if not settle(1.2):
+                add("abort", {"at": "echo2-settle-stop"})
+                return False, log
+            cursor_echo = self.read_cmd_cursor()
+            add("echo-probe-2", {"before": cursor_before,
+                                 "after": cursor_echo})
+            if cursor_echo is None or cursor_echo == cursor_before:
+                add("abort", {"at": "no-cursor-echo"})
+                return False, log
+
+        guard = 0
+        while self.read_cmd_cursor() != WAIT_CMD:
+            if stop_check is not None and stop_check():
+                add("abort", {"at": "wait-nav"})
+                return False, log
+            guard += 1
+            if guard > max_nav:
+                add("abort", {"at": "wait-nav-bound"})
+                return False, log
+            hits = _guarded_press(0x80, "c3:wait-nav-down")
+            if hits < 0:
+                add("abort", {"at": "wait-nav-stop"})
+                return False, log
+            if hits == 0:
+                # channel fault: the core stopped servicing the key poll
+                # (c3-live-a presses 3+). Retrying against a dead channel
+                # only hammers a wedged engine — abort here.
+                add("abort", {"at": "channel-no-hits"})
+                return False, log
+            if not settle(1.2):
+                add("abort", {"at": "wait-nav-settle-stop"})
+                return False, log
+        add("wait-nav", {"cursor": self.read_cmd_cursor()})
+        if _guarded_press(0x01, "c3:select-wait") < 0:
+            add("abort", {"at": "select-wait-stop"})
+            return False, log
+        if not settle(1.2):
+            add("abort", {"at": "select-wait-settle-stop"})
+            return False, log
+        if _guarded_press(0x01, "c3:confirm-wait") < 0:
+            add("abort", {"at": "confirm-wait-stop"})
+            return False, log
+        if not settle(1.6):
+            add("abort", {"at": "wait-commit-settle-stop"})
+            return False, log
+        add("wait-commit", {"cmd_cursor": self.read_cmd_cursor()})
+        return True, log
+
     def commit_identified_move(self, plan, stop_check=None, max_nav=8,
                                log_leg=None):
         """Execute an identified-move plan leg-by-leg, reading RAM between legs.
@@ -889,8 +1033,22 @@ class Probe:
                          "hits": hits, "aborted": hits < 0})
             return hits
 
-        def nav_cmd(target_cmd, what):
+        def nav_cmd(target_cmd, what, patient=False):
+            """DOWN until the decoded cursor reads target_cmd.
+
+            patient=True (post-move re-open): the menu may not re-open for
+            seconds after a mid-battle move (c3-live-a attempt 2: a 2-step
+            move re-opened >20 s late or not at all while an enemy panel
+            was pinned). The first DOWN is an echo gate — it must change
+            the decoded byte or the menu is not answering — and further
+            DOWNs are retried over a patience window before an honest
+            abort. Blind hammering (8 DOWNs at a stale byte) is what
+            attempt 2 did; it buys nothing and muddies the manual-play
+            handoff.
+            """
             guard = 0
+            patience_end = (time.time() + 20.0) if patient else None
+            echo_checked = False
             while self.read_cmd_cursor() != target_cmd:
                 if stop_check is not None and stop_check():
                     add("abort", {"at": what})
@@ -899,12 +1057,43 @@ class Probe:
                 if guard > max_nav:
                     add("abort", {"at": what + "-bound"})
                     return False
-                if _guarded_press(0x80, f"c2:{what}-down") < 0:
-                    add("abort", {"at": what + "-stop"})
+                if not echo_checked:
+                    echo_checked = True
+                    pre = self.read_cmd_cursor()
+                    if _guarded_press(0x80, f"c2:{what}-down") < 0:
+                        add("abort", {"at": what + "-stop"})
+                        return False
+                    if not settle(1.2):
+                        add("abort", {"at": what + "-settle-stop"})
+                        return False
+                    post = self.read_cmd_cursor()
+                    add(what + "-echo", {"before": pre, "after": post})
+                    if post == pre:
+                        # the UI did not answer: either no menu is up
+                        # (stale byte) or the engine is mid-sequence. A
+                        # patient nav retries over a window (the re-open
+                        # may still be pending); a plain nav aborts now.
+                        if not patient:
+                            add("abort", {"at": what + "-no-echo"})
+                            return False
+                        if time.time() >= patience_end:
+                            add("abort", {"at": what + "-no-echo-patient"})
+                            return False
+                        if not settle(2.0):
+                            add("abort", {"at": what + "-settle-stop"})
+                            return False
+                        echo_checked = False   # re-probe after the wait
+                        continue
+                elif patience_end is not None and time.time() >= patience_end:
+                    add("abort", {"at": what + "-patient-bound"})
                     return False
-                if not settle(1.2):
-                    add("abort", {"at": what + "-settle-stop"})
-                    return False
+                else:
+                    if _guarded_press(0x80, f"c2:{what}-down") < 0:
+                        add("abort", {"at": what + "-stop"})
+                        return False
+                    if not settle(1.2):
+                        add("abort", {"at": what + "-settle-stop"})
+                        return False
             return True
 
         # 1. command cursor -> Move (0)
@@ -997,9 +1186,64 @@ class Probe:
                             "cmd_cursor": self.read_cmd_cursor()})
 
         # 5. the move re-opened the command menu (probe5): finish the turn
-        #    with Wait so the engine owns the board again.
-        if not nav_cmd(WAIT_CMD, "wait-nav"):
-            return False, dest_used, log
+        #    with Wait so the engine owns the board again. Patient nav:
+        #    a mid-battle move's re-open can lag the walk animation by
+        #    seconds (c3-live-a attempt 2).
+        if not nav_cmd(WAIT_CMD, "wait-nav", patient=True):
+            # c3 round 7 law (probe4): when the confirmed destination tile
+            # was OCCUPIED (an enemy moved there during the enemy phase),
+            # A opened the unit's info panel instead of walking; the panel
+            # eats D-pads (cmd byte frozen, no echo) and B dismisses one
+            # layer (panel -> move-target mode -> command menu). Each B
+            # must be followed by an echo that PROVES the channel (hits>0)
+            # and the byte (change) before the Wait tail may drive; a
+            # bounded B-then-echo ladder replaces the blind patient retry.
+            repaired = False
+            for b_i in range(3):
+                if stop_check is not None and stop_check():
+                    add("abort", {"at": "b-ladder-stop"})
+                    return False, dest_used, log
+                if _guarded_press(0x02, f"c3:backout-{b_i}") < 0:
+                    add("abort", {"at": "b-ladder-stop"})
+                    return False, dest_used, log
+                if not settle(1.6):
+                    add("abort", {"at": "b-ladder-settle-stop"})
+                    return False, dest_used, log
+                pre = self.read_cmd_cursor()
+                hits = _guarded_press(0x80, f"c3:backout-echo-{b_i}")
+                if hits < 0:
+                    add("abort", {"at": "b-ladder-echo-stop"})
+                    return False, dest_used, log
+                if not settle(1.2):
+                    add("abort", {"at": "b-ladder-echo-settle-stop"})
+                    return False, dest_used, log
+                post = self.read_cmd_cursor()
+                add("b-ladder", {"round": b_i, "pre": pre,
+                                 "echo_hits": hits, "post": post})
+                if hits == 0:
+                    # channel dead (engine not polling keys): no B count
+                    # can fix that — bound honestly (c3-live-a lesson)
+                    add("abort", {"at": "b-ladder-channel-dead"})
+                    return False, dest_used, log
+                if pre is not None and post is not None and post != pre:
+                    repaired = True
+                    break
+            if not repaired:
+                add("abort", {"at": "b-ladder-exhausted"})
+                return False, dest_used, log
+            # the echo moved the byte: the command menu answers again.
+            # Drive the plain (echo-gated) Wait nav from wherever the
+            # byte now sits.
+            if not nav_cmd(WAIT_CMD, "wait-nav2"):
+                return False, dest_used, log
+            # the repaired turn's claim: the Wait that actually closed it.
+            # Published as a LEG record (not a plan mutation): the caller
+            # reads the finishing commit from its own log consumer.
+            if log_leg:
+                log_leg({"event": "finish", "kind": "identified-wait",
+                         "reason": "occupied-tile b-ladder repair: the "
+                                   "planned move was cancelled; the turn "
+                                   "closed via the Wait tail"})
         if _guarded_press(0x01, "c2:select-wait") < 0:
             add("abort", {"at": "select-wait-stop"})
             return False, dest_used, log
@@ -1110,7 +1354,8 @@ class Probe:
                 return True
         return len(self.seeds) >= target
 
-    def wait_player_menu_ready(self, seconds=240.0, max_seeds=None):
+    def wait_player_menu_ready(self, seconds=240.0, max_seeds=None,
+                               stop_check=None):
         """Wait for the two-stage menu boundary, or expire.
 
         Stage 1: the turn-ready flash (player CT==1000) appears.
@@ -1118,45 +1363,71 @@ class Probe:
         seed silence — the menu-open state (run 7 trace). The boundary is
         declared only when stage 2 settles, i.e. the menu can be driven.
         """
-        end = self.now() + seconds
-        trace = []
-        saw_ready = False
-        self.menu_unstick = []
-        last = None
-        frozen = 0
-        while self.now() < end:
-            self.pump(3.0, "menu-wait", sample_every=60.0, tick=3.0)
-            ps = self.player_slot()
-            ct = self.unit_u16(ps, OFF_CT) if ps is not None else None
-            trace.append({"t": self.now(), "ct": ct,
-                          "seeds": len(self.seeds)})
-            if ct == 1000:
-                saw_ready = True
-            if saw_ready and self.player_menu_settled(3):
-                self.menu_ct_trace = trace[-60:]
-                self.menu_saw_ready = True
+        # Astra round 3: STOP observed before a press must abort that
+        # press. Bound BEFORE each re-arm (not only in _classify): a
+        # long transition (panel echo ladder) must not smuggle presses
+        # past a latched stop or the wall budget.
+        rearm = 0
+        while True:
+            if stop_check is not None and stop_check():
+                self.menu_ct_trace = []
+                self.menu_saw_ready = False
                 return True
-            state = (ct, len(self.seeds), tuple(self.cts()))
-            if state == last:
-                frozen += 1
-                # Run 15 shape: Marche frozen mid-charge (580) with seed
-                # silence and a live roster — the engine paused on a modal
-                # awaiting A (same family as run 14's post-commit
-                # dormancy). A is evidence-backed (the A2.4a control run)
-                # and harmless when no modal is up; D-pad into unknown UI
-                # is what wedged runs 10-11, so only A is tried here.
-                if frozen >= 8 and len(self.menu_unstick) < 3:
-                    self.press(0x01, frames=1, pause=1.2,
-                               tag="menu-wait:unstick-a")
-                    self.menu_unstick.append({
-                        "t": self.now(), "action": "a-commit",
-                        "ct_before": ct, "seeds_before": len(self.seeds)})
-                    frozen = 0
-            else:
-                frozen = 0
-                last = state
-            if max_seeds is not None and len(self.seeds) >= max_seeds:
+            if (self.wall_seconds is not None
+                    and self.now() - self.bound_t0 >= self.wall_seconds):
+                self.menu_ct_trace = []
+                self.menu_saw_ready = False
+                return True
+            if rearm >= 2:
                 break
+            rearm += 1
+            end = self.now() + seconds
+            trace = []
+            saw_ready = False
+            self.menu_unstick = []
+            last = None
+            frozen = 0
+            while self.now() < end:
+                self.pump(3.0, "menu-wait", sample_every=60.0, tick=3.0)
+                ps = self.player_slot()
+                ct = self.unit_u16(ps, OFF_CT) if ps is not None else None
+                trace.append({"t": self.now(), "ct": ct,
+                              "seeds": len(self.seeds)})
+                if ct == 1000:
+                    saw_ready = True
+                if saw_ready and self.player_menu_settled(3):
+                    self.menu_ct_trace = trace[-60:]
+                    self.menu_saw_ready = True
+                    return True
+                state = (ct, len(self.seeds), tuple(self.cts()))
+                if state == last:
+                    frozen += 1
+                    # Astra round 2: a STOP must stop input *before* the
+                    # next input — including this boundary's recovery
+                    # presses.
+                    if stop_check is not None and stop_check():
+                        self.menu_ct_trace = trace[-60:]
+                        self.menu_saw_ready = saw_ready
+                        return True
+                    # Run 15 shape: Marche frozen mid-charge (580) with
+                    # seed silence and a live roster — the engine paused on
+                    # a modal awaiting A (same family as run 14's
+                    # post-commit dormancy). A is evidence-backed (the
+                    # A2.4a control run) and harmless when no modal is up;
+                    # D-pad into unknown UI is what wedged runs 10-11, so
+                    # only A is tried here.
+                    if frozen >= 8 and len(self.menu_unstick) < 3:
+                        self.press(0x01, frames=1, pause=1.2,
+                                   tag="menu-wait:unstick-a")
+                        self.menu_unstick.append({
+                            "t": self.now(), "action": "a-commit",
+                            "ct_before": ct, "seeds_before": len(self.seeds)})
+                        frozen = 0
+                else:
+                    frozen = 0
+                    last = state
+                if max_seeds is not None and len(self.seeds) >= max_seeds:
+                    break
         self.menu_ct_trace = trace[-60:]
         self.menu_saw_ready = saw_ready
         return self.player_menu_settled(3)

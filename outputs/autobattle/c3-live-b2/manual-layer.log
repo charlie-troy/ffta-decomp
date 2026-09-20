@@ -1,0 +1,9 @@
+[   0.0s] adopted handed-off emulator pid=784 port=2345 (read-only monitor; stub writes=0)
+[   0.7s] menu window at +0.7s (cursor=0, ct=580, tile=(4, 11))
+[   0.7s] target mode already open at turn start (target=(4, 11)) — stepping directly
+[   6.2s] DOWN did not move the target cursor ((4, 11) -> (4, 11)); trying next direction
+[  10.1s] stepped RIGHT: target (4, 11) -> (5, 11)
+[  15.2s] command menu re-opened (cursor=1, ct=580) — closing the turn with a manual Wait
+[  25.1s] manual turn CLOSED via window input (CT 580 -> 0, charging)
+[  25.1s] roster tile (4, 11) -> (5, 11) (mirrored)
+[  25.1s] PASS: the manual turn committed through the window (move + Wait); emulator left alive for --resume leg 2

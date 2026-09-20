@@ -1,0 +1,64 @@
+{
+  "packet": "C3",
+  "base_revision": "237aebe",
+  "tested_revision": "c3-live-a / c3-live-b2 live runs plus the working tree committed with this receipt",
+  "status": "pass-with-limitation",
+  "criteria": [
+    {
+      "id": "offline-failure-suite-green",
+      "status": "pass",
+      "command": "python tools/validate_transport_paths.py --scenario <each> --out-root outputs/autobattle (22 scenarios, run 2026-09-20)",
+      "expected": "every offline control passes on the final code: identified-move/-wrong/-invalid/-occupied, identified-wait-control/-noecho, boundary-panel/-dead, stop-before-start/-during-drive/-coincides-with-progress, strict-press, pause, guard-failure, results, defeat, unknown, submenu, takeover, disconnect, restart, resume-after-pause",
+      "observed": "all 22 PASS (timings recorded per scenario in outputs/autobattle/transport-checks/<scenario>/); the resumed shape validates and resume-without-leg1-pause is still rejected",
+      "evidence": [
+        "outputs/autobattle/transport-checks/"
+      ]
+    },
+    {
+      "id": "live-complete-battle-identified-selector",
+      "status": "pass",
+      "command": "python tools/run_autobattle.py --scenario configs/battle-scenarios/normal-battle.json --run-id c3-live-a --wall-timeout 3600 --yes",
+      "expected": "one live battle run to its end by the identified selector; results/defeat state reached and input ceases there",
+      "observed": "c3-live-a reached final_state=completed after 4 identified turns (2 verified moves + 2 identified waits); input ceased at the battle-end signature; terminal screenshot shows the concluded encounter (defeat dialog — valid completion per the round-3 precedent)",
+      "evidence": [
+        "outputs/autobattle/c3-live-a/run.json",
+        "outputs/autobattle/c3-live-a/events.jsonl",
+        "outputs/autobattle/c3-live-a/terminal-completed.png"
+      ]
+    },
+    {
+      "id": "pause-manual-action-automated-continuation",
+      "status": "pass",
+      "command": "leg 1: python tools/run_autobattle.py ... --run-id c3-live-b2 --yes then STOP file; manual layer: python tools/c3_manual_layer.py --receipt outputs/autobattle/c3-live-b2/run.json; leg 2: python tools/run_autobattle.py --resume c3-live-b2 --wall-timeout 3000 --yes",
+      "expected": "leg 1 pauses and leaves the emulator running (explicit handoff); a manual layer commits one identified move through the WINDOW channel (SendInput, no stub writes); leg 2 adopts the same pid without reboot and drives the SAME battle to its end",
+      "observed": "leg 1: final_state=paused, manual_handoff pid=784, emulator_handoff=left-running-for-player; manual layer: turn-start target mode detected, illegal DOWN skipped, RIGHT echo-verified the target cursor (4,11)->(5,11), A committed the walk, the re-opened menu closed with a manual Wait (CT 580->0 charging), roster tile mirrored (4,11)->(5,11), keys_sent=[DOWN,RIGHT,A,DOWN,A,A], monitor_reads=25 faults=0 reconnects=0, input_channel='window SendInput (no stub writes)'; leg 2: adopted pid 784 (no reboot), turn 2 boundary position_before=(5,11) — the automation continued from the manually walked tile — then drove turns 2-4 and reached final_state=completed (defeat dialog, input ceased at battle end)",
+      "evidence": [
+        "outputs/autobattle/c3-live-b2/run.json",
+        "outputs/autobattle/c3-live-b2/events.jsonl",
+        "outputs/autobattle/c3-live-b2/manual-layer.json",
+        "outputs/autobattle/c3-live-b2/manual-layer.log",
+        "outputs/autobattle/scratch/c3b2-leg1.log",
+        "outputs/autobattle/scratch/c3b2-leg2.log",
+        "outputs/autobattle/scratch/c3b2-final.png"
+      ]
+    },
+    {
+      "id": "receipt-published-and-status-reconciled",
+      "status": "pass",
+      "command": "docs/receipts/autobattle/C3.json (this file) + docs/auto-battle-roadmap.md C3 checkboxes + docs/player-ai-control.md handoff section",
+      "expected": "criterion-to-evidence receipt on the tested revision; roadmap/doc claims match the evidence",
+      "observed": "this receipt; C3 checkboxes ticked with run references; A2.5/A3 acceptance still gated on Astra's review per the acceptance contract (historical 'complete' claims do not override unresolved acceptance checks)",
+      "evidence": [
+        "docs/auto-battle-roadmap.md",
+        "docs/player-ai-control.md",
+        "docs/project-log.md"
+      ]
+    }
+  ],
+  "limitations": [
+    "The manual layer's step direction is chosen by bounded echo-probing of the target cursor (DOWN, RIGHT, UP, LEFT), not by planning: the documented command/interface is the window SendInput channel plus the target-cursor echo, and a fully boxed unit aborts honestly after the occupied-tile ladder (B to dismiss the occupant panel, B back to own tile, null-walk A) — proven on the orphaned-emulator battle of 2026-09-19 but not re-run inside this clean pass.",
+    "The stub's one-client-per-session law (take-22) remains the operational constraint on monitoring during a handoff: the manual layer holds exactly one connection, samples one read per interrupt, cross-validates fields, and closes before resume — encoded in tools/c3_manual_layer.py.",
+    "Battle outcome remains retail: the identified selector chooses Move/Wait by legality and menu evidence; tactical action selection is A5 scope."
+  ],
+  "next_packet": "Astra review of C3; then A4 (per-character assignment feasibility) per the roadmap order."
+}

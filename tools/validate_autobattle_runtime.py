@@ -75,15 +75,39 @@ def validate(out_dir):
         if rec.get("state") not in VALID_STATES:
             fail(f"event {i}: state {rec.get('state')!r} invalid", errors)
 
-    # lifecycle: exactly one start, exactly one terminal stop, last state
+    # lifecycle: exactly one start (or two for a C3 resumed battle: leg 1
+    # ended `paused`, leg 2 continues the SAME battle), exactly one terminal
+    # stop, last state. A resume is only honest when the receipt marks it,
+    # leg 1 ended paused with the emulator left running, and leg 2's start
+    # SAYS it continues that handoff.
     kinds = [r.get("kind") for r in events]
-    if kinds.count("start") != 1:
-        fail(f"expected exactly one start event, got {kinds.count('start')}",
-             errors)
+    n_starts = kinds.count("start")
+    starts = [r for r in events if r.get("kind") == "start"]
     stops = [r for r in events if r.get("kind") == "stop"]
-    if len(stops) != 1:
-        fail(f"expected exactly one stop event, got {len(stops)}", errors)
-    else:
+    resumed = bool(run.get("resumed"))
+    expected_starts = 2 if resumed else 1
+    if n_starts != expected_starts:
+        fail(f"expected exactly {expected_starts} start event(s)"
+             + (" (resumed battle: leg 1 + leg 2)" if resumed else "")
+             + f", got {n_starts}", errors)
+    if resumed:
+        if len(stops) < 1:
+            fail("resumed battle but no stop events at all", errors)
+        else:
+            first, last = stops[0], stops[-1]
+            if first.get("state") != "paused":
+                fail(f"resumed battle: leg 1's first stop is "
+                     f"{first.get('state')!r}, not 'paused' — the manual "
+                     "handoff precondition is missing", errors)
+            if not (starts[-1].get("note") or "").startswith("resume:"):
+                fail("resumed battle: leg 2's start event must say it "
+                     "continues a paused handoff (note 'resume: ...')",
+                     errors)
+    elif len(stops) == 1 and starts:
+        if (starts[0].get("note") or "").startswith("resume:"):
+            fail("start event claims a resume but run.json does not mark "
+                 "'resumed' — an untracked second leg", errors)
+    if len(stops) == 1:
         if stops[0].get("state") not in TERMINAL:
             fail(f"stop state {stops[0].get('state')!r} is not terminal", errors)
         if stops[0].get("state") != run.get("final_state"):
@@ -91,18 +115,35 @@ def validate(out_dir):
         reason = stops[0].get("note") or ""
         if stops[0].get("state") in ("completed", "stalled") and not reason:
             fail("terminal stop must record its reason", errors)
+    elif len(stops) >= 2:
+        if stops[-1].get("state") not in TERMINAL:
+            fail(f"final stop state {stops[-1].get('state')!r} is not "
+                 "terminal", errors)
+        if stops[-1].get("state") != run.get("final_state"):
+            fail("run.json final_state disagrees with the final stop event",
+                 errors)
+        reason = stops[-1].get("note") or ""
+        if stops[-1].get("state") in ("completed", "stalled") and not reason:
+            fail("terminal stop must record its reason", errors)
 
     # lifecycle guarantee: nothing the runtime does after the terminal stop
     # may issue or schedule input. Astra's live check: an events file with a
     # second boundary after `completed` passed the old validator. A stop is
     # the LAST event; any boundary/turn/note after it fails, and a pause
     # handoff must record that the emulator was left running.
-    last_stop_idx = max(i for i, r in enumerate(events)
-                        if r.get("kind") == "stop")
-    for i in range(last_stop_idx + 1, len(events)):
-        if events[i].get("kind") in INPUT_EVENT_KINDS:
-            fail(f"event {i}: {events[i].get('kind')} after the terminal "
-                 "stop — input activity after the run ended", errors)
+    if stops:
+        last_stop_idx = max(i for i, r in enumerate(events)
+                            if r.get("kind") == "stop")
+        # resumed battles: leg-2 activity sits between the two stops, so
+        # the no-input-after-terminal rule applies to the FINAL stop only
+        # (leg 1's paused stop is a handoff, not a terminal — C3 resume is
+        # input after it BY DESIGN, the player's move plus the automated
+        # continuation). With no stops at all the lifecycle check above
+        # has already failed; there is nothing further to scan.
+        for i in range(last_stop_idx + 1, len(events)):
+            if events[i].get("kind") in INPUT_EVENT_KINDS:
+                fail(f"event {i}: {events[i].get('kind')} after the terminal "
+                     "stop — input activity after the run ended", errors)
     if stops and stops[0].get("state") == "paused":
         handoff = run.get("emulator_handoff")
         if handoff not in ("left-running-for-player", "terminated"):
@@ -174,7 +215,14 @@ def validate(out_dir):
                 ilog.append(json.loads(line))
             except json.JSONDecodeError as exc:
                 fail(f"input-log line {ln}: not JSON ({exc})", errors)
+    # C3 resume: the leak threshold is the TERMINAL stop of the run's own
+    # leg — a resumed battle's leg-2 presses start AFTER leg 1's paused
+    # stop on purpose (the player's move and the continuation). The leg-1
+    # stop still governs leg 1 itself: everything after the first stop and
+    # before leg 2's resume marker must be manual or the resume marker.
     stops_il = [r for r in ilog if r.get("event") in STOP_EVENTS]
+    resume_marker_t = next((r.get("t") for r in ilog
+                            if r.get("event") == "resume"), None)
     # a TRUNCATED log is the same cheat as a deleted one: a run that
     # committed turns must carry at least the input records that auditing
     # those commits requires (boundary-only streams may be empty — zero
@@ -190,10 +238,23 @@ def validate(out_dir):
     # (Astra round 4 gap 1: the old validator never read this log at
     # all, so an injected post-STOP press passed validation)
     stop_t = None
-    if stops_il:
+    if resumed and resume_marker_t is not None:
+        # leg 2's presses are audited against leg 2's OWN terminal; leg 1's
+        # window (first stop .. resume marker) must contain NO automation
+        # press — anything there is either the manual write or a leak
+        leg1_leaks = [r for r in ilog
+                      if r.get("event") in ("press", "drive")
+                      and not (r.get("aborted") or r.get("completed") is False)
+                      and stops_il and r.get("t", 0) > stops_il[0].get("t", 0) + 0.001
+                      and r.get("t", 0) < resume_marker_t]
+        if leg1_leaks:
+            fail(f"input-log: {len(leg1_leaks)} automation press/drive "
+                 "between leg 1's paused stop and the resume marker "
+                 "(input during the handoff gap must be manual)", errors)
+    elif stops_il:
         stop_t = stops_il[0].get("t")
     else:
-        stop_t = stops[0].get("t") if stops else None
+        stop_t = stops[-1].get("t") if stops else None
     if stop_t is not None:
         leaks = []
         for r in ilog:
