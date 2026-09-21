@@ -4406,3 +4406,32 @@ Accept C3 and A2.5/A3 for this fixture, Move/Wait behavior, and one handoff.
 This is not general tactical AI or multi-scenario release acceptance. Corrected
 stale C2/C3 queue rows and removed the receipt's extra orchestrator sign-off
 dependency. Next is A4; A8 is independently unblocked under the worker contract.
+
+## 2026-09-21 — A4 slice 1: identity stability proven live
+
+Scope: A4 research gate (per-character assignment feasibility), per the
+autonomous-advance directive after C3 acceptance. A8 remains independently
+unblocked and is next.
+
+- `tools/probe_strategy_scope.py` boots the verified fixture twice, drives
+  two identified player Wait commits per boot, and snapshots the full
+  identity vector (decoded name, type, base/active job, race, level, id,
+  side bit) for every live roster slot at menu-open, post-turn-1, and
+  post-turn-2, plus the AI mirror array at 0x02002FC4 decoded the same way.
+- Result: identity stable 7/7 slots across turns and across fresh reloads;
+  the mirror holds 6 active records mapping 1:1 by decoded name with job
+  AND id agreement; Marche's mirror absence is verified, not assumed. After
+  every player commit, sequencer seeds attribute all five enemy actors by
+  name (8 seeds/boot) — the cross-side actor evidence.
+- Honest gap recorded, not papered over: the same-job cross-side divergence
+  demo is blocked on a fixture (roster jobs are 41/5/40/36/22 + Marche 2 —
+  no two units share a job anywhere verified). The placement screen's 6
+  dispatchable clan members make a two-ally fixture constructible via the
+  A1 route; that construction is the remaining A4 work.
+- `docs/strategy-runtime-scope.md` published: the identity key, the
+  player-only interception point (Option B chooser; nothing to restore —
+  the adapter writes nothing), the frozen precedence contract (character ->
+  job -> party -> retail), and the A5 adapter seam (plans in, `None` =
+  retail fallback, engine legality wins).
+- Receipt: docs/receipts/autobattle/A4.json (pass with the blocked demo
+  recorded as blocked).

@@ -316,10 +316,14 @@ unknown criterion keeps the packet open; keep fixing it within scope.
 
 Depends on A3. Existing schema-v1 profiles remain supported unchanged.
 
-- [ ] Add `tools/probe_strategy_scope.py` and `docs/strategy-runtime-scope.md` to identify stable party identity across turns, reloads, and battle-local slot reuse.
+- [x] Add `tools/probe_strategy_scope.py` and `docs/strategy-runtime-scope.md` to identify stable party identity across turns, reloads, and battle-local slot reuse.
+  (2026-09-21: identity vector (decoded name, type, base/active job, race, level, id, side bit) stable 7/7 slots across 3 phases × 2 boots; AI mirror maps 6/6 by name+job+id, Marche absent verified; receipt `docs/receipts/autobattle/A4.json`.)
 - [ ] Prove a player-only policy interception point; demonstrate different behavior for two same-job allies while an enemy of that job remains unaffected.
-- [ ] Select runtime lookup or another proven method. If shared table values are temporarily changed, prove restoration on every exit and no contamination of enemy turns before accepting that architecture.
-- [ ] Specify precedence: explicit character assignment, then job default, then party default, then retail behavior.
+  (Interception point selected and proven by construction: the player-menu boundary chooser (Option B) — no side-flag write, A2.4b's Stop-bit refutation recorded. The same-job divergence demo is **blocked on a fixture**: no verified fixture holds two same-job units; a two-ally dispatch fixture is constructible via the A1 route and is the remaining work.)
+- [x] Select runtime lookup or another proven method. If shared table values are temporarily changed, prove restoration on every exit and no contamination of enemy turns before accepting that architecture.
+  (2026-09-21: runtime identity lookup via the adapter contract — no shared-table writes, nothing to restore; the chooser reads RAM and never writes memory.)
+- [x] Specify precedence: explicit character assignment, then job default, then party default, then retail behavior.
+  (2026-09-21: frozen in `docs/strategy-runtime-scope.md` with fail-closed boot validation.)
 
 Done: identity and isolation evidence, with the actual runtime adapter contract recorded. Do not add persistent save fields or promise native-console support at this stage.
 
