@@ -96,7 +96,7 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | C1 cancellation → C2 valid player-action proof → C3 integration; autonomous acceptance per autobattle-worker-contract.md |
+| Current work package | A4 per-character assignment feasibility; A8 independently unblocked. C1–C3 accepted at 88b1072 for the documented fixture and one-handoff flow |
 | Last closed package | A1 normal-battle access; A2.3 pipeline question answered, full A2 acceptance still open |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
@@ -4391,3 +4391,18 @@ Commit: round-6 worker fixes.
   manual step direction is echo-probed, not planned; boxed-in units fall
   back to the occupied-tile ladder, proven 2026-09-19).
 Commit: round-7 C3 closure.
+
+
+## 2026-09-21 — C3 evidence review accepted; advance autonomously
+
+Reviewed 88b1072. Fresh receipt validation passed for c3-live-a and c3-live-b2;
+both terminal images show concluded failed encounters. The manual-layer receipt
+and resumed log connect pid 784 and the manually reached tile (5,11). A fresh
+resume-after-pause offline run passed in 153.7 s, completed after 3 turns,
+including the invalid-resume negative control. No live emulator was launched
+in this review; the full 22-scenario suite is worker-reported historical evidence.
+
+Accept C3 and A2.5/A3 for this fixture, Move/Wait behavior, and one handoff.
+This is not general tactical AI or multi-scenario release acceptance. Corrected
+stale C2/C3 queue rows and removed the receipt's extra orchestrator sign-off
+dependency. Next is A4; A8 is independently unblocked under the worker contract.

@@ -41,8 +41,8 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 | Order | Packet | Current status | Completion unlocks |
 |---|---|---|---|
 | 1 | C1 cancellation and handoff | 11/11 acceptance criteria PASS per `docs/receipts/autobattle/C1.json` (2026-09-17, round-4 update): all six STOP-timing rows, both CLI cleanup paths (leave-running + kill via real `__exit__`), guard-failure receipt, disconnect, the 2 s latency bound (measured 0.19–1.2 s), and the manual-command row closed with an agent-driven player input proof | C2 |
-| 2 | C2 validated player action | Active: snapshot plausibility + validated target decode landed; the identified-candidate selector and the identity→selection→execution receipt remain | C3 |
-| 3 | C3 integration and acceptance | Blocked on C1/C2 | Close A2.5/A3; start A4 or A8 |
+| 2 | C2 validated player action | Accepted for the documented Move fixture; 237aebe live6/live7 evidence retained | C3 |
+| 3 | C3 integration and acceptance | Accepted 2026-09-21 at 88b1072: complete live battle plus same-process manual Move/Wait and resumed completion; fresh resume regression passed | A2.5/A3 accepted within documented scope; start A4, or A8 independently |
 | Later | A4–A10 | Existing product scope retained | Follow declared dependencies |
 
 A1 and A2.4a supplied normal-battle fixtures. A2.4b supplied useful negative
@@ -50,7 +50,8 @@ control results. A3 has an unattended failed-encounter result (`a3-natural6`),
 and the CLI now preserves its process on pause. These are reusable evidence,
 not proof of player action selection or complete cancellation behavior.
 
-**Default assignment:** complete C1 → C2 → C3, in that order, within an
+**Default assignment:** start A4; A8 is independently unblocked. C1–C3 are
+accepted for the documented fixture and one-handoff flow. Work within an
 ongoing request to continue auto-battle work. Read the contract and the current
 packet only; load linked research references when that packet needs them.
 A passing packet unlocks the next packet automatically. No additional human
