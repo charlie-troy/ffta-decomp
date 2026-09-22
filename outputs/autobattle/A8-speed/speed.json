@@ -1,0 +1,89 @@
+{
+  "schema": "a8-speed/7",
+  "metric": "full CT recharge 296->998 (frame-driven, curve-shape-independent)",
+  "true_1x_prediction_s": 54.3,
+  "mechanism_matrix": {
+    "default": "unthrottled (~4-5x): audio sync inert, videoSync off",
+    "videoSync=1": "tracks host refresh (165 Hz), not 60 fps",
+    "fpsTarget": "no effect (Qt build); disables videoSync wait",
+    "fastForwardRatio": "no effect at launch",
+    "fast-forward toggle/hotkey": "never engages; Tab hold pauses",
+    "stub detach": "pauses execution (no client = no run)",
+    "mgba-sdl.exe": "no GDB stub"
+  },
+  "rows": [
+    {
+      "label": "default",
+      "mgba_args": null,
+      "pid": 51824,
+      "plan": true,
+      "committed": true,
+      "recharge_s": 13.21
+    },
+    {
+      "label": "default#2",
+      "mgba_args": null,
+      "pid": 58636,
+      "plan": true,
+      "committed": true,
+      "recharge_s": 13.21
+    },
+    {
+      "label": "default#3",
+      "mgba_args": null,
+      "pid": 97672,
+      "plan": true,
+      "committed": true,
+      "recharge_s": 13.21
+    },
+    {
+      "label": "vsync1",
+      "mgba_args": [
+        "-C",
+        "videoSync=1"
+      ],
+      "pid": 94688,
+      "plan": true,
+      "committed": true,
+      "recharge_s": 13.21
+    },
+    {
+      "label": "vsync1#2",
+      "mgba_args": [
+        "-C",
+        "videoSync=1"
+      ],
+      "pid": 34436,
+      "plan": true,
+      "committed": true,
+      "recharge_s": 13.21
+    },
+    {
+      "label": "vsync1#3",
+      "mgba_args": [
+        "-C",
+        "videoSync=1"
+      ],
+      "pid": 57124,
+      "plan": true,
+      "committed": true,
+      "recharge_s": 13.21
+    }
+  ],
+  "summary": {
+    "default_recharge_s": [
+      13.21,
+      13.21,
+      13.21
+    ],
+    "vsync1_recharge_s": [
+      13.21,
+      13.21,
+      13.21
+    ],
+    "default_mean_s": 13.21,
+    "vsync1_mean_s": 13.21,
+    "default_speedup_vs_true_1x": 4.11,
+    "vsync1_speedup_vs_true_1x": 4.11
+  }
+}

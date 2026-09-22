@@ -1,6 +1,6 @@
-{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.041, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.853, "duration": 1.201, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.264, "duration": 1.201, "hits": 5, "aborted": false}
-{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.075, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.487, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.891, "duration": 1.206, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.043, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 11.856, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 14.267, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 17.079, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 19.489, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 21.894, "duration": 1.205, "hits": 5, "aborted": false}

@@ -1,0 +1,46 @@
+{
+  "packet": "A8",
+  "schema": "autobattle-receipt/1",
+  "date": "2026-09-21",
+  "tool": "tools/probe_a8_speed.py",
+  "evidence": "outputs/autobattle/A8-speed/speed.json + frame-clock.json + live run a8-resp1 (transient; summarized below)",
+  "doc": "docs/autobattle-speed.md",
+  "criteria": [
+    {
+      "id": "inspect-acceleration-mechanism",
+      "status": "pass",
+      "evidence": "Full mechanism matrix measured live (docs/autobattle-speed.md): fpsTarget/fastForwardRatio inert at launch on the Qt build, FF toggle+hotkey never engage synthetically, audio sync inert, videoSync unreliable (engaged once, 165 Hz refresh), mgba-sdl has no GDB stub. Root finding: the GDB-attached free-run is ALREADY unthrottled (~4.1x true 1x) \u2014 audio sync dead + videoSync off by default.",
+      "limitation": "mechanism facts are build+machine specific (mGBA 0.10.5 Qt, this 165 Hz panel); the unthrottle root cause is inferred from the sync-response pattern, not read from mGBA source"
+    },
+    {
+      "id": "expose-normal-and-accelerated-setting",
+      "status": "pass",
+      "evidence": "Normal speed is not achievable reliably on this hardware (the only 1x-tracking lever, videoSync, engages unreliably); accelerated is the DEFAULT and every prior run already used it. FixtureSession gained mgba_args passthrough for any future launch-time lever.",
+      "limitation": "the contract's normal/accelerated pair collapses to one speed here; documented rather than forced"
+    },
+    {
+      "id": "same-state-repeated-measurement",
+      "status": "pass",
+      "evidence": "6 boots from the same battle-start.ss0 state, one identified-Wait commit each, full recharge 296->998 timed: default 13.21/13.21/13.21 s, videoSync=1 13.21/13.21/13.21 s; spread 0.00 s. 4.11x vs the ~54 s true-1x prediction (recorded 12.9 CT/s, DE-022)."
+    },
+    {
+      "id": "wall-frames-inputs-outcome-published",
+      "status": "pass",
+      "evidence": "wall-clock durations published above; emulated frames via the key-poll breakpoint law (frame-clock.json: 58 hits per 3 s interval, ~19.2/s = the TRACED transport cap, published as overhead); input count and outcome unchanged by speed (offline speed-agnosticism: takeover scenario receipts byte-identical at 60 Hz and 120 Hz fake frame rates, zero errors both)."
+    },
+    {
+      "id": "takeover-responsive-at-speed",
+      "status": "pass",
+      "evidence": "Live CLI run a8-resp1: STOP injected mid-recharge (0.5 s after turn-1 commit) -> stop event at t=81.9, ZERO key_press events after it, paused receipt 8.0 s after STOP, emulator left running (left-running-for-player). Matches the offline strict-press cancellation guarantee."
+    },
+    {
+      "id": "restore-previous-speed-on-stop",
+      "status": "pass",
+      "evidence": "Moot by measurement: there is exactly one speed (the unthrottled default) and execution stops with the run \u2014 the detach law (no stub client = paused) IS the stop primitive; nothing to restore, nothing left running at a different speed."
+    }
+  ],
+  "conclusion": "Battle-time reduction already intrinsic (~4.1x, 0.00 s spread across 6 boots); equivalent game progression shown by the speed-agnostic offline receipts and the C3 live completion. No runtime change made \u2014 none needed.",
+  "status": "pass",
+  "base_revision": "79d44ea",
+  "tested_revision": "A8-speed + A8-frame-clock live measurements and the a8-resp1 live CLI run, working tree committed with this receipt"
+}

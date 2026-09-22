@@ -4435,3 +4435,45 @@ unblocked and is next.
   retail fallback, engine legality wins).
 - Receipt: docs/receipts/autobattle/A4.json (pass with the blocked demo
   recorded as blocked).
+
+## 2026-09-21 — A8 closed: the runner was always accelerated (measured)
+
+- **Headline law** (docs/autobattle-speed.md): a GDB-attached mGBA
+  free-run on this machine is *unthrottled* — audio sync is inert
+  (all drivers identical) and videoSync defaults off. Measured as full
+  CT-recharge duration after a committed identified-Wait: 13.21 s in
+  six of six boots (spread 0.00 s) vs the ~54 s true-1x prediction from
+  the recorded 12.9 CT/s. Every historical run (A2.5, A3, C3) therefore
+  ran at ~4.1x hardware speed; their wall-clock numbers describe this
+  accelerated clock.
+- **Mechanism matrix, all verified live**: fpsTarget and
+  fastForwardRatio inert at launch; the FF UIA toggle "succeeds" with
+  no effect; the Tab hotkey never engages synthetically (a blocking
+  hold instead pauses the game); videoSync=1 engaged exactly once
+  (20.4 s = 165 frames/s, the monitor refresh) and never reproduced;
+  mgba-sdl.exe has no GDB stub. fpsTarget on the Qt build *disables*
+  the videoSync wait when combined.
+- **Detach law (C1-relevant)**: with no stub client the game pauses
+  (all seven roster CTs byte-identical across a 12 s detached window);
+  execution resumes on reconnect. Recorded caveat: interrupt/cont is
+  inert on a raw attach that skipped the `?` handshake, so frozen CTs
+  after a no-client window are not evidence of a paused game.
+- **Takeover responsiveness at the accelerated speed, live**: CLI run
+  a8-resp1 — STOP injected 0.5 s after turn-1 commit (mid-recharge);
+  stop event at t=81.9, ZERO key_press events after it, `paused`
+  receipt 8.0 s later, emulator left-running-for-player. (First
+  detached-launch attempt failed on the pre-guard confirmation prompt
+  — relaunched with --yes; recorded for future detached runs.)
+- **Runtime speed-agnosticism, offline**: the takeover scenario's
+  receipt is byte-identical at 60 Hz and 120 Hz fake frame rates
+  (errors [] both) — the runtime classifies on decoded engine state,
+  not wall time; no runtime change made.
+- **Tracing overhead published**: traced loop = 58 key-poll hits per
+  3 s interval (~19.2 traced-frames/s) — the stop-reply round-trip
+  ceiling, not the game's frame rate (probe_frame_clock.json).
+- FixtureSession gained `mgba_args=` passthrough (launch-time -C
+  overrides) — the mechanism hook for any future lever.
+- Receipt `docs/receipts/autobattle/A8.json`: all six criteria pass,
+  honest limitations recorded (machine/build-specific mechanism facts;
+  unthrottle root cause inferred from the sync-response pattern, not
+  read from mGBA source). Roadmap A8 rows closed.

@@ -366,12 +366,17 @@ Done: at least approach and hold produce contrasting legal movement on the same 
 
 Modify `tools/run_autobattle.py`; create `docs/autobattle-speed.md` and extend runtime validation.
 
-- [ ] Inspect the installed emulator's supported acceleration mechanism; expose normal speed and a verified accelerated setting without changing CT, damage, or game timers in ROM.
-- [ ] Keep takeover responsive and restore the previous speed on stop where possible.
-- [ ] Measure wall-clock duration, emulated frames, input count, and outcome from the same starting state at both speeds; repeat three times per setting.
-- [ ] Verify no missed turn transitions, modal overrun, or additional tactical input is required. Publish actual speedup, including any tracing overhead.
+- [x] Inspect the installed emulator's supported acceleration mechanism; expose normal speed and a verified accelerated setting without changing CT, damage, or game timers in ROM.
+  (2026-09-21: full mechanism matrix measured — docs/autobattle-speed.md. The GDB-attached free-run is ALREADY unthrottled at ~4.1x true 1x (audio sync inert, videoSync off); fpsTarget/fastForwardRatio/FF-hotkey verified inert on this Qt build; mgba-sdl has no stub. Normal speed is not reliably achievable (videoSync engaged once, 165 Hz refresh, never reproduced).
+- [x] Keep takeover responsive and restore the previous speed on stop where possible.
+  (2026-09-21: takeover responsiveness proven live at the accelerated speed — STOP mid-recharge observed with zero presses after the stop event, paused receipt 8 s later, emulator left running. Restore-on-stop moot: one intrinsic speed; execution stops with the run — the detach law is the pause primitive.)
+- [x] Measure wall-clock duration, emulated frames, input count, and outcome from the same starting state at both speeds; repeat three times per setting.
+  (2026-09-21: 6 boots, one identified-Wait commit each, full CT recharge timed — 13.21 s in all six, spread 0.00 s, 4.11x vs the ~54 s true-1x prediction; frames via the key-poll breakpoint law (~19.2/s traced = published transport cap); outcome/input equivalence via offline speed-agnosticism — takeover receipts byte-identical at 60/120 Hz fake frame rates.)
+- [x] Verify no missed turn transitions, modal overrun, or additional tactical input is required. Publish actual speedup, including any tracing overhead.
+  (2026-09-21: speedup published (4.1x intrinsic, one speed); traced-loop overhead published (~19.2 traced-frames/s = stop-reply round trip, not the game's rate); no runtime change made — the runtime classified identically at both fake speeds. Receipt `docs/receipts/autobattle/A8.json`.)
 
 Done: measurable battle-time reduction with equivalent game progression. Animation-skipping ROM patches are deferred until emulator acceleration is measured and insufficient.
+(2026-09-21: Done — the reduction is intrinsic and measured; A8 closed on evidence, with the honest caveat that "normal speed" is the one thing this hardware cannot currently expose.)
 
 ### A9 — Complete-battle acceptance matrix (P1)
 

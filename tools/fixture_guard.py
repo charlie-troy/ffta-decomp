@@ -351,7 +351,8 @@ class FixtureSession:
                  save=DEFAULT_SAVE, work_dir=None, port=GDB_PORT,
                  expected_rom_sha1=EXPECTED_ROM_SHA1, verify_rom=True,
                  missing_state_ok=False, expect=None, exact_ct=False,
-                 boot_wait=2.0, attach_timeout=20.0, quiet=False):
+                 boot_wait=2.0, attach_timeout=20.0, quiet=False,
+                 mgba_args=None):
         # Absolute paths throughout: mGBA resolves -t/ROM arguments relative to
         # its own cwd, so relative scratch paths silently load nothing.
         self.state = os.path.abspath(state) if state else None
@@ -370,6 +371,10 @@ class FixtureSession:
         # keep_process but __exit__ always called stop() with its kill
         # default — the receipt claimed "left running" while killing it)
         self.keep_process = keep_process
+        # extra emulator CLI args (e.g. ["-C", "fpsTarget=240"] for the A8
+        # gameplay-speed lever; the runtime menu toggle wedges the UI thread,
+        # so acceleration is a launch-time property)
+        self.mgba_args = list(mgba_args or [])
         self.exact_ct = exact_ct
         self.boot_wait = boot_wait
         self.attach_timeout = attach_timeout
@@ -465,6 +470,7 @@ class FixtureSession:
         cmd = [self.emulator, "-g"]
         if self.work_paths["state"]:
             cmd += ["-t", self.work_paths["state"]]
+        cmd += self.mgba_args
         cmd.append(self.work_paths["rom"])
         self.proc = subprocess.Popen(cmd, cwd=self.work_dir,
                                      stdout=subprocess.DEVNULL,

@@ -1,0 +1,7 @@
+[    2.1s] boot 2: pid=110596, waiting for Marche's menu
+[   14.1s] boot 2: menu-1 identity captured (7 live slots)
+[   19.9s] boot 2 turn 1: route driven (ok=True); waiting for the engine phase
+[   69.3s] boot 2 turn 1: post-commit identity captured; seed actors=['Carson', 'Godfrey', 'Jon', 'Schneider', 'Velasquez']
+[  130.8s] boot 2 turn 2: route driven (ok=True); waiting for the engine phase
+[  177.4s] boot 2 turn 2: post-commit identity captured; seed actors=['Carson', 'Godfrey', 'Jon', 'Schneider', 'Velasquez']
+[  178.2s] boot 2 complete: turns=2, phases=3

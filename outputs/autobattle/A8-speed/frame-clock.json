@@ -1,0 +1,39 @@
+{
+  "schema": "a8-frame-clock/3",
+  "law": "BP_KEY hits per wall s",
+  "intervals": [
+    {
+      "i": 0,
+      "hits": 58,
+      "wall_s": 3.027,
+      "frames_per_wall_s": 19.16,
+      "ct": 0
+    },
+    {
+      "i": 1,
+      "hits": 58,
+      "wall_s": 3.008,
+      "frames_per_wall_s": 19.28,
+      "ct": 0
+    },
+    {
+      "i": 2,
+      "hits": 58,
+      "wall_s": 3.024,
+      "frames_per_wall_s": 19.18,
+      "ct": 0
+    },
+    {
+      "i": 3,
+      "hits": 58,
+      "wall_s": 3.03,
+      "frames_per_wall_s": 19.14,
+      "ct": 0
+    }
+  ],
+  "halt_hits": 0,
+  "ct_per_frame": null,
+  "ct_per_second": null,
+  "pid": 14252,
+  "rate_mean": 19.19
+}

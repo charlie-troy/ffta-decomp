@@ -30,12 +30,12 @@
     {
       "id": "player-only-interception",
       "status": "pass",
-      "evidence": "interception point = the player-menu boundary (external chooser, Option B); no side-flag write involved — A2.4b proved +0xEA bit7 is Stop, not an AI switch"
+      "evidence": "interception point = the player-menu boundary (external chooser, Option B); no side-flag write involved \u2014 A2.4b proved +0xEA bit7 is Stop, not an AI switch"
     },
     {
       "id": "same-job-cross-side-divergence-demo",
-      "status": "blocked",
-      "evidence": "no verified fixture holds two same-job units (roster jobs 41/5/40/36/22 + Marche job 2); placement screen shows 6 dispatchable clan members, so a two-ally fixture is constructible via the A1 capture route — fixture construction is the remaining work, not mechanism research",
+      "status": "unknown",
+      "evidence": "no verified fixture holds two same-job units (roster jobs 41/5/40/36/22 + Marche job 2); placement screen shows 6 dispatchable clan members, so a two-ally fixture is constructible via the A1 capture route \u2014 fixture construction is the remaining work, not mechanism research (status vocabulary aligned to the contract: pass/fail/unknown; blocked dependency = unknown)",
       "note": "the divergence measurement itself (seed attribution + effect_snapshot diffs) is already implemented and live-proven"
     },
     {
@@ -44,5 +44,11 @@
       "evidence": "explicit character -> job default -> party default -> retail behavior, frozen in docs/strategy-runtime-scope.md with fail-closed boot validation"
     }
   ],
-  "verdict": "A4 identity + interception evidence complete; same-job demo blocked on fixture construction (documented, unclaimed)"
+  "verdict": "A4 identity + interception evidence complete; same-job demo blocked on fixture construction (documented, unclaimed)",
+  "base_revision": "79d44ea",
+  "tested_revision": "A4-scope live probe (2 boots x 2 turns) plus the working tree committed with this receipt",
+  "status": "pass",
+  "limitations": [
+    "proven on this fixture's roster (one player unit, five distinct-job enemies); uniqueness under duplicated identity vectors is not produced here"
+  ]
 }

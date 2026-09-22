@@ -1,2 +1,2 @@
-{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.043, "duration": 1.2, "hits": 5, "aborted": false}
-{"event": "stop_requested", "t": 10.243, "detection_latency_s": 1.194, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 9.041, "duration": 1.201, "hits": 5, "aborted": false}
+{"event": "stop_requested", "t": 10.242, "detection_latency_s": 1.189, "note": "STOP file observed; no further gameplay key injections permitted"}
