@@ -96,7 +96,7 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | A4 per-character assignment feasibility; A8 independently unblocked. C1–C3 accepted at 88b1072 for the documented fixture and one-handoff flow |
+| Current work package | A8 round-10 rework landed (investigation complete, product acceptance open). Next: A4 multi-ally fixture + same-job isolation demo. C1–C3 accepted at 88b1072 for the documented fixture and one-handoff flow |
 | Last closed package | A1 normal-battle access; A2.3 pipeline question answered, full A2 acceptance still open |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
@@ -4436,7 +4436,14 @@ unblocked and is next.
 - Receipt: docs/receipts/autobattle/A4.json (pass with the blocked demo
   recorded as blocked).
 
-## 2026-09-21 — A8 closed: the runner was always accelerated (measured)
+## 2026-09-21 — A8 closed: the runner was always accelerated (measured) **[RETRACTED 2026-10-05 — see the 2026-10-05 entry below]**
+
+> **Retraction (2026-10-05):** the headline claim below is refuted by
+> timestamped two-channel measurement (probe v12): the runner runs at
+> **0.87–0.97× nominal**, not ~4.1×; the "4.1x" divided by a derived
+> ~54 s prediction, and the v2 Lua-channel calibration it later cites
+> used the console channel that freezes a stub-attached boot (DE-024).
+> Kept below as history, not as fact.
 
 - **Headline law** (docs/autobattle-speed.md): a GDB-attached mGBA
   free-run on this machine is *unthrottled* — audio sync is inert
@@ -4477,3 +4484,62 @@ unblocked and is next.
   honest limitations recorded (machine/build-specific mechanism facts;
   unthrottle root cause inferred from the sync-response pattern, not
   read from mGBA source). Roadmap A8 rows closed.
+
+## 2026-10-05 — A8 round-10: two-channel timestamped calibration, honest withdrawals, durable a8-resp2
+
+Scope: Astra's round-9 rejection. A8 stays **investigation complete /
+product acceptance open**; every unsupported number was removed and
+the calibration was rebuilt from scratch on timestamped evidence.
+
+- **Probe v12 (`tools/probe_a8_speed.py`, schema a8-speed/12; all 8
+  rows usable, all gates pass).** Two independent channels over the
+  same definitional event (CT 296 → first ≥998 on battle-start.ss0):
+  (a) *traced* — key-poll breakpoint counts exact frames with start
+  CT==296 verified at stop 1, end ≥998 at the last stop, zero PC
+  anomalies, every cont/stop timestamped; (b) *free-run* — wall-time
+  bracket from timestamped cont/read windows with no breakpoints and
+  no `interrupt()`, start/end samples retained with absolute epochs.
+- **The measured law**: the single existing speed is **0.87–0.97× GBA
+  nominal** (default 52.5–58.0 fps; videoSync=1 52.2–56.3 fps), i.e.
+  slightly UNDER real time — the earlier "always accelerated /
+  unthrottled" reading is refuted. Mode separation bracket 0.90–1.11×,
+  best case below the pre-registered 1.30× gate → verdict "no tested
+  mechanism changes gameplay speed materially". Traced-cycle rate
+  18.5–18.7 fps is the stop-reply transport bound (~3× tracing
+  overhead), published separately and never as speed.
+- **Two new stub laws** (docs/dead-ends.md): DE-028 — one stray reply
+  offsets every later exchange, self-sustaining; `drain_paired`
+  (send + raw-pump until two empty pumps) proves pairing. DE-029 — a
+  served stub read implicitly HALTS the core and only `c` resumes it,
+  so wall time between bare reads is not emulated time. Both were
+  established by the byte-level sniffer `tools/diag_t_phase4.py`
+  (protocol: `+`+reply per command, un-acked `S02` for raw 0x03,
+  `+` only for `c`); earlier v9/v11 T-phase failures are explained by
+  these two laws and are closed, not re-litigated.
+- **Withdrawn this round** (all replaced by v12 evidence): the v1
+  "4.1×" (divided by a derived ~54 s prediction), the v2 Lua
+  `emu:currentFrame` calibration (console channel dead, DE-024), the
+  13.21 s stability table (predates start-CT gating + frame counting),
+  and the 14.8-min → "60 min hardware time" whole-battle extrapolation
+  (traced/untraced mixture, unmeasured).
+- **a8-resp2 actually run, durable artifacts** under
+  `outputs/autobattle/a8-takeover-resp2/` (probe.json,
+  input-log.jsonl, events.jsonl, two screenshots): STOP dropped on
+  turn 1 mid-recharge → final_state=paused, emulator survived the real
+  CLI cleanup path, ZERO automation key writes after `stop_requested`
+  (presses_after_stop=[]). The previous receipt had cited these
+  artifacts before they existed; the citation is now true.
+- **Detach vs takeover reconciled** in docs/autobattle-speed.md and
+  the receipt: leave-running hands over a PAUSED game; continuation
+  requires a monitoring client (C3 manual-layer pattern); an
+  unassisted no-software session is not claimed.
+- Docs: `docs/autobattle-speed.md` rewritten from v12 numbers;
+  receipt `docs/receipts/autobattle/A8.json` re-evidenced row by row
+  (calibrated-rate-measurement now cites speed.json schema 12, not the
+  dead Lua channel); roadmap A8 rows updated.
+- Gates: `validate_all.py baserom.gba` FULL VALIDATION PASSED (54–57
+  s); validate_ai 10/10, validate_missions 13/13, validate_maps
+  17/17.
+- **Still open**: A4's same-job cross-side isolation demo — the
+  receipt's top-level status stays `unknown` until a multi-ally
+  fixture exists (construction, not mechanism research).

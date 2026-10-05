@@ -1,0 +1,11 @@
+{
+  "schema": "handoff-probe/2",
+  "variant": "leave-running",
+  "run_id": "a8-takeover-resp2",
+  "stop_mode": "on-turn-1",
+  "final_state": "paused",
+  "emulator_pid": 36596,
+  "emulator_survived": true,
+  "port_released": false,
+  "presses_after_stop": []
+}

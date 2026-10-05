@@ -1,0 +1,7 @@
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 19.892, "duration": 1.463, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 22.981, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 25.609, "duration": 1.47, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 28.695, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 31.313, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 33.93, "duration": 1.432, "hits": 5, "aborted": false}
+{"event": "stop_requested", "t": 49.493, "detection_latency_s": 5.98, "note": "STOP file observed; no further gameplay key injections permitted"}

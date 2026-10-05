@@ -335,3 +335,130 @@ CLAUDE.md carries the slogan.
   must not count as five B taps.
 - **Do not:** fire per-held-frame input effects for any key; edge-detect
   every press in a per-poll input model.
+
+### DE-024 — The scripting console freezes a stub-attached boot
+
+- **Tried (A8, 2026-09-22):** to calibrate emulated time independently of
+  the CT trajectory, drove the mGBA scripting console via the UIA bridge
+  (`uia_lua2.ps1`): open console, `dofile` a driver, read results. Every
+  attempt on a stub-attached boot died the same way: the FIRST console
+  command returns its reply, and from that instant the emulated core is
+  frozen — `emu:currentFrame` and every memory read return identical
+  values minutes later, while the process still answers.
+- **Refuted by:** nonce-tagged diagnostic (`tools/lua_a8_nonce.lua`,
+  `tools/diag_a8_sample.py`): three samples with distinct nonces all
+  parsed with correct nonces (bridge/log path healthy), and B/C came
+  60+ s later at the *same* frame with CT 0 — core frozen, channel fine.
+  A boot with the console never touched runs normally (v5's GDB
+  measurements).
+- **Amended (2026-09-22):** the escape hatch does not exist either — a
+  stub-FREE boot hung the same UIA bridge (first sample call, 120 s
+  timeout, no reply). The bridge is unreliable in every observed
+  context; the console is dead as a measurement channel on this setup,
+  not merely incompatible with the stub.
+- **Do not:** mix the scripting console with a GDB-attached core on this
+  build, and do not plan on console reads as a calibration fallback —
+  use the GDB channel (v7's frame-exact method) for emulated-time work.
+
+### DE-025 — IO-register writes via the stub are silently discarded
+
+- **Tried (A8, 2026-09-22):** to build an emulated-cycle clock, armed the
+  idle GBA timers TM2/TM3 (`0x04000108+`) via stub `write_bytes`: TM2
+  prescalar 1024, TM3 cascade — 32-bit emulated time readable over the
+  stub with no console and no detach.
+- **Refuted by:** the stub replies `OK` to every width (byte/halfword/
+  word) and RAM writes land, but IO reads back unchanged: DISPCNT is
+  invariant under an inverted-value write, and timer control registers
+  stay 0x0000 after arming. IO writes never reach the memory core.
+- **Do not:** expect stub writes to affect memory-mapped IO on this
+  build; treat IO as read-only through the stub.
+
+### DE-026 — Stub reads over 512 bytes fail silently
+
+- **Tried (A8, 2026-09-22):** one-shot whole-roster blob reads
+  (8 slots x 0x108 = 2112 bytes) for identity-anchored CT scans;
+  `read_mem` returned None with no exception for anything over 512
+  bytes while 512 and below succeed.
+- **Refuted by:** bisection against a live boot (`512 -> 512 bytes,
+  1024 -> None`). The per-field helper reads that desync (roster-diag)
+  each did their own halt/cont; the fix is sub-reads inside ONE
+  halt/cont pair, which stays a consistent instant.
+- **Do not:** request >512-byte memory reads from this stub; chunk
+  inside a single interrupt window instead.
+
+### DE-027 — The battle roster array is scratch between turn-order phases
+
+- **Tried (A8, 2026-09-22):** to track Marche across a charging window by
+  identity, repeatedly decoded the 8-slot roster at `0x020159E8` (name
+  pointer + CT per slot, one halt window per scan). Immediately after an
+  identified-Wait commit the array is fully populated; seconds later it
+  reads as zeros/garbage, then rebuilds — with Marche back at slot 6 —
+  several times per minute.
+- **Refuted by:** time-series diagnostic (45 s of scans after the
+  commit): valid windows (6–7 named slots) alternate with scratch
+  windows (0–1 named slots) on a multi-second cadence; v4's "mostly
+  zeros with spikes" trajectory was the same array being read across
+  scratch windows. Fixed-slot reads without validity checks average
+  scratch values into measurements.
+- **Do not:** treat a successful roster decode as a live roster. Require
+  a named-slot validity gate before using any slot, and retry identity
+  matching across windows.
+- **Amended (2026-09-22, v7 calibration):** the "scratch" verdict is
+  REFUTED for the array's CT data. The v4/v5 garbage was the multi-read
+  desync law (DE-013's halt/cont discipline), not array invalidation: a
+  SINGLE 2-byte read at slot6's CT (`0x020162F8`) tracks a coherent
+  monotone curve through the whole cycle — 296 -> 310 -> 535 -> 998 ->
+  wrap -> next cycle 253 -> 415 — with none of the "zeros with spikes"
+  v4 saw from 2-byte reads inside multi-slot scans. What IS true: bulk
+  multi-slot decodes inside one halt window desync and produce garbage;
+  the CT datum read singly is reliable, and `CT_BASE` is the anchor for
+  any Marche-CT measurement. Identity (name pointer) verification of
+  OTHER fields still requires the valid-window gates above.
+
+### DE-028 — One stray reply offsets every later exchange (self-sustaining)
+
+- **Tried (A8, 2026-10-05):** v11's free-run T phase read CT with
+  `interrupt()` + `read_mem` after a clear/arm/disarm burn; every read
+  returned None ("3 consecutive CT read failures" on all 4 boots), and
+  packet-level tracing (`tools/diag_t_phase3.py`) showed
+  `interrupt()` returning mem data (`bc00`) where the stop reply
+  should be.
+- **Refuted by:** the byte-level sniffer (`tools/diag_t_phase4.py`):
+  every command gets `+` + one reply, raw `0x03` gets one un-acked
+  `S02`, `c` gets only `+`. One stray reply (here an `OK` left by the
+  retry-until-OK burn) makes `send()` consume the PREVIOUS reply; from
+  then on every exchange reports one reply late, and since each send
+  still produces exactly one reply, the offset never heals by itself.
+  `interrupt()` is hit hardest because it needs ITS stop reply
+  specifically. The cure is a pump: `{send 'm'; raw-drain the socket}`
+  until two consecutive drains come back empty — an empty drain after a
+  send that blocked for its own reply proves buffer and kernel are both
+  drained (`drain_paired` in `tools/probe_a8_speed.py`).
+- **Do not:** debug shifted streams by retrying reads (retries consume
+  nothing while the offset persists); drain with raw recvs instead, and
+  never call `interrupt()` on a stream whose pairing was not proven
+  after the last non-standard send.
+
+### DE-029 — A served stub read implicitly halts the core; only 'c' resumes it
+
+- **Tried (A8, 2026-10-05):** free-run CT polling without any continue:
+  `tools/diag_t_phase2.py` polled every ~20 ms (147 reads over 3 s, all
+  the park value 296), and the first v12 T run polled every 250 ms the
+  same way (`tools/probe_a8_speed.py` before the cont-after-read fix):
+  CT read 188 at the first poll and stayed at 188 for the whole 60 s
+  budget — 234 windows, last_ct=188 — as if the event never charged.
+  The cadence difference (20 ms vs 250 ms) changed nothing, which
+  killed the initial "poll floods starve the core" reading.
+- **Refuted by:** `tools/diag_t_phase4.py` window structure: every
+  window in that trace starts with 'c', idles, then reads — and the
+  values advance exactly as the traced waveform (188 at +1 s, 0 at
+  +1.5 s). Removing the 'c' freezes the value regardless of gap size:
+  the read itself pauses the core and the pause persists until the
+  next continue (mGBA serves the read from the just-halted instant,
+  freshly). This is the same halt/cont discipline DE-013 established,
+  now known to be triggered by reads themselves, not only by explicit
+  interrupts.
+- **Do not:** count wall time between bare reads as emulated time —
+  resume with `c` after every read and bracket the event from
+  cont/read timestamp pairs (the T phase's running windows), not from
+  poll arrival times alone.

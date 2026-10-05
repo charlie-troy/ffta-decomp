@@ -49,6 +49,11 @@ def main(argv=None):
                          "terminal bound with keep_process=False and PASS "
                          "only if the owned pid is terminated by the real "
                          "__exit__ cleanup")
+    ap.add_argument("--stop-after-turn", type=int, default=None,
+                    help="drop STOP the moment rt.turn reaches N — i.e. "
+                         "mid-recharge, inside the engine's post-commit "
+                         "window (a8-resp2's claimed injection point); "
+                         "overrides --stop-at")
     args = ap.parse_args(argv)
 
     out_dir = os.path.join("outputs", "autobattle", args.run_id)
@@ -83,8 +88,20 @@ def main(argv=None):
                 paused = final == "paused"
                 keep_process = False  # the CLI's kill semantics
             else:
-                threading.Timer(args.stop_at,
-                                lambda: open(stop_file, "w").close()).start()
+                if args.stop_after_turn is not None:
+                    # a8-resp2: the STOP must land mid-recharge — poll the
+                    # runtime's own turn counter and fire on the first
+                    # committed turn (the engine is recharging CTs while
+                    # the runtime waits for progress)
+                    def _drop_on_turn():
+                        while rt.turn < args.stop_after_turn:
+                            time.sleep(0.05)
+                        open(stop_file, "w").close()
+                    threading.Thread(target=_drop_on_turn,
+                                     daemon=True).start()
+                else:
+                    threading.Timer(args.stop_at,
+                                    lambda: open(stop_file, "w").close()).start()
                 final = rt.run()
                 # the CLI's exact handoff semantics (run_autobattle.py): flip
                 # the session's keep_process BEFORE __exit__ runs
@@ -135,14 +152,53 @@ def main(argv=None):
                      else f', port {session.port} still held')
         print(f"      (detached: transport closed{port_note}; kill "
               f"it with: taskkill /F /PID {pid})")
+    # C1/a8-resp2 evidence check: the RAW input log must show ZERO
+    # automation key writes after the stop was latched — takeover means
+    # input stops immediately, not merely that the run eventually pauses.
+    presses_after_stop = None
+    ilog_path = os.path.join(out_dir, "input-log.jsonl")
+    if not args.kill_path and os.path.exists(ilog_path):
+        stop_t = None
+        presses_after_stop = []
+        with open(ilog_path, encoding="utf-8") as fh:
+            for ln, line in enumerate(fh, 1):
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    rec = json.loads(line)
+                except ValueError:
+                    continue
+                if rec.get("event") == "stop_requested" and stop_t is None:
+                    stop_t = rec.get("t")
+                elif (rec.get("event") in ("press", "drive") and
+                      stop_t is not None and
+                      rec.get("t", 0) > stop_t):
+                    presses_after_stop.append({"line": ln, "t": rec.get("t"),
+                                               "tag": rec.get("tag")})
+        if presses_after_stop:
+            print(f"FAIL: {len(presses_after_stop)} automation key "
+                  f"writes after stop_requested: "
+                  f"{presses_after_stop[:3]}")
+            ok = False
+        elif stop_t is not None:
+            print(f"PASS: zero automation key writes after stop_requested "
+                  f"(input log: {ilog_path})")
+        else:
+            print("FAIL: no stop_requested record in the input log")
+            ok = False
     receipt = {
-        "schema": "handoff-probe/1",
+        "schema": "handoff-probe/2",
         "variant": "kill-path" if args.kill_path else "leave-running",
         "run_id": args.run_id,
+        "stop_mode": (f"on-turn-{args.stop_after_turn}"
+                      if args.stop_after_turn is not None
+                      else f"at-{args.stop_at}s"),
         "final_state": final_state,
         "emulator_pid": pid,
         "emulator_survived": survived,
         "port_released": port_free,
+        "presses_after_stop": presses_after_stop,
     }
     with open(os.path.join(out_dir, "probe.json"), "w",
               encoding="utf-8") as fh:

@@ -39,6 +39,11 @@ foreach ($w in $allwins) {
   if ($w.Current.ClassName -eq 'Shell_TrayWnd') { continue }
   if (-not [Win32e]::IsWindowVisible($wh)) { continue }
   if ([Win32e]::IsIconic($wh)) { continue }
+  # A8 law (2026-09-22): NEVER minimize the emulator's own windows (same
+  # process as the console). A minimized GL surface renders no frames, so
+  # mGBA's frame callbacks silently stop firing — the calibration died
+  # exactly when the console overlapped the main window.
+  if ($w.Current.ProcessId -eq $ProcId) { continue }
   $wr = New-Object Win32e+RECT
   if (-not [Win32e]::GetWindowRect($wh, [ref]$wr)) { continue }
   if (($wr.R - $wr.L) -le 0 -or ($wr.B - $wr.T) -le 0) { continue }

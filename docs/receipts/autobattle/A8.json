@@ -2,45 +2,62 @@
   "packet": "A8",
   "schema": "autobattle-receipt/1",
   "date": "2026-09-21",
+  "revised": "2026-10-05",
   "tool": "tools/probe_a8_speed.py",
-  "evidence": "outputs/autobattle/A8-speed/speed.json + frame-clock.json + live run a8-resp1 (transient; summarized below)",
+  "evidence": "outputs/autobattle/A8-speed/speed.json (schema a8-speed/12, probe v12: 4 traced N rows + 4 free-run T rows, all usable, all gates pass, every sample retained with absolute epoch timestamps) + outputs/autobattle/A8-speed/frame-clock.json (traced transport ceiling) + outputs/autobattle/a8-takeover-resp2/ committed artifacts: probe.json, input-log.jsonl, events.jsonl (local screenshots boundary-turn1.png and terminal-paused.png alongside, retained per the C3 screenshot convention)",
   "doc": "docs/autobattle-speed.md",
+  "product_acceptance": "open",
+  "status_note": "Round-10 rework (Astra round-9 review): (1) the old '4.1x' divided by a derived ~54 s prediction, not a verified baseline - withdrawn; (2) the v2 'independent calibration' via emu:currentFrame Lua callbacks claimed a channel that is dead on this build (console freezes a stub-attached boot, DE-024) - withdrawn entirely and re-evidenced by probe v12's two-channel measurement; (3) the whole-battle 14.8-min -> 60-min extrapolation - withdrawn; (4) the a8-resp2 artifacts cited by the previous receipt did not exist - the run was actually executed this round and its durable artifacts are cited below. A8 status remains investigation complete / product acceptance open.",
   "criteria": [
     {
       "id": "inspect-acceleration-mechanism",
       "status": "pass",
-      "evidence": "Full mechanism matrix measured live (docs/autobattle-speed.md): fpsTarget/fastForwardRatio inert at launch on the Qt build, FF toggle+hotkey never engage synthetically, audio sync inert, videoSync unreliable (engaged once, 165 Hz refresh), mgba-sdl has no GDB stub. Root finding: the GDB-attached free-run is ALREADY unthrottled (~4.1x true 1x) \u2014 audio sync dead + videoSync off by default.",
-      "limitation": "mechanism facts are build+machine specific (mGBA 0.10.5 Qt, this 165 Hz panel); the unthrottle root cause is inferred from the sync-response pattern, not read from mGBA source"
+      "evidence": "Full mechanism matrix measured live (docs/autobattle-speed.md): fpsTarget/fastForwardRatio inert at launch on the Qt build, FF toggle+hotkey never engage synthetically, audio sync inert across drivers, mgba-sdl ships without the GDB stub, stub detach pauses the core. The matrix's one open row, videoSync=1, was re-tested by probe v12 with timestamped free-run brackets: mode separation bracket 0.90-1.11x, best case below the pre-registered 1.30x gate.",
+      "limitation": "mechanism facts are build+machine specific (mGBA 0.10.5 Qt, this host); a different host (working vsync/audio pacing) could yield a real lever, which is why the product criterion stays open rather than fail"
     },
     {
-      "id": "expose-normal-and-accelerated-setting",
+      "id": "calibrated-rate-measurement",
       "status": "pass",
-      "evidence": "Normal speed is not achievable reliably on this hardware (the only 1x-tracking lever, videoSync, engages unreliably); accelerated is the DEFAULT and every prior run already used it. FixtureSession gained mgba_args passthrough for any future launch-time lever.",
-      "limitation": "the contract's normal/accelerated pair collapses to one speed here; documented rather than forced"
+      "evidence": "probe v12 (schema a8-speed/12), two independent channels over the same definitional event (CT 296 -> first >= 998 on battle-start.ss0): (a) traced channel counts exact frames with start CT verified == 296 at stop 1, end >= 998 at the last stop, zero PC anomalies, every cont/stop timestamped; (b) free-run channel brackets duration in wall time from timestamped cont/read windows (a served read implicitly halts the core, only 'c' resumes it - DE-029; reply pairing proven by drain_paired - DE-028), start and end samples retained with absolute epochs, end detected by direct >=998 read or the wrap signature. fps = N/D with N bracketed by pooled traced observations (default 1126-1190, vsync1 1123-1162 frames). Result: default 52.5-58.0 fps = 0.88-0.97x GBA nominal; videoSync=1 52.2-56.3 fps = 0.87-0.94x. No Lua console, no CT-rate baseline, no hardcoded prediction.",
+      "limitation": "the >=998 state dwells ~1 frame and is not directly pollable at 0.15 s cadence, so free-run end detection uses the wrap signature; the duration bracket (~0.2 s wide on ~21 s) and the pooled N jitter (~5%) are carried into the published fps bracket rather than hidden"
     },
     {
       "id": "same-state-repeated-measurement",
       "status": "pass",
-      "evidence": "6 boots from the same battle-start.ss0 state, one identified-Wait commit each, full recharge 296->998 timed: default 13.21/13.21/13.21 s, videoSync=1 13.21/13.21/13.21 s; spread 0.00 s. 4.11x vs the ~54 s true-1x prediction (recorded 12.9 CT/s, DE-022)."
+      "evidence": "v12: two traced boots per mode (default N 1190/1190, spread 0%; vsync1 1162/1123, spread 3.4%) and two free-run boots per mode with OVERLAPPING per-boot fps brackets (default 54.3-58.0 and 52.5-56.0; vsync1 52.2-54.6 and 53.8-56.3), start CT = 296 in all four free-run boots, 131-140 timestamped polls each. Traced-cycle rate stable at 18.5-18.7 fps (transport-bound, published as tracing overhead, not as speed).",
+      "limitation": "the event's frame count jitters a few percent boot-to-boot (commit timing); that jitter is pooled into the N bracket instead of being averaged away"
     },
     {
-      "id": "wall-frames-inputs-outcome-published",
-      "status": "pass",
-      "evidence": "wall-clock durations published above; emulated frames via the key-poll breakpoint law (frame-clock.json: 58 hits per 3 s interval, ~19.2/s = the TRACED transport cap, published as overhead); input count and outcome unchanged by speed (offline speed-agnosticism: takeover scenario receipts byte-identical at 60 Hz and 120 Hz fake frame rates, zero errors both)."
+      "id": "expose-normal-and-accelerated-setting",
+      "status": "unknown",
+      "evidence": "NOT satisfied on this host: no tested mechanism selects normal (1x) or an accelerated multiplier. Measured truth is worse than the old claim - the single existing speed runs at 0.87-0.97x nominal (slightly UNDER real time), and videoSync=1's best-case separation is 1.11x, below the 1.30x mechanism gate. Identical settings prove stability, not a speed knob.",
+      "limitation": "re-opens on a host where vsync or audio pacing actually paces the loop; -C passthrough on FixtureSession (mgba_args=) makes any future mechanism one flag away"
+    },
+    {
+      "id": "equivalent-outcomes-at-both-speeds",
+      "status": "unknown",
+      "evidence": "Cannot be established while only one speed exists on this host: there is no second speed to compare outcomes against. Offline speed-agnosticism (takeover receipts identical at 60/120 Hz fake frame rates) shows the runtime classifies on decoded engine state rather than wall time, but that is not a two-speed equivalence proof of live battles.",
+      "limitation": "re-opens automatically if a second speed is ever achieved"
     },
     {
       "id": "takeover-responsive-at-speed",
       "status": "pass",
-      "evidence": "Live CLI run a8-resp1: STOP injected mid-recharge (0.5 s after turn-1 commit) -> stop event at t=81.9, ZERO key_press events after it, paused receipt 8.0 s after STOP, emulator left running (left-running-for-player). Matches the offline strict-press cancellation guarantee."
+      "evidence": "Live CLI run a8-resp2 (2026-10-05, durable artifacts under outputs/autobattle/a8-takeover-resp2/): STOP dropped on turn 1 (mid-recharge, the event A8 measures), runtime classified paused, probe.json records final_state=paused + emulator_survived=true, and the raw input log proves ZERO automation key writes after the stop_requested event (presses_after_stop=[]); screenshots boundary-turn1.png and terminal-paused.png retained. This is the CLI's real finally/__exit__ path with keep_process flip, not a mock. (a8-resp1 of 2026-09-21 showed the same behavior but its artifacts were transient.)",
+      "limitation": "responsiveness is proven at the one existing speed (~0.9x nominal); 'at an accelerated speed' remains gated on the open expose criterion"
     },
     {
       "id": "restore-previous-speed-on-stop",
       "status": "pass",
-      "evidence": "Moot by measurement: there is exactly one speed (the unthrottled default) and execution stops with the run \u2014 the detach law (no stub client = paused) IS the stop primitive; nothing to restore, nothing left running at a different speed."
+      "evidence": "Moot by measurement: there is exactly one speed (0.87-0.97x nominal, v12) and execution stops with the run - the detach law (no stub client = paused) IS the stop primitive; nothing to restore, nothing left running at a different speed."
+    },
+    {
+      "id": "handoff-continuation-requires-monitor-client",
+      "status": "pass",
+      "evidence": "Round-9/10 reconciliation (docs/autobattle-speed.md, docs/player-ai-control.md): the A8 detach law means 'leave-running' alone hands over a PAUSED game - a player/agent continuation requires a monitoring client attached (monitor pattern, one connection, interrupt/read/cont per observation). The C3 manual layer proves exactly this loop live (c3-live-b2: leg 1 pause+handoff, window-only manual input, leg 2 resume to completion), and a8-resp2 demonstrates the same pause-plus-left-running handoff with durable artifacts. An unassisted no-software session is impossible under the law and is not claimed; window-input-while-detached was not separately exercised (the core is not stepping) and is recorded as covered by the law, not by a dedicated test."
     }
   ],
-  "conclusion": "Battle-time reduction already intrinsic (~4.1x, 0.00 s spread across 6 boots); equivalent game progression shown by the speed-agnostic offline receipts and the C3 live completion. No runtime change made \u2014 none needed.",
-  "status": "pass",
-  "base_revision": "79d44ea",
-  "tested_revision": "A8-speed + A8-frame-clock live measurements and the a8-resp1 live CLI run, working tree committed with this receipt"
+  "conclusion": "Investigation complete and calibrated: the runner runs at 0.87-0.97x GBA nominal on this host (NOT accelerated - the earlier always-accelerated reading is refuted), the rate is stable and measured from timestamped two-channel evidence with no baseline folklore, and no tested mechanism provides selectable speed. Product acceptance (normal/accelerated selection + two-speed equivalence) remains open by evidence, not by wording.",
+  "status": "investigation-complete",
+  "base_revision": "750c606",
+  "tested_revision": "probe v12 (schema a8-speed/12) + a8-resp2 live run + offline gates, with the working tree committed with this receipt"
 }

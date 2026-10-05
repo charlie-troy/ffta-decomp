@@ -47,7 +47,8 @@
   "verdict": "A4 identity + interception evidence complete; same-job demo blocked on fixture construction (documented, unclaimed)",
   "base_revision": "79d44ea",
   "tested_revision": "A4-scope live probe (2 boots x 2 turns) plus the working tree committed with this receipt",
-  "status": "pass",
+  "status": "unknown",
+  "status_note": "Round-9 correction (Astra review): a top-level pass contradicted the unknown same-job row. Honest status: investigation complete, packet acceptance open until the same-job cross-side isolation demonstration runs on a multi-ally fixture.",
   "limitations": [
     "proven on this fixture's roster (one player unit, five distinct-job enemies); uniqueness under duplicated identity vectors is not produced here"
   ]

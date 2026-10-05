@@ -438,3 +438,17 @@ value (charging again). Leg 2 `--resume` adopted the same pid without a
 reboot, continued from the manually walked tile, and drove the same battle
 to completion.
 
+(2026-09-22, round-9 A8 reconciliation.) The A8 detach law
+(docs/autobattle-speed.md) refines the handoff story above: with no stub
+client attached the core does not step, so `--on-stop leave-running`
+hands the player a **paused** battle, not a running one. That is the
+safe failure mode — the battle cannot run away while nobody watches —
+and it is exactly what the C3 manual layer exercised: the monitoring
+connection is the "player present" channel (one connection at a time,
+interrupt → read → cont per observation, window input for all keys,
+clean close before the runner resumes). Consequence recorded in the A8
+receipt (`handoff-continuation-requires-monitor-client`): a player
+continuation REQUIRES a monitoring client or another attach path;
+unassisted no-software play is impossible under the law and is not
+claimed.
+
