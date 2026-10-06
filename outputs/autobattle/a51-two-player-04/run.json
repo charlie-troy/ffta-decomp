@@ -1,0 +1,33 @@
+{
+  "schema": "a3-run/2",
+  "run_id": "a51-two-player-04",
+  "scenario": "a4-two-player",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 2,
+  "seeds": 4,
+  "router_hits": 166,
+  "terminal_reason": "turn budget reached",
+  "events": "outputs/autobattle\\a51-two-player-04\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "emulator_pid": 47408,
+  "player_identities": [
+    [
+      "Montblanc",
+      5
+    ],
+    [
+      "Marche",
+      7
+    ]
+  ],
+  "input_sha256": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/lua-nav/a4-multi-ally-battle-start.ss0": "7cbe2f661279d148dd659e023d2cbd89bd6044e9eeca21a171420ffff222491b",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "3a7332b9930108e100c36ee3a5641fd24ef8fa44c3a0eceb41002697028bb6ce",
+    "tools/autobattle_runtime.py": "414a34e807453a52ccb848df5de85d7bcf257ecf847c17c6f96587469a3c52d6",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "bfbd9bf7e4474f63e7906ff275e4ddb71f6755f83bc21df1bb61ef4bb3c7e9cf"
+  }
+}

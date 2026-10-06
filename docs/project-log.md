@@ -1,5 +1,46 @@
 # Project log
 
+## 2026-10-06 — A5.1 closed: live manual takeover and same-process resume pass
+
+Closed the two criteria the previous slice left open, and pinned the reason
+both had failed. The C3 manual handoff had been reproduced by racing a STOP
+file against the boundary drive, so whether the pause landed with the
+player's fresh menu open was luck; `run_autobattle.py --pause-at-boundary`
+now stops at that menu **on purpose** — owner identified from RAM, menu left
+open and untouched, zero automation input, the latch recorded in the raw
+input log as a STOP request is, breakpoints disarmed, emulator left running.
+The manual layer now identifies the owner from the whole roster (the unique
+live unit whose own tile holds the target cursor, stable across three
+samples) instead of fixed slot 6, probes the menu mode by seeing which cursor
+answers, and proves the destination from a whole-board tile delta.
+
+Live pair `outputs/autobattle/a51-live-manual-05` (window SendInput, zero stub
+writes): paused at t=13.7 s on Marche's menu; manual Move `(4,10)->(4,11)` with
+the roster tile mirrored and `moved_slots=[6]` (no other same-side slot);
+then `--resume` adopted the **same PID 44528** and drove turns whose
+`position_before` is `(4,11)`. Repeat run `a51-live-manual-04` continues with a
+*move* out of the manual tile — `(4,11)->(5,11)`, then `(5,11)->(6,11)`.
+
+**New trap (DE-032).** The battle struct at `0x020159E4` is scratch for ~10 s
+after a turn closes (`count 7 → 328201 → 7 again`, tile already moved). Both
+earlier resume failures were that window, not a damaged battle and not a
+stream desync: a 40 s read-only hold with **no input** left the roster perfect
+and the ROM byte-identical, and a key-by-key window replay showed the exact
+transition. `adopt_existing` now retries the roster guard to a bound and
+records `adopt_attempts`; each retry must also send `c`, because a served read
+halts the core (DE-029) and a read-only retry loop freezes the engine inside
+the transition — 16 identical scratch reads before the `cont` was added, then
+`roster guard ok after 3 attempt(s)`.
+
+Evidence and limits: two live public-runner runs on the two-player fixture
+after the change (`a51-two-player-04`) reproduced Marche Move + Montblanc Wait;
+AI 10/10, strategy 9/9, identity 21/21, manual-helper controls 5/5 (new
+ambiguous-owner control), the full 23-scenario transport suite (new
+`pause-at-boundary` scenario), and `validate_all.py baserom.gba` FULL
+VALIDATION PASSED in 56.8 s. A5.1 is accepted; scope stays the verified
+seven/eight-record fixtures, identified Move/Wait, and no multi-player
+battle-end signature. See `docs/a51-integration.md` and the A5 receipt.
+
 ## 2026-10-06 — A5.1 public-runner identity integration (partial)
 
 Implemented the A4 actor method in the public runner: read-only identity
@@ -37,6 +78,22 @@ Preserved Astra's pre-existing roadmap/log/scope edits. Canonical acceptance
 and source/artifact hashes are in the A5 receipt; raw local artifacts contain
 no committed ROM bytes.
 
+## 2026-10-06 — Worker roadmap reconciliation
+
+Reviewed HEAD `7c6f1b8`, clean worktree before edits, C3/A4/A8 receipts,
+A4 raw demo data, scope contract, and the public runner. C1–C3 remain accepted
+within their fixture/monitor-client handoff limits; A4 is bounded PASS.
+The demo is not integrated into the main runner: fixed Marche/slot-6 event
+labels and single-player helpers remain. **Current assignment: A5.1** in
+[auto-battle-roadmap.md](auto-battle-roadmap.md), followed by A5.2–A5.4.
+A8 research is complete but acceleration remains a product UNKNOWN; A9 final
+acceptance still depends on it. General matching/map work stays deferred.
+
+Added file ownership, dependency gates, negative controls, public-entry-point
+checks and per-slice receipts. Corrected the stale A4 evidence-map row and
+fallback wording. This was a documentation/code/retained-evidence review;
+no live emulator, ROM rebuild or full regression was run. Prior validation
+counts below are historical. The independent ROM hack keeps its own queue.
 
 ## 2026-09-06 — Orchestrator roadmap reset around playable auto-battle
 
@@ -134,10 +191,10 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | A4 round-9 closed: two-ally fixture + same-job divergence demo PASS, receipt status `pass`. A8 investigation complete, product acceptance open. C1–C3 accepted at 88b1072 for the documented fixture and one-handoff flow |
-| Last closed package | A1 normal-battle access; A2.3 pipeline question answered, full A2 acceptance still open |
+| Current work package | A5.1 accepted 2026-10-06: live manual takeover + same-process resume pass; start A5.2 (policy/candidate contracts). A4 bounded PASS; A8 investigation complete, product acceptance open |
+| Last closed package | A5.1 public-runner multi-character integration with the `--pause-at-boundary` handoff (see the 2026-10-06 entry); before it, A4 two-ally identity/isolation feasibility at `7c6f1b8` |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
-| Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
+| Historical core gates (not a current rerun) | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
 
 ## Prioritized backlog
 

@@ -33,6 +33,15 @@ def main(argv=None):
     ap.add_argument("--stall-seed-seconds", type=float, default=150.0)
     ap.add_argument("--wall-timeout", type=float, default=600.0)
     ap.add_argument("--max-turns", type=int, default=None)
+    ap.add_argument("--pause-at-boundary", action="store_true",
+                    help="manual-handoff entry point (A5.1): stop ON PURPOSE "
+                         "at the first identified player menu instead of "
+                         "driving it, leaving that fresh menu OPEN and "
+                         "untouched with zero automation input so a player "
+                         "can take the turn over and --resume afterwards. "
+                         "Just like a STOP-file pause, the emulator is left "
+                         "running (--on-stop) and the receipt records the "
+                         "handoff pid/port.")
     ap.add_argument("--yes", action="store_true",
                     help="run without the interactive paused prompt")
     ap.add_argument("--on-stop", choices=["kill", "leave-running"],
@@ -117,7 +126,8 @@ def main(argv=None):
                                 stall_seed_seconds=args.stall_seed_seconds,
                                 wall_timeout=args.wall_timeout,
                                 max_turns=args.max_turns,
-                                resume=bool(args.resume))
+                                resume=bool(args.resume),
+                                pause_at_boundary=args.pause_at_boundary)
         if not args.yes:
             ans = input("guards will run now; continue? [y/N] ").strip().lower()
             if ans != "y":
@@ -202,6 +212,21 @@ def main(argv=None):
                 with open(path, "rb") as fh:
                     receipt["input_sha256"][path] = hashlib.sha256(fh.read()).hexdigest()
         if args.resume:
+            # A5.1: an adopt may have to wait out the engine's turn-transition
+            # window (the battle-struct region is reused for a few seconds
+            # after a turn closes), so the receipt must carry HOW the adopt
+            # was verified, not only that it happened.
+            adopt_attempts = (session.receipt or {}).get("adopt_attempts") or []
+            first_failed = next((a["failed_required"] for a in adopt_attempts
+                                 if a.get("failed_required")), [])
+            receipt["adopt"] = {
+                "pid": session.pid,
+                "match_receipt_handoff_pid": session.pid == resumed_run.get(
+                    "manual_handoff", {}).get("pid"),
+                "roster_guard_ok": bool((session.receipt or {}).get("ok")),
+                "guard_attempts": len(adopt_attempts),
+                "guard_first_failed_checks": first_failed[:3],
+            }
             receipt["resumed"] = True
             # runtime.turn was preset to leg 1's count: it IS the battle's
             # running total (and matches the events' turn numbering, which

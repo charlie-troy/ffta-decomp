@@ -1,11 +1,42 @@
 # Customizable auto-battle roadmap
 
-Updated 2026-09-17. Planning baseline: `398bdc0`. Current acceptance status
+Updated 2026-10-06. Reviewed checkout: `7c6f1b8` (clean before this documentation change). Current acceptance status
 is maintained here; dated discoveries remain in `docs/project-log.md`.
 For every auto-battle implementation or completion claim, follow
 [Worker acceptance contract](autobattle-worker-contract.md). It defines the
 checks needed to finish a packet and continue without orchestrator approval.
 Earlier “closed” log entries are historical claims, not dependency clearance.
+
+## Current worker assignment
+
+**Start A5.2 below: freeze the tactics-policy and candidate contracts.**
+A5.1 is accepted (2026-10-06): the public runner drives the two-ally fixture
+with validated actor-linked Move/Wait, and the live manual takeover plus
+same-process resume pass on one battle (see `docs/a51-integration.md`).
+A4 remains a bounded feasibility demonstration, not a completed
+multi-character product. C1–C3 are accepted for the documented fixture and
+same-process handoff. A8 investigation is complete; selectable acceleration
+and two-speed equivalence remain UNKNOWN. A6/A7/A10 wait for A5; A9 final
+acceptance also waits for A8.
+
+This checkout remains the decompilation/modding and Windows companion project.
+The independent ROM-native hack has its own ROM-XX roadmap and evidence.
+General function matching and map cleanup remain deferred; this review does
+not change the established product priority.
+
+### Review evidence and limits (2026-10-06)
+
+| Observed work | Worker consequence |
+|---|---|
+| C3 receipt at `docs/receipts/autobattle/C3.json`; accepted at `88b1072` | Preserve STOP, monitor-client handoff and resume contracts. Completion includes a defeat, not demonstrated tactical strength. |
+| A4 receipt and `outputs/autobattle/A4-demo/demo.json` at `7c6f1b8` | Two job-5 allies execute different Move/Wait choices; same-job enemy remains retail. Reuse the demo and its actor attribution, not CT-only identity. |
+| `tools/autobattle_runtime.py` still emits `actor="Marche", actor_slot=6` and uses single-player position/death helpers | A4 demo acceptance does not certify the public runner on multiple allies. Close this integration gap before policy feature work. |
+| `docs/receipts/autobattle/A8.json`, revised 2026-10-05 | Measured roughly 0.87–0.97x nominal on this host; no selectable acceleration. Withdrawn 4.1x/Lua/extrapolated figures stay withdrawn. |
+| Last log records `validate_all.py` PASS at A4 closure | Historical validation, not rerun by this documentation review. No new gameplay or release certification is claimed. |
+
+Read the current packet and its named sources first. Use historical sections
+below only for the relevant research question; superseded next-step language
+there does not override this queue.
 
 ## Product outcome
 
@@ -22,9 +53,9 @@ First release scope: Windows mGBA companion plus guarded ROM patches where neede
 | Deterministic controls | `tools/ai_targeting.py` and `tools/ai_action.py` remove specific ordering/action-selection draws. This does not remove damage RNG or guarantee optimal tactics. |
 | Current regression evidence | Historical run (2026-09-06): `python tools/validate_ai_strategy.py baserom.gba` passed 9/9; aggressive changes 435 bytes, deterministic-actions 460 bytes. SHA1 verified as `4ac05441f4de70a4ec3dd932116346c61b8783d9`. |
 | AI internals | Candidate construction, sign-gated priority ordering, help/harm pools, evaluator and turn phases are documented and probed. Impact magnitude is not a retail ranking key. Do not revive the old magnitude-based interpretation. |
-| Live scenario | A frozen snowball enemy turn is reproducible. It cannot demonstrate normal approach movement, full-party automation, or contrasting profiles across complete battles. |
-| Normal-battle access | A1 captured a repeatable encounter and enemy movement/action (`123ea91`). A2 introduced additional fixture variants; their identity, roster metadata, and boot guards need reconciliation before more causal experiments (A2.4a). |
-| Missing product pieces | Player-control handoff, per-character runtime assignment, conditional tactics, resource/movement policy, full-battle recovery, measured acceleration, usable configuration workflow. |
+| Live scenario | Normal-battle C3 completion/handoff and A4 two-ally divergence are accepted within named fixtures. Snowball remains a narrow enemy-turn research fixture. |
+| Normal-battle access | A1 captured a repeatable encounter and enemy movement/action (`123ea91`). A2.4a reconciled fixture identity/guards; A4 added a purpose-built two-ally fixture. Revalidate each fixture for its named use. |
+| Missing product pieces | Multi-character public-runner integration, conditional tactics, resource/movement policy, broader battle recovery, selectable acceleration, usable configuration workflow. |
 
 Read `CLAUDE.md`, the current section of `docs/project-log.md`, `docs/dead-ends.md`, and the task-specific files below. Historical entries are evidence, not an instruction to reopen completed investigations.
 
@@ -42,15 +73,19 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 |---|---|---|---|
 | 1 | C1 cancellation and handoff | 11/11 acceptance criteria PASS per `docs/receipts/autobattle/C1.json` (2026-09-17, round-4 update): all six STOP-timing rows, both CLI cleanup paths (leave-running + kill via real `__exit__`), guard-failure receipt, disconnect, the 2 s latency bound (measured 0.19–1.2 s), and the manual-command row closed with an agent-driven player input proof | C2 |
 | 2 | C2 validated player action | Accepted for the documented Move fixture; 237aebe live6/live7 evidence retained | C3 |
-| 3 | C3 integration and acceptance | Accepted 2026-09-21 at 88b1072: complete live battle plus same-process manual Move/Wait and resumed completion; fresh resume regression passed | A2.5/A3 accepted within documented scope; start A4, or A8 independently |
-| Later | A4–A10 | Existing product scope retained | Follow declared dependencies |
+| 3 | C3 integration and acceptance | Accepted 2026-09-21 at 88b1072: complete live battle plus same-process manual Move/Wait and resumed completion; fresh resume regression passed | A2.5/A3 accepted within documented scope; enabled A4 and A8 |
+| 4 | A4 assignment feasibility | Bounded PASS, 2026-10-05 at `7c6f1b8`; two-ally demo and identity receipts | A5.1 runner integration |
+| 5 | A5 ordered tactics | **A5.1 accepted 2026-10-06** (runner identity + live `--pause-at-boundary` manual takeover + same-PID resume); start A5.2, then A5.3–A5.4 | A6/A7/A10 |
+| Independent | A8 acceleration | Investigation complete; product UNKNOWN | A9 remains gated on actual speed acceptance |
+| Later | A6/A7/A9/A10 | GATED by declared prerequisites | Follow the packet gates |
 
 A1 and A2.4a supplied normal-battle fixtures. A2.4b supplied useful negative
 control results. A3 has an unattended failed-encounter result (`a3-natural6`),
 and the CLI now preserves its process on pause. These are reusable evidence,
 not proof of player action selection or complete cancellation behavior.
 
-**Default assignment:** start A4; A8 is independently unblocked. C1–C3 are
+**Default assignment:** start A5.1; revisit A8 only for a new discriminating
+mechanism/host hypothesis. C1–C3 and A4 are
 accepted for the documented fixture and one-handoff flow. Work within an
 ongoing request to continue auto-battle work. Read the contract and the current
 packet only; load linked research references when that packet needs them.
@@ -82,7 +117,11 @@ Status (2026-09-07): all A1 boxes done. Two identical runs from `engage.ss0` set
 
 Done: another agent can load this fixture without navigating the intro. If navigation fails after two materially different approaches, return screenshots, observed state, and a precise blocker; do not spend another session teleporting snowball units.
 
-### A2 — Prove a reversible player-to-AI handoff (P0, still open)
+### A2 — Prove a reversible player-to-AI handoff (historical discovery; A2.5 accepted through C3)
+
+The open/blocking language in the investigation below describes its original
+checkpoint. C1–C3 later accepted the external identified-action route; native
+retail-AI delegation is not this project's accepted architecture.
 
 A2.3 answered a pipeline question, not the product acceptance gate. Existing
 `tools/probe_player_ai_control.py` and `docs/player-ai-control.md` are delivered;
@@ -90,7 +129,7 @@ do not recreate them. `1334849` established register-based battle input and a
 Wait/enemy-turn loop. `cda503c` established shared sequencer initialization and
 corrected actor attribution. Neither a sequencer seed, a merged-continuation
 hit, nor repeated Wait confirms proves that the player selected and executed
-an autonomous tactical action. A3 remains blocked on the evidence below.
+an autonomous tactical action. At that historical checkpoint A3 was blocked; C3 later supplied acceptance for the external route.
 
 Read `docs/player-ai-control.md` (especially A2.3 verdicts),
 `tools/exp_control_v48.py`, `tools/boot_fixture_gdb.py`,
@@ -329,9 +368,108 @@ Done: identity and isolation evidence, with the actual runtime adapter contract 
 
 ### A5 — Ordered tactical rules and decision receipts (P1)
 
+Execute these subpackets in order. Each writes a criterion table into the planned
+`docs/receipts/autobattle/A5.json`, with separate host, adapter and live results.
+The file/interface names below are deliverables, not claims they already exist.
+
+#### A5.1 — Put verified actor identity into the public runner (ACCEPTED)
+
+Accepted 2026-10-06. The public runner resolves the fresh-menu owner from
+verified identity (name/id with job/side agreement) and drives the two-ally
+fixture with actor-linked Move/Wait plus full-party result checks. The live
+manual takeover now passes too, on purpose and reproducible: `run_autobattle.py
+--pause-at-boundary` leaves the identified player menu OPEN with zero
+automation input, `tools/c3_manual_layer.py` commits a window-SendInput Move
+whose destination is verified from a whole-board tile delta, and `--resume`
+adopts the SAME pid and continues from that tile
+(`outputs/autobattle/a51-live-manual-05`; repeat `a51-live-manual-04` moves
+out of it). Both
+previously-failing gates are in `docs/receipts/autobattle/A5.json` with the
+DE-032 turn-transition trap that had masked the resume. Scope limits (verified
+fixtures, identified Move/Wait, no multi-player end signature) are recorded
+there; A5.2 starts from that scope, not from a broader claim.
+
+Read `docs/strategy-runtime-scope.md`, `tools/a4_divergence_demo.py`,
+`tools/autobattle_runtime.py`, `tools/probe_control_handoff.py` and the A4 receipt.
+Own the runner/adapter integration and focused transport regressions.
+
+1. Extract/reuse the demo's fresh-menu actor resolution and full-snapshot
+   cross-check. Resolve by validated identity (name + id), with job/side agreement;
+   ambiguous, missing, stale or duplicate identities prevent gameplay input.
+2. Replace fixed actor labels, slot assumptions, single-Marche terminal/death
+   decisions and fixture guards wherever they affect the runner's active actor.
+   A known actor dying must not make another ally's menu an authorized action.
+3. Preserve the C2 candidate/echo checks and C1 cancellation ordering. The policy
+   layer must neither inject keys nor write game memory. Scope the fresh-menu
+   cursor rule to its proven validity window; do not reuse it mid-targeting.
+4. Exercise `tools/run_autobattle.py` on the one-player and A4 two-player fixtures.
+   Receipts must name the actual actor, selected command/destination, engine
+   result and next actor; show both allies and an unaffected enemy. Reproduce
+   same-process pause/manual command/resume after changing transport integration.
+
+PASS: the public runner, not only the demo, produces correct actor-linked
+actions on both fixtures; ambiguous-owner and wrong-result controls reject;
+existing STOP/resume checks remain green. UNKNOWN on either fixture blocks A5.2.
+Commit only owned changes when implementing; preserve other workers' files.
+
+#### A5.2 — Freeze policy and candidate contracts
+
+Own `tools/tactics_policy.py`, `tools/validate_tactics_policy.py`,
+`docs/tactics-policy.md` and `configs/tactics/`. Start with proven Move/Wait
+candidates; inventory missing engine fields before enabling spell predicates.
+Define schema versions, identity, candidate IDs, observation freshness, supported
+facts, deterministic ordering, reason codes and explicit fallback semantics.
+Assignment precedence remains character → job → party → supported fallback.
+
+PASS: pure host tests cover every supported rule, threshold boundaries, unknown
+keys, absent/stale facts, duplicate identity/ability names, ties and empty sets.
+Do not equate learned abilities with legal candidates. Missing legality or actor
+identity means no commit. An identified legal Wait may be an explicit fallback;
+calling it "retail AI" would misdescribe the companion architecture.
+
+#### A5.3 — Prove the minimum conditional-action adapter
+
+Own focused research/adapter changes and their evidence. Identify command,
+target, range, MP/status restrictions and acceptance for one useful conditional
+action family. Record the engine observations supporting every exposed field.
+At commit, revalidate actor, candidate and target; a changed candidate cancels
+the commit. Bound each hypothesis to two materially different experiments,
+then record the result and choose the next discriminating hypothesis.
+
+PASS: positive execution links actor → rule → candidate → engine result;
+insufficient MP, illegal range/target, stale snapshot and misleading enemy-effect
+controls reject without confirming an action. Host-generated effects do not
+certify this interface. A narrow proven interface is acceptable; unsupported
+families stay explicit and cannot silently become enabled policy options.
+
+#### A5.4 — Integrate and close conditional tactics
+
+Use the public runner with contrasting per-character policies. Demonstrate two
+same-job allies following distinct rules, then change a relevant condition on
+equivalent starting states and show the expected decision/result change. Retain
+enemy isolation, STOP, monitor-client handoff and resumed continuation evidence.
+Move/Wait divergence alone does not close HP/MP/ability conditional behavior.
+
+PASS: every A5 requirement below has applicable host AND live evidence, the
+schema is frozen, unsupported predicates fail closed, and the receipt names
+exact remaining capability limits. Then continue A6, A7, and A10 as dependencies
+permit; A8's open product criteria do not block policy work.
+
+Implementation checks (PowerShell from this repository; use a fresh output root):
+
+```powershell
+python tools/validate_transport_paths.py --scenario all --out-root outputs/autobattle/A5-transport-<unique-run>
+python tools/validate_autobattle_runtime.py outputs/autobattle/<actual-live-run>
+python tools/validate_tactics_policy.py
+```
+
+The policy validator is an A5 deliverable; add its exact CLI to the receipt.
+For ROM changes, also run `python tools/validate_all.py baserom.gba` and the WSL
+build gates. A receipt validator checks consistency, not independently the game.
+
 Depends on A4. Create `tools/tactics_policy.py`, `tools/validate_tactics_policy.py`, `configs/tactics/`, and `docs/tactics-policy.md`. Extend the runner through A4's reviewed adapter; keep the existing global ROM profile compiler separate.
 
-Proposed pure interface: `choose_action(snapshot: dict, policy: dict) -> dict | None`. The adapter supplies an actor id and only engine-legal candidate actions, each with an action id, target id, actor/target HP and MP, cost, relation, and verified status data. Missing required facts make a rule ineligible. Return a candidate id plus matched rule id/reason, or `None` for retail fallback. Freeze the exact JSON schema in this packet before A6/A7/A10 start.
+Proposed pure interface: `choose_action(snapshot: dict, policy: dict) -> dict | None`. The adapter supplies an actor id and only engine-legal candidate actions, each with an action id, target id, actor/target HP and MP, cost, relation, and verified status data. Missing required facts make a rule ineligible. Return a candidate id plus matched rule id/reason, or `None` for the explicitly documented no-match path. Freeze the exact JSON schema in this packet before A6/A7/A10 start.
 
 - [ ] Implement ordered first-matching-eligible rules, enabled flags, explicit fallback, and deterministic tie handling. Reject unknown keys and invalid thresholds.
 - [ ] Support only verified initial predicates: self/ally/enemy, HP percentage threshold, known status present/absent, named/identified available ability, and remaining MP after cost.
@@ -363,6 +501,14 @@ Depends on A1/A5. Reuse `tools/trace_turn_march.py`; create `tools/probe_movemen
 Done: at least approach and hold produce contrasting legal movement on the same fixture. Kiting, hazard avoidance, and formation behavior remain later work unless supported by this evidence.
 
 ### A8 — Adjustable battle speed (P1, independent after A3)
+
+Worker re-entry rule: read the receipt and `docs/autobattle-speed.md` before
+running any probe. Pick a genuinely new supported emulator/host mechanism;
+retain the pre-registered 1.30x separation gate and timestamped frame/wall-time
+measurement. Repeating inert flags is not progress. If no available mechanism
+can be tested, report that dependency and continue A5 work. Do not relax A8/A9
+acceptance, promise an accelerated setting, or introduce ROM timer/animation
+changes to close this packet without a separately scoped design.
 
 Modify `tools/run_autobattle.py`; create `docs/autobattle-speed.md` and extend runtime validation.
 
@@ -422,7 +568,7 @@ Dispatch prompt:
 > docs/autobattle-worker-contract.md and the packet's named sources. Reproduce
 > the known failure, fix it, run its positive and adversarial checks, inspect
 > live evidence, reconcile status, and commit owned files. Continue through
-> C1–C3 without waiting for review when their criteria pass. Report observed
+> A5's subpackets and later unlocked work without waiting for review when their criteria pass. Report observed
 > facts and unresolved criteria; never replace a criterion with a weaker proxy.
 
 ## Deferred work

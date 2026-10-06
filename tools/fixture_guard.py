@@ -652,7 +652,7 @@ class FixtureSession:
         self.stop(keep_process=self.keep_process)
         return False
 
-    def adopt_existing(self, verify_rom=True):
+    def adopt_existing(self, verify_rom=True, guard_budget=45.0):
         """Attach to an ALREADY-RUNNING emulator this session can verify.
 
         C3 same-battle resume: a paused handoff (stop() with keep_process)
@@ -679,19 +679,54 @@ class FixtureSession:
                 raise FixtureError(
                     f"ROM SHA1 mismatch: {sha} != {self.expected_rom_sha1}")
         self._attach()
-        self.receipt = guard(self.g, expect=self.expect,
-                             exact_ct=False, rom=self.read_rom_bytes())
+        # A turn transition reuses the battle-struct EWRAM region for a few
+        # seconds — measured live 2026-10-06 on the solo fixture: the count
+        # field at 0x020159E4 read 7, then 0x00050209/0x00050407 with slot0's
+        # name pointer replaced, then 7 again ~10 s after a turn closed. A
+        # guard read that lands inside that window is a TIMING artifact, not
+        # a foreign emulator: the pid (port listener) and the ROM hash still
+        # bind the target, and the fixture shape still has to hold. So retry
+        # to a bound and RECORD every attempt, so an adopt that had to wait
+        # out a transition is visible in the receipt instead of being
+        # silently indistinguishable from an immediate one.
+        deadline = time.time() + guard_budget
+        attempts = []
+        while True:
+            receipt = guard(self.g, expect=self.expect, exact_ct=False,
+                            rom=self.read_rom_bytes())
+            failed = [f"{c['check']}={c['detail']}" for c in receipt["checks"]
+                      if c["severity"] == "required" and not c["ok"]]
+            attempts.append({"t": round(time.time(), 3),
+                             "ok": bool(receipt["ok"]),
+                             "failed_required": failed})
+            self.receipt = receipt
+            if receipt["ok"] or time.time() >= deadline:
+                break
+            self.log(f"adopt: roster guard not settled yet "
+                     f"({len(failed)} required check(s) failing: {failed[:2]}); "
+                     "retrying (turn-transition window)")
+            # Let the ENGINE run between attempts: a served memory read halts
+            # the core and only `c` resumes it (DE-029), so a retry loop that
+            # only re-reads would freeze the transition window forever and
+            # read the SAME scratch values on every attempt (observed live
+            # 2026-10-06: 16 attempts, one value).
+            try:
+                self.g.cont()
+            except Exception:
+                pass
+            time.sleep(3.0)
+        receipt["adopt_attempts"] = attempts
         # exact_ct stays False: a mid-battle roster reads whatever CT the
         # engine charged to (the boot-time CT expectation does not hold)
-        if not self.receipt["ok"]:
+        if not receipt["ok"]:
             raise FixtureError(
-                "adopted emulator failed the roster guard: "
-                + "; ".join(f"{c['check']}={c['detail']}" for c in
-                            self.receipt["checks"]
-                            if c["severity"] == "required" and not c["ok"]))
+                "adopted emulator failed the roster guard after "
+                f"{len(attempts)} attempt(s) over {guard_budget:.0f}s: "
+                + "; ".join(attempts[-1]["failed_required"]))
         self.keep_process = True
         self.log(f"adopted running emulator pid {self.pid} port {self.port} "
-                 f"(roster guard ok; NOT rebooted)")
+                 f"(roster guard ok after {len(attempts)} attempt(s); "
+                 "NOT rebooted)")
         return self.receipt
 
     def summary(self):

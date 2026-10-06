@@ -2,411 +2,274 @@
   "packet": "A5",
   "subpacket": "A5.1",
   "date": "2026-10-06",
-  "base_revision": "7c6f1b88ad13baf5645519f6abd578e94a71946e",
+  "base_revision": "0bb4fd408f4b452c4c648a0a6c8ae54aedf6e0f6 (A5.1 slice 1) plus this slice's delivered hashes",
   "tested_revision": "base plus per-file delivered hashes; each live run retains its own tested input hashes where available",
-  "status": "unknown",
+  "status": "pass",
   "delivered_source_sha256": {
+    "tools/autobattle_runtime.py": "414a34e807453a52ccb848df5de85d7bcf257ecf847c17c6f96587469a3c52d6",
+    "tools/run_autobattle.py": "3a7332b9930108e100c36ee3a5641fd24ef8fa44c3a0eceb41002697028bb6ce",
+    "tools/c3_manual_layer.py": "e15ebfa04266341f7aff77afc258239f47df9c5eb34a56be5a4d9256d110dde3",
+    "tools/fixture_guard.py": "d111371df71179388f5b2b60e2600cd84d961c4c45f2e3a129376f7f92e9c6f9",
+    "tools/validate_manual_handoff.py": "f5d74ca0ac98596ec87002da209cb9b798d7c2eceb7d019a8ab536da03893f67",
+    "tools/validate_transport_paths.py": "a781e7fccbf3924e6ab138c80e3431d41fd64bc8a24642d6e728fcf122f7870b",
     "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
-    "tools/autobattle_runtime.py": "4c8437953274f4e48f5da738299a759b0ffbcab33a7422d6b16138e8bffb52d3",
     "tools/probe_control_handoff.py": "bfbd9bf7e4474f63e7906ff275e4ddb71f6755f83bc21df1bb61ef4bb3c7e9cf",
-    "tools/run_autobattle.py": "6e12f174e3191bfd42c7623e3a5aaee35120e61f8acb85fbd141b4703c3e0ffe",
-    "tools/c3_manual_layer.py": "52c4dae7bd6a2bb162a9c5c4a79e1b8a0fb0997ae7248f20f29cc924c8df48f7",
-    "tools/validate_autobattle_runtime.py": "ec46dd2afbf277dba99363cdec93c7ae54d179b1ebeb2a711f2cb92ee432a3bc",
-    "tools/validate_actor_identity.py": "e8235eb1a147911a965b91a23701f337a02b83344e3ae1697b96c5d2ad6c214c",
-    "tools/validate_manual_handoff.py": "1ac5746c60595557ef18227eb8f66ee4b123f14490ba1d7965ebec67e8c0f462",
-    "tools/validate_transport_paths.py": "bfd5d6fd63de95570c1b40acf5a3f54c0c38a025da5aba426d230e0d7052ace5",
+    "tools/diag_a51_manual_watch.py": "c8b09afe9b6c7ca2dccacb11fb738b99fc4b4fadd35719fe084b392f95d8804b",
+    "tools/diag_a51_hold.py": "d93f42a69639ec0c97d215c9cfd4e8cec6a683d1231ee781067332e4aeafb7aa",
     "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3"
   },
   "criteria": [
     {
       "id": "A5.1-host-identity-and-rejection",
       "status": "pass",
-      "command": "python tools/validate_actor_identity.py --cli --out-root outputs/autobattle/a51-identity-final2",
+      "command": "python tools/validate_actor_identity.py --cli --out-root outputs/autobattle/a51-identity-final3",
       "expected": "actual CLI actor labels, duplicate/stale/invalid identity rejection, wrong result and corrupted receipt rejection",
-      "observed": "21 checks passed; synthetic control-flow evidence only",
+      "observed": "21 checks passed on the delivered revision; synthetic control-flow evidence only",
       "evidence": [
-        "outputs/autobattle/a51-identity-final2/checks.json",
-        "outputs/a51-identity-final2.log"
+        "outputs/autobattle/a51-identity-final3/checks.json",
+        "outputs/a51-identity-final3.log"
       ]
     },
     {
       "id": "A5.1-live-two-player-public-runner",
       "status": "pass",
-      "command": "python tools/run_autobattle.py --state outputs/lua-nav/a4-multi-ally-battle-start.ss0 --scenario configs/battle-scenarios/a4-two-player.json --run-id a51-two-player-final --yes --max-turns 2 --wall-timeout 260",
+      "command": "python tools/run_autobattle.py --state outputs/lua-nav/a4-multi-ally-battle-start.ss0 --scenario configs/battle-scenarios/a4-two-player.json --run-id a51-two-player-04 --yes --max-turns 2 --wall-timeout 260",
       "expected": "actual Marche Move, distinct Montblanc Wait, actor-linked results and unchanged retail enemy observations",
-      "observed": "two reloads (a51-two-player-02 and a51-two-player-final) each recorded Marche id 7 Move (4,10)->(4,11) and Montblanc id 5 Wait with no player movement. Both menu screenshots inspected. Bounded stop; no multi-player battle completion claim.",
+      "observed": "re-run AFTER this slice's runner change: Marche id 7 Move (4,10)->(4,11) at t=82.3 and Montblanc id 5 Wait at t=160.8 with no player movement; bounded turn-budget stop, no multi-player completion claim. Reproduces the earlier a51-two-player-02/-final pair on the new revision.",
       "evidence": [
-        "outputs/autobattle/a51-two-player-final/run.json",
-        "outputs/autobattle/a51-two-player-final/events.jsonl",
-        "outputs/autobattle/a51-two-player-final/boundary-turn1.png",
-        "outputs/autobattle/a51-two-player-final/boundary-turn2.png"
+        "outputs/autobattle/a51-two-player-04/run.json",
+        "outputs/autobattle/a51-two-player-04/events.jsonl",
+        "outputs/autobattle/a51-two-player-04/boundary-turn1.png",
+        "outputs/autobattle/a51-two-player-04/terminal-stalled.png"
       ]
     },
     {
-      "id": "A5.1-live-one-player-public-runner",
+      "id": "A5.1-pause-at-boundary-entry-point",
       "status": "pass",
-      "command": "python outputs/a51_pause_run.py (local watcher calls run_autobattle.main and writes STOP after first turn)",
-      "expected": "solo actor-linked Move and real leave-running pause",
-      "observed": "Marche id 6 moved (4,10)->(4,11); pause at 44.2 seconds; owned PID 32928 kept alive. Local watcher is retained but not a shipped entry point.",
+      "command": "python tools/run_autobattle.py --run-id a51-live-manual-05 --yes --pause-at-boundary --wall-timeout 300",
+      "expected": "stop ON PURPOSE at the identified player menu: menu left OPEN, zero automation input, handoff latch recorded, emulator left running",
+      "observed": "LIVE: paused at t=13.7 s on Marche's fresh menu (boundary event + terminal-paused.png), input-log carries only the intentional stop_requested latch, zero key writes, manual_handoff {pid 44528, port 2345}. OFFLINE: the new transport scenario 'pause-at-boundary' asserts the same contract against the fake transport (one boundary, no turn event, no key write, stop latched, breakpoints disarmed, engine still advancing) and PASSES.",
       "evidence": [
-        "outputs/autobattle/a51-solo-resume-01/run.json",
-        "outputs/autobattle/a51-solo-resume-01/events.jsonl",
-        "outputs/a51-solo-resume-01.log"
+        "outputs/autobattle/a51-live-manual-05/leg1.log",
+        "outputs/autobattle/a51-live-manual-05/run.json",
+        "outputs/autobattle/a51-live-manual-05/input-log.jsonl",
+        "outputs/autobattle/a51-live-manual-05/boundary-turn1.png",
+        "outputs/autobattle/a51-live-manual-05/terminal-paused.png",
+        "outputs/autobattle/a51-transport-all/pause-at-boundary/run.json",
+        "outputs/autobattle/a51-transport-all/pause-at-boundary/events.jsonl"
       ]
+    },
+    {
+      "id": "A5.1-live-manual-command-and-same-PID-resume",
+      "status": "pass",
+      "command": "python tools/c3_manual_layer.py --receipt outputs/autobattle/a51-live-manual-05/run.json --window-timeout 150; python tools/run_autobattle.py --resume a51-live-manual-05 --yes --max-turns 2 --wall-timeout 400",
+      "expected": "manual actor reaches independently verified destination; monitor closes; same PID adopted and automation continues from that tile",
+      "observed": "ACCEPTED. Manual layer (window SendInput, zero stub writes): parked player menu identified as owner slot 6 by 'target cursor == the unique live unit's own tile' held over three samples with a stable CT and a known command byte; the DOWN probe moved the COMMAND cursor (so the turn-start menu was a command menu, not target mode); navigated to Move, A opened target mode at (4,10), the step ladder reached (4,11), A committed the walk, a manual Wait closed the turn (CT 0 -> 188 charging); the roster tile mirrored (4,10)->(4,11); the whole-board delta is moved_slots=[6] with no other same-side slot moved; keys_sent=[DOWN,UP,A,DOWN,A,DOWN,A,A]; monitor_reads=72, faults=0, reconnects=0. Resume: adopted SAME pid 44528 with match_receipt_handoff_pid true, roster_guard_ok true, guard_attempts 3, no reboot, and drove two further turns whose position_before is (4,11) - the manually walked tile (final_state stalled on the turn budget). Repeat run a51-live-manual-04 (same pair, receipt predates the adopt block) continues with a MOVE out of the manual tile: (4,11)->(5,11) then (5,11)->(6,11).",
+      "evidence": [
+        "outputs/autobattle/a51-live-manual-05/manual-layer.json",
+        "outputs/autobattle/a51-live-manual-05/manual-layer.log",
+        "outputs/autobattle/a51-live-manual-05/run.json",
+        "outputs/autobattle/a51-live-manual-05/events.jsonl",
+        "outputs/autobattle/a51-live-manual-05/input-log.jsonl",
+        "outputs/autobattle/a51-live-manual-05/leg2.log",
+        "outputs/autobattle/a51-live-manual-05/manual-window.png",
+        "outputs/autobattle/a51-live-manual-05/manual-after.png",
+        "outputs/autobattle/a51-live-manual-04/manual-layer.json",
+        "outputs/autobattle/a51-live-manual-04/events.jsonl"
+      ],
+      "negative_control": "The pre-fix helper printed PASS with manual_move_committed=false and the destination unmoved; the delivered helper rejects that case (exit 1, manual_turn_committed null, observed_ct_progress true). The two recorded resume failures before the DE-032 fix (roster-shape failure at the turn-transition window) are kept in the previous revision's artifacts and explained, not deleted."
     },
     {
       "id": "A5.1-window-helper-negative-controls",
       "status": "pass",
       "command": "python tools/validate_manual_handoff.py",
-      "expected": "distinguish command/target echo; reject no echo before confirmation and reject CT-only progress with wrong destination",
-      "observed": "4 synthetic controls pass through the real manual helper; no live semantics claim",
+      "expected": "distinguish command/target echo; reject no echo before confirmation, reject CT-only progress with a wrong destination, and never commit for an ambiguous owner",
+      "observed": "5 synthetic controls pass through the real manual helper over a world model that serves the same reads the helper makes: command-menu-own-tile-is-not-target-mode (the refuted pre-A5.1 case), already-open-target-mode with a blocked direction (the pre-A5.1 single-DOWN probe aborted here; the delivered probe keeps trying directions), ct-progress-with-wrong-move-rejects (exit 1), no-cursor-echo-no-confirmation (no A pressed), ambiguous-owner-never-commits (DE-030 shape: no input at all). No live semantics claimed by this check.",
       "evidence": [
-        "outputs/a51-manual-controls.log"
+        "outputs/autobattle/a51-manual-controls/ct-progress-with-wrong-move-rejects/manual-layer.json",
+        "outputs/autobattle/a51-manual-controls/ambiguous-owner-never-commits/manual-layer.json"
       ]
     },
     {
       "id": "A5.1-transport-regressions",
       "status": "pass",
-      "command": "python tools/validate_transport_paths.py --out-root outputs/autobattle/a51-transport; final targeted reruns below",
-      "expected": "all existing STOP/receipt/results/resume checks green on delivered behavior",
-      "observed": "Initial suite: 18 of 22 pass; wrong-result and invalid-command expectations were stale, restart/results exposed a transient cleared-actor regression. Final reruns are listed separately; the initial suite is not described as green. All nine final targeted reruns passed, including all four initial failures and a new early cleared-actor results control. The other 18 initial scenario passes are reused within their unchanged control-flow scope; no second full-suite claim.",
+      "command": "python tools/validate_transport_paths.py --out-root outputs/autobattle/a51-transport-all",
+      "expected": "all existing STOP/receipt/results/resume checks green on the delivered behavior, plus the new pause-at-boundary entry point",
+      "observed": "FULL SUITE RUN on the delivered revision: 23 of 23 scenarios PASS, including the four that failed in the previous slice's initial run (identified-move-wrong, identified-move-invalid, results, restart) and the new pause-at-boundary scenario. Slowest: restart 145.8 s, resume-after-pause 132.6 s, takeover 106.7 s.",
       "evidence": [
-        "outputs/a51-transport.log"
+        "outputs/a51-transport-05.log",
+        "outputs/autobattle/a51-transport-all/"
       ]
     },
     {
-      "id": "A5.1-live-manual-command-and-same-PID-resume",
-      "status": "unknown",
-      "command": "python tools/c3_manual_layer.py --receipt outputs/autobattle/a51-solo-resume-01/run.json --window-timeout 150; python tools/run_autobattle.py --resume a51-solo-resume-01 --yes --max-turns 2 --wall-timeout 400",
-      "expected": "manual actor reaches independently verified destination; monitor closes; same PID adopted and automation continues from that tile",
-      "observed": "NOT ACCEPTED. Window layer selected (5,11), CT progressed, but roster stayed (4,11). Its former unconditional PASS was refuted and corrected. First reconnect overlapped the manual monitor and failed the guard; second failed to halt within 20s. Only our owned PID was terminated. Offline resume is separate evidence.",
+      "id": "A5.1-release-gate",
+      "status": "pass",
+      "command": "python tools/validate_all.py baserom.gba",
+      "expected": "complete local release gate: WSL rebuild, proof-mod receipt, function byte checks, byte-identical ROM, all table/strategy/AI validators",
+      "observed": "FULL VALIDATION PASSED in 56.8 s (workspace restored to the retail-build configuration). Includes validate_ai 10/10 and validate_ai_strategy 9/9.",
       "evidence": [
-        "outputs/autobattle/a51-solo-resume-01/manual-layer.json",
-        "outputs/a51-manual-03.log",
-        "outputs/a51-resume-01.log",
-        "outputs/a51-resume-02.log"
-      ],
-      "negative_control": "The pre-fix helper printed PASS with manual_move_committed=false; final synthetic wrong-destination control now exits 1."
-    }
-  ],
-  "final_transport_reruns": [
-    {
-      "scenario": "identified-move-wrong",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario identified-move-wrong --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-identified-move-wrong.log",
-      "sha256": "ea73d842ce7127fad287575508b5355593ff6fddfa7155cab7d6085a225317d4"
-    },
-    {
-      "scenario": "identified-move-invalid",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario identified-move-invalid --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-identified-move-invalid.log",
-      "sha256": "091be700c3d1d887139fcd99c749298ee3e54892e53d0eb982d45b7753999d55"
-    },
-    {
-      "scenario": "stop-during-drive",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario stop-during-drive --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-stop-during-drive.log",
-      "sha256": "8af0f13ea012fff22c44f22500c1a000964b649fb57f84c79464ace3018a2256"
-    },
-    {
-      "scenario": "resume-after-pause",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario resume-after-pause --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-resume-after-pause.log",
-      "sha256": "cf7b362e01cf9bdee53a97396f8fcc33ec8c93f4889dcdb43cb2c19190ec7c18"
-    },
-    {
-      "scenario": "results",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario results --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-results.log",
-      "sha256": "ac75d29e4eb6bb1f567ff08f4716df0574a4c56039ef0eb086b94e6ffbd609fb"
-    },
-    {
-      "scenario": "results-cleared",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario results-cleared --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-results-cleared.log",
-      "sha256": "90b8496b58554eb54b8b7c9bf663c96da19e596a56bc78ed2fbcce3b60bf2673"
-    },
-    {
-      "scenario": "restart",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario restart --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-restart.log",
-      "sha256": "e29b5989c1b3e9b11c76dbbac2e00f8dc29c74cb73404dfa41c6ba66c4513bed"
-    },
-    {
-      "scenario": "stop-before-start",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario stop-before-start --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-stop-before-start.log",
-      "sha256": "a06bf865d9371f570165674d13e60780201a286584fd14c631ddf2f41f3d6d94"
-    },
-    {
-      "scenario": "stop-coincides-with-progress",
-      "status": "pass",
-      "command": "python tools/validate_transport_paths.py --scenario stop-coincides-with-progress --out-root outputs/autobattle/a51-final-controls",
-      "log": "outputs/a51-final-stop-coincides-with-progress.log",
-      "sha256": "dff47b8c6b0f173b3f8714fe31f259b8afba80acb5721b27277ab74bbd5874c1"
+        "outputs/a51-validate-all.log"
+      ]
     }
   ],
   "live_runs": [
     {
-      "run_id": "a51-two-player-02",
+      "run_id": "a51-live-manual-05",
+      "role": "canonical manual-handoff pair (leg 1 --pause-at-boundary, manual layer, leg 2 --resume)",
       "final_state": "stalled",
-      "turns": [
-        {
-          "t": 99.8,
-          "actor": "Marche",
-          "actor_slot": 7,
-          "actor_identity": {
-            "name_text": "Marche",
-            "id": 7,
-            "job": 5,
-            "side_bit": false,
-            "addr": "02016120"
-          },
-          "selected_action": {
-            "kind": "identified-move",
-            "command_id": 0,
-            "dest": [
-              4,
-              11
-            ],
-            "from": [
-              4,
-              10
-            ]
-          },
-          "position_before": {
-            "x": 4,
-            "y": 10
-          },
-          "position_after": {
-            "x": 4,
-            "y": 11
-          },
-          "next_actor": {
-            "source": "sequencer context",
-            "names": [
-              "Carson",
-              "PP",
-              "Schneider"
-            ]
-          }
-        },
-        {
-          "t": 160.7,
-          "actor": "Montblanc",
-          "actor_slot": 5,
-          "actor_identity": {
-            "name_text": "Montblanc",
-            "id": 5,
-            "job": 5,
-            "side_bit": false,
-            "addr": "02015f10"
-          },
-          "selected_action": {
-            "kind": "identified-wait",
-            "command_id": 0,
-            "dest": null,
-            "from": [
-              5,
-              10
-            ]
-          },
-          "position_before": {
-            "x": 5,
-            "y": 10
-          },
-          "position_after": {
-            "x": 5,
-            "y": 10
-          },
-          "next_actor": {
-            "source": "sequencer context",
-            "names": [
-              "Godfrey",
-              "Jon",
-              "PP"
-            ]
-          }
-        }
-      ],
-      "tested_input_sha256": null,
-      "receipt_sha256": "727f9d40e9d9c7b82943fd890a9c9fb45ad1efa519674baeda610b61bda52ba0",
-      "events_sha256": "53486cc9283978599eb13f7c274caa37df940df18d979b7fab70174c16dd6647"
-    },
-    {
-      "run_id": "a51-two-player-final",
-      "final_state": "stalled",
-      "turns": [
-        {
-          "t": 82.2,
-          "actor": "Marche",
-          "actor_slot": 7,
-          "actor_identity": {
-            "name_text": "Marche",
-            "id": 7,
-            "job": 5,
-            "side_bit": false,
-            "addr": "02016120"
-          },
-          "selected_action": {
-            "kind": "identified-move",
-            "command_id": 0,
-            "dest": [
-              4,
-              11
-            ],
-            "from": [
-              4,
-              10
-            ]
-          },
-          "position_before": {
-            "x": 4,
-            "y": 10
-          },
-          "position_after": {
-            "x": 4,
-            "y": 11
-          },
-          "next_actor": {
-            "source": "sequencer actor context",
-            "name": "Schneider",
-            "id": 3,
-            "job": 36,
-            "side_bit": true
-          }
-        },
-        {
-          "t": 160.0,
-          "actor": "Montblanc",
-          "actor_slot": 5,
-          "actor_identity": {
-            "name_text": "Montblanc",
-            "id": 5,
-            "job": 5,
-            "side_bit": false,
-            "addr": "02015f10"
-          },
-          "selected_action": {
-            "kind": "identified-wait",
-            "command_id": 0,
-            "dest": null,
-            "from": [
-              5,
-              10
-            ]
-          },
-          "position_before": {
-            "x": 5,
-            "y": 10
-          },
-          "position_after": {
-            "x": 5,
-            "y": 10
-          },
-          "next_actor": {
-            "source": "sequencer actor context",
-            "name": "Jon",
-            "id": 0,
-            "job": 41,
-            "side_bit": true
-          }
-        }
-      ],
-      "tested_input_sha256": {
-        "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
-        "outputs/lua-nav/a4-multi-ally-battle-start.ss0": "7cbe2f661279d148dd659e023d2cbd89bd6044e9eeca21a171420ffff222491b",
-        "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
-        "tools/run_autobattle.py": "6e12f174e3191bfd42c7623e3a5aaee35120e61f8acb85fbd141b4703c3e0ffe",
-        "tools/autobattle_runtime.py": "dd54b0d50c88206dfe07e08592c02bc008157a8b212a94a475785cee5e48fa3a",
-        "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
-        "tools/probe_control_handoff.py": "bfbd9bf7e4474f63e7906ff275e4ddb71f6755f83bc21df1bb61ef4bb3c7e9cf"
+      "resumed": true,
+      "emulator_pid": 44528,
+      "adopt": {
+        "pid": 44528,
+        "match_receipt_handoff_pid": true,
+        "roster_guard_ok": true,
+        "guard_attempts": 3,
+        "guard_first_failed_checks": [
+          "battle_struct_readable=struct_count=328201",
+          "slot0_name_matches=slot0 name=0x40309 (None) expected=0x85671ee",
+          "at_least_two_live_units=live_count=1"
+        ]
       },
-      "receipt_sha256": "569a421565082063900145a79b2bee5a21385ca5e59b5f1bde2b7ed48775676c",
-      "events_sha256": "4c9943b4eca8a0b281840714889af48deabe840658be1a08aeec8f73dec77d17"
-    },
-    {
-      "run_id": "a51-solo-resume-01",
-      "final_state": "paused",
       "turns": [
         {
-          "t": 42.5,
+          "turn": 1,
           "actor": "Marche",
           "actor_slot": 6,
-          "actor_identity": {
-            "name_text": "Marche",
-            "id": 6,
-            "job": 2,
-            "side_bit": false,
-            "addr": "02016018"
-          },
-          "selected_action": {
-            "kind": "identified-move",
-            "command_id": 0,
-            "dest": [
-              4,
-              11
-            ],
-            "from": [
-              4,
-              10
-            ]
-          },
-          "position_before": {
-            "x": 4,
-            "y": 10
-          },
-          "position_after": {
-            "x": 4,
-            "y": 11
-          },
-          "next_actor": {
-            "source": "sequencer actor context",
-            "name": "Schneider",
-            "id": 3,
-            "job": 36,
-            "side_bit": true
-          }
+          "kind": "identified-wait",
+          "position_before": [4, 11],
+          "position_after": [4, 11],
+          "note": "position_before is the manually walked tile"
+        },
+        {
+          "turn": 2,
+          "actor": "Marche",
+          "actor_slot": 6,
+          "kind": "identified-wait",
+          "position_before": [4, 11],
+          "position_after": [4, 11]
         }
       ],
-      "tested_input_sha256": null,
-      "receipt_sha256": "6b49040d6ce0c817cbb6d840d85dc33fd7513a1de085fe7f6994b1f6455e5ac3",
-      "events_sha256": "423935397f1db0332cfebb3c0ac75b49dcbafdbd7a728a1ba92efe85144e00f7"
+      "manual_turn": {
+        "owner_slot": 6,
+        "tile_before": [4, 10],
+        "tile_after": [4, 11],
+        "stepped_target": [4, 11],
+        "moved_slots": [6],
+        "other_same_side_moved": [],
+        "keys_sent": ["DOWN", "UP", "A", "DOWN", "A", "DOWN", "A", "A"],
+        "input_channel": "window SendInput (no stub writes)",
+        "monitor_reads": 72,
+        "monitor_faults": 0,
+        "monitor_reconnects": 0
+      },
+      "receipt_sha256": "95374f46deec9fcd3132204eb945be1069013f17333760bba5dd0b1bc0cf16c8",
+      "events_sha256": "18545715974b91e1f849a8e534742a52c3f2ab5892dea4ec84828b383093fd03"
+    },
+    {
+      "run_id": "a51-live-manual-04",
+      "role": "repeat pair; the resumed leg MOVES out of the manual tile (receipt predates the adopt block)",
+      "final_state": "stalled",
+      "resumed": true,
+      "turns": [
+        {
+          "turn": 1,
+          "actor": "Marche",
+          "actor_slot": 6,
+          "kind": "identified-move",
+          "position_before": [4, 11],
+          "position_after": [5, 11]
+        },
+        {
+          "turn": 2,
+          "actor": "Marche",
+          "actor_slot": 6,
+          "kind": "identified-move",
+          "position_before": [5, 11],
+          "position_after": [6, 11]
+        }
+      ],
+      "manual_turn": {
+        "owner_slot": 6,
+        "tile_before": [4, 10],
+        "tile_after": [4, 11],
+        "moved_slots": [6]
+      },
+      "receipt_sha256": "04642cfd1f2bcd31b2618d4643583103cb1b3debb7657789e9e0cf4f6548bebe",
+      "events_sha256": "2b2a94c3a4fdc63f5f43c099d6055b90cf3f41c2c2267657b49d52c2ad59aaac"
+    },
+    {
+      "run_id": "a51-two-player-04",
+      "role": "two-player public-runner regression on the delivered revision",
+      "final_state": "stalled",
+      "turns": [
+        {
+          "turn": 1,
+          "actor": "Marche",
+          "actor_slot": 7,
+          "kind": "identified-move",
+          "position_before": [4, 10],
+          "position_after": [4, 11],
+          "t": 82.3
+        },
+        {
+          "turn": 2,
+          "actor": "Montblanc",
+          "actor_slot": 5,
+          "kind": "identified-wait",
+          "position_before": [5, 10],
+          "position_after": [5, 10],
+          "t": 160.8
+        }
+      ],
+      "receipt_sha256": "f0b26d61d2f9c6f6e36f981d62747762a2c5de9dc179bcd39a397eefa16ece6d",
+      "events_sha256": "f90ab50f2bee47c21478a0a5de4c9949dff8662d58d3906b879d0827f261d727"
     }
   ],
+  "trap_recorded": {
+    "id": "DE-032",
+    "summary": "The battle struct at 0x020159E4 is scratch for ~10 s after a turn closes (count 7 -> 328201/328711 -> 7 again, roster tile already moved). A resume guard read inside that window fails the roster shape. Not a damaged battle and not a DE-028 desync: a 40 s read-only hold with no input left the roster perfect and the ROM byte-identical. The adopt now retries to a 45 s bound, records every attempt, and sends 'c' between attempts (a served read halts the core, so a read-only retry freezes the engine inside the transition - 16 identical scratch reads before the cont was added).",
+    "evidence": [
+      "tools/diag_a51_hold.py",
+      "tools/diag_a51_manual_watch.py",
+      "docs/dead-ends.md"
+    ]
+  },
   "artifact_sha256": {
-    "outputs/autobattle/a51-identity-final2/checks.json": "e6477dba807b9da4310d816dba57675136bd1d4f967f3c63a93b06b79ba7c1ea",
-    "outputs/a51-identity-final2.log": "d8122b0016520e12815be1bcfc11cd0ab8d1a132ac99cc7195f20de5565cf204",
-    "outputs/autobattle/a51-two-player-final/run.json": "569a421565082063900145a79b2bee5a21385ca5e59b5f1bde2b7ed48775676c",
-    "outputs/autobattle/a51-two-player-final/events.jsonl": "4c9943b4eca8a0b281840714889af48deabe840658be1a08aeec8f73dec77d17",
-    "outputs/autobattle/a51-two-player-final/boundary-turn1.png": "45ae8c9f2ab760153086abcdb7a86d3f9d891a5901a2bdfbd193775367fb684a",
-    "outputs/autobattle/a51-two-player-final/boundary-turn2.png": "ca4e32b262837c41d87d37bd2a1971fee0a5dc931693db34217541ab21855924",
-    "outputs/autobattle/a51-solo-resume-01/run.json": "6b49040d6ce0c817cbb6d840d85dc33fd7513a1de085fe7f6994b1f6455e5ac3",
-    "outputs/autobattle/a51-solo-resume-01/events.jsonl": "423935397f1db0332cfebb3c0ac75b49dcbafdbd7a728a1ba92efe85144e00f7",
-    "outputs/a51-solo-resume-01.log": "1155c623e3bcb6ae1354ad059f50400cbcecef2cf8b6950d9288ee01d7e436d8",
-    "outputs/a51-manual-controls.log": "b0ab8c0a8a604543be7766bbd5c9bdcf2bd344dc2ef539ab5be2b483da49acbf",
-    "outputs/a51-transport.log": "57c012889db24e8e044eb4158960e23017c5e0658020627a7d022d6fbbbe5c80",
-    "outputs/autobattle/a51-solo-resume-01/manual-layer.json": "e9220b80847e1c07a76cb3fbce6e430e988111c0957c31cd61c48f3782595884",
-    "outputs/a51-manual-03.log": "7b201506dbe11720f24660ba4021f45e521c46aeece03958ec32f5f1d6d812fb",
-    "outputs/a51-resume-01.log": "5c985ee327d812f0606e179d26f2d0d5c94a6641c11d040b99f688ffc5dbb77a",
-    "outputs/a51-resume-02.log": "66c97ce6c297da6721be9762aee8b64ff5f78b28bd230e909b47be7586dba744"
+    "outputs/autobattle/a51-live-manual-05/run.json": "95374f46deec9fcd3132204eb945be1069013f17333760bba5dd0b1bc0cf16c8",
+    "outputs/autobattle/a51-live-manual-05/events.jsonl": "18545715974b91e1f849a8e534742a52c3f2ab5892dea4ec84828b383093fd03",
+    "outputs/autobattle/a51-live-manual-05/input-log.jsonl": "ad7c099b3a7a93e70058837351572ce73453d23912443d75fa43c0535fca4699",
+    "outputs/autobattle/a51-live-manual-05/manual-layer.json": "792282190016f4d383aa4cd8d6006cf78b3f5d7500275605d1dfb718151693ee",
+    "outputs/autobattle/a51-live-manual-05/manual-layer.log": "ffa95dcebf4e8459c4fd251f8cdaa34cf76a48812c97dec9597ca2ba0b8022a7",
+    "outputs/autobattle/a51-live-manual-05/leg1.log": "eca975d47fda7a39f86606b4d20d5b4cae9e6fcf1a5a0a2bdfb3400007e3cbc1",
+    "outputs/autobattle/a51-live-manual-05/leg2.log": "16c2d1ab8cb9691494cf520fca588c7d39ce48af6db995916c3f3e20c91213ce",
+    "outputs/autobattle/a51-live-manual-05/boundary-turn1.png": "212b2d1d736911f71fd3d750c652a69033539b316466c98cb24fdc2240e0463f",
+    "outputs/autobattle/a51-live-manual-05/manual-window.png": "603a62a796c69d7399cd161449a5d1542405918308cb7280d315689ac36db34c",
+    "outputs/autobattle/a51-live-manual-05/manual-after.png": "19cd650b0dbb7afe9855b913324a258e62c72de7fbffe9a0a74fd1dff8969c41",
+    "outputs/autobattle/a51-live-manual-05/terminal-paused.png": "bacf6ca7917e994a8c641dfd414d657f6333791480747ff2a7415e22d510a504",
+    "outputs/autobattle/a51-live-manual-05/terminal-stalled.png": "6906f3dbd0bd5c624e45ccdc39b5dc7149ebfebdee3901130a4ec9a7ec326fbf",
+    "outputs/autobattle/a51-live-manual-04/manual-layer.json": "87a3fa00a1520f6ff073d4c6bab027014b972521551f21b99ff43aaa7b57831f",
+    "outputs/autobattle/a51-live-manual-04/run.json": "04642cfd1f2bcd31b2618d4643583103cb1b3debb7657789e9e0cf4f6548bebe",
+    "outputs/autobattle/a51-live-manual-04/events.jsonl": "2b2a94c3a4fdc63f5f43c099d6055b90cf3f41c2c2267657b49d52c2ad59aaac",
+    "outputs/autobattle/a51-two-player-04/run.json": "f0b26d61d2f9c6f6e36f981d62747762a2c5de9dc179bcd39a397eefa16ece6d",
+    "outputs/autobattle/a51-two-player-04/events.jsonl": "f90ab50f2bee47c21478a0a5de4c9949dff8662d58d3906b879d0827f261d727",
+    "outputs/autobattle/a51-two-player-04/boundary-turn1.png": "c52ad7dd32b9603a32681bbb997845cebc7e554c200fcae0e4b9a7cda2784afb",
+    "outputs/autobattle/a51-two-player-04/terminal-stalled.png": "356c745bb41f3b8b337177e2edcb4048203a06dffe5a06452d624372e79ada95",
+    "outputs/autobattle/a51-identity-final3/checks.json": "e6477dba807b9da4310d816dba57675136bd1d4f967f3c63a93b06b79ba7c1ea",
+    "outputs/a51-identity-final3.log": "5ac5f5f6ce5d99443a5130765511ffec1a4ecaa7ce139af504c7b03c98e000c9",
+    "outputs/a51-transport-05.log": "40203ee463aa789b4584fab7fdda9ccb10d1025ddb9105a634363488aaa60f6d",
+    "outputs/a51-validate-all.log": "12899374c12dddde9617feafe6bb45a35e60398f4f0e9c71b1ff0790185adb4d",
+    "outputs/autobattle/a51-manual-controls/ct-progress-with-wrong-move-rejects/manual-layer.json": "e58f3f1ba50b5332a6fce00183539a6a8bc69cc0a3870ae6fe306546e3741875",
+    "outputs/autobattle/a51-manual-controls/ambiguous-owner-never-commits/manual-layer.json": "45e259e901df0e4cbdd4372390d54d92395e38061241726b76b5da3f3e01f794"
   },
   "limitations": [
-    "A5.1 remains partial; A5.2 must not start.",
-    "Verified seven/eight-record fixture scope; player side false is fixture-specific.",
+    "Verified seven/eight-record fixture scope; player side_bit false is fixture-specific.",
+    "The manual layer's parked-menu gate is evidence, not proof: the whole-board tile delta after the manual turn is the falsifier.",
     "Fresh-menu cursor-own-tile law is not used to infer actors while targeting.",
     "Scenario Move/Wait assignment is not a conditional tactics policy.",
-    "No multi-player end signature or complete-battle acceptance.",
-    "No ROM bytes or bulk memory dumps committed; raw local evidence remains ignored.",
-    "Live final run preceded the final solo-results handling correction; affected solo end path checked offline."
+    "No multi-player end signature or complete-battle acceptance; both resumed legs stopped on the turn budget.",
+    "The resumed legs' turns were identified Waits in the canonical run (position_before still proves continuation); the repeat run shows Moves from the manual tile.",
+    "No ROM bytes or bulk memory dumps committed; raw local evidence (including the window PNGs) stays ignored and is cited by sha256.",
+    "The turn-transition scratch window (DE-032) is bounded to 45 s in the adopt; a much longer transition would still fail the guard honestly."
   ],
-  "next_packet": "A5.1: fresh live manual destination proof, then same-PID resume after monitor closure"
+  "next_packet": "A5.2: freeze the tactics-policy and candidate contracts (tools/tactics_policy.py, tools/validate_tactics_policy.py, docs/tactics-policy.md, configs/tactics/)."
 }

@@ -1145,6 +1145,53 @@ def run_scenario(name, out_root):
         stops = [e for e in _events(rt.events_path) if e["kind"] == "stop"]
         if not stops or "manual play" not in (stops[0].get("note") or ""):
             errors.append(f"pause: stop event must record the handoff, got {stops}")
+    elif name == "pause-at-boundary":
+        # A5.1 manual-handoff entry point (`run_autobattle.py
+        # --pause-at-boundary`): a deliberate pause AT the identified player
+        # menu. The contract: the menu is identified from RAM, left OPEN and
+        # untouched (zero automation input), the pause is latched in the raw
+        # input log exactly as a STOP request is, the run ends `paused` with
+        # breakpoints disarmed and the engine still running, so a player can
+        # play that turn and `--resume` the same battle afterwards.
+        world.identified_move = True
+        rt.pause_at_boundary = True
+        state = rt.run()
+        if state != "paused":
+            errors.append(f"pause-at-boundary: expected paused, got {state}")
+        if rt.turn != 0:
+            errors.append(f"pause-at-boundary: {rt.turn} turn(s) committed; "
+                          "the handoff must leave the player's turn "
+                          "untouched")
+        writes = [c for _, c in session.g.key_writes()]
+        if writes:
+            errors.append(f"pause-at-boundary: {len(writes)} key write(s) "
+                          f"reached the engine: {writes[:3]}")
+        evs = _events(rt.events_path)
+        kinds = [e["kind"] for e in evs]
+        if kinds.count("boundary") != 1:
+            errors.append(f"pause-at-boundary: expected exactly one boundary "
+                          f"event, got {kinds}")
+        if "turn" in kinds:
+            errors.append("pause-at-boundary: a turn event was recorded "
+                          "before the handoff")
+        stops = [e for e in evs if e["kind"] == "stop"]
+        if not stops or "manual play" not in (stops[0].get("note") or ""):
+            errors.append(f"pause-at-boundary: stop event must record the "
+                          f"handoff, got {stops}")
+        ilog = _input_log(rt.input_log_path)
+        if not any(r.get("event") == "stop_requested" for r in ilog):
+            errors.append("pause-at-boundary: the pause was not latched in "
+                          "the raw input log (a paused receipt without the "
+                          "latch is unauditable)")
+        if session.g.armed:
+            errors.append("pause-at-boundary: breakpoints still armed after "
+                          "the handoff")
+        vt = world.vt
+        world.pump(session.g)
+        if world.vt <= vt:
+            errors.append("pause-at-boundary: the engine stopped advancing; "
+                          "the handoff must leave the battle live for the "
+                          "player")
     elif name == "strict-press":
         # Astra round 3: after a STOP is OBSERVED, not one further key
         # write may reach the engine — the pre-round-3 shape pressed B and
@@ -1917,6 +1964,7 @@ def main(argv=None):
                                      "identified-wait-control",
                                      "identified-wait-noecho",
                                      "boundary-panel", "boundary-dead",
+                                     "pause-at-boundary",
                                      "resume-after-pause"])
     ap.add_argument("--out-root", default=os.path.join("outputs", "autobattle",
                                                        "transport-checks"))
@@ -1929,7 +1977,7 @@ def main(argv=None):
              "identified-move", "identified-move-wrong",
              "identified-move-invalid", "identified-move-occupied",
              "identified-wait-control", "boundary-panel", "boundary-dead",
-             "resume-after-pause"]
+             "pause-at-boundary", "resume-after-pause"]
     if args.scenario != "all":
         names = [args.scenario]
     failures = []

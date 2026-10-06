@@ -1,7 +1,10 @@
 """C3 phase B manual layer: commit a real identified move as the player.
 
 Runs AFTER leg 1 paused and left the emulator alive (run.json's
-manual_handoff records the pid). This script:
+manual_handoff records the pid). The A5.1 entry point that produces that
+pause deliberately is `run_autobattle.py --pause-at-boundary`, which stops
+at the identified player menu with the fresh menu left OPEN and no
+automation input issued. This script:
   1. verifies the handed-off pid is alive and matches the receipt,
   2. attaches ONE held monitor connection and samples it with the
      take-22 law: interrupt -> exactly ONE read -> cont per observation
@@ -44,6 +47,12 @@ from probe_control_handoff import (CMD_CURSOR, TARGET_X,  # noqa: E402
                                    ROSTER, STRIDE, OFF_CT)
 
 OFF_TILE_X, OFF_TILE_Y = 0xF6, 0xF7   # A2.5 contract: roster tile bytes
+OFF_HP = 0x18                         # u16 current hp
+OFF_SIDE = 0x28                       # u16 side word (bit 15 = 0x8000 group)
+OFF_ID = 0x104                        # u8 unit id (0xFF = sentinel/scratch)
+SIDE_BIT = 0x8000
+REC_LEN = 0x108                       # roster stride (fixture_guard.STRIDE)
+UNITS = 8                             # records the verified fixtures cover
 KEYINPUT = 0x03007F98                 # active-low key register (diagnostic)
 
 
@@ -190,6 +199,23 @@ class Monitor:
             pass
         self.g = None
 
+    def detach(self):
+        """Leave the core RUNNING for the next client, then close.
+
+        DE-029: a served read halts the core and only `c` resumes it, so a
+        client that disconnects right after a read can hand the next client
+        a halted target — and a client that dies mid-reply wedges the stub
+        for the session (take-22). The handoff therefore resumes explicitly
+        before it lets go.
+        """
+        try:
+            if self.g is not None:
+                self.g.cont()
+                time.sleep(0.3)
+        except Exception:
+            pass
+        self._drop()
+
     def close(self):
         self._drop()
 
@@ -231,7 +257,7 @@ def main(argv=None):
         log_lines.append(line)
 
     def finish(code, **extra):
-        mon.close()
+        mon.detach()
         try:
             capture(pid, os.path.join(out_dir, "manual-after.png"))
         except Exception as exc:                        # noqa: BLE001
@@ -242,6 +268,10 @@ def main(argv=None):
             "port": port,
             "leg1_final_state": leg1.get("final_state"),
             "menu_open_at_s": opened_at,
+            "owner_slot": owner_slot,
+            "owner_rule": ("target cursor == the unique live unit's own tile, "
+                           "unchanged across three samples with a stable CT "
+                           "and a known command byte"),
             "tile_before": list(tile0) if tile0 else None,
             "tile_after": list(tile_now) if tile_now else None,
             "manual_move_committed": moved,
@@ -267,22 +297,12 @@ def main(argv=None):
     opened_at = None
     tile0 = tile_now = None
     moved = False
-
-    def ct():
-        return u16le(mon.read(ROSTER + STRIDE * 6 + OFF_CT, 2))
+    owner_slot = None                 # identified from the roster, never fixed
+    owner_ct0 = None
 
     def cursor():
         b = mon.read(CMD_CURSOR)
         return b[0] if b is not None and b[0] <= 3 else None
-
-    def tile():
-        xy = mon.read(ROSTER + STRIDE * 6 + OFF_TILE_X, 2)
-        if xy is None or len(xy) < 2:
-            return None
-        x, y = xy[0], xy[1]
-        if not (0 <= x < 64 and 0 <= y < 64) or (x, y) == (0, 0):
-            return None
-        return (x, y)
 
     def target():
         """Move-target cursor (x, y); only meaningful inside target mode."""
@@ -294,15 +314,82 @@ def main(argv=None):
             return None
         return (x, y)
 
+    def slot_tile(slot):
+        xy = mon.read(ROSTER + STRIDE * slot + OFF_TILE_X, 2)
+        if xy is None or len(xy) < 2:
+            return None
+        x, y = xy[0], xy[1]
+        if not (0 <= x < 64 and 0 <= y < 64) or (x, y) == (0, 0):
+            return None
+        return (x, y)
+
+    def slot_ct(slot):
+        return u16le(mon.read(ROSTER + STRIDE * slot + OFF_CT, 2))
+
+    def roster_scan():
+        """Every record's OWN tile/CT (one read per record, 0x108 < 512).
+
+        The ownership law needs ALL of them: a fixed slot is the same guess
+        as a fixed name, and A4/DE-030 showed CT cannot name an actor on a
+        multi-ally fixture.
+        """
+        rows = []
+        for slot in range(UNITS):
+            raw = mon.read(ROSTER + STRIDE * slot, REC_LEN)
+            if raw is None or len(raw) < REC_LEN:
+                rows.append({"slot": slot, "readable": False})
+                continue
+            x, y = raw[OFF_TILE_X], raw[OFF_TILE_Y]
+            rows.append({
+                "slot": slot, "readable": True, "x": x, "y": y,
+                "tile": (x, y) if 0 < x < 64 and 0 < y < 64 else None,
+                "hp": u16le(raw[OFF_HP:OFF_HP + 2]),
+                "max_hp": u16le(raw[OFF_HP + 2:OFF_HP + 4]),
+                "ct": u16le(raw[OFF_CT:OFF_CT + 2]),
+                "side": u16le(raw[OFF_SIDE:OFF_SIDE + 2]),
+                "id": raw[OFF_ID],
+            })
+        return rows
+
+    def fresh_menu_owner(rows, tgt):
+        """The unique unit whose OWN tile the target cursor sits on.
+
+        C2/A4 law: a freshly opened player menu parks the move cursor on the
+        owner's own tile. Uniqueness plus the two-sample stability gate is
+        what makes the owner IDENTIFIED here; the destination check after
+        the commit is the independent falsifier.
+        """
+        if tgt is None:
+            return None
+        matches = [r for r in rows
+                   if r.get("readable") and r.get("tile") == tgt
+                   and (r.get("hp") or 0) > 0 and (r.get("max_hp") or 0) > 0
+                   and r.get("id") not in (None, 0xFF)]
+        if len(matches) != 1:
+            return None
+        return matches[0]
+
     def keyinput():
         v = u16le(mon.read(KEYINPUT, 2))
         # active-low: 0x3FF = nothing pressed
         return v
 
+    def ct():
+        return slot_ct(owner_slot) if owner_slot is not None else None
+
+    def tile():
+        return slot_tile(owner_slot) if owner_slot is not None else None
+
     say(f"adopted handed-off emulator pid={pid} port={port} (read-only "
         f"monitor; stub writes=0)")
 
     # -- 3. wait for the player-command window --------------------------
+    # The handoff precondition is a PARKED PLAYER MENU: exactly one live
+    # unit holds the target cursor on its own tile, the command byte is a
+    # known menu value, and that unit's tile and CT are unchanged across
+    # three samples ~3 s apart. A running battle can serve a stale copy of
+    # all three at once, so the gate is evidence, not proof — the
+    # destination check after the commit is the proof.
     deadline = time.time() + args.window_timeout
     prev = None
     stable_polls = 0
@@ -310,49 +397,54 @@ def main(argv=None):
         # A pair 350 ms apart can catch an enemy animation with a frozen
         # player copy. Ride out that transient before probing a live menu.
         time.sleep(3.0)
+        rows = roster_scan()
         sample = {"t": round(time.time() - t0, 1),
-                  "cursor": cursor(), "ct": ct(), "keyinput": keyinput(),
-                  "target": target(), "tile": tile()}
-        if sample["ct"] is not None and prev is not None:
-            stable = (prev["ct"] == sample["ct"]
-                      and prev["cursor"] == sample["cursor"]
-                      and sample["cursor"] is not None
-                      and sample["ct"] is not None and sample["ct"] != 1000
-                      and sample["target"] == sample["tile"]
-                      and sample["tile"] is not None)
-            sample["stable"] = stable
-            # frozen CT + stable cursor = parked UI (a charging Marche
-            # never holds two equal samples 0.35 s apart); the echo
-            # probe is what actually proves the menu answers
-            stable_polls = stable_polls + 1 if stable else 0
-            if stable_polls >= 2:
-                opened_at = sample["t"]
-                trace.append(sample)
-                break
+                  "cursor": cursor(), "target": target(),
+                  "keyinput": keyinput(),
+                  "slots": [{k: r.get(k) for k in
+                             ("slot", "readable", "x", "y", "hp", "ct",
+                              "side", "id")} for r in rows]}
+        owner = fresh_menu_owner(rows, sample["target"])
+        sample["owner_slot"] = owner["slot"] if owner else None
+        sample["owner_tile"] = [owner["x"], owner["y"]] if owner else None
+        sample["owner_ct"] = owner["ct"] if owner else None
+        stable = bool(
+            owner is not None and prev is not None
+            and prev.get("owner_slot") == owner["slot"]
+            and prev.get("owner_ct") == owner["ct"]
+            and prev.get("owner_tile") == [owner["x"], owner["y"]]
+            and prev.get("cursor") == sample["cursor"]
+            and sample["cursor"] in (0, 1, 2)
+            and sample["target"] == (owner["x"], owner["y"]))
+        sample["stable"] = stable
+        stable_polls = stable_polls + 1 if stable else 0
         trace.append(sample)
+        if stable_polls >= 2:
+            opened_at = sample["t"]
+            owner_slot = owner["slot"]
+            owner_ct0 = owner["ct"]
+            tile0 = (owner["x"], owner["y"])
+            break
         prev = sample
     if opened_at is None:
-        say("FAIL: no player-command window within "
-            f"{args.window_timeout:.0f}s (last sample: {trace[-1] if trace else None})")
+        say("FAIL: no parked player menu within "
+            f"{args.window_timeout:.0f}s (last sample: "
+            f"{trace[-1] if trace else None})")
         return finish(1, menu_open=False)
-
-    # the roster tile can read garbage for a few seconds during the
-    # boundary's roster churn (c3-live-b2 turn 2): retry patiently — the
-    # echo/stability gate above is the live discriminator, not the tile
-    tile0 = None
-    t_end = time.time() + 15.0
-    while tile0 is None and time.time() < t_end:
-        tile0 = tile()
-        if tile0 is None:
-            time.sleep(1.5)
-    if tile0 is None:
-        say("FAIL: roster tile unreadable at the window (invalid snapshot)")
-        return finish(1, menu_open=True)
-    say(f"menu window at +{opened_at}s (cursor={prev['cursor']}, "
-        f"ct={prev['ct']}, tile={tile0})")
+    say(f"parked player menu at +{opened_at}s: owner slot {owner_slot}, "
+        f"own tile {tile0}, ct={owner_ct0}, cmd byte "
+        f"{trace[-1].get('cursor')}")
+    # Board snapshot BEFORE any window input: the destination claim is
+    # compared against this, so a pre-existing position cannot be mistaken
+    # for evidence that our input moved the unit.
+    pre_scan = roster_scan()
+    try:
+        capture(pid, os.path.join(out_dir, "manual-window.png"))
+    except Exception as exc:                        # noqa: BLE001
+        say(f"capture failed: {exc}")
 
     def echo_key(key, expect_change=True, settle=2.0):
-        """Send one window key; require the cursor byte to move."""
+        """Send one window key; require the COMMAND cursor byte to move."""
         pre = cursor()
         sendkey(pid, f"{key}:200")
         keys_sent.append(key)
@@ -364,9 +456,9 @@ def main(argv=None):
             if post is not None and post != pre:
                 break
         trace.append({"t": round(time.time() - t0, 1), "key": key,
-                      "pre": pre, "post": post})
+                      "stage": "command-echo", "pre": pre, "post": post})
         if expect_change and (post is None or post == pre):
-            say(f"echo FAIL: {key} did not move the cursor "
+            say(f"echo FAIL: {key} did not move the command cursor "
                 f"({pre} -> {post}); UI not answering")
             return None
         return post
@@ -375,71 +467,92 @@ def main(argv=None):
     # Turn-START law (c3-live-b2, 2026-09-20): FFTA opens a unit's turn in
     # MOVE-TARGET MODE (ring under the unit, no command menu; cmd byte
     # sticky 0), and the command menu only exists after a move confirm
-    # (the re-open law). So if the target byte already reads a valid tile
-    # at the window, target mode is already open — skip the menu
-    # navigation and the A-open entirely and step from here. The echo
-    # gate below still proves the UI answers before any commit input.
-    tgt0 = target()
-    cur = cursor()
-    nav = 0
-    while cur != MOVE_CURSOR and nav < 4:
-        nav += 1
-        nxt = echo_key("UP" if cur == 1 else "DOWN")
-        if nxt is None:
-            return finish(1, menu_open=True, abort="cursor echo failed during navigation")
-        cur = nxt
-    if cur != MOVE_CURSOR:
-        return finish(1, menu_open=True, abort="navigation exhausted")
-
-    # A fresh command menu ALSO leaves the target copy on the owner's
-    # tile (A4/A5.1). Equality alone cannot distinguish targeting mode.
-    # Probe one DOWN: command echo proves a command menu; target echo
-    # with a frozen command byte proves the already-open target mode.
-    command_echo = echo_key("DOWN", expect_change=False)
-    target_echo = target()
-    if command_echo == 1:
-        if echo_key("UP") != MOVE_CURSOR:
-            return finish(1, menu_open=True, abort="echo UP did not return to Move")
-        sendkey(pid, "A:200")
-        keys_sent.append("A")
-        time.sleep(2.5)
-        say(f"command menu echo verified; opened target at {target()}")
-    elif command_echo == MOVE_CURSOR and tgt0 == tile0 and target_echo != tgt0 and target_echo is not None:
-        say(f"target mode echo verified: {tgt0} -> {target_echo}")
-    else:
-        return finish(1, menu_open=True, abort="neither command nor target cursor echoed; no confirmation")
-
-    try:
-        capture(pid, os.path.join(out_dir, "manual-target-open.png"))
-    except Exception as exc:                        # noqa: BLE001
-        say(f"capture failed: {exc}")
-
-    # step one tile: try each direction, echo-verified on the target-
-    # cursor byte (a blind press into an unreachable tile leaves the
-    # byte frozen — the live map decides which directions are legal)
-    t_step = None
+    # (the re-open law). But a FRESH COMMAND MENU also parks the target
+    # copy on the owner's tile (A4/A5.1), so "target == own tile" cannot
+    # name the mode — and a blocked direction (map edge, occupant) answers
+    # NEITHER byte, which the old single-DOWN probe misread as a dead UI
+    # and aborted on. Probe until some direction moves some cursor and let
+    # the byte that answered name the mode; the first target-mode answer
+    # IS the step, so no press is wasted.
+    mode = None
+    stepped = None
     for direction in ("DOWN", "RIGHT", "UP", "LEFT"):
-        pre = target()
+        pre_cmd, pre_tgt = cursor(), target()
         sendkey(pid, f"{direction}:200")
         keys_sent.append(direction)
         time.sleep(2.0)
-        post = target()
-        trace.append({"t": round(time.time() - t0, 1), "stage": "step",
-                      "dir": direction, "pre": pre, "post": post})
-        if post is not None and pre is not None and post != pre:
-            t_step = post
-            say(f"stepped {direction}: target {pre} -> {post}")
+        post_cmd, post_tgt = cursor(), target()
+        trace.append({"t": round(time.time() - t0, 1), "stage": "probe",
+                      "dir": direction, "cmd": [pre_cmd, post_cmd],
+                      "target": [list(pre_tgt) if pre_tgt else None,
+                                 list(post_tgt) if post_tgt else None]})
+        if post_cmd is not None and pre_cmd is not None and post_cmd != pre_cmd:
+            mode = "command"
             break
-        say(f"{direction} did not move the target cursor ({pre} -> {post}); "
-            "trying next direction")
+        if post_tgt is not None and pre_tgt is not None and post_tgt != pre_tgt:
+            mode = "target"
+            stepped = post_tgt
+            break
+    if mode is None:
+        say("FAIL: no direction moved either cursor — the UI is not "
+            "answering; no confirmation attempted")
+        return finish(1, menu_open=True,
+                      abort="no cursor answered the mode probe")
+    say(f"{mode} mode verified: the {direction} probe moved "
+        + ("the command cursor" if mode == "command" else "the target cursor")
+        + (f" to {stepped}" if stepped else ""))
+
+    if mode == "command":
+        cur = cursor()
+        nav = 0
+        while cur != MOVE_CURSOR and nav < 4:
+            nav += 1
+            nxt = echo_key("UP" if cur == 1 else "DOWN")
+            if nxt is None:
+                return finish(1, menu_open=True,
+                              abort="cursor echo failed during navigation")
+            cur = nxt
+        if cur != MOVE_CURSOR:
+            return finish(1, menu_open=True, abort="navigation exhausted")
+        sendkey(pid, "A:200")                   # open target mode
+        keys_sent.append("A")
+        time.sleep(2.5)
+        say(f"command menu at Move; opened target at {target()}")
+        try:
+            capture(pid, os.path.join(out_dir, "manual-target-open.png"))
+        except Exception as exc:                # noqa: BLE001
+            say(f"capture failed: {exc}")
+        # step one tile: try each direction, echo-verified on the target-
+        # cursor byte (a blind press into an unreachable tile leaves the
+        # byte frozen — the live map decides which directions are legal)
+        for direction in ("DOWN", "RIGHT", "UP", "LEFT"):
+            pre = target()
+            sendkey(pid, f"{direction}:200")
+            keys_sent.append(direction)
+            time.sleep(2.0)
+            post = target()
+            trace.append({"t": round(time.time() - t0, 1), "stage": "step",
+                          "dir": direction, "pre": pre, "post": post})
+            if post is not None and pre is not None and post != pre:
+                stepped = post
+                say(f"stepped {direction}: target {pre} -> {post}")
+                break
+            say(f"{direction} did not move the target cursor "
+                f"({pre} -> {post}); trying next direction")
+    else:
+        try:
+            capture(pid, os.path.join(out_dir, "manual-target-open.png"))
+        except Exception as exc:                # noqa: BLE001
+            say(f"capture failed: {exc}")
+
     try:
         capture(pid, os.path.join(out_dir, "manual-step.png"))
     except Exception as exc:                        # noqa: BLE001
         say(f"capture failed: {exc}")
 
-    if t_step is None or t_step == tile0:
-        say("FAIL: the step did not move the target cursor — backing out "
-            "(B) and leaving the battle intact")
+    if stepped is None or stepped == tile0:
+        say("FAIL: the step did not move the target cursor off the owner's "
+            "tile — backing out (B) and leaving the battle intact")
         sendkey(pid, "B:200")                   # cancel target mode
         keys_sent.append("B")
         return finish(1, menu_open=True, abort="step unreachable")
@@ -516,22 +629,56 @@ def main(argv=None):
     tile_now = tile()
     while time.time() < deadline:
         tile_now = tile()
-        if tile_now == t_step:
+        if tile_now == stepped:
             break
         time.sleep(2.0)
-    moved = tile_now == t_step and t_step != tile0
-    say(f"roster tile {tile0} -> {tile_now} "
-        f"({'mirrored' if moved else 'not yet mirrored at turn close'})")
+    say(f"owner slot {owner_slot} tile {tile0} -> {tile_now} "
+        f"({'mirrored' if tile_now == stepped else 'not yet mirrored at turn close'})")
 
-    if not moved:
+    # Independent, whole-board destination check. CT progress alone is NOT
+    # evidence: the refuted pre-A5.1 helper called it a PASS while the tile
+    # never moved. The claim is precise — the identified owner walked to the
+    # tile our window input stepped to, and no OTHER unit on the owner's
+    # side changed tile (the enemy phase may legitimately move enemies, so
+    # only the owner's side is claimed).
+    post_scan = roster_scan()
+    before_tiles = {r["slot"]: (r["x"], r["y"])
+                    for r in pre_scan if r.get("readable")}
+    after_tiles = {r["slot"]: (r["x"], r["y"])
+                   for r in post_scan if r.get("readable")}
+    sides = {r["slot"]: r.get("side") for r in pre_scan if r.get("readable")}
+    moved_slots = sorted(s for s in before_tiles
+                         if before_tiles[s] != after_tiles.get(s))
+    owner_side = sides.get(owner_slot)
+    same_side_moved = sorted(s for s in before_tiles
+                             if s != owner_slot and sides.get(s) == owner_side
+                             and before_tiles[s] != after_tiles.get(s))
+    reached = after_tiles.get(owner_slot)
+    board_ok = (reached == tuple(stepped) and stepped != tile0
+                and not same_side_moved)
+    moved = board_ok                    # the receipt's only move claim
+    say(f"board check: owner slot {owner_slot} at {reached} "
+        f"(stepped {tuple(stepped)}); moved slots {moved_slots}; "
+        f"other same-side slots moved {same_side_moved}")
+    extra = {"owner_tile_before": list(tile0) if tile0 else None,
+             "owner_tile_after": list(reached) if reached else None,
+             "stepped_target": list(stepped),
+             "moved_slots": moved_slots,
+             "other_same_side_moved": same_side_moved,
+             "destination_verified_by":
+                 "roster tile delta across the manual turn (owner walked to "
+                 "the stepped target; no other same-side slot moved)"}
+
+    if not board_ok:
         say("FAIL: window input produced CT progress but the selected move "
             "did not reach its destination; manual action remains unverified")
         return finish(1, menu_open=True, observed_ct_progress=True,
                       manual_turn_committed=None,
-                      abort="selected manual destination not verified")
+                      abort="selected manual destination not verified",
+                      **extra)
     say("PASS: manual move destination verified after window Move/Wait; "
         "emulator left alive for --resume leg 2")
-    return finish(0, menu_open=True, manual_turn_committed=True)
+    return finish(0, menu_open=True, manual_turn_committed=True, **extra)
 
 
 if __name__ == "__main__":

@@ -64,7 +64,7 @@ class BattleRuntime:
     def __init__(self, session, scenario, run_id, out_dir,
                  mode="retail-ai", stall_seed_seconds=150.0,
                  wall_timeout=600.0, max_turns=None, verbose=True,
-                 resume=False):
+                 resume=False, pause_at_boundary=False):
         self.s = session
         self.p = Probe(session, verbose=verbose)
         self.scenario = scenario
@@ -124,6 +124,12 @@ class BattleRuntime:
         self.p.bound_t0 = 0.0
         self._last_seed_count = 0
         self._last_seed_t = time.time()
+        # A5.1 manual-handoff entry point: pause ON PURPOSE at the first
+        # identified player menu instead of driving it. The old handoff
+        # raced a STOP file against the boundary drive, so whether the pause
+        # landed with the player's menu open (the C3 shape) was luck.
+        self.pause_at_boundary = bool(pause_at_boundary)
+        self._boundary_pause_used = False
         self._terminal_reason = None
         self._saw_unknown_modal = False
         self._failed_boundaries = 0  # consecutive echo-failed drives (c3-live-a5)
@@ -392,6 +398,10 @@ class BattleRuntime:
                             stop_when=lambda _probe: self._stop_check())
                 nxt = self._classify()
                 if nxt == TAKEOVER:
+                    if self.pause_at_boundary and not self._boundary_pause_used:
+                        self._boundary_pause_used = True
+                        self._pause_at_player_boundary()
+                        break
                     self._drive_player_boundary()
                 elif nxt == COMPLETED:
                     self._finish(COMPLETED, "battle end signature held")
@@ -429,6 +439,42 @@ class BattleRuntime:
             return bool(rows) and all(r["hp"] == 0 for r in rows)
         except IdentityError:
             return False
+
+    def _pause_at_player_boundary(self):
+        """Deliberate manual handoff at the identified player menu (A5.1).
+
+        The C3 handoff reproduced by racing a STOP file against the boundary
+        drive, so the pause point — and whether automation input had already
+        fired — was luck. This path latches the SAME handoff contract on
+        purpose: the fresh player menu is identified from RAM, left OPEN and
+        untouched, no input is issued, the raw input log records the latch
+        exactly as a STOP request does, and the emulator is left running for
+        the player (the CLI's --on-stop decides survival).
+        """
+        owner = self.owner or {}
+        before = {"x": owner.get("x"), "y": owner.get("y")}
+        shot = None
+        try:
+            shot = self.s.screenshot(os.path.join(
+                os.path.dirname(self.events_path),
+                f"boundary-turn{self.turn + 1}.png"))
+        except Exception:
+            shot = None
+        self.event("boundary", **self._actor_fields(),
+                   control_mode="external", position_before=before,
+                   note=shot)
+        self._stop_requested = True
+        self._stop_requested_t = time.time()
+        self._log_input({"event": "stop_requested",
+                         "t": round(time.time() - self.t0, 3),
+                         "detection_latency_s": 0.0,
+                         "note": "pause-at-boundary: intentional latch at "
+                                 "the identified player menu; no input issued"})
+        self.event("note", **self._actor_fields(), control_mode="external",
+                   note="pause-at-boundary: identified player menu left open "
+                        "with no input issued (manual handoff)")
+        self._finish(PAUSED, "pause-at-boundary: identified player menu left "
+                             "open for manual play (no input issued)")
 
     def _drive_player_boundary(self):
         try:

@@ -114,8 +114,9 @@ in this fixed order — first match wins:
 2. **Job default** — keyed by the unit's active job id.
 3. **Party default** — keyed by side (the player's party vs the enemy clan);
    the player's side is identified by the RAM-named member(s), per the guard.
-4. **Retail behavior** — no rule matched: the runner sends nothing beyond
-   the proven Wait fallback, exactly as today.
+4. **Supported fallback** — no rule matched: use an explicitly identified legal
+   Wait only where its validity is established; otherwise pause without input.
+   This external companion fallback is not native retail-AI delegation.
 
 Rules: engine legality always wins over policy preference (A5's rejected-
 candidate law); assignment is read-only against game state (no save fields,
@@ -132,7 +133,7 @@ The chooser the runtime already drives (`plan_identified_move` /
   identified candidate data (command id, target cursor, tile) + the
   candidate evidence the runtime already reads (abilities, hp/mp, tile).
 * **Output**: a plan the existing identified-commit drivers execute, or
-  `None` (= retail fallback: the identified-Wait path).
+  `None` (= no match; the adapter applies the documented supported fallback).
 * **Isolation**: the policy layer never writes memory and never presses keys
   itself; it only chooses among plans the driver can prove from RAM.
 * **Restoration**: nothing to restore — the adapter writes nothing (Option B
@@ -147,4 +148,24 @@ The chooser the runtime already drives (`plan_identified_move` /
 | Mirror maps 1:1 by name+job+id | verdict `mirror_maps_1to1_by_name` (6/6 active records), `mirror_absent == ["Marche"]` |
 | Enemy actors named by decode | boots[].seeds_actors: all five enemy names after every player commit (8 seeds/boot) |
 | Interception is player-only | player-ai-control.md Option B + A2.4b Stop-bit refutation (DE-015 lineage) |
-| Same-job divergence demo | **not claimed** — blocked on a two-ally fixture (construction path documented above) |
+| Same-job divergence demo | Bounded PASS on the two-ally fixture, 2026-10-05; `docs/receipts/autobattle/A4.json` and `outputs/autobattle/A4-demo/demo.json`. Public-runner integration is A5.1. |
+
+## Integration limit (2026-10-06 review)
+
+The public runner now uses `autobattle_identity.py`: boot-verified name/id
+with job/side agreement, two fresh cursor-own-tile observations, per-input
+actor validation, and an independent full-party movement cross-check. Two
+reloads of the A4 fixture produced Marche Move and Montblanc Wait through
+`run_autobattle.py`; the final run is `outputs/autobattle/a51-two-player-final`.
+Only the verified seven/eight-record fixtures and identified Move/Wait are
+supported. Multi-player battle-end signatures are not certified.
+
+**A5.1 is accepted** (2026-10-06). The live manual takeover now passes and is
+reproducible: `run_autobattle.py --pause-at-boundary` stops on purpose at the
+identified player menu (open, untouched, zero automation input), the manual
+layer commits a window-SendInput Move whose destination is verified from a
+whole-board tile delta, and `--resume` adopts the same pid and continues from
+that tile. The manual layer identifies the owner from the roster rather than
+slot 6, and `adopt_existing` retries the roster guard because the battle
+struct is scratch for ~10 s after a turn closes (DE-032). See
+`docs/a51-integration.md` and `docs/receipts/autobattle/A5.json`.

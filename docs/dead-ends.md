@@ -509,3 +509,34 @@ CLAUDE.md carries the slogan.
   semantics on this screen; probe the D-pad first, and always
   round-trip the built state through the guard before citing it as a
   fixture.
+
+### DE-032 — The battle struct is scratch for ~10 s after a turn closes
+
+- **Tried (A5.1 same-process resume, 2026-10-06):** after the manual layer
+  committed its window Move+Wait, `--resume` adopted the same pid but the
+  roster guard failed — `struct_count=328201`, `slot0 name=0x40309`,
+  all seven required checks failing. Two false leads followed: "the
+  window input damaged the battle memory" and "the stub is desynced
+  (DE-028)"; a `drain_paired` cure was tried and changed nothing.
+- **Refuted by two read-only probes.** `tools/diag_a51_hold.py` held a
+  stub client for 40 s with **no input at all**: the roster stayed perfect
+  (count=7, all seven names, Marche still on (4,10)) and the ROM header
+  stayed byte-identical, so neither the client nor elapsed time is the
+  cause and the stream is aligned. `tools/diag_a51_manual_watch.py` then
+  replayed the manual route key by key through the real window channel and
+  showed the transition exactly: healthy until the Wait committed, then
+  `count=7 → 328201 → 328711 → 7 again` about 14 s later, with Marche's
+  tile already mirrored to (4,11). The address is reused as scratch during
+  the post-turn transition and restored afterwards.
+- **Cure:** `FixtureSession.adopt_existing` retries the roster guard to a
+  45 s bound and records every attempt (`adopt_attempts` in the guard
+  receipt; the resumed run receipt carries `adopt.guard_attempts`). Each
+  retry must also **send `c`**: a served read halts the core (DE-029), so a
+  retry loop that only re-reads freezes the engine inside the transition
+  forever — observed live as 16 attempts returning the identical scratch
+  bytes until the `cont` was added. With both, the live resume reported
+  `roster guard ok after 3 attempt(s)` on pid 44528 and drove on from the
+  manually walked tile.
+- **Do not:** read a roster-shape failure in the seconds after a turn
+  closes as a wrong emulator, a damaged battle or a stream desync; and
+  never retry a live guard by re-reading alone.

@@ -1,0 +1,10 @@
+[   0.0s] adopted handed-off emulator pid=44528 port=2345 (read-only monitor; stub writes=0)
+[   9.0s] parked player menu at +9.0s: owner slot 6, own tile (4, 10), ct=0, cmd byte 0
+[  14.5s] command mode verified: the DOWN probe moved the command cursor
+[  21.0s] command menu at Move; opened target at (4, 10)
+[  26.4s] stepped DOWN: target (4, 10) -> (4, 11)
+[  31.5s] command menu re-opened (cursor=1, ct=0) — closing the turn with a manual Wait
+[  41.4s] manual turn CLOSED via window input (CT 0 -> 188, charging)
+[  41.4s] owner slot 6 tile (4, 10) -> (4, 11) (mirrored)
+[  41.4s] board check: owner slot 6 at (4, 11) (stepped (4, 11)); moved slots [6]; other same-side slots moved []
+[  41.4s] PASS: manual move destination verified after window Move/Wait; emulator left alive for --resume leg 2
