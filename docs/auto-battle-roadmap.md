@@ -9,10 +9,14 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**Start A5.2 below: freeze the tactics-policy and candidate contracts.**
+**Start A5.3 below: prove the minimum conditional-action adapter.**
 A5.1 is accepted (2026-10-06): the public runner drives the two-ally fixture
 with validated actor-linked Move/Wait, and the live manual takeover plus
 same-process resume pass on one battle (see `docs/a51-integration.md`).
+A5.2 is frozen (2026-10-06): `tools/tactics_policy.py` + `configs/tactics/`
+implement the frozen schema in `docs/tactics-policy.md`, with a pure host
+suite at 94/94 (`python tools/validate_tactics_policy.py`). No live wiring or
+engine-legality claim belongs to A5.2; A5.3 proves the adapter seam.
 A4 remains a bounded feasibility demonstration, not a completed
 multi-character product. C1–C3 are accepted for the documented fixture and
 same-process handoff. A8 investigation is complete; selectable acceleration
@@ -30,7 +34,7 @@ not change the established product priority.
 |---|---|
 | C3 receipt at `docs/receipts/autobattle/C3.json`; accepted at `88b1072` | Preserve STOP, monitor-client handoff and resume contracts. Completion includes a defeat, not demonstrated tactical strength. |
 | A4 receipt and `outputs/autobattle/A4-demo/demo.json` at `7c6f1b8` | Two job-5 allies execute different Move/Wait choices; same-job enemy remains retail. Reuse the demo and its actor attribution, not CT-only identity. |
-| `tools/autobattle_runtime.py` still emits `actor="Marche", actor_slot=6` and uses single-player position/death helpers | A4 demo acceptance does not certify the public runner on multiple allies. Close this integration gap before policy feature work. |
+| `tools/autobattle_runtime.py` still emits `actor="Marche", actor_slot=6` and uses single-player position/death helpers | A4 demo acceptance does not certify the public runner on multiple allies. Closed by A5.1 (`0bb4fd4`/`1132bee`): the runner resolves the verified fresh-menu owner by name+id with job/side agreement and cross-checks the whole party's movement. |
 | `docs/receipts/autobattle/A8.json`, revised 2026-10-05 | Measured roughly 0.87–0.97x nominal on this host; no selectable acceleration. Withdrawn 4.1x/Lua/extrapolated figures stay withdrawn. |
 | Last log records `validate_all.py` PASS at A4 closure | Historical validation, not rerun by this documentation review. No new gameplay or release certification is claimed. |
 
@@ -75,7 +79,7 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 | 2 | C2 validated player action | Accepted for the documented Move fixture; 237aebe live6/live7 evidence retained | C3 |
 | 3 | C3 integration and acceptance | Accepted 2026-09-21 at 88b1072: complete live battle plus same-process manual Move/Wait and resumed completion; fresh resume regression passed | A2.5/A3 accepted within documented scope; enabled A4 and A8 |
 | 4 | A4 assignment feasibility | Bounded PASS, 2026-10-05 at `7c6f1b8`; two-ally demo and identity receipts | A5.1 runner integration |
-| 5 | A5 ordered tactics | **A5.1 accepted 2026-10-06** (runner identity + live `--pause-at-boundary` manual takeover + same-PID resume); start A5.2, then A5.3–A5.4 | A6/A7/A10 |
+| 5 | A5 ordered tactics | **A5.1 accepted, A5.2 frozen** (2026-10-06; A5.2 = policy/candidate contract + 94/94 host suite); start A5.3, then A5.4 | A6/A7/A10 |
 | Independent | A8 acceleration | Investigation complete; product UNKNOWN | A9 remains gated on actual speed acceptance |
 | Later | A6/A7/A9/A10 | GATED by declared prerequisites | Follow the packet gates |
 
@@ -92,6 +96,12 @@ packet only; load linked research references when that packet needs them.
 A passing packet unlocks the next packet automatically. No additional human
 or orchestrator sign-off is required for scoped, reversible implementation,
 local tests, evidence capture, or commit of owned files.
+
+A5.2's frozen contract is `docs/tactics-policy.md`: the adapter supplies only
+engine-legal candidates plus verified identity and fresh facts, and
+`choose_action(snapshot, policy)` orders preferences among them (or returns
+`None`). Unsupported predicates fail to load, so A6/A7 extend the schema
+rather than silently enabling anything.
 
 The initial implementation path is external engine-legal player action
 selection through the existing Windows mGBA transport. Workers may decode the
@@ -412,7 +422,15 @@ actions on both fixtures; ambiguous-owner and wrong-result controls reject;
 existing STOP/resume checks remain green. UNKNOWN on either fixture blocks A5.2.
 Commit only owned changes when implementing; preserve other workers' files.
 
-#### A5.2 — Freeze policy and candidate contracts
+#### A5.2 — Freeze policy and candidate contracts (FROZEN 2026-10-06)
+
+Frozen as delivered: `tools/tactics_policy.py` (strict schema validation +
+`choose_action`/`evaluate`), `configs/tactics/{default,damage-focused,contrast-two-ally}.json`,
+`docs/tactics-policy.md`, and a 94/94 pure host suite including a five-mutant
+non-vacuity check. Criteria are recorded under `a5_2` in
+`docs/receipts/autobattle/A5.json`. The remaining bullets below stay the
+guide for **A5.3/A5.4** (live adapter wiring and divergent rules in a real
+battle); they are not reopened by this freeze.
 
 Own `tools/tactics_policy.py`, `tools/validate_tactics_policy.py`,
 `docs/tactics-policy.md` and `configs/tactics/`. Start with proven Move/Wait

@@ -1,6 +1,9 @@
 {
   "packet": "A5",
-  "subpacket": "A5.1",
+  "subpackets": {
+    "A5.1": "accepted 2026-10-06; the criteria array below is A5.1's",
+    "A5.2": "frozen 2026-10-06; see the a5_2 object"
+  },
   "date": "2026-10-06",
   "base_revision": "0bb4fd408f4b452c4c648a0a6c8ae54aedf6e0f6 (A5.1 slice 1) plus this slice's delivered hashes",
   "tested_revision": "base plus per-file delivered hashes; each live run retains its own tested input hashes where available",
@@ -234,6 +237,98 @@
       "docs/dead-ends.md"
     ]
   },
+  "a5_2": {
+    "subpacket": "A5.2",
+    "date": "2026-10-06",
+    "status": "pass",
+    "scope": "pure host contract only; no engine legality, menu acceptance or live wiring is claimed by this subpacket",
+    "delivered_source_sha256": {
+      "tools/tactics_policy.py": "d25314ecf06468d0f8e0f6a1945d69eb6fc283c1aeafeca28aaab70044a0adec",
+      "tools/validate_tactics_policy.py": "8125fd87f7764107e1352f451db317d47471b9c09ab927f06ea4e3216261b2cf",
+      "configs/tactics/default.json": "1a679de5789604347064a1a6eafdeb03e2ffcf92bc18d7a85a175ead85d11d82",
+      "configs/tactics/damage-focused.json": "4626fbc037143ee0f0feae4faed9a010d74f431a4fcc9878dd4c4b0f70c70c46",
+      "configs/tactics/contrast-two-ally.json": "b6db55c894fec17b7860e83c354a7e4520e5b395446f9171748027c8a3810781",
+      "docs/tactics-policy.md": "453c796c1663fbdda73098be6e500af6b9c8b117a6da0827d2f99b82e3c33c14"
+    },
+    "criteria": [
+      {
+        "id": "A5.2-frozen-schema-and-interface",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py",
+        "expected": "the frozen schema versions, precedence, selectors, reason codes and fallback semantics implemented exactly as frozen in docs/tactics-policy.md",
+        "observed": "choose_action(snapshot, policy) -> decision | None and evaluate() -> outcome/reason/scope/rule_id/decision/detail implement the frozen contract; schema strings are ffta-tactics-policy/1 and ffta-tactics-snapshot/1; assignment precedence is character -> job -> party with first-match-wins and no cross-scope fall-through (a matched scope governs, its own fallback applies).",
+        "evidence": [
+          "docs/tactics-policy.md",
+          "outputs/autobattle/a52-tactics-policy/checks.json"
+        ]
+      },
+      {
+        "id": "A5.2-predicate-and-boundary-coverage",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py",
+        "expected": "every supported rule evaluated, threshold boundaries exact, absent facts making a rule ineligible rather than permissive",
+        "observed": "relation/kind/action_id/ability_name, actor and target HP percent (floored integer percent; lte 25 includes exactly 25 while lt 25 excludes it), remaining MP after cost at the exact 0 and 1 boundaries, and actor/target status present/absent over the frozen byte vocabulary are all exercised; a missing HP/MP/status fact rejects the predicate (an absent status block is NOT 'known absent').",
+        "evidence": [
+          "outputs/autobattle/a52-tactics-policy/checks.json"
+        ]
+      },
+      {
+        "id": "A5.2-reject-unknown-and-invalid",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py",
+        "expected": "unknown keys and invalid thresholds rejected at load; missing legality or actor identity means no commit",
+        "observed": "~40 rejection cases pass: unknown keys at every level, wrong schema, unknown fallback/selector/relation/kind/party key/status name (case-sensitive)/comparison operator, ~10 malformed threshold shapes, malformed character/job/party keys, duplicate rule id. Runtime fail-closed cases pass too: identity other than verified, snapshot older than max_age_seconds, malformed snapshots (duplicate candidate ids, bad stats/tiles/status bytes, unknown keys), zero/absent candidate facts and engine-illegal (legal=false) candidates are never selectable, including as the Wait fallback.",
+        "evidence": [
+          "outputs/autobattle/a52-tactics-policy/checks.json"
+        ]
+      },
+      {
+        "id": "A5.2-determinism-ties-and-duplicates",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py",
+        "expected": "deterministic tie handling and duplicate-name resolution independent of adapter order",
+        "observed": "equal-priority targets and two same-named abilities resolve to the same candidate under both forward and reversed adapter order (tie-break on candidate id ascending); repeated evaluation returns an identical decision; the first/ordered walk skips disabled rules.",
+        "evidence": [
+          "outputs/autobattle/a52-tactics-policy/checks.json"
+        ]
+      },
+      {
+        "id": "A5.2-presets-and-per-character-divergence",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py",
+        "expected": "shipped presets validate; a per-character preset changes the decision for two same-job allies",
+        "observed": "all three shipped presets (default, damage-focused, contrast-two-ally) load against the frozen schema; contrast-two-ally.json yields Marche#7 -> the legal Move and Montblanc#5 -> the legal Wait from one identical candidate set, and damage-focused.json takes the weakest offered enemy. Host-only: no live run is claimed in A5.2.",
+        "evidence": [
+          "configs/tactics/contrast-two-ally.json",
+          "configs/tactics/damage-focused.json",
+          "outputs/autobattle/a52-tactics-policy/checks.json"
+        ]
+      },
+      {
+        "id": "A5.2-suite-non-vacuity",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py",
+        "expected": "the suite must fail when a contract guarantee is removed, so a green run is not self-confirming",
+        "observed": "the suite copies the module into a temp dir, applies five independent mutations (legality gate removed, identity gate removed, staleness gate removed, fallback ignores legality, tie-break replaced by adapter order) and requires every mutant to exit non-zero; all five are rejected. Total: 94/94 checks PASS, exit 0.",
+        "evidence": [
+          "outputs/autobattle/a52-tactics-policy/checks.json"
+        ],
+        "negative_control": "the pre-A5.2 state is 'no module at all' (import error), which is not a useful regression; the mutation harness supplies the falsifier instead"
+      }
+    ],
+    "artifact_sha256": {
+      "outputs/autobattle/a52-tactics-policy/checks.json": "6a771bcf4301e5502a35b750b99a3ed56776de4fa0711561388b5a619368c2ce"
+    },
+    "limitations": [
+      "Pure host control-flow evidence only: the suite cannot show that any candidate is engine-legal in the game or that a real menu accepts the chosen command.",
+      "No runner wiring yet: A5.3 proves the minimum conditional-action adapter and A5.4 integrates it live; A5.1's scenario Move/Wait assignment is unchanged.",
+      "Position/distance, reachability, damage or hit estimation, item counts, revive, law constraints, movement preference and multi-turn planning are unsupported and a policy using them fails to load rather than being ignored.",
+      "Status vocabulary covers the live +0xe8..+0xed named bits only; durations (+0xd9..+0xe7), +0xe8 bit 0 and the numeric +0xed bits 5-7 stay unexposed.",
+      "Candidate id canonical form is a documented adapter convention, not enforced by the loader; only uniqueness and the tie-break role are contractual.",
+      "Healer and resource-preservation presets are A6 (they need MP/item/recovery facts outside this freeze)."
+    ],
+    "next_packet_steps": "A5.3: prove the minimum conditional-action adapter (command/target/range/MP/status restrictions and acceptance for one conditional action family), then A5.4 integrates it with contrasting per-character policies and live evidence."
+  },
   "artifact_sha256": {
     "outputs/autobattle/a51-live-manual-05/run.json": "95374f46deec9fcd3132204eb945be1069013f17333760bba5dd0b1bc0cf16c8",
     "outputs/autobattle/a51-live-manual-05/events.jsonl": "18545715974b91e1f849a8e534742a52c3f2ab5892dea4ec84828b383093fd03",
@@ -271,5 +366,5 @@
     "No ROM bytes or bulk memory dumps committed; raw local evidence (including the window PNGs) stays ignored and is cited by sha256.",
     "The turn-transition scratch window (DE-032) is bounded to 45 s in the adopt; a much longer transition would still fail the guard honestly."
   ],
-  "next_packet": "A5.2: freeze the tactics-policy and candidate contracts (tools/tactics_policy.py, tools/validate_tactics_policy.py, docs/tactics-policy.md, configs/tactics/)."
+  "next_packet": "A5.3: prove the minimum conditional-action adapter (tools/tactics_policy.py consumers + live evidence), then A5.4 integrates contrasting per-character policies."
 }

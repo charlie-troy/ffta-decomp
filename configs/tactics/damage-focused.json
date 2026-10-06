@@ -1,0 +1,34 @@
+{
+  "schema": "ffta-tactics-policy/1",
+  "fallback": "wait",
+  "observation": {
+    "max_age_seconds": 3.0
+  },
+  "assignments": {
+    "party": {
+      "player": {
+        "rules": [
+          {
+            "id": "finish-wounded-enemy",
+            "when": {
+              "relation": "enemy",
+              "target_hp_pct": { "lte": 25 }
+            },
+            "select": "lowest-target-hp",
+            "note": "prefer a finishing blow on the weakest eligible enemy"
+          },
+          {
+            "id": "pressure-weakest-enemy",
+            "when": {
+              "relation": "enemy"
+            },
+            "select": "lowest-target-hp",
+            "note": "otherwise hit whichever enemy the engine offers with the least HP"
+          }
+        ],
+        "note": "Applies to every player-side actor without its own character assignment."
+      }
+    }
+  },
+  "note": "Chooses only among the engine-legal candidates the adapter supplies; a learned ability is never a candidate by itself. Targeting quality is not claimed by this preset."
+}

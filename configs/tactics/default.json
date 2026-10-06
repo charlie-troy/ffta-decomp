@@ -1,0 +1,9 @@
+{
+  "schema": "ffta-tactics-policy/1",
+  "fallback": "wait",
+  "observation": {
+    "max_age_seconds": 3.0
+  },
+  "assignments": {},
+  "note": "No rules: every player turn uses the explicit supported fallback, an identified legal Wait. This is the external companion's documented no-tactics preset, not native retail-AI delegation."
+}

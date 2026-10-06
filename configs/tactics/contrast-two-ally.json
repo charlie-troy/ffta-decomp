@@ -1,0 +1,32 @@
+{
+  "schema": "ffta-tactics-policy/1",
+  "fallback": "wait",
+  "observation": {
+    "max_age_seconds": 3.0
+  },
+  "assignments": {
+    "characters": {
+      "Marche#7": {
+        "rules": [
+          {
+            "id": "marche-takes-the-walk",
+            "when": { "kind": "move" },
+            "select": "first",
+            "note": "Marche walks whenever the engine offers a legal Move"
+          }
+        ]
+      },
+      "Montblanc#5": {
+        "rules": [
+          {
+            "id": "montblanc-holds-position",
+            "when": { "kind": "wait" },
+            "select": "first",
+            "note": "Montblanc holds position whenever a legal Wait is offered"
+          }
+        ]
+      }
+    }
+  },
+  "note": "Host demonstration of per-character divergence using only the proven Move/Wait candidates; the identity keys mirror the A4/A5.1 two-ally fixture. Live runner wiring is A5.3/A5.4 work, not claimed here."
+}

@@ -1,5 +1,52 @@
 # Project log
 
+## 2026-10-06 — A5.2 frozen: tactics-policy and candidate contracts
+
+Froze the pure half of the tactics layer so A6/A7/A10 build on a fixed
+contract instead of re-deriving one. New `tools/tactics_policy.py` implements
+`choose_action(snapshot, policy) -> decision | None` plus `evaluate()` (which
+carries outcome/reason/scope/rule_id for receipts) over a strictly validated
+policy document and per-turn snapshot; `tools/validate_tactics_policy.py` is a
+pure host suite (**94/94 PASS**, exit 0, from the roadmap's exact CLI
+`python tools/validate_tactics_policy.py`); `configs/tactics/` ships
+default, damage-focused and contrast-two-ally presets;
+`docs/tactics-policy.md` is the frozen schema. Receipt: the `a5_2` object in
+`docs/receipts/autobattle/A5.json`.
+
+Decisions worth not re-litigating. (1) **A matched scope governs**: precedence
+is character -> job -> party first-match-wins, and if the matched scope's
+rules select nothing the run goes to that scope's explicit fallback rather
+than falling through to a lower scope — falling through would silently apply a
+party rule to a character whose own rules were merely ineligible. Only a
+*missing* assignment falls through. (2) **Engine legality is the adapter's
+afirmation**: a `legal: false` candidate is a valid observation (the engine
+rejects it) but is never selectable, including as the Wait fallback. (3) The
+status vocabulary is the 44 named live `+0xe8..+0xed` bits from
+`docs/unit-flags.md`; durations (`+0xd9..+0xe7`), `+0xe8` bit 0 and the
+numeric `+0xed` bits 5-7 stay unexposed, and a policy naming an unknown status
+fails to load rather than being ignored. (4) Absent facts are not "known
+absent": a missing status block makes a `*_status_absent` predicate
+ineligible. (5) Ties break on candidate id ascending, so a decision is
+independent of adapter ordering.
+
+Because a suite written against the same assumptions as its code confirms the
+assumptions rather than the code, the suite ends with a **non-vacuity check**
+that copies the module into a temp dir and applies five mutations — legality
+gate removed, identity gate removed, staleness gate removed, fallback ignores
+legality, tie-break replaced by adapter order — requiring every mutant to exit
+non-zero. All five are rejected.
+
+No A5.1 code was touched, and a post-freeze cross-check confirms it:
+`validate_actor_identity.py --cli` 21/21 and `validate_manual_handoff.py` 5/5
+both exited 0 (`outputs/autobattle/a52-identity-crosscheck/`).
+
+Limits recorded in the receipt: host control-flow evidence only (no candidate
+is shown engine-legal, and no menu acceptance is shown); no runner wiring yet
+(that is A5.3/A5.4); position/distance, reachability, damage estimation, item
+counts, revive, law constraints and movement preference are unsupported and
+fail to load. `docs/tactics-policy.md` is the schema of record; update it in
+the same change as any predicate change, with a version bump.
+
 ## 2026-10-06 — A5.1 closed: live manual takeover and same-process resume pass
 
 Closed the two criteria the previous slice left open, and pinned the reason
