@@ -443,6 +443,14 @@ capability.
 
 ## Host evidence
 
+A6 live research is recorded in [a6-recovery-research.md](a6-recovery-research.md):
+two constructed-fixture self-Cure casts consume six MP and increase HP;
+five-MP Cure is disabled and rejected. The decoded effective-MP reader matches
+2,429 executions of the retail cost function. These are research results;
+the public adapter still offers only Move/Wait. Recovery-policy and
+wounded-party acceptance remain open until modal actor/target identity and
+confirmation guards are integrated and validated.
+
 `python tools/validate_tactics_policy.py` -> **94/94 PASS**, writing
 `outputs/autobattle/a52-tactics-policy/checks.json`. Coverage: every
 supported predicate; HP/MP threshold boundaries; `lte` inclusive vs `lt`

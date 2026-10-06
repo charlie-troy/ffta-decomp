@@ -1,6 +1,6 @@
 # Customizable auto-battle roadmap
 
-Updated 2026-10-06. Reviewed checkout: `f903da4` plus the A6 audit fixes. Current acceptance status
+Updated 2026-10-06. Reviewed checkout: `3b8bb4f` plus the A6 live research. Current acceptance status
 is maintained here; dated discoveries remain in `docs/project-log.md`.
 For every auto-battle implementation or completion claim, follow
 [Worker acceptance contract](autobattle-worker-contract.md). It defines the
@@ -543,14 +543,17 @@ Done: reproducible per-character conditional tactics, with unsupported predicate
 
 Depends on A5. Modify `tools/tactics_policy.py` and its validator; add a healer preset under `configs/tactics/`.
 
-2026-10-06 status: **host contract partial; live recovery open**. Schema v2,
+2026-10-06 status: **host contract reviewed; bounded self-Cure proven; policy recovery open**. Schema v2,
 the healer preset and 119 host checks are reviewed. The preset now names Life
 and Cure, excludes KO from Cure, and applies the MP reserve to Life too;
 enabled kind-only item rules require opt-in. See
-[`A6.json`](receipts/autobattle/A6.json). Next dependency: decode the Action
-submenu's ability identity/availability and legal target selection, then prove
-one recovery cast and its resource delta. Do not extend the pure schema again
-to substitute for this engine evidence.
+[`A6.json`](receipts/autobattle/A6.json). Self-Cure now heals 100→163 HP and
+spends 6 MP; a five-MP negative control rejects selection without resource
+changes. MP-cost semantics match 2,429 executed retail-function cases. See
+[`a6-recovery-research.md`](a6-recovery-research.md). Next dependency: a verified
+targeting/confirmation modal reader, then guarded policy integration and
+ally/KO targeting. The roster is scratch during targeting; do not bypass
+identity rejection or substitute the research key route for an adapter.
 
 - [ ] Trace missing item-count/MP consumers only as required by concrete rules; document the evidence in `docs/tactics-policy.md`.
 - [ ] Add heal-under-threshold, revive-before-attack where a legal revive candidate exists, MP reserve, and never-use-item rules. Consumables default to disabled.

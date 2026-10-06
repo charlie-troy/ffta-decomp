@@ -1,0 +1,46 @@
+{
+  "scope": "executed retail function on constructed unit records; not live availability",
+  "rom_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
+  "profiles": [
+    {
+      "profile": "plain",
+      "race": 1,
+      "support_index": 0,
+      "abilities": 347
+    },
+    {
+      "profile": "human-effect10",
+      "race": 1,
+      "support_index": 31,
+      "abilities": 347
+    },
+    {
+      "profile": "moogle-effect10",
+      "race": 2,
+      "support_index": 74,
+      "abilities": 347
+    },
+    {
+      "profile": "viera-effect4",
+      "race": 4,
+      "support_index": 30,
+      "abilities": 347
+    },
+    {
+      "profile": "numou-effect4",
+      "race": 5,
+      "support_index": 52,
+      "abilities": 347
+    },
+    {
+      "profile": "unrelated-effect7",
+      "race": 1,
+      "support_index": 32,
+      "abilities": 347
+    }
+  ],
+  "engine_comparisons": 2429,
+  "invalid_controls": 7,
+  "failures": [],
+  "status": "pass"
+}

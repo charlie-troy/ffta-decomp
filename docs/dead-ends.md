@@ -540,3 +540,21 @@ CLAUDE.md carries the slogan.
 - **Do not:** read a roster-shape failure in the seconds after a turn
   closes as a wrong emulator, a damaged battle or a stream desync; and
   never retry a live guard by re-reading alone.
+
+### DE-033 — Recovery cancellation does not restore the fixed battle roster
+
+- **Tried (A6, 2026-10-06):** a disposable White Magic fixture with Marche
+  HP100/MP6 opens self-Cure. B/B returns to the Action group
+  (`a6-cure-cancel-01`); B/B/B returns to the command menu
+  (`a6-cure-cancel-02`). Both run the core between reads and settle afterward.
+- **Observed:** HP100/MP6 unchanged, but `020159E4` remains scratch and
+  `ActorAdapter.snapshot()` rejects the roster shape in both final states.
+  The full-cancel menu reports command mode 4/cursor 1 while the context's
+  selected-ability field still retains Cure ID 1. A completed cast, by
+  contrast, restores the roster after its animation.
+- **Do not:** equate command mode/cursor or a retained ability ID with fresh
+  ownership; assume cancellation makes the fixed roster readable again; or
+  bypass its identity rejection. The next A6 reader must verify canonical
+  actor/target and modal lifecycle independently before enabling recovery.
+  These are constructed-fixture observations, not a general heap-lifetime
+  proof or safe public-runner cancellation acceptance.

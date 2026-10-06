@@ -1,22 +1,22 @@
 {
   "packet": "A6",
   "date": "2026-10-06",
-  "base_revision": "f903da4dedb784d2d13944607f2d2a6cf87816e3",
+  "base_revision": "3b8bb4f054afcda2cbe7e81e7451c3f114a2a24e",
   "status": "partial",
-  "scope": "Reviewed pure policy/resource contract and preset; no live recovery acceptance",
+  "scope": "Reviewed host policy and bounded live self-Cure/MP research; no public-runner recovery acceptance",
   "criteria": [
     {
       "id": "resource-consumers",
       "status": "unknown",
       "expected": "Engine-backed item counts, ability MP costs and legal targets as required by concrete rules",
-      "observed": "Roster MP offsets are documented; the live adapter offers only zero-cost Move/Wait. Item inventory and Action submenu availability/targeting are not decoded by this work.",
+      "observed": "Effective MP cost decoded and compared to 2,429 executed retail-function cases. White Magic menu row identity and enable gate observed live, including insufficient MP rejection. Item counts and general legal ally/KO targets remain unproven.",
       "command": null
     },
     {
       "id": "recovery-policy",
       "status": "unknown",
       "expected": "Heal under threshold, revive before attack, MP reserve, never use items by default",
-      "observed": "Schema v2 and healer preset implement host selection: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve on all casts, consumables disabled. Regression rejects unrelated ally abilities and Cure on KO. No live cast proven.",
+      "observed": "Schema v2 and healer preset implement host selection: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve on all casts, consumables disabled. Regression rejects unrelated ally abilities and Cure on KO. Constructed-fixture self-Cure heals 100 to 156/163 HP and consumes six MP in two runs, but the policy chooser does not drive either run.",
       "command": "python tools/validate_tactics_policy.py --out-root outputs/autobattle/a6-review-policy"
     },
     {
@@ -33,6 +33,40 @@
       "expected": "Compare healer and damage-focused policies on a wounded party; prove executed recovery, consumed resource and fallback when unavailable",
       "observed": "Not run. Ability candidate availability, legal target and engine execution are prerequisites; synthetic candidates cannot establish this criterion.",
       "command": null
+    },
+    {
+      "id": "bounded-self-cure-research",
+      "status": "pass",
+      "expected": "One accepted self-Cure with selected ability identity, returned actor and HP/MP effect",
+      "observed": "a6-cure-cast-03: Cure ID 1; unit and peer 02000080; self cursor (4,10); HP100->163, MP85->79 in both canonical member and restored battle mirror. Command list restored, Action disabled. Earlier cast-02 HP100->156 and MP85->79. Disposable job/HP/MP edits precede research input; not policy acceptance.",
+      "evidence": "outputs/autobattle/a6-cure-cast-03/probe.json"
+    },
+    {
+      "id": "insufficient-mp-menu-gate",
+      "status": "pass",
+      "expected": "Cure disabled and rejected below six MP with no resource effect",
+      "observed": "Five-MP run: first White Magic row enable=0; confirmation stays in list and does not latch Cure; final HP100 MP5 unchanged. Pre-preview HUD retains stale 388/85 after fixture edits.",
+      "evidence": "outputs/autobattle/a6-cure-low-mp-01/probe.json"
+    },
+    {
+      "id": "effective-mp-cost-semantics",
+      "status": "pass",
+      "expected": "Reader matches the decoded retail function including support effects and rounding",
+      "observed": "2,429 engine comparisons across all 347 ability IDs, six support/race profiles and null unit; seven invalid fact controls rejected. Constructed-unit ROM execution, not live availability.",
+      "evidence": "outputs/autobattle/a6-resource-cost/checks.json"
+    },
+    {
+      "id": "guarded-recovery-integration",
+      "status": "unknown",
+      "expected": "Policy-selected recovery with verified modal actor/target, stop/cancel handling and resource fallback",
+      "observed": "Not implemented. Existing battle-roster identity guard rejects targeting scratch state. Public adapter remains Move/Wait only."
+    },
+    {
+      "id": "exact-cost-cancellation-research",
+      "status": "pass",
+      "expected": "At six MP Cure opens, then cancellation consumes no HP/MP",
+      "observed": "a6-cure-cancel-01: Cure enabled at MP6; self preview opens; B/B returns to Action group, HP100 MP6 unchanged. This does not establish safe identity restoration.",
+      "evidence": "outputs/autobattle/a6-cure-cancel-01/probe.json"
     }
   ],
   "review_findings": [
@@ -43,12 +77,17 @@
     "A5 threshold-30 live boundary was 84/241 HP, not 177/241; corrected A5 receipt and docs. Future policy turn receipts carry the actual chooser snapshot.",
     "pause-at-boundary test expected a wall-clock frame on an immediate pump; retained failure, then corrected observation window passes without runtime changes."
   ],
-  "next_dependency": "Decode Action submenu ability identity, availability, MP cost and legal targeting; verify one real recovery cast with actor/target HP and MP deltas before extending candidate support.",
+  "next_dependency": "Implement and validate a separate targeting/confirmation modal reader that pins actor, canonical unit/peer, ability and state; cancellation and stale/changed target controls precede policy integration, ally/KO targeting and wounded-party replay. DE-033 full cancellation remains scratch even at command mode 4; neither cursor nor cached ability is a safe fresh-state signal.",
   "limits": [
-    "No live A6 ability/item execution or resource consumption evidence.",
+    "Self-Cure and MP consumption proven only in owned, constructed research fixtures. No public-runner policy recovery, ally/KO targeting, revive or item count evidence.",
     "A5 artifact validation was rerun; no new live A5 run.",
     "Adopted-process cleanup still has host evidence only after its fix.",
-    "Known optional identified-wait-noecho transport failure remains outside the default suite."
+    "Known optional identified-wait-noecho transport failure remains outside the default suite.",
+    "Pre-preview HUD remains stale after fixture edits; resource claims use member/mirror agreement and post-cast screenshots.",
+    "Battle roster is scratch during targeting. No fresh-menu identity bypass added.",
+    "No deterministic heal magnitude or complete-battle result claimed.",
+    "Raw RAM, screenshots and savestates remain local; compact probe JSON and check receipts are retained.",
+    "DE-033: both Action-group and full-command cancellation leave the fixed roster as scratch; full cancellation retains selected ability 1 despite command mode 4. Safe cancel/return integration remains unknown."
   ],
   "delivered_source_sha256": {
     "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
@@ -57,7 +96,11 @@
     "tools/validate_tactics_policy.py": "8cc503bcccdc122fe979a8d5d3d2316bb51c43c6af7216203438dfd840b1d5e3",
     "tools/validate_tactics_adapter.py": "8bf2bacb47e3e3b3661075dd4582bae6b029b83bc7a783b441c933233ec1ecc9",
     "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
-    "tools/validate_transport_paths.py": "e5998c7d1cf1c95168bbc3b35845c65431108ccb2516db9dd41e70927844a6fe"
+    "tools/validate_transport_paths.py": "e5998c7d1cf1c95168bbc3b35845c65431108ccb2516db9dd41e70927844a6fe",
+    "tools/probe_a6_action_menu.py": "13650ba96ffc5661a62a5998b8bc16016424df1c6a97d0b8053a5d81e5341f75",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/validate_ability_resources.py": "d779981a1a1dc98899485c1aa0cf697dff20416eefc5a77dca18292014cbb1e2",
+    "tools/validate_a6_recovery_probe.py": "b9a22ef007a17ac299f7eb4cbd9b870c6f4916d2ba6368517d53a6ff00f4a88c"
   },
   "host_checks": {
     "policy": 119,
@@ -66,7 +109,9 @@
     "cleanup": 4,
     "ai": 10,
     "ai_strategy": 9,
-    "transport": 23
+    "transport": 23,
+    "effective_mp_engine_comparisons": 2429,
+    "recovery_artifact_mutations": 9
   },
   "evidence": [
     "outputs/autobattle/a6-review-policy/checks.json",
@@ -77,7 +122,15 @@
     "outputs/a6-review-snapshot-before.log",
     "outputs/autobattle/a6-review-transport-parallel/pause-at-boundary.log",
     "outputs/a6-review-pause-corrected.log",
-    "outputs/a6-review-transport-summary.json"
+    "outputs/a6-review-transport-summary.json",
+    "outputs/autobattle/a6-cure-cast-03/probe.json",
+    "outputs/autobattle/a6-cure-low-mp-01/probe.json",
+    "outputs/autobattle/a6-resource-cost/checks.json",
+    "outputs/autobattle/a6-recovery-artifacts/checks.json",
+    "outputs/autobattle/a6-menu-policy-check/checks.json",
+    "outputs/autobattle/a6-menu-adapter-check/checks.json",
+    "outputs/autobattle/a6-cure-cancel-01/probe.json",
+    "outputs/autobattle/a6-cure-cancel-02/probe.json"
   ],
   "tested_revision": "base_revision plus delivered_source_sha256",
   "commands": [
@@ -87,7 +140,45 @@
     "python tools/validate_session_cleanup.py --out-root outputs/autobattle/a6-review-cleanup",
     "python tools/validate_ai.py baserom.gba",
     "python tools/validate_ai_strategy.py baserom.gba",
-    "python tools/validate_transport_paths.py --scenario pause-at-boundary --out-root outputs/autobattle/a6-review-transport-corrected"
+    "python tools/validate_transport_paths.py --scenario pause-at-boundary --out-root outputs/autobattle/a6-review-transport-corrected",
+    "python tools/validate_ability_resources.py baserom.gba --out outputs/autobattle/a6-resource-cost/checks.json",
+    "python tools/validate_a6_recovery_probe.py --cast outputs/autobattle/a6-cure-cast-03/probe.json --low-mp outputs/autobattle/a6-cure-low-mp-01/probe.json --cancel outputs/autobattle/a6-cure-cancel-01/probe.json --out outputs/autobattle/a6-recovery-artifacts/checks.json"
   ],
-  "transport_note": "22 scenarios passed on the first attempt; pause-at-boundary passed after adding its missing wall-time observation window. Original failure is retained."
+  "transport_note": "22 scenarios passed on the first attempt; pause-at-boundary passed after adding its missing wall-time observation window. Original failure is retained.",
+  "retained_research_sha256": {
+    "outputs/autobattle/a6-cure-cast-03/probe.json": "3df5cc875722488607752e0160f95cd7e07cfb3e44492f387da9e363fb272667",
+    "outputs/autobattle/a6-cure-low-mp-01/probe.json": "7b8b1f63c84a8facbc3904cbe75dab9b86e8df7af9861f9e1c74625d0499c281",
+    "outputs/autobattle/a6-resource-cost/checks.json": "985c49df2fabf43bb3a4db0c213ec669973e329297e0dadce0fbd3dfcb6de92e",
+    "outputs/autobattle/a6-recovery-artifacts/checks.json": "50034b626f3a088639ce31a7d58ede6e43b913232c0657f469d70f4cbec28360",
+    "outputs/autobattle/a6-menu-policy-check/checks.json": "445aca9c73df97647e95bb70cc6c318164ca59a3c736be27eade02ff40a594e8",
+    "outputs/autobattle/a6-menu-adapter-check/checks.json": "dec36652a18665890396c73a5a2b08a8152d4bac4c79de38aaddc0f3b16cc9df",
+    "outputs/autobattle/a6-cure-cancel-01/probe.json": "461c5095ca44e80f5518fe9d30e25e178ca9465420b1fb54fcb96c87a33014ad",
+    "outputs/autobattle/a6-cure-cancel-02/probe.json": "55ce6579cd5a7c17c8cd8f98e2701d7c0d4eff1a0191ef5593409ebb3b630757"
+  },
+  "local_screenshot_sha256": {
+    "outputs/autobattle/a6-cure-cast-03/05-A.png": "9fbba847dcaa56930c7f4d5de930310b7122b0ea18c55f17c73677ae2419c5af",
+    "outputs/autobattle/a6-cure-cast-03/07-A.png": "c7f4f1acea24303fcc2898c18d6336318528d8d6c4f02b5293b045a84fcf801e",
+    "outputs/autobattle/a6-cure-cast-03/99-settled.png": "7076484cd797457c3219e01e89f213a6df3997ef16fb5f116878b77e26597f80",
+    "outputs/autobattle/a6-cure-low-mp-01/06-A.png": "a95e37a7595d28278dbbf692f137b84a6484dfd802e5f83ce864333ea0c07e9b",
+    "outputs/autobattle/a6-cure-cancel-01/06-A.png": "e6dfde1faf760722c946a2662f3a428f4c9168fdcc92eda6bc8e37ff995e680d",
+    "outputs/autobattle/a6-cure-cancel-02/99-settled.png": "913c3bc372d11425b211d42a25065767410e557520e9d9bcd405f76ea8f68a36"
+  },
+  "research_commands": [
+    "python tools/probe_a6_action_menu.py --out outputs/autobattle/a6-cure-cast-03 --secondary-job 7 --hp 100 --mp 85 --edit-members --route DOWN,A,DOWN,DOWN,A,A,A,A,A --settle-end 8",
+    "python tools/probe_a6_action_menu.py --out outputs/autobattle/a6-cure-low-mp-01 --secondary-job 7 --hp 100 --mp 5 --edit-members --route DOWN,A,DOWN,DOWN,A,A --settle-end 2",
+    "python tools/probe_a6_action_menu.py --out outputs/autobattle/a6-cure-cancel-01 --secondary-job 7 --hp 100 --mp 6 --edit-members --route DOWN,A,DOWN,DOWN,A,A,B,B --settle-end 2",
+    "python tools/probe_a6_action_menu.py --out outputs/autobattle/a6-cure-cancel-02 --secondary-job 7 --hp 100 --mp 6 --edit-members --route DOWN,A,DOWN,DOWN,A,A,B,B,B --settle-end 2"
+  ],
+  "rom_sha1": "4ac05441f4de70a4ec3dd932116346c61b8783d9",
+  "source_fixture_sha256": "4da58bfe0e162210383c28aa8f66659fca33c91c69da0e965b87b3b7a730abe5",
+  "current_verification": {
+    "policy": 119,
+    "adapter": 12,
+    "ai": 10,
+    "strategy": 9,
+    "effective_mp_engine_comparisons": 2429,
+    "recovery_artifact_controls": 3,
+    "recovery_artifact_mutations": 9,
+    "note": "Current-slice checks; cleanup/identity/transport counts above are inherited from the preceding verified audit, not rerun here."
+  }
 }

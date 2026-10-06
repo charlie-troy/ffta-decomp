@@ -1,0 +1,19 @@
+{
+  "scope": "retained self-Cure research artifacts, not fresh gameplay or policy acceptance",
+  "cast": "outputs/autobattle/a6-cure-cast-03/probe.json",
+  "low_mp": "outputs/autobattle/a6-cure-low-mp-01/probe.json",
+  "cancel": "outputs/autobattle/a6-cure-cancel-01/probe.json",
+  "positive_controls": 3,
+  "rejected_mutations": [
+    "missing input log",
+    "wrong selected ability",
+    "wrong target",
+    "unspent MP",
+    "no healing",
+    "enabled at five MP",
+    "extra resource write",
+    "cancellation spends MP",
+    "cancellation remains modal"
+  ],
+  "status": "pass"
+}

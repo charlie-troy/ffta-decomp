@@ -1,5 +1,45 @@
 # Project log
 
+## 2026-10-06 — A6 self-Cure, menu enable gate and effective MP consumer proven
+
+Continued A6 after the audit at `3b8bb4f`. The new owned research probe builds
+a disposable White Magic/wounded Marche fixture; original save, ROM and
+savestate remain untouched. Mirror-only changes did not change the menu;
+the unique canonical clan member at `02000080` must also be edited.
+Pre-preview HUD values can remain stale after these edits. The delivered
+probe pairs halted RAM with screenshots after menu redraw.
+
+Two live self-Cure casts increased HP100→156 and HP100→163 and consumed
+MP85→79. Final command menu returned with Action disabled, and canonical
+member/restored battle mirror agree. The first shorter route stopped at
+Do it/Cancel without effects: preview is not execution. A five-MP control
+kept Cure disabled and rejected confirmation with HP100/MP5 unchanged.
+Selected ability 1 and unit/peer pointers pin the self-target research path.
+
+Decoded `0812ED98` effective MP and `080CD50C` support effects: numeric
+4 doubles cost, 10 halves rounded up. Read-only `ability_resources.py`
+matches **2,429** retail ROM executions and rejects seven invalid-fact
+controls. Static menu handler `08028970` resolves race-table rows and gates
+selection through `080287C4` enable bytes. Retained probe validator passes
+three controls and rejects nine adversarial mutations. Exploratory AI/general
+usability breakpoints were inconclusive and removed from the delivered tool.
+
+The roster becomes scratch during targeting, so existing identity rejection
+is preserved. No fixed research route is added to the public runner. A6
+remains partial; next is a verified modal actor/target/confirmation reader,
+then guarded policy integration and ally/KO targets. Item counts and the
+wounded-party policy comparison remain open. Full commands, local screenshot
+hashes and compact observations are in `docs/receipts/autobattle/A6.json`
+and `docs/a6-recovery-research.md`. The pre-existing `docs/roadmap.md` edit
+remains separate.
+
+Current-slice checks: policy **119/119**, adapter **12/12**, AI **10/10**,
+strategy **9/9**, effective MP **2,429/2,429**, retained recovery artifacts
+**3 positive controls / 9 rejected mutations**. Six-MP Cure is enabled;
+cancellation preserves HP/MP but leaves the roster as scratch at the Action
+group, so safe return to the existing adapter is not claimed. No ROM source changed;
+no matching rebuild required for these host research tools.
+
 ## 2026-10-06 — Review A5 evidence and repair A6 host policy defects
 
 Reviewed the other worker's changes through `f903da4`. Four retained A5 live
