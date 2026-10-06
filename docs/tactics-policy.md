@@ -297,6 +297,7 @@ families by extending this document and `tools/tactics_policy.py` together.
 | `damage-focused.json` | party-player rules: finish an enemy at `<= 25%` HP, else pressure the lowest-HP enemy offered |
 | `contrast-two-ally.json` | per-character divergence on the proven Move/Wait candidates (`Marche#7` takes a Move, `Montblanc#5` holds with Wait) — a contract demonstration, not tactics quality |
 | `hp-split.json` | one party rule set conditioned on the actor's own engine-read HP percent (`<= 80%` holds, otherwise advance); calibrated to the A4 two-ally fixture so one live run exercises both rules |
+| `hold-below-30.json` | the A5.4 condition-change twin of `hp-split.json`: identical rules, one value different (threshold 30 instead of 80) |
 
 All of them are validated by the host suite on every run. The healer and
 resource-preservation presets are A6's (they need MP/item/recovery facts that
@@ -357,6 +358,45 @@ submenu decoded (command cursor 1 -> ability list -> target mode). Until then no
 ability predicate can become an enabled option: the schema rejects any
 predicate the adapter cannot supply facts for, and the adapter offers only what
 the menu names.
+
+## Conditional-tactics closure (A5.4, 2026-10-06)
+
+The A5 requirements are met with host **and** live evidence, for the narrow
+family: the public runner follows per-character rules (two job-5 allies take
+different commands in one battle) and an engine-read condition changes the
+decision and the result. Full detail and criteria live in the `a5_4` object of
+`docs/receipts/autobattle/A5.json`; the decisive live pair is
+`hp-split.json` vs `hold-below-30.json` on the same starting state — identical
+rules and notes, one threshold changed:
+
+| policy | Marche (100% HP) | Montblanc (73% HP) |
+|---|---|---|
+| `hp-split.json` (`<= 80`) | `advance-when-above-threshold` -> Move `(4,10)->(4,11)` | `hold-when-below-threshold` -> Wait, no movement |
+| `hold-below-30.json` (`<= 30`) | `advance-when-above-threshold` -> Move `(4,10)->(4,11)` | `advance-when-above-threshold` -> Move `(5,10)->(5,11)` |
+
+Marche is the control (unchanged decision in both runs); Montblanc's decision
+and engine result both change with the condition. Runs:
+`outputs/autobattle/a53-live-hp-split-01`, `a53-live-hp-split-30-01`.
+
+Two integration defects were found by this evidence and are fixed with their
+own regressions:
+
+* **Adopted-session cleanup.** `--resume` adopts the emulator by pid without a
+  `Popen`, so `FixtureSession.stop()`'s old `self.proc is not None` gate skipped
+  the kill and logged nothing while the CLI receipt said `terminated` —
+  observed live (receipt `terminated pid: 57716`, mGBA 57716 still listening).
+  `tools/validate_session_cleanup.py` pins the intended decisions (4/4, with a
+  pre-fix negative control where the old gate fails the suite).
+* **Resume scenario mismatch.** The fixture guard expectations come from the
+  scenario file, which the receipt does not carry, so resuming with the wrong
+  `--scenario` failed as a 45 s "struct_count=8 expected=7" roster guard.
+  `--resume` now refuses a scenario whose id differs from the resumed run's.
+
+Still explicitly **not** claimed: complete-battle/defeat behaviour under a
+policy, law or status-conditioned tactics, ability targeting (MP/range), and
+movement preference. The retained STOP, monitor-client handoff and resumed
+continuation gates are C1/C3 shapes re-run on this revision, not new
+capability.
 
 ## Host evidence
 

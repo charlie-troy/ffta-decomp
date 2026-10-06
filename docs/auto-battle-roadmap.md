@@ -9,7 +9,17 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**Start A5.4 below: integrate and close conditional tactics.**
+**Start A6 below: resource and recovery tactics.**
+A5 is closed for the narrow family (2026-10-06): the public runner follows
+per-character rules (two job-5 allies take different commands in one battle),
+and on equivalent starting states changing one condition value changes both the
+decision and the engine result (Montblanc at 73% HP: Wait under a `<= 80`
+threshold, Move under `<= 30`), with Marche as an unchanged control. STOP, the
+monitor-client handoff and same-PID resume were re-run on this revision, and two
+integration defects found by that evidence are fixed with regressions (adopted-
+session cleanup; resume scenario mismatch). Ability targeting, movement
+preference, law/status-conditioned play and complete-battle outcomes under a
+policy remain open and are named in the receipt.
 A5.1 is accepted (2026-10-06): the public runner drives the two-ally fixture
 with validated actor-linked Move/Wait, and the live manual takeover plus
 same-process resume pass on one battle (see `docs/a51-integration.md`).
@@ -86,7 +96,7 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 | 2 | C2 validated player action | Accepted for the documented Move fixture; 237aebe live6/live7 evidence retained | C3 |
 | 3 | C3 integration and acceptance | Accepted 2026-09-21 at 88b1072: complete live battle plus same-process manual Move/Wait and resumed completion; fresh resume regression passed | A2.5/A3 accepted within documented scope; enabled A4 and A8 |
 | 4 | A4 assignment feasibility | Bounded PASS, 2026-10-05 at `7c6f1b8`; two-ally demo and identity receipts | A5.1 runner integration |
-| 5 | A5 ordered tactics | **A5.1 accepted, A5.2 frozen, A5.3 proven** (2026-10-06; A5.3 = live adapter seam with a narrow Move/Wait family + engine-fact conditional); start A5.4 | A6/A7/A10 |
+| 5 | A5 ordered tactics | **A5.1 accepted, A5.2 frozen, A5.3 proven, A5.4 closed** (2026-10-06) for the narrow Move/Wait family; ability targeting stays unsupported | A6/A7/A10 |
 | Independent | A8 acceleration | Investigation complete; product UNKNOWN | A9 remains gated on actual speed acceptance |
 | Later | A6/A7/A9/A10 | GATED by declared prerequisites | Follow the packet gates |
 
@@ -478,7 +488,17 @@ controls reject without confirming an action. Host-generated effects do not
 certify this interface. A narrow proven interface is acceptable; unsupported
 families stay explicit and cannot silently become enabled policy options.
 
-#### A5.4 — Integrate and close conditional tactics
+#### A5.4 — Integrate and close conditional tactics (CLOSED 2026-10-06, narrow family)
+
+Closed for the delivered family: contrasting per-character rules through the
+public runner (Marche Move / Montblanc Wait, same job), the condition-change
+pair (`hp-split.json` `<= 80` vs `hold-below-30.json` `<= 30`, one value
+different, flipping Montblanc's decision and result while Marche stays the
+control), retained STOP and handoff/resume gates re-run on this revision, plus
+`tools/validate_session_cleanup.py` (4/4) and the resume scenario guard.
+Criteria are under `a5_4` in `docs/receipts/autobattle/A5.json`. Not closed and
+not claimed: HP/MP/ability conditional behaviour on real ability candidates,
+complete-battle outcomes under a policy, movement preference, laws.
 
 Use the public runner with contrasting per-character policies. Demonstrate two
 same-job allies following distinct rules, then change a relevant condition on

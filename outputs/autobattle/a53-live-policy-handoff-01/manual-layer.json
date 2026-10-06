@@ -1,0 +1,393 @@
+{
+  "schema": "c3-manual-layer/2",
+  "pid": 57716,
+  "port": 2345,
+  "leg1_final_state": "paused",
+  "menu_open_at_s": 9.0,
+  "owner_slot": 7,
+  "owner_rule": "target cursor == the unique live unit's own tile, unchanged across three samples with a stable CT and a known command byte",
+  "tile_before": [
+    4,
+    10
+  ],
+  "tile_after": [
+    4,
+    11
+  ],
+  "manual_move_committed": true,
+  "keys_sent": [
+    "DOWN",
+    "UP",
+    "A",
+    "DOWN",
+    "A",
+    "DOWN",
+    "A",
+    "A"
+  ],
+  "input_channel": "window SendInput (no stub writes)",
+  "monitor_reads": 72,
+  "monitor_faults": 0,
+  "monitor_reconnects": 0,
+  "trace": [
+    {
+      "t": 3.0,
+      "cursor": 0,
+      "target": [
+        4,
+        10
+      ],
+      "keyinput": 0,
+      "slots": [
+        {
+          "slot": 0,
+          "readable": true,
+          "x": 13,
+          "y": 8,
+          "hp": 319,
+          "ct": 466,
+          "side": 32769,
+          "id": 0
+        },
+        {
+          "slot": 1,
+          "readable": true,
+          "x": 10,
+          "y": 8,
+          "hp": 300,
+          "ct": 967,
+          "side": 32769,
+          "id": 1
+        },
+        {
+          "slot": 2,
+          "readable": true,
+          "x": 9,
+          "y": 10,
+          "hp": 303,
+          "ct": 0,
+          "side": 32769,
+          "id": 2
+        },
+        {
+          "slot": 3,
+          "readable": true,
+          "x": 9,
+          "y": 2,
+          "hp": 323,
+          "ct": 139,
+          "side": 32769,
+          "id": 3
+        },
+        {
+          "slot": 4,
+          "readable": true,
+          "x": 7,
+          "y": 4,
+          "hp": 231,
+          "ct": 0,
+          "side": 32769,
+          "id": 4
+        },
+        {
+          "slot": 5,
+          "readable": true,
+          "x": 5,
+          "y": 10,
+          "hp": 177,
+          "ct": 0,
+          "side": 129,
+          "id": 5
+        },
+        {
+          "slot": 6,
+          "readable": true,
+          "x": 5,
+          "y": 3,
+          "hp": 10,
+          "ct": 0,
+          "side": 4097,
+          "id": 6
+        },
+        {
+          "slot": 7,
+          "readable": true,
+          "x": 4,
+          "y": 10,
+          "hp": 442,
+          "ct": 306,
+          "side": 129,
+          "id": 7
+        }
+      ],
+      "owner_slot": 7,
+      "owner_tile": [
+        4,
+        10
+      ],
+      "owner_ct": 306,
+      "stable": false
+    },
+    {
+      "t": 6.0,
+      "cursor": 0,
+      "target": [
+        4,
+        10
+      ],
+      "keyinput": 0,
+      "slots": [
+        {
+          "slot": 0,
+          "readable": true,
+          "x": 13,
+          "y": 8,
+          "hp": 319,
+          "ct": 466,
+          "side": 32769,
+          "id": 0
+        },
+        {
+          "slot": 1,
+          "readable": true,
+          "x": 10,
+          "y": 8,
+          "hp": 300,
+          "ct": 967,
+          "side": 32769,
+          "id": 1
+        },
+        {
+          "slot": 2,
+          "readable": true,
+          "x": 9,
+          "y": 10,
+          "hp": 303,
+          "ct": 0,
+          "side": 32769,
+          "id": 2
+        },
+        {
+          "slot": 3,
+          "readable": true,
+          "x": 9,
+          "y": 2,
+          "hp": 323,
+          "ct": 139,
+          "side": 32769,
+          "id": 3
+        },
+        {
+          "slot": 4,
+          "readable": true,
+          "x": 7,
+          "y": 4,
+          "hp": 231,
+          "ct": 0,
+          "side": 32769,
+          "id": 4
+        },
+        {
+          "slot": 5,
+          "readable": true,
+          "x": 5,
+          "y": 10,
+          "hp": 177,
+          "ct": 0,
+          "side": 129,
+          "id": 5
+        },
+        {
+          "slot": 6,
+          "readable": true,
+          "x": 5,
+          "y": 3,
+          "hp": 10,
+          "ct": 0,
+          "side": 4097,
+          "id": 6
+        },
+        {
+          "slot": 7,
+          "readable": true,
+          "x": 4,
+          "y": 10,
+          "hp": 442,
+          "ct": 306,
+          "side": 129,
+          "id": 7
+        }
+      ],
+      "owner_slot": 7,
+      "owner_tile": [
+        4,
+        10
+      ],
+      "owner_ct": 306,
+      "stable": true
+    },
+    {
+      "t": 9.0,
+      "cursor": 0,
+      "target": [
+        4,
+        10
+      ],
+      "keyinput": 0,
+      "slots": [
+        {
+          "slot": 0,
+          "readable": true,
+          "x": 13,
+          "y": 8,
+          "hp": 319,
+          "ct": 466,
+          "side": 32769,
+          "id": 0
+        },
+        {
+          "slot": 1,
+          "readable": true,
+          "x": 10,
+          "y": 8,
+          "hp": 300,
+          "ct": 967,
+          "side": 32769,
+          "id": 1
+        },
+        {
+          "slot": 2,
+          "readable": true,
+          "x": 9,
+          "y": 10,
+          "hp": 303,
+          "ct": 0,
+          "side": 32769,
+          "id": 2
+        },
+        {
+          "slot": 3,
+          "readable": true,
+          "x": 9,
+          "y": 2,
+          "hp": 323,
+          "ct": 139,
+          "side": 32769,
+          "id": 3
+        },
+        {
+          "slot": 4,
+          "readable": true,
+          "x": 7,
+          "y": 4,
+          "hp": 231,
+          "ct": 0,
+          "side": 32769,
+          "id": 4
+        },
+        {
+          "slot": 5,
+          "readable": true,
+          "x": 5,
+          "y": 10,
+          "hp": 177,
+          "ct": 0,
+          "side": 129,
+          "id": 5
+        },
+        {
+          "slot": 6,
+          "readable": true,
+          "x": 5,
+          "y": 3,
+          "hp": 10,
+          "ct": 0,
+          "side": 4097,
+          "id": 6
+        },
+        {
+          "slot": 7,
+          "readable": true,
+          "x": 4,
+          "y": 10,
+          "hp": 442,
+          "ct": 306,
+          "side": 129,
+          "id": 7
+        }
+      ],
+      "owner_slot": 7,
+      "owner_tile": [
+        4,
+        10
+      ],
+      "owner_ct": 306,
+      "stable": true
+    },
+    {
+      "t": 14.5,
+      "stage": "probe",
+      "dir": "DOWN",
+      "cmd": [
+        0,
+        1
+      ],
+      "target": [
+        [
+          4,
+          10
+        ],
+        [
+          4,
+          10
+        ]
+      ]
+    },
+    {
+      "t": 16.8,
+      "key": "UP",
+      "stage": "command-echo",
+      "pre": 1,
+      "post": 0
+    },
+    {
+      "t": 26.6,
+      "stage": "step",
+      "dir": "DOWN",
+      "pre": [
+        4,
+        10
+      ],
+      "post": [
+        4,
+        11
+      ]
+    },
+    {
+      "t": 33.7,
+      "key": "DOWN",
+      "stage": "command-echo",
+      "pre": 1,
+      "post": 2
+    }
+  ],
+  "menu_open": true,
+  "manual_turn_committed": true,
+  "owner_tile_before": [
+    4,
+    10
+  ],
+  "owner_tile_after": [
+    4,
+    11
+  ],
+  "stepped_target": [
+    4,
+    11
+  ],
+  "moved_slots": [
+    7
+  ],
+  "other_same_side_moved": [],
+  "destination_verified_by": "roster tile delta across the manual turn (owner walked to the stepped target; no other same-side slot moved)"
+}

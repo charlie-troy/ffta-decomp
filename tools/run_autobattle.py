@@ -120,6 +120,20 @@ def main(argv=None):
             print(f"FAIL: --resume {run_id}: this run already resumed once "
                   "(one manual handoff per battle is the audited shape)")
             return 2
+        # A5.4: the guard expectations come from the SCENARIO file, and the
+        # receipt does not carry them — so resuming with the wrong --scenario
+        # (or the default) fails the roster guard for a reason that looks like
+        # a damaged battle. Observed live 2026-10-06: a resume of the two-ally
+        # fixture with the default scenario reported
+        # "struct_count=8 expected=7" for 45 s. Name the real cause instead.
+        given_scenario = scenario.get("scenario_id")
+        run_scenario = resumed_run.get("scenario")
+        if run_scenario and given_scenario and run_scenario != given_scenario:
+            print(f"FAIL: --resume {run_id}: scenario {given_scenario!r} does not "
+                  f"match the resumed run's {run_scenario!r} — pass the same "
+                  "--scenario (the fixture guard expectations are per-scenario, "
+                  "so a mismatch looks like a failed roster guard)")
+            return 2
     else:
         run_id = args.run_id or time.strftime("a3-%Y%m%d-%H%M%S")
         out_dir = os.path.join(args.out_root, run_id)

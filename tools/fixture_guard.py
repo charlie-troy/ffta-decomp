@@ -628,17 +628,25 @@ class FixtureSession:
             except Exception:
                 pass
             self.g = None
-        if self.proc is not None and not keep_process:
-            # Own process only: never `taskkill /IM mgba.exe`.
-            subprocess.run(["taskkill", "/F", "/PID", str(self.pid)],
+        # A5.4 defect fix: this used to gate on `self.proc is not None`, so an
+        # ADOPTED process (--resume: adopt_existing sets self.pid from the port
+        # listener but creates no Popen) was never killed and stop() logged
+        # nothing — while the CLI receipt still claimed `terminated`. Live
+        # evidence: after a resumed leg ended `stalled`, the receipt said
+        # terminated/pid 57716 and the emulator was still running.
+        pid = self.pid
+        owned = self.proc is not None
+        if pid is not None and not keep_process:
+            # Own or adopted process only: never `taskkill /IM mgba.exe`.
+            subprocess.run(["taskkill", "/F", "/PID", str(pid)],
                            capture_output=True, timeout=30)
             deadline = time.time() + wait
             while time.time() < deadline:
-                if self.proc.poll() is not None and \
-                        port_listener_pid(self.port) is None:
+                released = port_listener_pid(self.port) is None
+                if released and (not owned or self.proc.poll() is not None):
                     break
                 time.sleep(0.5)
-            self.log(f"terminated owned pid {self.pid} "
+            self.log(f"terminated {'owned' if owned else 'adopted'} pid {pid} "
                      f"(port {self.port} "
                      f"{'free' if port_listener_pid(self.port) is None else 'STILL HELD'})")
         self.proc = None

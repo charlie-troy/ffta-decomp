@@ -1,0 +1,5 @@
+FAIL: --resume a54-resume-guard-probe: scenario 'normal-battle' does not match the resumed run's 'a4-two-player' — pass the same --scenario (the fixture guard expectations are per-scenario, so a mismatch looks like a failed roster guard)
+GUARD_EXIT=2
+scenario a4-two-player -> run a54-resume-guard-probe [RESUME]
+FAIL: could not adopt the running emulator: GDB port 2345 has no listener — nothing to adopt (the handed-off emulator is gone; a restart would NOT continue the same battle)
+MATCH_EXIT=2

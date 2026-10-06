@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "an adopted session's non-paused exit kills the handed-off pid",
+    "a paused handoff leaves the adopted process alone",
+    "a booted session keeps its original behaviour and label",
+    "a still-listening port is never reported as free"
+  ],
+  "passed": 4,
+  "scope": "synthetic cleanup control flow only; no real process is killed by this suite"
+}

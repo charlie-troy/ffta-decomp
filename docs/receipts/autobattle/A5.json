@@ -3,7 +3,8 @@
   "subpackets": {
     "A5.1": "accepted 2026-10-06; the criteria array below is A5.1's",
     "A5.2": "frozen 2026-10-06; see the a5_2 object",
-    "A5.3": "proven 2026-10-06 with a narrow Move/Wait family; see the a5_3 object"
+    "A5.3": "proven 2026-10-06 with a narrow Move/Wait family; see the a5_3 object",
+    "A5.4": "conditional tactics closed 2026-10-06 for the narrow family; see the a5_4 object"
   },
   "date": "2026-10-06",
   "base_revision": "0bb4fd408f4b452c4c648a0a6c8ae54aedf6e0f6 (A5.1 slice 1) plus this slice's delivered hashes",
@@ -451,6 +452,130 @@
     ],
     "next_packet_steps": "A5.4: run the public runner with contrasting per-character policies in the normal battle, retain enemy isolation / STOP / monitor-client handoff / resumed continuation evidence, and keep Move/Wait divergence from being presented as HP/MP/ability conditional behaviour."
   },
+  "a5_4": {
+    "subpacket": "A5.4",
+    "date": "2026-10-06",
+    "status": "pass",
+    "scope": "conditional tactics closed for the narrow engine-offered Move/Wait family. Every A5 requirement has host evidence and, where it is a live behaviour, live evidence on the changed revision. Ability targeting, movement preference, law/status-conditioned play and complete-battle outcomes under a policy are NOT claimed.",
+    "delivered_source_sha256": {
+      "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+      "tools/run_autobattle.py": "7468daf973de5ab5ded33669c63018f0284da4f9be553afcba04b59407157132",
+      "tools/validate_session_cleanup.py": "939508edc15804c316e603aa98f4df4d8465ff3323a88ae7fab9e11eb15b4fbe",
+      "configs/tactics/hold-below-30.json": "b4eccfec302d35bdbcc1fdd85eb45de1d5d3f13a53a7f0703d78acbfa0d00d2a",
+      "docs/tactics-policy.md": "de992a2e430aec8ce287d43c6c00c0379e80a1ffaf004274cdb6851cb0ca7adf"
+    },
+    "criteria": [
+      {
+        "id": "A5.4-contrasting-per-character-policies-live",
+        "status": "pass",
+        "command": "python tools/run_autobattle.py --state outputs/lua-nav/a4-multi-ally-battle-start.ss0 --scenario configs/battle-scenarios/a4-two-player.json --run-id a53-live-contrast-01 --yes --max-turns 2 --wall-timeout 300 --tactics-policy configs/tactics/contrast-two-ally.json",
+        "expected": "the PUBLIC runner follows contrasting per-character policies: two same-job allies take different commands in one battle, each attributed to its own rule and verified against the engine's board state",
+        "observed": "Marche (id 7, job 5) matched 'marche-takes-the-walk' in the character scope -> Move (4,10)->(4,11); Montblanc (id 5, job 5) matched 'montblanc-holds-position' -> Wait with no movement. Both engine_result.verified. Enemy clan activity (178 router hits) remained retail and unattributed to either ally.",
+        "evidence": [
+          "outputs/autobattle/a53-live-contrast-01/run.json",
+          "outputs/autobattle/a53-live-contrast-01/events.jsonl"
+        ]
+      },
+      {
+        "id": "A5.4-condition-change-flips-decision-and-result",
+        "status": "pass",
+        "command": "python tools/run_autobattle.py --run-id a53-live-hp-split-01 ... --tactics-policy configs/tactics/hp-split.json ; python tools/run_autobattle.py --run-id a53-live-hp-split-30-01 ... --tactics-policy configs/tactics/hold-below-30.json",
+        "expected": "on equivalent starting states, changing one relevant condition changes the decision AND the engine result, with a control actor whose decision does not change",
+        "observed": "Same fixture, same rules and notes, only the HP threshold changed (80 -> 30). Marche (100% HP) is the control: Move (4,10)->(4,11) in BOTH runs via 'advance-when-above-threshold'. Montblanc (73% HP) flips: under <=80 he matched 'hold-when-below-threshold' and waited with no movement; under <=30 he matched 'advance-when-above-threshold' and moved (5,10)->(5,11), engine-verified. Observation ages 1.6 s both runs.",
+        "evidence": [
+          "outputs/autobattle/a53-live-hp-split-01/events.jsonl",
+          "outputs/autobattle/a53-live-hp-split-30-01/events.jsonl",
+          "configs/tactics/hp-split.json",
+          "configs/tactics/hold-below-30.json"
+        ],
+        "negative_control": "the control actor's unchanged decision rules out a run-to-run artifact (RNG, turn order or enemy interference) explaining the flipped decision"
+      },
+      {
+        "id": "A5.4-retained-stop-gate",
+        "status": "pass",
+        "command": "run_autobattle.py --run-id a53-live-policy-stop-01 --tactics-policy configs/tactics/hp-split.json --on-stop kill, with outputs/autobattle/a53-live-policy-stop-01/STOP dropped 25 s in",
+        "expected": "with a policy configured, a STOP still stops all gameplay input at observation and the receipt is truthful about the process",
+        "observed": "LIVE: STOP observed with 0.035 s detection latency during the initial progress wait; input-log.jsonl contains exactly ONE record (stop_requested) — zero key writes before or after; final_state paused, turns 0; emulator_handoff terminated (the booted process really was killed).",
+        "evidence": [
+          "outputs/autobattle/a53-live-policy-stop-01/run.json",
+          "outputs/autobattle/a53-live-policy-stop-01/input-log.jsonl"
+        ]
+      },
+      {
+        "id": "A5.4-retained-handoff-and-same-pid-resume",
+        "status": "pass",
+        "command": "run_autobattle.py --run-id a53-live-policy-handoff-01 --pause-at-boundary --tactics-policy configs/tactics/hp-split.json ; python tools/c3_manual_layer.py --receipt outputs/autobattle/a53-live-policy-handoff-01/run.json ; run_autobattle.py --resume a53-live-policy-handoff-01 --scenario configs/battle-scenarios/a4-two-player.json --tactics-policy configs/tactics/hp-split.json",
+        "expected": "the monitor-client handoff and same-process resume still hold with a policy configured, and the resumed leg's turns are policy decisions",
+        "observed": "LIVE: leg 1 paused at t=54.3 s with the identified menu open and zero input (policy not consulted on this path by design); the manual layer committed Marche (owner slot 7) (4,10)->(4,11) through the window channel with the whole-board delta verified (moved_slots [7], other_same_side_moved []); leg 2 adopted the SAME pid 57716 (match_receipt_handoff_pid true, roster_guard_ok true, guard_attempts 1, no reboot), reached Marche's boundary with position_before (4,11) — the manually walked tile — and drove a policy turn (Montblanc, 'hold-when-below-threshold' -> Wait, engine-verified). The run then bounded honestly: a policy-chosen Move at Marche's next boundary committed but produced no sequencer progress, so it stopped with 'no-progress bound reached' and no recovery input (the documented contract behaviour), rather than claiming a turn.",
+        "evidence": [
+          "outputs/autobattle/a53-live-policy-handoff-01/run.json",
+          "outputs/autobattle/a53-live-policy-handoff-01/events.jsonl",
+          "outputs/autobattle/a53-live-policy-handoff-01/manual-layer.json",
+          "outputs/a53-live-policy-handoff-01-leg1.log",
+          "outputs/a53-live-policy-handoff-01-leg2b.log"
+        ],
+        "negative_control": "the resumed leg was first attempted with the default --scenario and failed the roster guard for 45 s (struct_count=8 expected=7); the operator error is preserved in outputs/a53-live-policy-handoff-01-leg2.log and led to the scenario-match guard below"
+      },
+      {
+        "id": "A5.4-adopted-session-cleanup-defect-fixed",
+        "status": "pass",
+        "command": "python tools/validate_session_cleanup.py",
+        "expected": "a resumed leg that ends non-paused must actually terminate the adopted emulator, and the receipt must not claim a termination that did not happen",
+        "observed": "Defect found live by this packet: after the resumed leg ended stalled, the receipt said 'terminated pid: 57716' while mGBA 57716 was still listening on the GDB port (stop() gated on self.proc, which adopt_existing never sets). Fixed; tools/validate_session_cleanup.py passes 4/4 (adopted kill, paused handoff keeps the process, booted session unchanged, a still-held port never reported free). Negative control: the pre-fix gate, restored in a throwaway copy of fixture_guard.py, fails the suite (AssertionError: [] — no taskkill issued).",
+        "evidence": [
+          "outputs/autobattle/a54-session-cleanup/checks.json",
+          "tools/validate_session_cleanup.py",
+          "outputs/autobattle/a53-live-policy-handoff-01/run.json"
+        ]
+      },
+      {
+        "id": "A5.4-resume-scenario-guard",
+        "status": "pass",
+        "command": "python tools/run_autobattle.py --resume a54-resume-guard-probe --scenario configs/battle-scenarios/normal-battle.json --yes",
+        "expected": "resuming with a scenario other than the resumed run's is refused up front instead of failing as an unexplained roster guard",
+        "observed": "Exit 2 with 'scenario 'normal-battle' does not match the resumed run's 'a4-two-player' — pass the same --scenario (the fixture guard expectations are per-scenario, so a mismatch looks like a failed roster guard)'. With the matching scenario the same receipt proceeds to the adopt step and fails honestly (no port listener), proving the guard is the mismatch and not a blanket refusal.",
+        "evidence": [
+          "outputs/a54-resume-guard.log"
+        ]
+      },
+      {
+        "id": "A5.4-host-status-and-frozen-schema",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py ; python tools/validate_tactics_adapter.py ; python tools/validate_autobattle_runtime.py outputs/autobattle/a53-live-hp-split-01",
+        "expected": "the frozen schema is unchanged, unsupported predicates still fail closed, and the live receipts pass the runtime contract",
+        "observed": "Policy suite 94/94 (including the five-mutant non-vacuity check and every shipped preset, now five files); adapter suite 12/12; the live hp-split receipt passes validate_autobattle_runtime. No schema version changed in A5.4.",
+        "evidence": [
+          "outputs/autobattle/a52-tactics-policy/checks.json",
+          "outputs/autobattle/a53-tactics-adapter/checks.json",
+          "outputs/a53-receipt-validation.log"
+        ]
+      }
+    ],
+    "artifact_sha256": {
+      "outputs/autobattle/a53-live-policy-stop-01/run.json": "3a75aa816235baccc9e7d565c64834e0d961d6d3d957e618f0013ef44bc9440d",
+      "outputs/autobattle/a53-live-policy-stop-01/events.jsonl": "395d0dd21c5f9eb2852db25cb24f45aa5310616bd7a07169d00a3cc76f35dd42",
+      "outputs/autobattle/a53-live-policy-stop-01/input-log.jsonl": "f868e118a247947561141c134ad0f6e5facd5b8a49bf68e90ee1262f34a5b437",
+      "outputs/autobattle/a53-live-policy-handoff-01/run.json": "ec04c9a3bba3f3371c54efe766201cbd5ad34f9d0c81c6c19cf1436d16357d4e",
+      "outputs/autobattle/a53-live-policy-handoff-01/events.jsonl": "9446f4fe5d61995e349db9e6079048892e8dd5737fdc09a72a41cee24247ed62",
+      "outputs/autobattle/a53-live-policy-handoff-01/input-log.jsonl": "863d7413f5708a9a5b9c3e032b7089a4d3df45e550f2682fa368d1c714c945f3",
+      "outputs/autobattle/a53-live-policy-handoff-01/manual-layer.json": "0fd83fabb3a5da0b54ba4552e2ecb2e0abe3264f9b03180ddd06f21304e5e1ad",
+      "outputs/autobattle/a53-live-hp-split-30-01/run.json": "dbbba1b39dedc7db4d5987cf4e80021dfdd269c62fff594bb2c151ce0a61bda3",
+      "outputs/autobattle/a53-live-hp-split-30-01/events.jsonl": "874f81614e29b8a55fb92615c4486eea1a5418678064bb3a65ef11af6d6d9ba7",
+      "outputs/autobattle/a53-live-hp-split-30-01/input-log.jsonl": "8945e183c15330ec6d0451eef5a700100f4ae75386bddeb3c14491519a492201",
+      "outputs/autobattle/a54-session-cleanup/checks.json": "db6212a27cbc6448105f3eba4825df2ae13ebc3d739928d582c694c5258c1c2b",
+      "outputs/a54-resume-guard.log": "bc3343063a8ee523e1f43a0e2ba63c550e3b076614c129cb79535b5564082a5a"
+    },
+    "limitations": [
+      "The live capability is still the narrow Move/Wait family: an engine-offered Move with no destination, range or MP cost. Ability targeting (MP/range/status restrictions) is not implemented, so those controls remain not applicable rather than passing.",
+      "No complete-battle, defeat, results-screen or law-conditioned run under a policy; both condition-change runs stopped on the 2-turn budget.",
+      "The resumed leg's later Move at Marche's boundary committed but produced no sequencer progress and bounded honestly; the cause (menu shape after the manual turn) is not diagnosed in this packet, and the run is recorded as a bound, not a turn.",
+      "The adopted-cleanup fix is host-verified (validate_session_cleanup.py, with a pre-fix negative control) plus the live defect observation; a live re-run proving taskkill ends a real adopted mGBA after the fix was not performed in this packet, so that specific live step stays open.",
+      "STOP-classification wording: a killed-stop receipt still reads 'STOP requested: battle left running for manual play' while emulator_handoff says terminated. The truthful field is emulator_handoff; the reason text is a pre-existing wording wart, left unchanged to avoid breaking recorded transport expectations.",
+      "A5.1's stored delivered hashes describe the revision that produced them; tools/fixture_guard.py and tools/run_autobattle.py changed again in A5.4, so A5.1's live runs are historical evidence for those files.",
+      "The pre-existing transport scenario 'identified-wait-noecho' failure recorded under a5_3 remains open and untouched."
+    ],
+    "next_packet_steps": "A6 (resource and recovery tactics): extend the frozen schema with item-count/MP consumers as concrete rules require, add heal-under-threshold / revive-before-attack / MP-reserve / never-use-item rules and a healer preset under configs/tactics/, test the exact boundaries, and replay a wounded-party fixture against a damage-focused policy. A7 movement tactics and A10 configuration follow as dependencies permit."
+  },
   "artifact_sha256": {
     "outputs/autobattle/a51-live-manual-05/run.json": "95374f46deec9fcd3132204eb945be1069013f17333760bba5dd0b1bc0cf16c8",
     "outputs/autobattle/a51-live-manual-05/events.jsonl": "18545715974b91e1f849a8e534742a52c3f2ab5892dea4ec84828b383093fd03",
@@ -488,5 +613,5 @@
     "No ROM bytes or bulk memory dumps committed; raw local evidence (including the window PNGs) stays ignored and is cited by sha256.",
     "The turn-transition scratch window (DE-032) is bounded to 45 s in the adopt; a much longer transition would still fail the guard honestly."
   ],
-  "next_packet": "A5.4: integrate and close conditional tactics (public runner, contrasting per-character policies, live evidence retained across enemy isolation / STOP / handoff / resume)."
+  "next_packet": "A6: resource and recovery tactics (schema extension for item/MP rules, a healer preset under configs/tactics/, boundary tests, and a wounded-party replay against a damage-focused policy)."
 }

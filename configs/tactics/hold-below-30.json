@@ -1,0 +1,34 @@
+{
+  "schema": "ffta-tactics-policy/1",
+  "fallback": "wait",
+  "observation": {
+    "max_age_seconds": 5.0
+  },
+  "assignments": {
+    "party": {
+      "player": {
+        "rules": [
+          {
+            "id": "hold-when-below-threshold",
+            "when": {
+              "actor_hp_pct": { "lte": 30 },
+              "kind": "wait"
+            },
+            "select": "first",
+            "note": "an actor the engine reports at or below the threshold holds position"
+          },
+          {
+            "id": "advance-when-above-threshold",
+            "when": {
+              "kind": "move"
+            },
+            "select": "first",
+            "note": "otherwise take the engine-offered legal Move"
+          }
+        ],
+        "note": "Conditioned only on engine-read facts: the actor's own HP percent and which commands the menu offers."
+      }
+    }
+  },
+  "note": "A5.4 condition-change twin of hp-split.json: identical rules and notes, one value different (threshold 30 instead of 80). On the A4 two-ally fixture Montblanc sits at 73% HP, so the same starting state must flip his decision from Wait (under <=80) to Move (above 30)."
+}

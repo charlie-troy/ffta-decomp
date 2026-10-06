@@ -1,5 +1,49 @@
 # Project log
 
+## 2026-10-06 — A5.4 closed: conditional tactics, and two defects the evidence found
+
+Closed the A5 packet for the narrow family and re-ran the retained live gates on
+the changed revision. The decisive demonstration is a **condition change on an
+equivalent starting state**: `configs/tactics/hp-split.json` and
+`configs/tactics/hold-below-30.json` are the same rules with one value different
+(threshold 80 vs 30). On the A4 two-ally fixture (Marche 100% HP, Montblanc 73%
+HP) Marche is the control — Move `(4,10)->(4,11)` in **both** runs — while
+Montblanc flips: Wait with no movement under `<= 80`, Move
+`(5,10)->(5,11)` under `<= 30`, both engine-verified
+(`outputs/autobattle/a53-live-hp-split-01`, `a53-live-hp-split-30-01`).
+Retained gates on the same revision: STOP with a policy configured stopped all
+input at 0.035 s detection latency with zero key writes ever
+(`a53-live-policy-stop-01`), and a `--pause-at-boundary` handoff
+(`a53-live-policy-handoff-01`) left the identified menu open untouched, took a
+window-channel manual Move `(4,10)->(4,11)` verified by the whole-board delta,
+and the resumed leg adopted the **same pid 57716** (guard_attempts 1, no reboot),
+reached Marche's boundary at `position_before (4,11)` and drove a policy turn
+(Montblanc, `hold-when-below-threshold` -> Wait).
+
+**Two defects found by that evidence, both fixed with regressions.** (1) An
+*adopted* session was never cleaned up: `--resume` takes the pid from the GDB
+port listener and creates no `Popen`, so `FixtureSession.stop()`'s old
+`self.proc is not None` gate skipped the kill and logged nothing while the CLI
+receipt still said `terminated`; observed live as receipt `terminated pid:
+57716` with mGBA 57716 still listening. `tools/validate_session_cleanup.py`
+(4/4) now pins the decisions, and the pre-fix gate restored in a throwaway copy
+fails that suite (negative control). (2) Resuming with the wrong `--scenario`
+failed as a 45 s "struct_count=8 expected=7" roster guard, because the guard
+expectations come from the scenario file and the receipt does not carry them;
+`--resume` now refuses a scenario id that differs from the resumed run's and
+says so (`outputs/a54-resume-guard.log`). The operator error is kept as the
+negative control for that guard.
+
+Honest bounds in the receipt: the live capability is still Move/Wait (no
+ability candidate, no MP cost, no range), no complete-battle/law/defeat run
+under a policy, the resumed leg's later Move committed but produced no
+sequencer progress and was recorded as an honest bound rather than a turn, and
+the adopted-cleanup fix is host-verified plus the live defect observation — a
+live re-run proving the kill lands on a real adopted mGBA was not performed.
+A pre-existing wording wart is recorded too: a killed-stop receipt still reads
+"battle left running for manual play" while `emulator_handoff` says terminated;
+the handoff field is the truthful one.
+
 ## 2026-10-06 — A5.3 proven: the conditional-tactics adapter runs live
 
 Wired the frozen chooser into the public runner and proved it against the real

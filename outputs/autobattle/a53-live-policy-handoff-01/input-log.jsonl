@@ -1,0 +1,13 @@
+{"event": "stop_requested", "t": 52.697, "detection_latency_s": 0.0, "note": "pause-at-boundary: intentional latch at the identified player menu; no input issued"}
+{"event": "resume", "t": 55.3}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 69.067, "duration": 1.462, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:wait-nav-down", "t": 71.757, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 74.387, "duration": 1.431, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 77.031, "duration": 1.427, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 151.052, "duration": 1.462, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 154.131, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 16, "tag": "c2:step-right", "t": 156.764, "duration": 1.409, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 159.391, "duration": 1.46, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 162.461, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 165.102, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 167.75, "duration": 1.41, "hits": 5, "aborted": false}
