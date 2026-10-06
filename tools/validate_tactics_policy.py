@@ -17,7 +17,7 @@ import os
 from tactics_policy import (
     REASON_FALLBACK_WAIT, REASON_IDENTITY_UNVERIFIED, REASON_NO_LEGAL_CANDIDATE,
     REASON_NO_RULE_MATCH, REASON_SNAPSHOT_INVALID, REASON_SNAPSHOT_STALE,
-    SCHEMA, SNAPSHOT_SCHEMA, STATUS_BITS,
+    SCHEMA, SCHEMA2, SNAPSHOT_SCHEMA, SNAPSHOT_SCHEMA2, STATUS_BITS,
     PolicyError, SnapshotError, choose_action, evaluate, hp_percent,
     load_policy_file, matches, select, statuses_present, target_statuses,
     validate_policy, validate_snapshot,
@@ -52,10 +52,12 @@ def snap(actors=None, candidates=None, age=0.0, identity="verified", **overrides
     return doc
 
 
-def ruleset(*rules, fallback=None):
+def ruleset(*rules, fallback=None, consumables=None):
     out = {"rules": [dict(rule) for rule in rules]}
     if fallback is not None:
         out["fallback"] = fallback
+    if consumables is not None:
+        out["consumables"] = consumables
     return out
 
 
@@ -407,7 +409,7 @@ def main(argv=None):
             "empty status list": {**good, "assignments": {"party": {"player": {
                 "rules": [{"id": "r", "select": "first", "when": {"actor_status_absent": []}}]}}}},
             "missing schema": {"assignments": {}},
-            "wrong schema": {**good, "schema": "ffta-tactics-policy/2"},
+            "wrong schema": {**good, "schema": "ffta-tactics-policy/3"},
             "policy not an object": ["nope"],
         }
         for label, doc in bad.items():
@@ -513,11 +515,12 @@ def main(argv=None):
         files = sorted(glob.glob(os.path.join(args.configs, "*.json")))
         assert files, f"no presets under {args.configs}"
         names = {os.path.basename(path) for path in files}
-        for required in ("default.json", "damage-focused.json", "contrast-two-ally.json"):
+        for required in ("default.json", "damage-focused.json", "contrast-two-ally.json",
+                         "healer.json"):
             assert required in names, f"missing shipped preset {required}"
         for path in files:
             doc = load_policy_file(path)
-            assert doc["schema"] == SCHEMA
+            assert doc["schema"] in (SCHEMA, SCHEMA2), path
         print(f"    presets validated: {sorted(names)}", flush=True)
     check("every shipped preset validates against the frozen schema",
           shipped_presets_validate)
@@ -560,11 +563,20 @@ def main(argv=None):
                 ('    if snap["age_seconds"] > normalized_policy["observation"]["max_age_seconds"]:',
                  "    if False:"),
             "fallback ignores legality":
-                ('    waits = [c for c in snap["candidates"] if c["legal"] and c["kind"] == "wait"]',
-                 '    waits = [c for c in snap["candidates"] if c["kind"] == "wait"]'),
+                ('    waits = [c for c in candidates if c["legal"] and c["kind"] == "wait"]',
+                 '    waits = [c for c in candidates if c["kind"] == "wait"]'),
             "tie-break replaced by adapter order":
                 ('        return min(scored, key=lambda pair: (pair[0], pair[1]["id"]))[1]',
                  "        return scored[0][1]"),
+            "consumables gate removed":
+                ('    if not consumables:\n        candidates = [c for c in candidates if c["kind"] != "item"]',
+                 '    if not consumables and False:\n        candidates = [c for c in candidates if c["kind"] != "item"]'),
+            "empty-consumable gate removed":
+                ('    if candidate["kind"] == "item" and (candidate.get("count") or 0) < 1:\n'
+                 '        # A consumable whose remaining count is zero is not usable; the\n'
+                 '        # engine-legal flag cannot override an empty inventory (fail closed).\n'
+                 '        return False',
+                 "    if False:\n        return False"),
         }
         survivors = []
         with tempfile.TemporaryDirectory() as tmp:
@@ -598,6 +610,194 @@ def main(argv=None):
         assert result["outcome"] == "selected"
         assert result["decision"]["candidate_id"] == "e-weak"
     check("the damage-focused preset takes the weakest enemy", damage_preset_prefers_the_weakest_enemy)
+
+    # -- A6: resource and recovery (schema v2) -----------------------------
+    def policy2(**overrides):
+        doc = {"schema": SCHEMA2, "fallback": "wait", "assignments": {}}
+        doc.update(overrides)
+        return doc
+
+    def snap2(**overrides):
+        overrides.setdefault("schema", SNAPSHOT_SCHEMA2)
+        return snap(**overrides)
+
+    def heal(cid, hp, maximum=100, relation="ally", **overrides):
+        return cand(cid, "ability", action_id=12, relation=relation,
+                    target_hp=hp, target_max_hp=maximum,
+                    target={"kind": "unit", "id": 20}, **overrides)
+
+    def consumable(cid, count, name="Potion", **overrides):
+        return cand(cid, "item", action_id=0, item_name=name, count=count,
+                    **overrides)
+
+    def v2_keys_are_version_gated():
+        raises("rejects v1 policy carrying consumables", PolicyError,
+               lambda: validate_policy({"schema": SCHEMA, "consumables": True}))
+        for key, value in (("target_hp", 0), ("item_name", "Potion"),
+                           ("item_count", {"gte": 1})):
+            raises(f"rejects v1 rule using {key}", PolicyError,
+                   lambda key=key, value=value: validate_policy(
+                       {"schema": SCHEMA, "assignments": {"party": {"player": {
+                           "rules": [{"id": "r", "select": "first",
+                                      "when": {key: value}}]}}}}))
+        raises("rejects unknown v2 policy key", PolicyError,
+               lambda: validate_policy({"schema": SCHEMA2, "extras": 1}))
+        raises("rejects a non-boolean consumables flag", PolicyError,
+               lambda: validate_policy(policy2(consumables="yes")))
+        raises("rejects an enabled item rule while consumables are off", PolicyError,
+               lambda: validate_policy(policy2(assignments={"party": {"player": ruleset(
+                   rule("use-potion", {"item_name": "Potion"}, "first"))}})))
+        # the scope may opt in, or a disabled rule may document the intent
+        validate_policy(policy2(assignments={"party": {"player": ruleset(
+            rule("use-potion", {"item_name": "Potion"}, "first"),
+            consumables=True)}}))
+        validate_policy(policy2(assignments={"party": {"player": ruleset(
+            rule("never-use-item", {"item_name": "Potion"}, "first", enabled=False))}}))
+        normalized = validate_policy(policy2(consumables=True))
+        assert normalized["consumables"] is True
+    check("v2 keys are version-gated and item rules require an opt-in",
+          v2_keys_are_version_gated)
+
+    def heal_threshold_boundaries():
+        doc = policy2(fallback="none", assignments={"party": {"player": ruleset(
+            rule("heal-wounded-ally", {"kind": "ability", "relation": "ally",
+                                       "target_hp_pct": {"lte": 50}},
+                 "lowest-target-hp"),)}})
+        assert choose_action(snap2(candidates=[heal("a-50", 50)]), doc)["candidate_id"] == "a-50"
+        assert choose_action(snap2(candidates=[heal("a-51", 51)]), doc) is None
+        strict = policy2(fallback="none", assignments={"party": {"player": ruleset(
+            rule("heal", {"target_hp_pct": {"lt": 50}}, "first"),)}})
+        assert choose_action(snap2(candidates=[heal("a-49", 49)]), strict) is not None
+        assert choose_action(snap2(candidates=[heal("a-50", 50)]), strict) is None
+        chosen = choose_action(snap2(candidates=[heal("a-40", 40), heal("a-10", 10)]), doc)
+        assert chosen["candidate_id"] == "a-10"
+    check("heal-under-threshold honours inclusive/strict boundaries and picks the lowest HP",
+          heal_threshold_boundaries)
+
+    def zero_max_hp_is_ineligible():
+        doc = policy2(fallback="none", assignments={"party": {"player": ruleset(
+            rule("heal", {"kind": "ability", "relation": "ally",
+                          "target_hp_pct": {"lte": 100}}, "first"),)}})
+        assert hp_percent(0, 0) is None and hp_percent(5, 0) is None
+        assert choose_action(snap2(candidates=[heal("no-max", 5, maximum=0)]), doc) is None
+        assert choose_action(snap2(candidates=[heal("full", 100)]), doc) is not None
+    check("a zero or missing max HP makes an HP-percent rule ineligible",
+          zero_max_hp_is_ineligible)
+
+    def ko_vs_living_targets():
+        revive = policy2(fallback="none", assignments={"party": {"player": ruleset(
+            rule("revive-before-attack", {"kind": "ability", "relation": "ally",
+                                          "target_hp": {"lte": 0}}, "first"),)}})
+        ko = heal("ally-ko", 0)
+        living = heal("ally-1hp", 1, maximum=200)   # floors to 0 percent
+        assert choose_action(snap2(candidates=[ko]), revive)["candidate_id"] == "ally-ko"
+        assert choose_action(snap2(candidates=[living]), revive) is None
+        # the percent form cannot tell them apart -- which is why target_hp exists
+        pct = policy2(fallback="none", assignments={"party": {"player": ruleset(
+            rule("by-percent", {"target_hp_pct": {"lte": 0}}, "first"),)}})
+        when_pct = pct["assignments"]["party"]["player"]["rules"][0]["when"]
+        subject = actor()
+        norm = validate_snapshot(snap2(candidates=[ko, living]))
+        assert all(matches(when_pct, subject, c) for c in norm["candidates"])
+    check("the absolute target HP predicate separates a KO from a 1-HP floored percent",
+          ko_vs_living_targets)
+
+    def mp_reserve_blocks_insufficient_mp():
+        doc = policy2(fallback="none", assignments={"party": {"player": ruleset(
+            rule("heal-with-reserve", {"kind": "ability", "relation": "ally",
+                                       "target_hp_pct": {"lte": 50},
+                                       "remaining_mp_after_cost": {"gte": 8}},
+                 "first"),)}})
+        assert choose_action(snap2(actors=actor(mp=12), candidates=[heal("cheap", 40, cost=4)]),
+                             doc)["candidate_id"] == "cheap"
+        assert choose_action(snap2(actors=actor(mp=12), candidates=[heal("dear", 40, cost=5)]),
+                             doc) is None
+        assert choose_action(snap2(actors=actor(mp=12), candidates=[heal("broke", 40, cost=20)]),
+                             doc) is None
+        no_mp = {k: v for k, v in actor().items() if k != "mp"}
+        assert choose_action(snap2(actors=no_mp, candidates=[heal("cheap", 40, cost=4)]),
+                             doc) is None
+    check("an MP reserve excludes casts that would drop below the reserve",
+          mp_reserve_blocks_insufficient_mp)
+
+    def no_revive_ability_falls_through_legally():
+        doc = policy2(fallback="none", assignments={"party": {"player": ruleset(
+            rule("revive-before-attack", {"kind": "ability", "relation": "ally",
+                                          "target_hp": {"lte": 0}}, "first"),
+            rule("heal-wounded", {"kind": "ability", "relation": "ally",
+                                  "target_hp_pct": {"lte": 50}}, "lowest-target-hp"),)}})
+        result = choose_action(snap2(candidates=[heal("ally-40", 40)]), doc)
+        assert result["rule_id"] == "heal-wounded" and result["candidate_id"] == "ally-40"
+        assert choose_action(snap2(candidates=[cand("w1")]), doc) is None
+        waits = policy2(fallback="wait", assignments={"party": {"player": ruleset(
+            rule("revive-before-attack", {"kind": "ability", "relation": "ally",
+                                          "target_hp": {"lte": 0}}, "first"),)}})
+        fallback = evaluate(snap2(candidates=[cand("w1")]), waits)
+        assert fallback["outcome"] == "fallback" and fallback["decision"]["candidate_id"] == "w1"
+    check("a rule with no legal revive candidate is skipped and the fallback explains it",
+          no_revive_ability_falls_through_legally)
+
+    def last_consumable_and_the_disabled_default():
+        raises("rejects enabled item rule while consumables are off", PolicyError,
+               lambda: validate_policy(policy2(fallback="none", assignments={
+                   "party": {"player": ruleset(rule("use-potion", {
+                       "kind": "item", "item_name": "Potion",
+                       "item_count": {"gte": 1}}, "first"))}})))
+        on = policy2(assignments={"party": {"player": ruleset(
+            rule("use-potion", {"kind": "item", "item_name": "Potion",
+                                "item_count": {"gte": 1}}, "first"),
+            fallback="wait", consumables=True)}})
+        last = consumable("potion-last", 1)
+        empty = consumable("potion-empty", 0)
+        assert choose_action(snap2(candidates=[last]), on)["candidate_id"] == "potion-last"
+        # a zero-count consumable is present but never usable, and never a fallback
+        result = evaluate(snap2(candidates=[empty, cand("w1")]), on)
+        assert result["outcome"] == "fallback" and result["decision"]["candidate_id"] == "w1"
+        off = policy2(assignments={"party": {"player": ruleset(
+            rule("wait-only", {"kind": "wait"}, "first"), fallback="wait")}})
+        assert evaluate(snap2(candidates=[last, cand("w1")]), off)["decision"]["candidate_id"] == "w1"
+        assert choose_action(snap2(candidates=[last]), off) is None
+    check("the last consumable is usable, an empty one is not, and consumables default off",
+          last_consumable_and_the_disabled_default)
+
+    def v2_snapshot_requires_item_facts():
+        good = validate_snapshot(snap2(candidates=[consumable("p", 2)]))
+        assert good["candidates"][0]["count"] == 2
+        assert good["candidates"][0]["item_name"] == "Potion"
+        cases = {
+            "item without count": snap2(candidates=[{"id": "p", "kind": "item",
+                                                      "action_id": 0, "legal": True,
+                                                      "cost": 0, "item_name": "Potion"}]),
+            "item without name": snap2(candidates=[{"id": "p", "kind": "item",
+                                                    "action_id": 0, "legal": True,
+                                                    "cost": 0, "count": 2}]),
+            "item_name on a move": snap2(candidates=[cand("m", "move", 0, item_name="Potion")]),
+            "v1 snapshot with an item kind": snap(candidates=[consumable("p", 2)]),
+            "v2 snapshot with an unsupported schema": snap2(schema="ffta-tactics-snapshot/3"),
+        }
+        for label, doc in cases.items():
+            def run(doc=doc):
+                try:
+                    validate_snapshot(doc)
+                except SnapshotError:
+                    return
+                raise AssertionError(f"{label}: expected SnapshotError")
+            check(f"rejects and never commits: {label}", run)
+    check("a v2 item candidate must carry item_name and count", v2_snapshot_requires_item_facts)
+
+    def healer_preset_revives_before_healing():
+        doc = load_policy_file(os.path.join(args.configs, "healer.json"))
+        assert doc["schema"] == SCHEMA2
+        result = choose_action(snap2(candidates=[heal("ally-40", 40), heal("ally-ko", 0),
+                                                enemy("e", 90)]), doc)
+        assert result["rule_id"] == "revive-before-attack" and result["candidate_id"] == "ally-ko"
+        result = choose_action(snap2(candidates=[heal("ally-40", 40), enemy("e", 90)]), doc)
+        assert result["rule_id"] == "heal-wounded-ally" and result["candidate_id"] == "ally-40"
+        result = evaluate(snap2(candidates=[enemy("e", 90)]), doc)
+        assert result["outcome"] == "selected" and result["rule_id"] == "pressure-enemy"
+        assert result["decision"]["kind"] == "ability"
+    check("the healer preset revives first, then heals, then pressures an enemy",
+          healer_preset_revives_before_healing)
 
     root = args.out_root
     os.makedirs(root, exist_ok=True)

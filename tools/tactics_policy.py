@@ -31,18 +31,35 @@ Contract rules this module enforces:
 
 Schema: docs/tactics-policy.md. Evidence for the status vocabulary:
 docs/unit-flags.md ("Named status flags", live +0xe8..+0xed block).
+
+Schema v2 (A6, 2026-10-06) adds resource/recovery surface **additively**: a
+consumable ``item`` candidate kind carrying ``item_name`` + remaining
+``count`` behind a per-scope ``consumables`` gate (default *disabled*), and
+the absolute ``target_hp`` comparison. The absolute comparison exists because
+a floored HP percent cannot separate a KO'd unit (HP 0) from a living one:
+1 HP of a 200-max unit also floors to 0. v1 documents keep their exact v1
+meanings; a v1 document that uses a v2 key is rejected and vice versa, so an
+unsupported family still fails to load rather than being silently enabled.
 """
 from __future__ import annotations
 
 import json
 
 # -- schema versions -------------------------------------------------------
+# v1 is the A5.2 freeze; v2 is A6's additive extension. Version is part of
+# the contract: a key that only v2 defines is rejected inside a v1 document,
+# so an unsupported family can never silently become an available option.
 SCHEMA = "ffta-tactics-policy/1"
+SCHEMA2 = "ffta-tactics-policy/2"
+SCHEMAS = (SCHEMA, SCHEMA2)
 SNAPSHOT_SCHEMA = "ffta-tactics-snapshot/1"
+SNAPSHOT_SCHEMA2 = "ffta-tactics-snapshot/2"
+SNAPSHOT_SCHEMAS = (SNAPSHOT_SCHEMA, SNAPSHOT_SCHEMA2)
 
 # -- frozen vocabularies ---------------------------------------------------
 RELATIONS = ("self", "ally", "enemy")
 KINDS = ("move", "wait", "ability")
+KINDS2 = ("move", "wait", "ability", "item")
 SIDES = ("player", "enemy")
 FALLBACKS = ("wait", "none")
 SELECTORS = ("first", "lowest-target-hp", "highest-target-hp",
@@ -127,12 +144,18 @@ _STATUS_KEYS = {"0x%02x" % byte for byte in STATUS_BYTES}
 
 # -- frozen key sets (unknown keys are rejected) ---------------------------
 POLICY_KEYS = ("schema", "assignments", "fallback", "observation", "note")
+POLICY_KEYS2 = POLICY_KEYS + ("consumables",)
 RULESET_KEYS = ("rules", "fallback", "note")
+RULESET_KEYS2 = RULESET_KEYS + ("consumables",)
 RULE_KEYS = ("id", "enabled", "when", "select", "note")
 WHEN_KEYS = ("relation", "kind", "action_id", "ability_name",
              "actor_hp_pct", "target_hp_pct", "remaining_mp_after_cost",
              "actor_status_present", "actor_status_absent",
              "target_status_present", "target_status_absent")
+# v2 predicates: the absolute target HP comparison (KO vs living) and the
+# consumable facts. `remaining_mp_after_cost` already covers an MP reserve.
+WHEN_KEYS2 = WHEN_KEYS + ("target_hp", "item_name", "item_count")
+ITEM_WHEN_KEYS = ("item_name", "item_count")
 SNAPSHOT_KEYS = ("schema", "identity", "actor", "candidates",
                  "age_seconds", "observed_at", "note")
 ACTOR_KEYS = ("name", "id", "job_id", "side", "hp", "max_hp", "mp",
@@ -140,6 +163,7 @@ ACTOR_KEYS = ("name", "id", "job_id", "side", "hp", "max_hp", "mp",
 CANDIDATE_KEYS = ("id", "kind", "action_id", "legal", "cost", "relation",
                   "target", "target_hp", "target_max_hp", "target_mp",
                   "target_status_bytes", "ability_name", "note")
+CANDIDATE_KEYS2 = CANDIDATE_KEYS + ("item_name", "count")
 
 
 class PolicyError(ValueError):
@@ -216,7 +240,7 @@ def _status_list(value, where):
     return list(value)
 
 
-def _rule(value, where, seen_ids):
+def _rule(value, where, seen_ids, version, consumables):
     if not isinstance(value, dict):
         raise PolicyError(f"{where}: rule must be an object")
     _unknown(value, RULE_KEYS, where, PolicyError)
@@ -237,7 +261,9 @@ def _rule(value, where, seen_ids):
     when = value.get("when", {})
     if not isinstance(when, dict):
         raise PolicyError(f"{where}.when: object required")
-    _unknown(when, WHEN_KEYS, f"{where}.when", PolicyError)
+    allowed_when = WHEN_KEYS if version == 1 else WHEN_KEYS2
+    _unknown(when, allowed_when, f"{where}.when", PolicyError)
+    allowed_kinds = KINDS if version == 1 else KINDS2
     out = {"id": rule_id, "enabled": enabled, "select": selector, "when": {}}
     for key, operand in when.items():
         sub = f"{where}.when.{key}"
@@ -245,35 +271,48 @@ def _rule(value, where, seen_ids):
             if operand not in RELATIONS:
                 raise PolicyError(f"{sub}: one of {RELATIONS} required")
         elif key == "kind":
-            if operand not in KINDS:
-                raise PolicyError(f"{sub}: one of {KINDS} required")
+            if operand not in allowed_kinds:
+                raise PolicyError(f"{sub}: one of {allowed_kinds} required")
         elif key == "action_id":
             _nonneg_int(operand, sub, PolicyError)
-        elif key == "ability_name":
+        elif key in ("ability_name", "item_name"):
             if not isinstance(operand, str) or not operand:
                 raise PolicyError(f"{sub}: non-empty string required")
         elif key in ("actor_hp_pct", "target_hp_pct"):
             operand = _comparison(operand, sub, maximum=MAX_HP_PERCENT)
-        elif key == "remaining_mp_after_cost":
+        elif key in ("remaining_mp_after_cost", "target_hp", "item_count"):
             operand = _comparison(operand, sub)
         else:  # status lists
             operand = _status_list(operand, sub)
         out["when"][key] = operand
+    if version == 2 and enabled and not consumables:
+        used = sorted(set(out["when"]) & set(ITEM_WHEN_KEYS))
+        if used:
+            raise PolicyError(
+                f"{where}.when: {used} require the consuming scope to enable "
+                f"`consumables` (consumables default to disabled)")
     if "note" in value:
         out["note"] = value["note"]
     return out
 
 
-def _ruleset(value, where):
+def _ruleset(value, where, version, policy_consumables):
     if not isinstance(value, dict):
         raise PolicyError(f"{where}: rule set must be an object")
-    _unknown(value, RULESET_KEYS, where, PolicyError)
+    allowed = RULESET_KEYS if version == 1 else RULESET_KEYS2
+    _unknown(value, allowed, where, PolicyError)
+    consumables = value.get("consumables", policy_consumables)
+    if type(consumables) is not bool:
+        raise PolicyError(f"{where}.consumables: boolean required")
     rules = value.get("rules", [])
     if not isinstance(rules, list):
         raise PolicyError(f"{where}.rules: list required")
     seen = set()
-    parsed = [_rule(rule, f"{where}.rules[{i}]", seen) for i, rule in enumerate(rules)]
+    parsed = [_rule(rule, f"{where}.rules[{i}]", seen, version, consumables)
+              for i, rule in enumerate(rules)]
     out = {"rules": parsed}
+    if version == 2 and "consumables" in value:
+        out["consumables"] = consumables
     if "fallback" in value:
         if value["fallback"] not in FALLBACKS:
             raise PolicyError(f"{where}.fallback: one of {FALLBACKS} required")
@@ -289,9 +328,16 @@ def validate_policy(policy):
     """Validate and normalize a policy document; returns the normalized copy."""
     if not isinstance(policy, dict):
         raise PolicyError("policy: object required")
-    _unknown(policy, POLICY_KEYS, "policy", PolicyError)
-    if policy.get("schema") != SCHEMA:
-        raise PolicyError(f"policy.schema: must be {SCHEMA!r}")
+    _unknown(policy, POLICY_KEYS2, "policy", PolicyError)
+    schema = policy.get("schema")
+    if schema not in SCHEMAS:
+        raise PolicyError(f"policy.schema: must be one of {SCHEMAS}")
+    version = 2 if schema == SCHEMA2 else 1
+    if version == 1 and "consumables" in policy:
+        raise PolicyError(f"policy.consumables: only valid with schema {SCHEMA2!r}")
+    consumables = policy.get("consumables", False)
+    if type(consumables) is not bool:
+        raise PolicyError("policy.consumables: boolean required")
     fallback = policy.get("fallback", "wait")
     if fallback not in FALLBACKS:
         raise PolicyError(f"policy.fallback: one of {FALLBACKS} required")
@@ -321,7 +367,8 @@ def validate_policy(policy):
                 raise PolicyError(f"policy.assignments.characters[{key!r}]: id must be 0..254")
             if name + "#" + str(unit_id) != key:
                 raise PolicyError(f"policy.assignments.characters[{key!r}]: non-canonical id")
-            out[key] = _ruleset(value, f"policy.assignments.characters[{key!r}]")
+            out[key] = _ruleset(value, f"policy.assignments.characters[{key!r}]",
+                                version, consumables)
         parsed_assignments["characters"] = out
     if "jobs" in assignments:
         jobs = assignments["jobs"]
@@ -333,7 +380,8 @@ def validate_policy(policy):
                 _job_key(key)
             except ValueError as exc:
                 raise PolicyError(f"policy.assignments.jobs[{key!r}]: {exc}")
-            out[key] = _ruleset(value, f"policy.assignments.jobs[{key!r}]")
+            out[key] = _ruleset(value, f"policy.assignments.jobs[{key!r}]",
+                                version, consumables)
         parsed_assignments["jobs"] = out
     if "party" in assignments:
         party = assignments["party"]
@@ -343,13 +391,16 @@ def validate_policy(policy):
         for key, value in party.items():
             if key not in SIDES:
                 raise PolicyError(f"policy.assignments.party[{key!r}]: one of {SIDES} required")
-            out[key] = _ruleset(value, f"policy.assignments.party[{key!r}]")
+            out[key] = _ruleset(value, f"policy.assignments.party[{key!r}]",
+                                version, consumables)
         parsed_assignments["party"] = out
     if "note" in policy and not isinstance(policy["note"], str):
         raise PolicyError("policy.note: string required")
-    normalized = {"schema": SCHEMA, "fallback": fallback,
+    normalized = {"schema": schema, "fallback": fallback,
                   "observation": {"max_age_seconds": float(max_age)},
                   "assignments": parsed_assignments}
+    if version == 2:
+        normalized["consumables"] = consumables
     if "note" in policy:
         normalized["note"] = policy["note"]
     return normalized
@@ -406,17 +457,19 @@ def _unit_facts(value, where, require_identity):
     return out
 
 
-def _candidate(value, where):
+def _candidate(value, where, version):
     if not isinstance(value, dict):
         raise SnapshotError(f"{where}: object required")
-    _unknown(value, CANDIDATE_KEYS, where, SnapshotError)
+    allowed = CANDIDATE_KEYS if version == 1 else CANDIDATE_KEYS2
+    _unknown(value, allowed, where, SnapshotError)
+    allowed_kinds = KINDS if version == 1 else KINDS2
     out = {}
     cid = value.get("id")
     if not isinstance(cid, str) or not cid:
         raise SnapshotError(f"{where}.id: non-empty string required")
     out["id"] = cid
-    if value.get("kind") not in KINDS:
-        raise SnapshotError(f"{where}.kind: one of {KINDS} required")
+    if value.get("kind") not in allowed_kinds:
+        raise SnapshotError(f"{where}.kind: one of {allowed_kinds} required")
     out["kind"] = value["kind"]
     out["action_id"] = _nonneg_int(value.get("action_id"), f"{where}.action_id", SnapshotError)
     if type(value.get("legal")) is not bool:
@@ -453,6 +506,18 @@ def _candidate(value, where):
         if not isinstance(value["ability_name"], str) or not value["ability_name"]:
             raise SnapshotError(f"{where}.ability_name: non-empty string required")
         out["ability_name"] = value["ability_name"]
+    if out["kind"] == "item":
+        # An item candidate must carry the facts its predicates need, so a
+        # consumable can never be selected on assumption (count is required).
+        name = value.get("item_name")
+        if not isinstance(name, str) or not name:
+            raise SnapshotError(f"{where}.item_name: non-empty string required "
+                                "for an item candidate")
+        out["item_name"] = name
+        out["count"] = _nonneg_int(value.get("count"), f"{where}.count",
+                                   SnapshotError)
+    elif "item_name" in value or "count" in value:
+        raise SnapshotError(f"{where}: item_name/count require kind 'item'")
     return out
 
 
@@ -461,8 +526,10 @@ def validate_snapshot(snapshot):
     if not isinstance(snapshot, dict):
         raise SnapshotError("snapshot: object required")
     _unknown(snapshot, SNAPSHOT_KEYS, "snapshot", SnapshotError)
-    if snapshot.get("schema") != SNAPSHOT_SCHEMA:
-        raise SnapshotError(f"snapshot.schema: must be {SNAPSHOT_SCHEMA!r}")
+    schema = snapshot.get("schema")
+    if schema not in SNAPSHOT_SCHEMAS:
+        raise SnapshotError(f"snapshot.schema: must be one of {SNAPSHOT_SCHEMAS}")
+    version = 2 if schema == SNAPSHOT_SCHEMA2 else 1
     identity = snapshot.get("identity")
     if not isinstance(identity, str) or not identity:
         raise SnapshotError("snapshot.identity: non-empty string required")
@@ -470,14 +537,15 @@ def validate_snapshot(snapshot):
     candidates = snapshot.get("candidates")
     if not isinstance(candidates, list):
         raise SnapshotError("snapshot.candidates: list required")
-    parsed = [_candidate(c, f"snapshot.candidates[{i}]") for i, c in enumerate(candidates)]
+    parsed = [_candidate(c, f"snapshot.candidates[{i}]", version)
+              for i, c in enumerate(candidates)]
     ids = [c["id"] for c in parsed]
     if len(set(ids)) != len(ids):
         raise SnapshotError("snapshot.candidates: duplicate candidate id")
     age = snapshot.get("age_seconds")
     if isinstance(age, bool) or not isinstance(age, (int, float)) or age < 0:
         raise SnapshotError("snapshot.age_seconds: non-negative number required")
-    out = {"schema": SNAPSHOT_SCHEMA, "identity": identity, "actor": actor,
+    out = {"schema": schema, "identity": identity, "actor": actor,
            "candidates": parsed, "age_seconds": float(age)}
     if "observed_at" in snapshot:
         out["observed_at"] = snapshot["observed_at"]
@@ -560,6 +628,10 @@ def matches(when, actor, candidate):
     """True when every predicate in `when` holds for this candidate."""
     if not candidate["legal"]:
         return False
+    if candidate["kind"] == "item" and (candidate.get("count") or 0) < 1:
+        # A consumable whose remaining count is zero is not usable; the
+        # engine-legal flag cannot override an empty inventory (fail closed).
+        return False
     for key, operand in when.items():
         if key == "relation":
             if candidate.get("relation") != operand:
@@ -580,6 +652,17 @@ def matches(when, actor, candidate):
         elif key == "target_hp_pct":
             value = hp_percent(candidate.get("target_hp"), candidate.get("target_max_hp"))
             if value is None or not _compare(operand, value):
+                return False
+        elif key == "target_hp":
+            value = candidate.get("target_hp")
+            if value is None or not _compare(operand, value):
+                return False
+        elif key == "item_name":
+            if candidate["kind"] != "item" or candidate.get("item_name") != operand:
+                return False
+        elif key == "item_count":
+            count = candidate.get("count")
+            if candidate["kind"] != "item" or count is None or not _compare(operand, count):
                 return False
         elif key == "remaining_mp_after_cost":
             if actor.get("mp") is None:
@@ -688,11 +771,20 @@ def evaluate(snapshot, policy):
                              f"age={snap['age_seconds']}s")
     actor = snap["actor"]
     scope, ruleset = resolve_scope(actor, normalized_policy["assignments"])
+    # Consumables are disabled unless the governing scope enables them, so an
+    # item candidate is invisible to every rule -- and to the fallback -- when
+    # the policy has not opted in.
+    consumables = normalized_policy.get("consumables", False)
+    if ruleset is not None and "consumables" in ruleset:
+        consumables = ruleset["consumables"]
+    candidates = snap["candidates"]
+    if not consumables:
+        candidates = [c for c in candidates if c["kind"] != "item"]
     if ruleset is not None:
         for rule in ruleset["rules"]:
             if not rule["enabled"]:
                 continue
-            matched = [c for c in snap["candidates"] if matches(rule["when"], actor, c)]
+            matched = [c for c in candidates if matches(rule["when"], actor, c)]
             chosen = select(matched, rule["select"], actor)
             if chosen is not None:
                 return {"outcome": OUTCOME_SELECTED, "reason": REASON_MATCHED,
@@ -705,7 +797,7 @@ def evaluate(snapshot, policy):
         fallback = ruleset["fallback"]
     if fallback == "none":
         return _none_outcome(REASON_NO_RULE_MATCH, scope)
-    waits = [c for c in snap["candidates"] if c["legal"] and c["kind"] == "wait"]
+    waits = [c for c in candidates if c["legal"] and c["kind"] == "wait"]
     if not waits:
         return _none_outcome(REASON_NO_LEGAL_CANDIDATE, scope)
     chosen = min(waits, key=lambda c: c["id"])
