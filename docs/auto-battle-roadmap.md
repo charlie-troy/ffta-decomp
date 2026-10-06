@@ -9,10 +9,17 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**Start A5.3 below: prove the minimum conditional-action adapter.**
+**Start A5.4 below: integrate and close conditional tactics.**
 A5.1 is accepted (2026-10-06): the public runner drives the two-ally fixture
 with validated actor-linked Move/Wait, and the live manual takeover plus
 same-process resume pass on one battle (see `docs/a51-integration.md`).
+A5.3 is proven (2026-10-06) for a deliberately **narrow** family: with
+`run_autobattle.py --tactics-policy PATH` the adapter offers only the commands
+the decoded menu names (Move/Wait), one live run followed per-character rules
+(Marche Move, Montblanc Wait on the same battle) and another followed one
+engine-read condition (actor HP percent, 100% -> Move, 73% -> Wait), both
+engine-verified. Ability candidates, MP cost and range targeting remain
+unproven and cannot become enabled options (`docs/tactics-policy.md`).
 A5.2 is frozen (2026-10-06): `tools/tactics_policy.py` + `configs/tactics/`
 implement the frozen schema in `docs/tactics-policy.md`, with a pure host
 suite at 94/94 (`python tools/validate_tactics_policy.py`). No live wiring or
@@ -79,7 +86,7 @@ Critical path: A1 → A2 → A3 → A4 → A5 → A6/A7 → A9. A8 can run after
 | 2 | C2 validated player action | Accepted for the documented Move fixture; 237aebe live6/live7 evidence retained | C3 |
 | 3 | C3 integration and acceptance | Accepted 2026-09-21 at 88b1072: complete live battle plus same-process manual Move/Wait and resumed completion; fresh resume regression passed | A2.5/A3 accepted within documented scope; enabled A4 and A8 |
 | 4 | A4 assignment feasibility | Bounded PASS, 2026-10-05 at `7c6f1b8`; two-ally demo and identity receipts | A5.1 runner integration |
-| 5 | A5 ordered tactics | **A5.1 accepted, A5.2 frozen** (2026-10-06; A5.2 = policy/candidate contract + 94/94 host suite); start A5.3, then A5.4 | A6/A7/A10 |
+| 5 | A5 ordered tactics | **A5.1 accepted, A5.2 frozen, A5.3 proven** (2026-10-06; A5.3 = live adapter seam with a narrow Move/Wait family + engine-fact conditional); start A5.4 | A6/A7/A10 |
 | Independent | A8 acceleration | Investigation complete; product UNKNOWN | A9 remains gated on actual speed acceptance |
 | Later | A6/A7/A9/A10 | GATED by declared prerequisites | Follow the packet gates |
 
@@ -445,7 +452,18 @@ Do not equate learned abilities with legal candidates. Missing legality or actor
 identity means no commit. An identified legal Wait may be an explicit fallback;
 calling it "retail AI" would misdescribe the companion architecture.
 
-#### A5.3 — Prove the minimum conditional-action adapter
+#### A5.3 — Prove the minimum conditional-action adapter (PROVEN 2026-10-06, narrow family)
+
+Delivered: `tools/tactics_adapter.py` (read-only snapshot builder + frozen
+chooser), `run_autobattle.py --tactics-policy PATH` (validated before the
+emulator is touched), `tools/validate_tactics_adapter.py` (12/12 host checks
+including the real runtime cancellation path), and the events/receipt schema
+field `tactics` carrying outcome/reason/scope/rule/candidates/age. Live:
+`a53-live-contrast-01` (per-character rules -> Marche Move, Montblanc Wait)
+and `a53-live-hp-split-01` (one engine-read condition -> Move at 100% HP, Wait
+at 73%). Criteria are under `a5_3` in `docs/receipts/autobattle/A5.json`; the
+remaining bullets below are still the guide for the ability family, which A5.4
+does not require but A6 does.
 
 Own focused research/adapter changes and their evidence. Identify command,
 target, range, MP/status restrictions and acceptance for one useful conditional
@@ -479,9 +497,12 @@ Implementation checks (PowerShell from this repository; use a fresh output root)
 python tools/validate_transport_paths.py --scenario all --out-root outputs/autobattle/A5-transport-<unique-run>
 python tools/validate_autobattle_runtime.py outputs/autobattle/<actual-live-run>
 python tools/validate_tactics_policy.py
+python tools/validate_tactics_adapter.py      # A5.3
 ```
 
-The policy validator is an A5 deliverable; add its exact CLI to the receipt.
+The policy and adapter validators are A5 deliverables; their exact CLIs are in
+the receipt. `python tools/run_autobattle.py ... --tactics-policy PATH` is the
+live policy entry point.
 For ROM changes, also run `python tools/validate_all.py baserom.gba` and the WSL
 build gates. A receipt validator checks consistency, not independently the game.
 

@@ -296,10 +296,67 @@ families by extending this document and `tools/tactics_policy.py` together.
 | `default.json` | no rules; every turn uses the explicit legal-Wait fallback |
 | `damage-focused.json` | party-player rules: finish an enemy at `<= 25%` HP, else pressure the lowest-HP enemy offered |
 | `contrast-two-ally.json` | per-character divergence on the proven Move/Wait candidates (`Marche#7` takes a Move, `Montblanc#5` holds with Wait) — a contract demonstration, not tactics quality |
+| `hp-split.json` | one party rule set conditioned on the actor's own engine-read HP percent (`<= 80%` holds, otherwise advance); calibrated to the A4 two-ally fixture so one live run exercises both rules |
 
-All three are validated by the host suite on every run. The healer and
+All of them are validated by the host suite on every run. The healer and
 resource-preservation presets are A6's (they need MP/item/recovery facts that
 are not part of this freeze).
+
+## Live adapter seam (A5.3, 2026-10-06)
+
+`tools/tactics_adapter.py` is the impure half: it reads the engine (read-only)
+and builds the snapshot. `run_autobattle.py --tactics-policy PATH` replaces the
+scenario's fixed per-actor assignment with the chooser; the policy is validated
+*before* the emulator is touched and a bad document exits 2.
+
+Facts the adapter supplies live, and what proves each one:
+
+| fact | source |
+|---|---|
+| actor name/id/job/side | the A5.1 verified fresh-menu owner row (boot-guard identity + cursor-own-tile pairing) |
+| actor hp/max_hp/mp/max_mp/ct | the same roster record (`+0x18`, `+0x1A`, `+0x1C`, `+0x1E`, `+0xD0`) |
+| actor tile | the same record `+0xF6`/`+0xF7`, already part of identity validation |
+| `move` candidate | `plan_identified_move` returns a plan (decoded command cursor reads Move 0 and the target cursor is readable) |
+| `wait` candidate | `plan_identified_wait` returns a plan (decoded command cursor reads a known command 0/1/2) |
+| `age_seconds` | owner observation -> decision, measured by the caller; live runs measured 1.5-1.6 s, dominated by the boundary screenshot |
+
+Candidate `legal: true` means **the menu offers that command in this state**, not
+that a Move destination is reachable: the C2 driver steps the real cursor,
+reads the reached tile from RAM before confirming, and the runtime independently
+verifies the whole party's tile delta against the RAM-read destination. Rows the
+narrow family cannot supply (relation/target/ability facts, MP cost, range) stay
+absent, so predicates needing them are ineligible rather than assumed.
+
+A decision the engine no longer offers **cancels the commit** (zero key
+writes); it never falls back to a command the policy did not choose. The
+scenario path keeps its identified-Wait fallback; the policy path does not.
+
+### Live evidence (2026-10-06)
+
+* `outputs/autobattle/a53-live-contrast-01` — `contrast-two-ally.json`: turn 1
+  Marche (slot 7) matched `marche-takes-the-walk` in the `character` scope, took
+  the Move, engine moved only Marche `(4,10)->(4,11)`; turn 2 Montblanc
+  (slot 5) matched `montblanc-holds-position` and took the Wait with no
+  movement. Ages 1.57 s / 1.51 s.
+* `outputs/autobattle/a53-live-hp-split-01` — `hp-split.json`, one party rule
+  set over the same fixture (Marche 442/442 = 100%, Montblanc 177/241 = 73%):
+  turn 1 Marche matched `advance-when-above-threshold` and moved; turn 2
+  Montblanc matched `hold-when-below-threshold` and waited. Same-job allies,
+  one engine-read fact, contrasting decisions, both engine-verified.
+
+During both runs the enemy clan took ~178 router hits of retail activity and
+the verified result still attributed movement only to the acting player — the
+misleading-enemy-effect control holds on live data.
+
+### Explicitly not proven by A5.3
+
+`insufficient MP` and `illegal range/target` controls are **not applicable** to
+this family: neither live candidate carries an MP cost, a ranged target, or an
+ability. They remain open for the ability family, which needs the Action
+submenu decoded (command cursor 1 -> ability list -> target mode). Until then no
+ability predicate can become an enabled option: the schema rejects any
+predicate the adapter cannot supply facts for, and the adapter offers only what
+the menu names.
 
 ## Host evidence
 

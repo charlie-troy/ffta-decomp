@@ -30,6 +30,7 @@ import time
 
 from probe_control_handoff import Probe
 from autobattle_identity import ActorAdapter, IdentityError, key
+from tactics_adapter import TacticsAdapter
 
 # Runtime states (roadmap A3: explicit state machine)
 IDLE = "idle"
@@ -52,6 +53,9 @@ EVENT_SCHEMA = {
     # flagged in round 4 (a passed kwarg that never reaches the artifact).
     "input_log": None,
     "actor_identity": None, "engine_result": None, "next_actor": None,
+    # A5.3: the conditional-tactics receipt (policy, outcome, reason, matched
+    # scope/rule, observation age, offered candidates). None without a policy.
+    "tactics": None,
 }
 
 
@@ -64,9 +68,18 @@ class BattleRuntime:
     def __init__(self, session, scenario, run_id, out_dir,
                  mode="retail-ai", stall_seed_seconds=150.0,
                  wall_timeout=600.0, max_turns=None, verbose=True,
-                 resume=False, pause_at_boundary=False):
+                 resume=False, pause_at_boundary=False,
+                 tactics_policy=None, tactics_policy_source=None):
         self.s = session
         self.p = Probe(session, verbose=verbose)
+        # A5.3: with a policy, the scenario's fixed per-actor assignment is
+        # replaced by the frozen chooser (docs/tactics-policy.md). The
+        # adapter is read-only; a bad policy raises here, before any input.
+        self.tactics_policy_source = tactics_policy_source
+        self.tactics = (TacticsAdapter(self.p, tactics_policy)
+                        if tactics_policy is not None else None)
+        self._tactics_meta = None
+        self._owner_observed_at = None
         self.scenario = scenario
         self.scenario_id = scenario.get("scenario_id", "unknown")
         self.run_id = run_id
@@ -325,6 +338,10 @@ class BattleRuntime:
                 if owner is not None:
                     self.owner = owner
                     self.p.active_player_slot = owner["slot"]
+                    # A5.3: the tactics snapshot's age is measured from THIS
+                    # observation (the fresh-menu pairing that authorizes the
+                    # turn) to the policy decision, never assumed.
+                    self._owner_observed_at = time.time()
                     return TAKEOVER
             except IdentityError:
                 # Transient copies during enemy execution have no input
@@ -507,8 +524,50 @@ class BattleRuntime:
         # finishes the turn with the proven Wait commit (probe5/6: the move
         # re-opens the command menu, so the turn only closes after Wait).
         self.adapter.prior = None
-        action = next((a["action"] for a in self.scenario.get("actor_actions", [])
-                       if (a["name"], a["id"]) == key(self.owner)), "move")
+        self._tactics_meta = None
+        # -- A5.3 conditional tactics --------------------------------------
+        # With a policy configured, the adapter supplies only the commands
+        # the engine currently offers (read from RAM) and the frozen chooser
+        # picks one. A decision the engine no longer offers cancels the
+        # commit — it never falls back to a command the policy did not
+        # choose (the scenario path keeps its identified-Wait fallback).
+        policy_choice = None
+        if self.tactics is not None:
+            evaluation = self.tactics.choose(self.owner, self._owner_observed_at)
+            decision = evaluation["decision"]
+            self._tactics_meta = {
+                "policy": self.tactics_policy_source,
+                "outcome": evaluation["outcome"],
+                "reason": evaluation["reason"],
+                "scope": evaluation["scope"],
+                "rule_id": evaluation["rule_id"],
+                "detail": evaluation["detail"],
+                "age_seconds": self.tactics.last_age,
+                "candidates": list(self.tactics.last_candidate_ids),
+            }
+            if decision is None:
+                self.event("note", **self._actor_fields(),
+                           control_mode="external",
+                           note=("tactics policy selected no candidate ("
+                                 + evaluation["reason"]
+                                 + (": " + str(evaluation["detail"])
+                                    if evaluation["detail"] else "")
+                                 + "); no input issued"))
+                self._saw_unknown_modal = True
+                self.state = prev
+                return
+            policy_choice = decision["kind"]
+            self.event("note", **self._actor_fields(),
+                       control_mode="external",
+                       note=(f"tactics policy matched rule "
+                             f"{evaluation['rule_id']!r} in the "
+                             f"{evaluation['scope']!r} scope -> "
+                             f"{decision['candidate_id']} "
+                             f"({evaluation['reason']}, "
+                             f"age {self.tactics.last_age:.2f}s)"))
+        action = policy_choice or next(
+            (a["action"] for a in self.scenario.get("actor_actions", [])
+             if (a["name"], a["id"]) == key(self.owner)), "move")
         plan = None
         try:
             plan = self.p.plan_identified_move() if action == "move" else None
@@ -526,7 +585,11 @@ class BattleRuntime:
                 waitplan = self.p.plan_identified_wait()
             except Exception:
                 waitplan = None
-            if waitplan is not None:
+            # A5.3: the identified-Wait fallback belongs to the scenario
+            # path only. When a policy chose Move, a move the engine no
+            # longer offers must CANCEL (no input), not silently commit the
+            # policy's unselected Wait.
+            if waitplan is not None and policy_choice in (None, "wait"):
                 self.event("note", **self._actor_fields(),
                            control_mode="external",
                            note="identified-wait candidate (sticky cursor "
@@ -585,7 +648,11 @@ class BattleRuntime:
                        note="identified-move plan rejected: menu state "
                             "not identified from RAM — no input issued "
                             "(candidate rejected, battle left on the "
-                            "open menu)")
+                            "open menu)"
+                            + (" [tactics policy chose the move candidate, "
+                               "which the engine menu no longer offers: "
+                               "commit cancelled, no input]"
+                               if policy_choice == "move" else ""))
             self._saw_unknown_modal = True
             self.state = prev
             return
@@ -759,6 +826,7 @@ class BattleRuntime:
                    position_before=before, position_after=after,
                    engine_result=self._engine_result,
                    next_actor=self._next_seed_actor(),
+                   tactics=self._tactics_meta,
                    note=f"committed via {route_note}")
         self.state = RUNNING
 

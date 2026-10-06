@@ -1,0 +1,10 @@
+{"event": "press", "mask": 1, "tag": "c2:open-target", "t": 52.678, "duration": 1.464, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:step-down", "t": 55.759, "duration": 1.409, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-move", "t": 58.38, "duration": 1.47, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c2:wait-nav-down", "t": 61.474, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:select-wait", "t": 64.097, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c2:confirm-wait", "t": 66.734, "duration": 1.409, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 137.858, "duration": 1.462, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:wait-nav-down", "t": 140.535, "duration": 1.414, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 143.161, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 145.794, "duration": 1.411, "hits": 5, "aborted": false}

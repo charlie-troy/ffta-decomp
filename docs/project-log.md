@@ -1,5 +1,61 @@
 # Project log
 
+## 2026-10-06 — A5.3 proven: the conditional-tactics adapter runs live
+
+Wired the frozen chooser into the public runner and proved it against the real
+engine, for a deliberately narrow candidate family. New
+`tools/tactics_adapter.py` reads the decoded menu (the two C2/C3 planners) and
+builds the snapshot; `run_autobattle.py --tactics-policy PATH` replaces the
+scenario's fixed per-actor assignment with the chooser, validating the document
+**before** the emulator is constructed (a bad policy exits 2 with no boot). The
+runtime stamps each turn event with a `tactics` record
+(policy/outcome/reason/scope/rule/candidates/observation-age), which the run
+receipt collects.
+
+Two live positives on the A4 two-ally fixture (`outputs/autobattle/`):
+`a53-live-contrast-01` ran `contrast-two-ally.json` — turn 1 Marche (id 7,
+`character` scope, rule `marche-takes-the-walk`) took the Move and the engine
+moved only him `(4,10)->(4,11)`; turn 2 Montblanc (id 5, rule
+`montblanc-holds-position`) took the Wait with no movement.
+`a53-live-hp-split-01` ran one party rule set over the same battle state
+(Marche 442/442 = 100%, Montblanc 177/241 = 73%, both job 5): turn 1 matched
+`advance-when-above-threshold` -> Move, turn 2 matched
+`hold-when-below-threshold` (`actor_hp_pct lte 80`) -> Wait. Same actor-to-rule
+to-candidate to engine-verified-result chain in both, and the enemy clan's 178
+router hits of retail activity were never attributed to a player action. Live
+observation ages were 1.5-1.6 s, dominated by the boundary screenshot, against
+the policy's 5 s freshness budget.
+
+Honest boundaries, recorded rather than smoothed over. The candidate family is
+**Move/Wait only**: a Move candidate means the menu offers the Move command,
+not that a destination is reachable (the C2 driver reads the reached tile from
+RAM and the whole-party delta verifies it), and neither candidate carries an MP
+cost, a range or an ability — so the packet's "insufficient MP" and "illegal
+range/target" controls are **not applicable** and remain open for the ability
+family (command cursor 1 -> ability list -> target mode). A decision the engine
+no longer offers **cancels** the commit with zero key writes instead of falling
+back to the identified Wait, which the scenario path still keeps. Stale
+rejection is host-proven only.
+
+Checks now: `tools/validate_tactics_adapter.py` 12/12 (adapter candidates, rule
+selection, the engine-fact flip, precedence, stale/timestamp-less rejection, the
+runtime cancellation and no-match zero-input paths, the real CLI, and the
+pre-boot policy rejection); `tools/validate_tactics_policy.py` 94/94;
+`validate_autobattle_runtime.py` passes the live run; nine transport scenarios
+covering the changed boundary dispatch, event schema and receipt vocabulary pass
+(identified-move/-wrong/-invalid/-occupied, identified-wait-control,
+boundary-panel, boundary-dead, pause-at-boundary, strict-press) after extending
+`KNOWN_FIELDS` with the new `tactics` field.
+
+**Pre-existing failure found, not caused here and not fixed here:** the
+transport scenario `identified-wait-noecho` fails on committed master and on
+this revision identically (0 presses, 0 seeds, 150.7 s): the run never reaches a
+boundary because the A5.1 owner law rejects the sticky-cursor state the scenario
+models, so its expected 3-boundary note is absent. It is not in the suite's
+default names list, which is why A5.1's "23/23" full run stayed green; evidence
+`outputs/autobattle/a53-prefix/identified-wait-noecho/` (pre-change runtime,
+stashed) and `outputs/autobattle/a53-subset/identified-wait-noecho/`.
+
 ## 2026-10-06 — A5.2 frozen: tactics-policy and candidate contracts
 
 Froze the pure half of the tactics layer so A6/A7/A10 build on a fixed

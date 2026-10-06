@@ -20,6 +20,24 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from fixture_guard import FixtureSession  # noqa: E402
 from autobattle_runtime import BattleRuntime  # noqa: E402
+from tactics_policy import PolicyError, load_policy_file  # noqa: E402
+
+
+def _tactics_decisions(events_path):
+    """Turn events' tactics metadata, for the run receipt (A5.3 evidence)."""
+    out = []
+    try:
+        with open(events_path, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                rec = json.loads(line)
+                if rec.get("kind") == "turn" and rec.get("tactics"):
+                    out.append(rec["tactics"])
+    except (OSError, ValueError):
+        return []
+    return out
 
 
 def main(argv=None):
@@ -50,6 +68,12 @@ def main(argv=None):
                          "with a STOP file (manual takeover): leave-running "
                          "detaches and leaves the battle for the player; "
                          "kill ends it (default: leave-running)")
+    ap.add_argument("--tactics-policy", metavar="PATH", default=None,
+                    help="A5.3 conditional tactics: load a frozen policy "
+                         "(docs/tactics-policy.md) and let it choose among the "
+                         "commands the engine currently offers, instead of the "
+                         "scenario's fixed per-actor assignment. Validated "
+                         "before the emulator is touched; a bad document exits 2.")
     ap.add_argument("--resume", metavar="RUN_ID", default=None,
                     help="continue the battle of a previously paused run: "
                          "adopt the ALREADY-RUNNING emulator (no reboot — "
@@ -61,6 +85,18 @@ def main(argv=None):
 
     with open(args.scenario, encoding="utf-8") as fh:
         scenario = json.load(fh)
+
+    # A5.3: validate the policy BEFORE any emulator work. A configuration
+    # error must fail closed at the CLI, not after a boot and a menu.
+    tactics_policy = None
+    if args.tactics_policy:
+        try:
+            tactics_policy = load_policy_file(args.tactics_policy)
+        except (PolicyError, OSError, ValueError) as exc:
+            print(f"FAIL: tactics policy {args.tactics_policy}: {exc}")
+            return 2
+        print(f"tactics policy {args.tactics_policy} "
+              f"({tactics_policy['schema']}) validated")
 
     resumed_run = None
     if args.resume:
@@ -127,7 +163,9 @@ def main(argv=None):
                                 wall_timeout=args.wall_timeout,
                                 max_turns=args.max_turns,
                                 resume=bool(args.resume),
-                                pause_at_boundary=args.pause_at_boundary)
+                                pause_at_boundary=args.pause_at_boundary,
+                                tactics_policy=tactics_policy,
+                                tactics_policy_source=args.tactics_policy)
         if not args.yes:
             ans = input("guards will run now; continue? [y/N] ").strip().lower()
             if ans != "y":
@@ -205,9 +243,13 @@ def main(argv=None):
                                   for r in runtime.adapter.expected],
         }
         receipt["input_sha256"] = {}
-        for path in (args.rom, args.state, args.scenario,
-                     "tools/run_autobattle.py", "tools/autobattle_runtime.py",
-                     "tools/autobattle_identity.py", "tools/probe_control_handoff.py"):
+        inputs = [args.rom, args.state, args.scenario,
+                  "tools/run_autobattle.py", "tools/autobattle_runtime.py",
+                  "tools/autobattle_identity.py", "tools/probe_control_handoff.py",
+                  "tools/tactics_policy.py", "tools/tactics_adapter.py"]
+        if args.tactics_policy:
+            inputs.append(args.tactics_policy)
+        for path in inputs:
             if os.path.isfile(path):
                 with open(path, "rb") as fh:
                     receipt["input_sha256"][path] = hashlib.sha256(fh.read()).hexdigest()
@@ -241,6 +283,17 @@ def main(argv=None):
             receipt["manual_handoff"] = {"pid": session.pid,
                                          "port": session.port}
 
+        if args.tactics_policy:
+            receipt["tactics_policy"] = {
+                "path": args.tactics_policy,
+                "schema": (tactics_policy or {}).get("schema"),
+                "fallback": (tactics_policy or {}).get("fallback"),
+                "scopes": sorted((tactics_policy or {}).get("assignments", {})),
+                "decisions": _tactics_decisions(runtime.events_path),
+                "note": "choices made by the frozen chooser among the "
+                        "commands the engine offered; the scenario's fixed "
+                        "actor_actions are not used in this run",
+            }
         with open(os.path.join(out_dir, "run.json"), "w",
                   encoding="utf-8") as fh:
             json.dump(receipt, fh, indent=2)

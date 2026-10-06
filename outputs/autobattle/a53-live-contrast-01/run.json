@@ -1,0 +1,73 @@
+{
+  "schema": "a3-run/2",
+  "run_id": "a53-live-contrast-01",
+  "scenario": "a4-two-player",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 2,
+  "seeds": 4,
+  "router_hits": 178,
+  "terminal_reason": "turn budget reached",
+  "events": "outputs/autobattle\\a53-live-contrast-01\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "emulator_pid": 54144,
+  "player_identities": [
+    [
+      "Montblanc",
+      5
+    ],
+    [
+      "Marche",
+      7
+    ]
+  ],
+  "input_sha256": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/lua-nav/a4-multi-ally-battle-start.ss0": "7cbe2f661279d148dd659e023d2cbd89bd6044e9eeca21a171420ffff222491b",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "eb6f685f929f71503ecf5f3114e5b39837815c86528184796bb33022b96c7a49",
+    "tools/autobattle_runtime.py": "df35f4905c3295a2999cfff571c499a76218cda6416e8a76de0a37b54aca0883",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "bfbd9bf7e4474f63e7906ff275e4ddb71f6755f83bc21df1bb61ef4bb3c7e9cf",
+    "tools/tactics_policy.py": "d25314ecf06468d0f8e0f6a1945d69eb6fc283c1aeafeca28aaab70044a0adec",
+    "tools/tactics_adapter.py": "b1f27df8a6ff634acc396ad15cc3fb7d77c1f07831fd496dc2f64fd40d70dad0",
+    "configs/tactics/contrast-two-ally.json": "b6db55c894fec17b7860e83c354a7e4520e5b395446f9171748027c8a3810781"
+  },
+  "tactics_policy": {
+    "path": "configs/tactics/contrast-two-ally.json",
+    "schema": "ffta-tactics-policy/1",
+    "fallback": "wait",
+    "scopes": [
+      "characters"
+    ],
+    "decisions": [
+      {
+        "policy": "configs/tactics/contrast-two-ally.json",
+        "outcome": "selected",
+        "reason": "rule:matched",
+        "scope": "character",
+        "rule_id": "marche-takes-the-walk",
+        "detail": null,
+        "age_seconds": 1.5687642097473145,
+        "candidates": [
+          "move",
+          "wait"
+        ]
+      },
+      {
+        "policy": "configs/tactics/contrast-two-ally.json",
+        "outcome": "selected",
+        "reason": "rule:matched",
+        "scope": "character",
+        "rule_id": "montblanc-holds-position",
+        "detail": null,
+        "age_seconds": 1.513559103012085,
+        "candidates": [
+          "move",
+          "wait"
+        ]
+      }
+    ],
+    "note": "choices made by the frozen chooser among the commands the engine offered; the scenario's fixed actor_actions are not used in this run"
+  }
+}

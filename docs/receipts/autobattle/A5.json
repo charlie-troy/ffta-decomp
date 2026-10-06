@@ -2,7 +2,8 @@
   "packet": "A5",
   "subpackets": {
     "A5.1": "accepted 2026-10-06; the criteria array below is A5.1's",
-    "A5.2": "frozen 2026-10-06; see the a5_2 object"
+    "A5.2": "frozen 2026-10-06; see the a5_2 object",
+    "A5.3": "proven 2026-10-06 with a narrow Move/Wait family; see the a5_3 object"
   },
   "date": "2026-10-06",
   "base_revision": "0bb4fd408f4b452c4c648a0a6c8ae54aedf6e0f6 (A5.1 slice 1) plus this slice's delivered hashes",
@@ -329,6 +330,127 @@
     ],
     "next_packet_steps": "A5.3: prove the minimum conditional-action adapter (command/target/range/MP/status restrictions and acceptance for one conditional action family), then A5.4 integrates it with contrasting per-character policies and live evidence."
   },
+  "a5_3": {
+    "subpacket": "A5.3",
+    "date": "2026-10-06",
+    "status": "pass",
+    "scope": "minimum conditional-action adapter, proven live for a deliberately narrow candidate family (engine-offered Move and Wait). Ability candidates, MP cost and range targeting are NOT proven and stay unsupported.",
+    "delivered_source_sha256": {
+      "tools/tactics_adapter.py": "b1f27df8a6ff634acc396ad15cc3fb7d77c1f07831fd496dc2f64fd40d70dad0",
+      "tools/validate_tactics_adapter.py": "3fe14179a54bfebedd1200e057417398ab0d0162a7df54a1c8d976cce351eaba",
+      "tools/autobattle_runtime.py": "df35f4905c3295a2999cfff571c499a76218cda6416e8a76de0a37b54aca0883",
+      "tools/run_autobattle.py": "eb6f685f929f71503ecf5f3114e5b39837815c86528184796bb33022b96c7a49",
+      "tools/validate_autobattle_runtime.py": "e1457e5c6a2f2328c1748ba8c022e66af4dd05b86c913464b6c739227f185f39",
+      "configs/tactics/hp-split.json": "a77d59a365448d467e41bbaecf8711009d6df3b5a050420cfa18442cddb94de2",
+      "docs/tactics-policy.md": "761ae3dcd4bfac698ab275d0ad2669a1323c0e7ebab825f9a9c1a8d9a3acec26"
+    },
+    "criteria": [
+      {
+        "id": "A5.3-adapter-candidate-source",
+        "status": "pass",
+        "command": "python tools/validate_tactics_adapter.py",
+        "expected": "only commands the decoded engine menu actually offers become candidates; a menu that names no known command offers none",
+        "observed": "12/12 checks pass. The adapter reads the two C2/C3 planners (plan_identified_move / plan_identified_wait) and emits exactly {move, wait} in id order; with a command byte outside 0/1/2 it emits no candidates and the chooser returns None with reason no-legal-candidate. A bad policy raises at adapter construction.",
+        "evidence": [
+          "outputs/autobattle/a53-tactics-adapter/checks.json",
+          "docs/tactics-policy.md"
+        ]
+      },
+      {
+        "id": "A5.3-live-actor-rule-candidate-result",
+        "status": "pass",
+        "command": "python tools/run_autobattle.py --state outputs/lua-nav/a4-multi-ally-battle-start.ss0 --scenario configs/battle-scenarios/a4-two-player.json --run-id a53-live-contrast-01 --yes --max-turns 2 --wall-timeout 300 --tactics-policy configs/tactics/contrast-two-ally.json",
+        "expected": "positive execution links actor -> matched rule -> chosen candidate -> engine result, with the scenario's fixed actor_actions unused",
+        "observed": "LIVE PASS. Turn 1: Marche id 7, scope character, rule 'marche-takes-the-walk', candidate move, observation age 1.57 s; the engine moved only Marche (4,10)->(4,11) (engine_result.verified true, moved_actors [[Marche,7]]). Turn 2: Montblanc id 5, scope character, rule 'montblanc-holds-position', candidate wait, age 1.51 s; no player moved. Both allies are job 5 and the per-character rules produced different commands from one battle state. Run ended 'stalled' on the turn budget (a bounded stop, not a battle-end claim).",
+        "evidence": [
+          "outputs/autobattle/a53-live-contrast-01/run.json",
+          "outputs/autobattle/a53-live-contrast-01/events.jsonl",
+          "outputs/autobattle/a53-live-contrast-01/input-log.jsonl",
+          "outputs/a53-live-contrast-01.log"
+        ]
+      },
+      {
+        "id": "A5.3-live-engine-fact-conditional",
+        "status": "pass",
+        "command": "python tools/run_autobattle.py --state outputs/lua-nav/a4-multi-ally-battle-start.ss0 --scenario configs/battle-scenarios/a4-two-player.json --run-id a53-live-hp-split-01 --yes --max-turns 2 --wall-timeout 300 --tactics-policy configs/tactics/hp-split.json",
+        "expected": "one policy whose decision changes with a fact the engine reports (the actor's HP percent), with the expected decision/result change observed live",
+        "observed": "LIVE PASS. Fixture facts at battle start: Marche 442/442 = 100%, Montblanc 177/241 = 73% (both job 5). Turn 1 Marche (100%) matched 'advance-when-above-threshold' -> move (4,10)->(4,11), engine-verified. Turn 2 Montblanc (73%) matched 'hold-when-below-threshold' (actor_hp_pct lte 80) -> wait, no movement, engine-verified. Ages 1.60 s / 1.63 s. Same policy document, one engine-read fact, contrasting decisions in one battle.",
+        "evidence": [
+          "outputs/autobattle/a53-live-hp-split-01/run.json",
+          "outputs/autobattle/a53-live-hp-split-01/events.jsonl",
+          "outputs/autobattle/a53-live-hp-split-01/input-log.jsonl",
+          "outputs/a53-live-hp-split-01.log",
+          "configs/tactics/hp-split.json"
+        ],
+        "negative_control": "the same fixture driven by the per-character contrast policy chooses per identity instead (a53-live-contrast-01), so the split run's contrast comes from the engine-read condition, not from the preset's shape"
+      },
+      {
+        "id": "A5.3-host-negative-controls",
+        "status": "pass",
+        "command": "python tools/validate_tactics_adapter.py",
+        "expected": "stale snapshot, missing observation timestamp, no rule match, a changed candidate at commit, and a bad policy all reject without confirming an action",
+        "observed": "All pass on the real runtime path, not a mock: a stale or timestamp-less observation returns None (snapshot-stale / snapshot-invalid); a policy that matches nothing and has fallback none issues ZERO key writes and records 'selected no candidate (no-rule-match)'; a policy-chosen Move that the engine menu no longer offers after the decision CANCELS with zero key writes and an explicit note (it does not silently commit the policy's unselected Wait, which the identified-Wait fallback would otherwise have done); a bad policy is rejected with exit 2 BEFORE the emulator is constructed; illegal candidates are never selectable (A5.2 suite).",
+        "evidence": [
+          "outputs/autobattle/a53-tactics-adapter/checks.json",
+          "outputs/autobattle/a52-tactics-policy/checks.json"
+        ]
+      },
+      {
+        "id": "A5.3-misleading-enemy-effect-control",
+        "status": "pass",
+        "command": "python tools/validate_autobattle_runtime.py outputs/autobattle/a53-live-hp-split-01",
+        "expected": "enemy activity during the run must not be attributed to the policy's chosen action",
+        "observed": "The receipt validator passes the live run. Both live runs show heavy retail enemy activity (178 router hits, 4 seeds) while engine_result attributes movement only to the acting player (moved_actors [[Marche,7]] / [] on the Wait turn) and the full-party tile delta rejects any other actor's movement.",
+        "evidence": [
+          "outputs/a53-receipt-validation.log",
+          "outputs/autobattle/a53-live-hp-split-01/events.jsonl"
+        ]
+      },
+      {
+        "id": "A5.3-transport-and-receipt-regression",
+        "status": "pass",
+        "command": "python tools/validate_transport_paths.py --scenario <name> (identified-move, identified-move-wrong, identified-move-invalid, identified-move-occupied, identified-wait-control, boundary-panel, boundary-dead, pause-at-boundary, strict-press)",
+        "expected": "the changed boundary dispatch, event schema and receipt vocabulary still hold on the recorded transport paths",
+        "observed": "9 of those 9 scenarios PASS on the delivered revision (each re-validated through validate_autobattle_runtime's receipt contract). The event schema gained the 'tactics' field, so validate_autobattle_runtime.KNOWN_FIELDS was extended (null on every scenario-driven run). A separate pre-existing failure is recorded below, not claimed as passing.",
+        "evidence": [
+          "outputs/autobattle/a53-subset/identified-move-wrong/run.json",
+          "outputs/autobattle/a53-subset/boundary-panel/run.json",
+          "outputs/autobattle/a53-subset/pause-at-boundary/run.json"
+        ]
+      },
+      {
+        "id": "A5.3-unsupported-families-stay-explicit",
+        "status": "pass",
+        "command": "python tools/validate_tactics_policy.py",
+        "expected": "an unsupported predicate cannot silently become an enabled option; unsupported controls are recorded as not applicable rather than as passing",
+        "observed": "94/94 host checks pass. The adapter supplies no MP cost, range, target or ability fact, so relation/target/ability predicates are ineligible and a policy naming an unknown status or unsupported key fails to LOAD. The packet's 'insufficient MP' and 'illegal range/target' controls are therefore not applicable to this family and are recorded as open for the ability family (docs/tactics-policy.md, 'Explicitly not proven by A5.3').",
+        "evidence": [
+          "outputs/autobattle/a52-tactics-policy/checks.json",
+          "docs/tactics-policy.md"
+        ]
+      }
+    ],
+    "artifact_sha256": {
+      "outputs/autobattle/a53-live-contrast-01/run.json": "083fc85d97caf9d45cad6c47f142a7dcaee8a90cf0ae577ea995ac4b66e6b209",
+      "outputs/autobattle/a53-live-contrast-01/events.jsonl": "d01862d8597db177dba233e814cfeffbaab2cb39455ee522c10a11ce51968a78",
+      "outputs/autobattle/a53-live-contrast-01/input-log.jsonl": "2285e9eda30d7dd887830037c3574cd157ea719d60ce3a0b8dd367ae6333ae93",
+      "outputs/autobattle/a53-live-hp-split-01/run.json": "5a50ebf4c9b5f7992ed5590055dd90aec08db71d8f30cf65665d64a9d423d919",
+      "outputs/autobattle/a53-live-hp-split-01/events.jsonl": "e1387d5bfe471ccdca10fb0f64a7e314b6fc2c756b5def12eb10b572b12525ab",
+      "outputs/autobattle/a53-live-hp-split-01/input-log.jsonl": "7e5b3fca254f90f2b6b76bfbe06d4afaae5f19b48787bb38e7b156504ec6e46d",
+      "outputs/autobattle/a53-tactics-adapter/checks.json": "26a8c3c27b08e5ab40b6b7cf78c0a232bb24d37a28191c002ed9fd40e58f3303",
+      "outputs/a53-receipt-validation.log": "528b705a2f783982f237a1ccecc79da63fbdcf72073507bca40c14ab5610f3e6"
+    },
+    "limitations": [
+      "Narrow family: only the engine-offered Move and Wait are candidates. Ability candidates (command cursor 1 -> ability list -> target mode) are not decoded, so the 'insufficient MP' and 'illegal range/target' controls are not applicable here and remain open.",
+      "A Move candidate asserts that the menu offers the Move command, not that a destination is reachable; reachability is decided by the engine at the confirm and verified by the whole-party tile delta afterwards.",
+      "Stale-snapshot rejection is host-proven only; the live observations measured 1.5-1.6 s of age (dominated by the boundary screenshot) against the 5.0 s policy budget, so no live run happened to be stale.",
+      "Both live runs stopped on the turn budget (2 turns) as intended; this packet makes no complete-battle, defeat, takeover or resume claim (those remain A5.1/C3 evidence).",
+      "The live conditional family is a condition on the actor's own engine-read state (HP percent and which commands the menu offers), not on a target: the adapter exposes no target unit for a Move.",
+      "Mode label: run.json still records mode 'retail-ai' for the policy run (the field names the enemy-turn behaviour, which is unchanged); the policy path is named by tactics_policy and by each turn event's tactics record.",
+      "PRE-EXISTING FAILURE (not caused by this slice, not in the suite's default names list): the transport scenario 'identified-wait-noecho' (reachable only via --scenario all or by name) fails on the committed revision AND on this one, identically: the run never reaches a boundary because the A5.1 owner law rejects the sticky-cursor state the scenario models, so the expected 3-boundary bound note is absent (0 presses, 0 seeds, 150.7 s). Reproduced on the pre-change runtime with tools/autobattle_runtime.py stashed."
+    ],
+    "next_packet_steps": "A5.4: run the public runner with contrasting per-character policies in the normal battle, retain enemy isolation / STOP / monitor-client handoff / resumed continuation evidence, and keep Move/Wait divergence from being presented as HP/MP/ability conditional behaviour."
+  },
   "artifact_sha256": {
     "outputs/autobattle/a51-live-manual-05/run.json": "95374f46deec9fcd3132204eb945be1069013f17333760bba5dd0b1bc0cf16c8",
     "outputs/autobattle/a51-live-manual-05/events.jsonl": "18545715974b91e1f849a8e534742a52c3f2ab5892dea4ec84828b383093fd03",
@@ -366,5 +488,5 @@
     "No ROM bytes or bulk memory dumps committed; raw local evidence (including the window PNGs) stays ignored and is cited by sha256.",
     "The turn-transition scratch window (DE-032) is bounded to 45 s in the adopt; a much longer transition would still fail the guard honestly."
   ],
-  "next_packet": "A5.3: prove the minimum conditional-action adapter (tools/tactics_policy.py consumers + live evidence), then A5.4 integrates contrasting per-character policies."
+  "next_packet": "A5.4: integrate and close conditional tactics (public runner, contrasting per-character policies, live evidence retained across enemy isolation / STOP / handoff / resume)."
 }

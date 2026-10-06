@@ -21,7 +21,11 @@ KNOWN_FIELDS = {"t", "kind", "scenario", "turn", "actor", "actor_slot",
                 "control_mode", "selected_action", "selected_target",
                 "position_before", "position_after", "state", "seeds",
                 "router_hits", "note", "input_log", "actor_identity",
-                "engine_result", "next_actor"}
+                "engine_result", "next_actor",
+                # A5.3: the conditional-tactics receipt (policy path, outcome,
+                # reason, matched scope/rule, observation age, offered
+                # candidates). Null on every scenario-driven run.
+                "tactics"}
 # kinds whose presence after the terminal stop means the run kept driving:
 # boundaries, turns, and notes about recovery cycles are all input activity
 INPUT_EVENT_KINDS = {"boundary", "turn", "note"}
