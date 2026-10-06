@@ -549,6 +549,21 @@
           "outputs/autobattle/a53-tactics-adapter/checks.json",
           "outputs/a53-receipt-validation.log"
         ]
+      },
+      {
+        "id": "A5.4-transport-default-suite",
+        "status": "pass",
+        "command": "python tools/validate_transport_paths.py --scenario <name> --out-root outputs/autobattle/a54-subset (all 23 names of the suite's default list)",
+        "expected": "the changed boundary dispatch, the added event field and the two cleanup/guard fixes still hold on every recorded transport path of the default suite",
+        "observed": "23 of 23 DEFAULT scenarios PASS on this revision (14 run in this slice: takeover 106.7s, submenu 59.0s, resume-after-pause 132.6s, stop-during-drive 32.0s, results 72.9s, results-cleared 90.0s, defeat 85.0s, unknown 59.0s, restart 145.9s, disconnect 21.7s, guard-failure 0.0s, pause 28.0s, stop-before-start 0.0s, stop-coincides-with-progress 21.9s; the other nine were run in the A5.3 slice and are re-listed in the summary log). Each scenario is gated through validate_autobattle_runtime's receipt contract. The summary log is a TRANSCRIPTION of those runs; the raw per-scenario receipts/events/input logs are the evidence under outputs/autobattle/a54-subset/ and a53-subset/.",
+        "evidence": [
+          "outputs/a54-transport-default-summary.log",
+          "outputs/autobattle/a54-subset/takeover/run.json",
+          "outputs/autobattle/a54-subset/resume-after-pause/run.json",
+          "outputs/autobattle/a54-subset/results/run.json",
+          "outputs/autobattle/a54-subset/restart/run.json"
+        ],
+        "negative_control": "--scenario identified-wait-noecho (outside the default list) fails on the committed revision and on this one identically"
       }
     ],
     "artifact_sha256": {
@@ -563,7 +578,8 @@
       "outputs/autobattle/a53-live-hp-split-30-01/events.jsonl": "874f81614e29b8a55fb92615c4486eea1a5418678064bb3a65ef11af6d6d9ba7",
       "outputs/autobattle/a53-live-hp-split-30-01/input-log.jsonl": "8945e183c15330ec6d0451eef5a700100f4ae75386bddeb3c14491519a492201",
       "outputs/autobattle/a54-session-cleanup/checks.json": "db6212a27cbc6448105f3eba4825df2ae13ebc3d739928d582c694c5258c1c2b",
-      "outputs/a54-resume-guard.log": "bc3343063a8ee523e1f43a0e2ba63c550e3b076614c129cb79535b5564082a5a"
+      "outputs/a54-resume-guard.log": "bc3343063a8ee523e1f43a0e2ba63c550e3b076614c129cb79535b5564082a5a",
+      "outputs/a54-transport-default-summary.log": "60671ef6c01bbfadc0687e324a0c1107a5005e899c8be85543b7b67214efde92"
     },
     "limitations": [
       "The live capability is still the narrow Move/Wait family: an engine-offered Move with no destination, range or MP cost. Ability targeting (MP/range/status restrictions) is not implemented, so those controls remain not applicable rather than passing.",
@@ -572,7 +588,8 @@
       "The adopted-cleanup fix is host-verified (validate_session_cleanup.py, with a pre-fix negative control) plus the live defect observation; a live re-run proving taskkill ends a real adopted mGBA after the fix was not performed in this packet, so that specific live step stays open.",
       "STOP-classification wording: a killed-stop receipt still reads 'STOP requested: battle left running for manual play' while emulator_handoff says terminated. The truthful field is emulator_handoff; the reason text is a pre-existing wording wart, left unchanged to avoid breaking recorded transport expectations.",
       "A5.1's stored delivered hashes describe the revision that produced them; tools/fixture_guard.py and tools/run_autobattle.py changed again in A5.4, so A5.1's live runs are historical evidence for those files.",
-      "The pre-existing transport scenario 'identified-wait-noecho' failure recorded under a5_3 remains open and untouched."
+      "The pre-existing transport scenario 'identified-wait-noecho' failure recorded under a5_3 remains open and untouched (the default 23-scenario suite excludes it).",
+      "The 23-scenario result is recorded as a transcribed summary plus the per-scenario receipt artifacts; the suite was run scenario-by-scenario because one --scenario all invocation exceeds the command budget on this host."
     ],
     "next_packet_steps": "A6 (resource and recovery tactics): extend the frozen schema with item-count/MP consumers as concrete rules require, add heal-under-threshold / revive-before-attack / MP-reserve / never-use-item rules and a healer preset under configs/tactics/, test the exact boundaries, and replay a wounded-party fixture against a damage-focused policy. A7 movement tactics and A10 configuration follow as dependencies permit."
   },

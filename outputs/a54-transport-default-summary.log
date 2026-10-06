@@ -1,0 +1,37 @@
+A5.4 transport re-verification on the delivered revision (6e55f9a)
+===============================================================
+Command per scenario (one process each):
+  python tools/validate_transport_paths.py --scenario <name> --out-root outputs/autobattle/a5{3,4}-subset
+
+This is a TRANSCRIPTION of the runs' PASS/exit lines; the raw per-scenario
+artifacts (run.json, events.jsonl, input-log.jsonl) are the evidence and live in
+outputs/autobattle/a54-subset/<name>/ (and a53-subset/ for the nine run in the
+A5.3 slice). Every scenario is gated through validate_autobattle_runtime's
+receipt contract, so TRANSPORT VALIDATION PASSED means the receipts passed too.
+
+PASS takeover (106.7s)                  exit 0
+PASS submenu (59.0s)                    exit 0
+PASS resume-after-pause (132.6s)        exit 0
+PASS stop-during-drive (32.0s)          exit 0
+PASS results (72.9s)                    exit 0
+PASS results-cleared (90.0s)            exit 0
+PASS defeat (85.0s)                     exit 0
+PASS unknown (59.0s)                    exit 0
+PASS restart (145.9s)                   exit 0
+PASS disconnect (21.7s)                 exit 0
+PASS guard-failure (0.0s)               exit 0
+PASS pause (28.0s)                      exit 0
+PASS stop-before-start (0.0s)           exit 0
+PASS stop-coincides-with-progress (21.9s) exit 0
+
+Previously verified in the A5.3 slice, same revision except for the two A5.4
+fixes (fixture_guard adopted-kill, resume scenario guard), which the scenarios
+above also exercise through the fake transport:
+PASS identified-move (27.7s) / identified-move-wrong (44.8s) / identified-move-invalid (12.1s)
+PASS identified-move-occupied (58.3s) / identified-wait-control (19.7s)
+PASS boundary-panel (84.4s) / boundary-dead (58.5s)
+PASS pause-at-boundary (6.0s) / strict-press (9.3s)
+
+Default suite total: 23/23 PASS.
+KNOWN PRE-EXISTING FAILURE (not in the default names list, untouched here):
+  --scenario identified-wait-noecho fails identically on committed master.

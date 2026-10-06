@@ -34,6 +34,14 @@ expectations come from the scenario file and the receipt does not carry them;
 says so (`outputs/a54-resume-guard.log`). The operator error is kept as the
 negative control for that guard.
 
+Verification on the delivered revision: the **whole default transport suite —
+23/23 scenarios PASS**, including takeover, submenu, resume-after-pause,
+results, results-cleared, defeat, restart and every STOP row, each gated through
+the runtime receipt contract (`outputs/autobattle/a54-subset/`,
+`a53-subset/`; transcribed summary `outputs/a54-transport-default-summary.log`).
+The scenario outside the default list, `identified-wait-noecho`, still fails and
+is recorded, not fixed.
+
 Honest bounds in the receipt: the live capability is still Move/Wait (no
 ability candidate, no MP cost, no range), no complete-battle/law/defeat run
 under a policy, the resumed leg's later Move committed but produced no
