@@ -1,0 +1,301 @@
+{
+  "schema": "a4-divergence-demo/3",
+  "date": "2026-10-05",
+  "fixture": "a4-multi-ally-battle-start.ss0",
+  "same_job": 5,
+  "menus": [
+    {
+      "menu": 1,
+      "slot": 7,
+      "name": "Marche",
+      "job": 5,
+      "wait_ev": {
+        "ticks": 11,
+        "flashed": [
+          5,
+          7
+        ],
+        "rule": "target-cursor-own-tile",
+        "trace_head": [
+          {
+            "5": 0,
+            "7": 0
+          },
+          {
+            "5": 0,
+            "7": 0
+          },
+          {
+            "5": 754,
+            "7": 808
+          },
+          {
+            "5": 1000,
+            "7": 443
+          },
+          {
+            "5": 928,
+            "7": 1000
+          },
+          {
+            "5": 194,
+            "7": 677
+          }
+        ],
+        "trace_tail": [
+          {
+            "5": 194,
+            "7": 677
+          },
+          {
+            "5": 928,
+            "7": 1000
+          },
+          {
+            "5": 24,
+            "7": 498
+          },
+          {
+            "5": 0,
+            "7": 306
+          },
+          {
+            "5": 0,
+            "7": 306
+          },
+          {
+            "5": 0,
+            "7": 306
+          }
+        ],
+        "cts": {
+          "5": 0,
+          "7": 306
+        },
+        "exclude": [],
+        "cursor": [
+          4,
+          10
+        ],
+        "match": [
+          7
+        ],
+        "stable": [
+          5,
+          7
+        ]
+      }
+    },
+    {
+      "menu": 2,
+      "slot": 5,
+      "name": "Montblanc",
+      "job": 5,
+      "wait_ev": {
+        "ticks": 5,
+        "flashed": [],
+        "rule": "target-cursor-own-tile",
+        "trace_head": [
+          {
+            "5": 630,
+            "7": 55
+          },
+          {
+            "5": 0,
+            "7": 311
+          },
+          {
+            "5": 353,
+            "7": 0
+          },
+          {
+            "5": 353,
+            "7": 0
+          },
+          {
+            "5": 353,
+            "7": 0
+          }
+        ],
+        "trace_tail": [
+          {
+            "5": 630,
+            "7": 55
+          },
+          {
+            "5": 0,
+            "7": 311
+          },
+          {
+            "5": 353,
+            "7": 0
+          },
+          {
+            "5": 353,
+            "7": 0
+          },
+          {
+            "5": 353,
+            "7": 0
+          }
+        ],
+        "cts": {
+          "5": 353,
+          "7": 0
+        },
+        "exclude": [
+          7
+        ],
+        "cursor": [
+          5,
+          10
+        ],
+        "match": [
+          5
+        ],
+        "stable": [
+          5,
+          7
+        ]
+      }
+    }
+  ],
+  "attempts": [],
+  "seeds_by_phase": [
+    {
+      "after_menu": 1,
+      "actors": [
+        "Carson",
+        "Jon",
+        "PP",
+        "Schneider",
+        "Velasquez"
+      ]
+    },
+    {
+      "final": true,
+      "actors": [
+        "Carson",
+        "Jon",
+        "PP",
+        "Schneider",
+        "Velasquez"
+      ]
+    }
+  ],
+  "effect_snapshots": [
+    {
+      "menu": 1,
+      "owner": "Marche",
+      "slot": 7,
+      "kind": "move",
+      "plan_kind": "identified-move",
+      "completed": true,
+      "owner_moved": true,
+      "moved_slots": [
+        7
+      ],
+      "owner_tile": [
+        4,
+        10
+      ],
+      "stale_dest": null,
+      "dest_used": [
+        4,
+        11
+      ],
+      "legs": [
+        "cmd-nav",
+        "open-target",
+        "dest-step",
+        "target-identified",
+        "confirm-move",
+        "wait-nav-echo",
+        "wait-commit"
+      ]
+    },
+    {
+      "menu": 2,
+      "owner": "Montblanc",
+      "slot": 5,
+      "kind": "wait",
+      "plan_kind": "identified-wait",
+      "completed": true,
+      "owner_moved": false,
+      "moved_slots": [],
+      "owner_tile": [
+        5,
+        10
+      ],
+      "stale_dest": null,
+      "dest_used": null,
+      "legs": [
+        "echo-probe",
+        "wait-nav",
+        "wait-commit"
+      ]
+    }
+  ],
+  "verdicts": {
+    "fixture_shape": true,
+    "two_same_job_allies_distinct": true,
+    "divergence_move_vs_wait": true,
+    "interception_no_memory_writes": true,
+    "same_job_enemy_retail_turn": true,
+    "enemy_unaffected": true
+  },
+  "fixture_shape": {
+    "players": [
+      [
+        5,
+        "Montblanc",
+        5
+      ],
+      [
+        7,
+        "Marche",
+        5
+      ]
+    ],
+    "enemies": [
+      [
+        0,
+        "Jon",
+        41
+      ],
+      [
+        1,
+        "Velasquez",
+        5
+      ],
+      [
+        2,
+        "Godfrey",
+        40
+      ],
+      [
+        3,
+        "Schneider",
+        36
+      ],
+      [
+        4,
+        "Carson",
+        22
+      ]
+    ],
+    "two_same_job_players": true,
+    "same_job_enemy": true
+  },
+  "seeds_total": 3,
+  "turns_router": 157,
+  "t_elapsed_s": 169.7,
+  "writes": [],
+  "same_job_enemy_actors_seen": [
+    "Carson",
+    "Jon",
+    "PP",
+    "Schneider",
+    "Velasquez"
+  ]
+}

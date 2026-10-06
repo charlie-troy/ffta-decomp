@@ -279,23 +279,33 @@ def main():
                                    == roster.get(m["name_text"], {})
                                    .get("job")),
                 })
-        # roster units with NO mirror record: Marche is expected here by
-        # construction (the mirror is the AI-side copy); anything else is
-        # a real mapping gap
+        # roster units with NO mirror record: player-side units are absent
+        # by construction (the mirror is the AI-side copy). A1's fixture had
+        # one player (Marche); the A4 multi-ally fixture has two — the law is
+        # "every player-side unit is absent", not a hardcoded name list.
         missing = [r["name_text"] for r in b1["phases"][0]["roster"]
                    if r["name_text"] not in mirror_names]
+        player_side = [r["name_text"]
+                       for r in b1["phases"][0]["roster"]
+                       if not r.get("side_bit") and r.get("type") != 20]
         analysis["verdicts"]["mirror_absent"] = missing
-        analysis["verdicts"]["mirror_absent_expected"] = missing == ["Marche"]
+        analysis["verdicts"]["mirror_absent_expected_names"] = player_side
+        analysis["verdicts"]["mirror_absent_expected"] = (
+            set(missing) == set(player_side))
         analysis["verdicts"]["identity_stable_within_battle"] = all(
             e["stable_within_battle"] for e in analysis["per_slot"]) \
             if analysis["per_slot"] else False
         analysis["verdicts"]["identity_stable_across_reload"] = (
             all(e.get("stable_across_reload") for e in analysis["per_slot"])
             if analysis["per_slot"] and b2 else None)
+        n_active = sum(1 for m in analysis["mirror_map"]
+                       if m.get("roster_slot") is not None) \
+            if analysis["mirror_map"] else 0
         analysis["verdicts"]["mirror_maps_1to1_by_name"] = (
-            all(e["jobs_agree"] and e["mirror_id"] == e["roster_id"]
-                for e in analysis["mirror_map"])
-            if len(analysis["mirror_map"]) == 6 else False)
+            all(m["jobs_agree"] and m["mirror_id"] == m["roster_id"]
+                for m in analysis["mirror_map"])
+            and len(analysis["mirror_map"]) == n_active
+            and len(analysis["mirror_map"]) >= 6)
         report["analysis"] = analysis
 
     report["t_elapsed_s"] = round(time.time() - t0, 1)

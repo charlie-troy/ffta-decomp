@@ -1,0 +1,236 @@
+{
+  "schema": "a4-fixture-build/1",
+  "date": "2026-10-05",
+  "source_state": "C:\\Users\\charl\\Projects\\ffta-decomp\\outputs\\lua-nav\\engage.ss0",
+  "fixture": "outputs\\lua-nav\\a4-multi-ally-battle-start.ss0",
+  "fixture_sha1": "34c88fa47dc314891f93584e151484451dc94aa6",
+  "retag": {
+    "job": 5,
+    "race": 1,
+    "secondary": 0,
+    "members": 14
+  },
+  "route": [
+    {
+      "mask": 1,
+      "tag": "enter-dispatch"
+    },
+    {
+      "mask": 1,
+      "tag": "dismiss-notice"
+    },
+    {
+      "mask": 1,
+      "tag": "pick-0"
+    },
+    {
+      "mask": 1,
+      "tag": "place-0"
+    },
+    {
+      "mask": 1,
+      "tag": "back-to-list"
+    },
+    {
+      "mask": 1,
+      "tag": "re-pick-0"
+    },
+    {
+      "mask": 1,
+      "tag": "re-place-0"
+    },
+    {
+      "mask": 1,
+      "tag": "re-back-to-list"
+    },
+    {
+      "mask": 16,
+      "tag": "switch-member"
+    },
+    {
+      "mask": 1,
+      "tag": "pick-1"
+    },
+    {
+      "mask": 1,
+      "tag": "place-1"
+    },
+    {
+      "mask": 1,
+      "tag": "back-to-list-2"
+    },
+    {
+      "mask": 8,
+      "tag": "to-battle"
+    },
+    {
+      "mask": 1,
+      "tag": "confirm"
+    }
+  ],
+  "roster": [
+    {
+      "slot": 0,
+      "name_text": "Jon",
+      "job": 41,
+      "base_job": 41,
+      "race": 5,
+      "level": 40,
+      "type": 1,
+      "id": 0,
+      "side_bit": true,
+      "hp": 319,
+      "max_hp": 319,
+      "ct": 320
+    },
+    {
+      "slot": 1,
+      "name_text": "Velasquez",
+      "job": 5,
+      "base_job": 5,
+      "race": 1,
+      "level": 42,
+      "type": 1,
+      "id": 1,
+      "side_bit": true,
+      "hp": 300,
+      "max_hp": 300,
+      "ct": 715
+    },
+    {
+      "slot": 2,
+      "name_text": "Godfrey",
+      "job": 40,
+      "base_job": 40,
+      "race": 5,
+      "level": 40,
+      "type": 1,
+      "id": 2,
+      "side_bit": true,
+      "hp": 303,
+      "max_hp": 303,
+      "ct": 922
+    },
+    {
+      "slot": 3,
+      "name_text": "Schneider",
+      "job": 36,
+      "base_job": 36,
+      "race": 5,
+      "level": 41,
+      "type": 1,
+      "id": 3,
+      "side_bit": true,
+      "hp": 323,
+      "max_hp": 323,
+      "ct": 0
+    },
+    {
+      "slot": 4,
+      "name_text": "Carson",
+      "job": 22,
+      "base_job": 22,
+      "race": 3,
+      "level": 40,
+      "type": 1,
+      "id": 4,
+      "side_bit": true,
+      "hp": 231,
+      "max_hp": 231,
+      "ct": 0
+    },
+    {
+      "slot": 5,
+      "name_text": "Montblanc",
+      "job": 5,
+      "base_job": 5,
+      "race": 1,
+      "level": 40,
+      "type": 8,
+      "id": 5,
+      "side_bit": false,
+      "hp": 241,
+      "max_hp": 241,
+      "ct": 822
+    },
+    {
+      "slot": 6,
+      "name_text": "Judge",
+      "job": 104,
+      "base_job": 104,
+      "race": 23,
+      "level": 10,
+      "type": 20,
+      "id": 6,
+      "side_bit": false,
+      "hp": 10,
+      "max_hp": 10,
+      "ct": 0
+    },
+    {
+      "slot": 7,
+      "name_text": "Marche",
+      "job": 5,
+      "base_job": 5,
+      "race": 1,
+      "level": 50,
+      "type": 2,
+      "id": 7,
+      "side_bit": false,
+      "hp": 442,
+      "max_hp": 442,
+      "ct": 110
+    }
+  ],
+  "players_same_job": true,
+  "enemy_same_job": true,
+  "ok": true,
+  "log": [
+    "booted engage.ss0 pid=37580",
+    "member 0 patch (80, 1, 2, 8) -> (5, 1, 5, 0)",
+    "retagged 14 members to job 5",
+    "  press enter-dispatch mask=0x01 hits=12",
+    "    flags after enter-dispatch: []",
+    "  press dismiss-notice mask=0x01 hits=12",
+    "    flags after dismiss-notice: []",
+    "  press pick-0 mask=0x01 hits=12",
+    "    flags after pick-0: [0]",
+    "  press place-0 mask=0x01 hits=12",
+    "    flags after place-0: [0]",
+    "  press back-to-list mask=0x01 hits=12",
+    "    flags after back-to-list: [0]",
+    "  press re-pick-0 mask=0x01 hits=12",
+    "    flags after re-pick-0: [0]",
+    "  press re-place-0 mask=0x01 hits=12",
+    "    flags after re-place-0: [0]",
+    "  press re-back-to-list mask=0x01 hits=12",
+    "    flags after re-back-to-list: [0]",
+    "  press switch-member mask=0x10 hits=12",
+    "    flags after switch-member: [0]",
+    "  press pick-1 mask=0x01 hits=12",
+    "    flags after pick-1: [0, 1]",
+    "  press place-1 mask=0x01 hits=12",
+    "    flags after place-1: [0, 1]",
+    "  press back-to-list-2 mask=0x01 hits=12",
+    "    flags after back-to-list-2: [0, 1]",
+    "  settle 3.0s",
+    "  press to-battle mask=0x08 hits=12",
+    "    flags after to-battle: [0, 1]",
+    "  press confirm mask=0x01 hits=12",
+    "    flags after confirm: [0, 1]",
+    "deployed members after route: [0, 1]",
+    "roster: 2 players 5 enemies 1 judge",
+    "  slot0 Jon job=41 side_enemy=True hp=319/319",
+    "  slot1 Velasquez job=5 side_enemy=True hp=300/300",
+    "  slot2 Godfrey job=40 side_enemy=True hp=303/303",
+    "  slot3 Schneider job=36 side_enemy=True hp=323/323",
+    "  slot4 Carson job=22 side_enemy=True hp=231/231",
+    "  slot5 Montblanc job=5 side_enemy=False hp=241/241",
+    "  slot6 Judge job=104 side_enemy=False hp=10/10",
+    "  slot7 Marche job=5 side_enemy=False hp=442/442",
+    "hotkey: sent Shift+F2 (pid=37580)",
+    "state saved: C:\\Users\\charl\\Projects\\ffta-decomp\\outputs\\autobattle\\scratch\\engage\\baserom.ss2 (96470 bytes)",
+    "fixture written: outputs\\lua-nav\\a4-multi-ally-battle-start.ss0 sha1=34c88fa47dc314891f93584e151484451dc94aa6"
+  ],
+  "t_elapsed_s": 80.4
+}

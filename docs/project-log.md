@@ -96,7 +96,7 @@ status and backlog tables are living sections and should be kept current.
 |---|---|
 | Branch | `master`, tracking `origin/master` |
 | Active phase | Phase 9 — player-authored auto-battle strategies |
-| Current work package | A8 round-10 rework landed (investigation complete, product acceptance open). Next: A4 multi-ally fixture + same-job isolation demo. C1–C3 accepted at 88b1072 for the documented fixture and one-handoff flow |
+| Current work package | A4 round-9 closed: two-ally fixture + same-job divergence demo PASS, receipt status `pass`. A8 investigation complete, product acceptance open. C1–C3 accepted at 88b1072 for the documented fixture and one-handoff flow |
 | Last closed package | A1 normal-battle access; A2.3 pipeline question answered, full A2 acceptance still open |
 | Baseline | 173 matched functions / 9,888 bytes; byte-identical 16 MB rebuild |
 | Core gates | `make check` 173/173; AI 10/10; strategies 7/7; jobs 4/4; missions 13/13; maps 16/16; items 8/8; statuses/state 21/21; text 2,757/2,757; matching ROM SHA1 |
@@ -4543,3 +4543,63 @@ the calibration was rebuilt from scratch on timestamped evidence.
 - **Still open**: A4's same-job cross-side isolation demo — the
   receipt's top-level status stays `unknown` until a multi-ally
   fixture exists (construction, not mechanism research).
+
+## 2026-10-05 — A4 round 9: two-ally fixture built, same-job divergence demo PASS
+
+Scope: Astra's round-9 worker step 3 (build the missing multi-ally fixture
+and finish A4's same-job cross-side isolation demonstration), following the
+A8 round-10 closure at `394300f`.
+
+**Fixture.** `outputs/lua-nav/a4-multi-ally-battle-start.ss0` (sha1
+`34c88fa47dc314891f93584e151484451dc94aa6`, sha256 first 16
+`7cbe2f661279d148`) built by `tools/a4_fixture_build.py` driving the A1
+engage route through the key-poll channel: players **Marche + Montblanc
+both job 5**, five enemies incl. same-job **Velasquez** (job 5), Judge
+present; `--verify` round-trips the roster. Evidence:
+`outputs/autobattle/A4-demo/fixture-build.json`. The route is pinned in
+`docs/battle-fixtures.md`: the pedestal-member switch is **D-pad RIGHT
+(`0x10`)** — the R-shoulder candidate failed three build attempts (new
+DE-031), and START must fire from the LIST screen only.
+
+**Demo (`tools/a4_divergence_demo.py`, schema `a4-divergence-demo/3`).**
+Read-only player-menu method — zero memory writes (`writes=[]`). Runs:
+
+- run 1 FAIL (392.8 s): false settle mid-walk-in (roster tiles still
+  0,0) and the commit return tuple read as a bool, so every attempt
+  logged ok. Fixed: `wait_tiles` gate, real return contracts,
+  full-snapshot `moved_slots` evidence.
+- run 2 FAIL (746.9 s): both commits engine-correct but BOTH owner
+  labels swapped — flash+park named Montblanc for menu 1 while the
+  engine moved slot 7, and Marche for menu 2 while the engine moved
+  slot 5. Root cause (new DE-030): on this fixture the menu owner
+  parks ABOVE `PARK_CT_MAX` (306/353 observed) while the frozen ally
+  sits stable at 0, so `flash ∩ parked` selects exactly the non-owner.
+  Attribution replaced with the engine's own answer: `TARGET_X/Y`
+  reads the owner's own tile at a freshly opened menu (C2 law), held
+  across two ticks, with already-committed allies excluded from
+  matching.
+- run 4 PASS (169.7 s): menu 1 owner Marche, `identified-move`,
+  engine moved `(4,10) -> (4,11)` (`moved_slots=[7]`); menu 2 owner
+  Montblanc (Marche excluded), `identified-wait`, no tile change
+  (`moved_slots=[]`); final pump attributes all five enemies incl.
+  same-job Velasquez; all six verdicts true. `A4-DEMO PASS`.
+
+**Scope probe re-run** on the two-ally fixture: `A4-SCOPE PASS`
+(448.3 s) — the generalized mirror laws hold with two players:
+`mirror_absent == [Montblanc, Marche]` equals the expected player-side
+set, 6/6 mirror map by name+job+id, identity stable 8/8 within battle
+and across reloads. Limitation: the probe's CT-park menu-2 settle does
+not fire on this fixture (same DE-030 law), so each boot drove 1 of 2
+planned turns (2 phases instead of 3); recorded in the receipt.
+
+**Receipt/docs.** `docs/receipts/autobattle/A4.json`: the same-job row
+unknown → **pass** (cites demo.json + fixture-build.json), identity
+rows re-evidenced against the current probe.json (original
+single-player run preserved at `750c606`), top-level status →
+**pass — A4 closed**. Updated: roadmap A4 rows,
+`docs/strategy-runtime-scope.md` (divergence section: demonstrated),
+`docs/battle-fixtures.md` (fixture table + pinned route),
+`docs/dead-ends.md` (DE-030, DE-031).
+
+**Gates:** `validate_all.py baserom.gba` FULL VALIDATION PASSED
+(52.6 s); AI 10/10, missions 13/13, maps 17/17 within it.

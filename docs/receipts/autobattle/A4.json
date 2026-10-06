@@ -1,31 +1,34 @@
 {
   "packet": "A4",
   "schema": "autobattle-receipt/1",
-  "date": "2026-09-21",
+  "date": "2026-10-05",
   "tool": "tools/probe_strategy_scope.py",
   "evidence": "outputs/autobattle/A4-scope/probe.json",
+  "demo_tool": "tools/a4_divergence_demo.py",
+  "demo_evidence": "outputs/autobattle/A4-demo/demo.json",
+  "fixture_evidence": "outputs/autobattle/A4-demo/fixture-build.json",
   "doc": "docs/strategy-runtime-scope.md",
   "criteria": [
     {
       "id": "identity-stable-across-turns",
       "status": "pass",
-      "evidence": "7/7 live slots byte-identical across menu-open, post-turn-1, post-turn-2 in both boots (identity fields: decoded name, type, base/active job, race, level, id, side bit)",
-      "limitation": "proven on this fixture's roster (one player unit, five distinct-job enemies); uniqueness under duplicated identity vectors is not produced here"
+      "evidence": "two-ally re-run (2026-10-05, schema a4-strategy-scope/1): 8/8 live slots byte-identical across menu-open and post-turn-1 in both boots (identity fields: decoded name, type, base/active job, race, level, id, side bit); the original single-player run (7 slots x 3 phases x 2 boots, preserved at 750c606:outputs/autobattle/A4-scope/probe.json) agrees",
+      "limitation": "the two-ally re-run drove 1 of 2 planned turns per boot (menu-2 settle does not fire on this fixture, DE-030), so within-battle stability covers 2 phases per boot; the original run covers 3 phases; uniqueness under duplicated identity vectors is only produced here (two job-5 players distinguished by decoded name + id)"
     },
     {
       "id": "identity-stable-across-reloads",
       "status": "pass",
-      "evidence": "all 7 slots identical between two fresh boots of battle-start.ss0"
+      "evidence": "all 8 slots identical between two fresh boots of a4-multi-ally-battle-start.ss0 (boot2-menu1 == boot1-menu1); the original 7-slot run (750c606) is identical too"
     },
     {
       "id": "mirror-maps-by-identity",
       "status": "pass",
-      "evidence": "AI mirror 0x02002FC4: 6/6 active records match the roster record of the same decoded name on job AND unit id; mirror_absent == ['Marche'] verified, not assumed"
+      "evidence": "AI mirror 0x02002FC4 on the two-ally fixture: 6/6 active records match the roster record of the same decoded name on job AND unit id; mirror_absent == ['Montblanc', 'Marche'] equals the expected player-side set (both player units, verified not assumed; the single-player run at 750c606 gave ['Marche'])"
     },
     {
       "id": "actor-attribution-by-decode",
       "status": "pass",
-      "evidence": "after each driven player commit the sequencer seeds attribute all five enemy actors by decoded name in both boots (8 seeds/boot)"
+      "evidence": "after each driven player commit the sequencer seeds attribute enemy actors by decoded name in both boots (original run: all five enemies, 8 seeds/boot, 750c606; two-ally re-run: seed actors=['Velasquez'] post-commit per boot; the A4 demo's final pump attributed all five enemies including same-job Velasquez, demo.json)"
     },
     {
       "id": "player-only-interception",
@@ -34,9 +37,9 @@
     },
     {
       "id": "same-job-cross-side-divergence-demo",
-      "status": "unknown",
-      "evidence": "no verified fixture holds two same-job units (roster jobs 41/5/40/36/22 + Marche job 2); placement screen shows 6 dispatchable clan members, so a two-ally fixture is constructible via the A1 capture route \u2014 fixture construction is the remaining work, not mechanism research (status vocabulary aligned to the contract: pass/fail/unknown; blocked dependency = unknown)",
-      "note": "the divergence measurement itself (seed attribution + effect_snapshot diffs) is already implemented and live-proven"
+      "status": "pass",
+      "evidence": "two-ally fixture a4-multi-ally-battle-start.ss0 (players Marche + Montblanc both job 5; five enemies including same-job Velasquez job 5; outputs/autobattle/A4-demo/fixture-build.json, sha1 34c88fa47dc314891f93584e151484451dc94aa6) driven read-only by tools/a4_divergence_demo.py: menu 1 owner Marche (rule target-cursor-own-tile, cursor (4,10)) committed identified-move and the engine moved slot 7 (4,10) to (4,11) (moved_slots=[7]); menu 2 owner Montblanc (cursor (5,10), Marche excluded from attribution) committed identified-wait with no tile change (moved_slots=[]); same-job enemy Velasquez attributed a retail turn in the final pump; zero memory writes (writes=[]). demo.json schema a4-divergence-demo/3, A4-DEMO PASS in 169.7 s, all six verdicts true",
+      "note": "attribution law established while building the demo: CT cannot name the menu owner on this fixture (the owner parks at 306/353, above PARK_CT_MAX, while the frozen ally sits stable at 0), so the owner is read from the engine's own target cursor \u2014 at a freshly opened menu TARGET_X/Y reads the owner's own tile \u2014 cross-checked by the full-snapshot tile delta"
     },
     {
       "id": "precedence-contract",
@@ -44,12 +47,12 @@
       "evidence": "explicit character -> job default -> party default -> retail behavior, frozen in docs/strategy-runtime-scope.md with fail-closed boot validation"
     }
   ],
-  "verdict": "A4 identity + interception evidence complete; same-job demo blocked on fixture construction (documented, unclaimed)",
+  "verdict": "A4 complete: identity, interception, and the same-job cross-side divergence demo all have live evidence; packet acceptance closed",
   "base_revision": "79d44ea",
-  "tested_revision": "A4-scope live probe (2 boots x 2 turns) plus the working tree committed with this receipt",
-  "status": "unknown",
-  "status_note": "Round-9 correction (Astra review): a top-level pass contradicted the unknown same-job row. Honest status: investigation complete, packet acceptance open until the same-job cross-side isolation demonstration runs on a multi-ally fixture.",
+  "tested_revision": "A4-scope live probe on both fixtures (two-ally re-run PASS 448.3 s, original single-player run at 750c606) plus the same-job divergence demo (A4-DEMO PASS, 2026-10-05) plus the working tree committed with this receipt",
+  "status": "pass",
+  "status_note": "Round-9 close: the previously open same-job row now has passing evidence on a purpose-built two-ally fixture (2026-10-05; the earlier failed demo runs and their root causes are recorded in docs/project-log.md and docs/dead-ends.md).",
   "limitations": [
-    "proven on this fixture's roster (one player unit, five distinct-job enemies); uniqueness under duplicated identity vectors is not produced here"
+    "identity rows are proven on the original one-player fixture; the demo runs on the two-ally fixture and proves divergence for job 5 only (the method generalizes: any two same-job players plus a same-job enemy)"
   ]
 }

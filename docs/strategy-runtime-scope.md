@@ -69,20 +69,39 @@ The A2.4b result stands as the negative control for the *other* candidate:
 `+0xEA` bit 7 is Stop, not an AI switch — there is no proven one-flag
 delegation lever, which is why the runner-side chooser is the architecture.
 
-## Same-job cross-side divergence: blocked on a fixture, not on a mechanism
+## Same-job cross-side divergence: demonstrated (2026-10-05)
 
 The roadmap's demonstration ("two same-job allies diverge while an enemy of
-that job is unaffected") cannot be executed on any verified fixture today:
-the battle roster holds five enemies with **five distinct jobs** (41/5/40/36/
-22) and one player unit. The placement screen showed 0/6 dispatchable clan
-members, so a two-ally dispatch fixture is *constructible* through the A1
-capture route, but that is a new fixture capture plus new guard expectations
-and is its own task — this packet does not claim the demo.
+that job is unaffected") ran on the purpose-built two-ally fixture
+`outputs/lua-nav/a4-multi-ally-battle-start.ss0` (sha1
+`34c88fa47dc314891f93584e151484451dc94aa6`, built by
+`tools/a4_fixture_build.py`, round-trip verified by its `--verify`): players
+**Marche** and **Montblanc** both job 5, five enemies including same-job
+**Velasquez** (job 5), Judge present. Evidence:
+`outputs/autobattle/A4-demo/fixture-build.json` + `demo.json` (schema
+`a4-divergence-demo/3`, `A4-DEMO PASS` in 169.7 s, all six verdicts true).
 
-What A4 contributes now: the identity vector above is exactly the key a
-policy map would use, and the divergence demo's *measurement* is already
-implemented (`probe.seeds` attribution + `effect_snapshot` diffs). The
-remaining work is fixture construction, not mechanism research.
+Method (player-menu boundary, zero memory writes — `writes=[]`):
+
+1. menu 1: owner **Marche** identified from the engine's own target cursor
+   (rule `target-cursor-own-tile`, cursor `(4,10)` = his own tile),
+   `identified-move` committed — the engine moved him `(4,10) -> (4,11)`
+   (`moved_slots=[7]`);
+2. menu 2: owner **Montblanc** (cursor `(5,10)`; Marche excluded from
+   attribution), `identified-wait` committed — no tile change
+   (`moved_slots=[]`);
+3. final pump: same-job enemy **Velasquez** attributed a retail turn by
+   decoded-name seed attribution, unaffected throughout.
+
+Attribution law established while building the demo (recorded as DE-030):
+**CT cannot name the menu owner on a multi-ally fixture.** The owner parks
+ABOVE `PARK_CT_MAX` (306/353 observed) while the frozen ally sits stable at
+0, so the flash+park rule that worked on the solo fixture swapped both
+attributions in demo run 2 — the commits were engine-correct, only the
+labels were wrong, and the full-snapshot tile delta exposed the swap. The
+owner is now read from the target cursor (`TARGET_X/Y` reads the owner's own
+tile at a freshly opened menu, the C2 law) held across two ticks, with the
+tile delta as independent cross-check.
 
 ## Precedence contract (frozen for A5+)
 

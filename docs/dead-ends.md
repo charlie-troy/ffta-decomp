@@ -462,3 +462,50 @@ CLAUDE.md carries the slogan.
   resume with `c` after every read and bracket the event from
   cont/read timestamp pairs (the T phase's running windows), not from
   poll arrival times alone.
+
+### DE-030 — CT cannot name the menu owner on a multi-ally fixture
+
+- **Tried (A4 demo, 2026-10-05):** owner attribution by CT park: the
+  rule that worked on the solo fixture — the turn-ready 1000 flash plus
+  a stable park at `ct <= PARK_CT_MAX` (300) — was carried onto the
+  two-ally fixture. Demo run 2 used it on two consecutive menus.
+- **Refuted by:** the engine's own answer. Run 2's rule named
+  Montblanc for menu 1 and Marche for menu 2 — both wrong. The commits
+  were engine-correct (the engine always moves the unit whose menu is
+  open), and the full-snapshot tile delta showed it: menu 1 moved
+  slot 7 `(4,10) -> (4,11)` while the label said slot 5, menu 2 moved
+  slot 5 `(5,10) -> (5,11)` while the label said slot 7. The CT trace
+  explains the swap: **the real owner parks ABOVE `PARK_CT_MAX`**
+  (306 and 353 observed across the two menus) while the *frozen* ally
+  sits stable at 0 — so `flash ∩ parked` selected exactly the
+  non-owner both times. A 1000-flash alone is also not owner proof:
+  both allies flashed within the same wait.
+- **Cure:** the owner is read from the engine itself — at a freshly
+  opened menu `TARGET_X/Y` reads the **owner's own tile** (the C2 law),
+  so the owner is the live player slot standing on the cursor tile,
+  matched across two ticks with tiles populated and at least one slot
+  byte-stable as settle gates, and with already-committed allies
+  excluded so a stale cursor cannot mislabel the next menu
+  (`wait_menu` in `tools/a4_divergence_demo.py`). The full-snapshot
+  `moved_slots` delta is the independent cross-check: engine moves the
+  menu owner, nobody else.
+- **Do not:** attribute menu ownership from absolute CT thresholds or
+  turn-ready flashes on fixtures with more than one player unit; the
+  park value is unit-specific and the frozen ally can be the "stable
+  low" one. Trust a tile delta or the engine's own cursor.
+
+### DE-031 — The R shoulder does not switch the pedestal unit in dispatch
+
+- **Tried (A4 fixture build, 2026-10-05):** three build attempts used
+  the R shoulder (`0x100`) to cycle the pedestal member in the
+  placement screen between placing the first and second ally.
+- **Refuted by:** the pinned route — the pedestal cycles on **D-pad
+  RIGHT (`0x10`)**. With R the route re-picked the same member, the
+  second placement overwrote the first, and the built state failed the
+  two-player guard (`players=1`) each time. After switching to
+  D-pad RIGHT the build passed `--verify` on the first run
+  (`players_same_job=true`, `enemy_same_job=true`).
+- **Do not:** assume shoulder buttons mirror list-cursor D-pad
+  semantics on this screen; probe the D-pad first, and always
+  round-trip the built state through the guard before citing it as a
+  fixture.

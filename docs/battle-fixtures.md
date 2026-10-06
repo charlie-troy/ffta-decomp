@@ -21,6 +21,7 @@ holds". Nothing in this file is a game byte; savestates stay untracked.
 | `battle-start.ss0` | **verified battle fixture** | `4da58bfe0e162210` |
 | `battle-start-r1.ss0` | A1 reproducibility run; same live roster | `4d87b5db2ef5f358` |
 | `fix3-battle-start.ss0` | Live state byte-identical to `battle-start.ss0` | `591f64c6760f9898` |
+| `a4-multi-ally-battle-start.ss0` | **A4 two-ally same-job fixture** (Marche + Montblanc job 5 vs five enemies incl. same-job Velasquez; Judge present) | `7cbe2f661279d148` |
 
 `a2-battle-start.ss0` (`ac80bafab261a245`), `a2b-battle-start.ss0`,
 `a2run-battle-start.ss0`, `fix2-battle-start.ss0` and `dp-battle-start.ss0` all
@@ -99,6 +100,50 @@ LEFT=32, UP=64, DOWN=128, R=256, L=512.
 
 **Timing caveat:** START fires reliably only after the placement screen has
 settled (~2 s after the last A); issued too early it opens the unit roster.
+
+## Two-ally same-job fixture (A4, 2026-10-05)
+
+`a4-multi-ally-battle-start.ss0` (sha1
+`34c88fa47dc314891f93584e151484451dc94aa6`) holds the roster A4 needed:
+two player units of the same job plus an enemy of that job.
+
+| slot | name | job | type | side | role |
+|---|---|---|---|---|---|
+| 0 | Jon | 41 | enemy | clan | enemy |
+| 1 | **Velasquez** | **5** | enemy | clan | same-job enemy |
+| 2 | Godfrey | 40 | enemy | clan | enemy |
+| 3 | Schneider | 36 | enemy | clan | enemy |
+| 4 | Carson | 22 | enemy | clan | enemy |
+| 5 | **Montblanc** | **5** | player | party | ally 2 |
+| 6 | Judge | 104 | neutral | unaffiliated | Judge |
+| 7 | **Marche** | **5** | player | party | ally 1 |
+
+Built and verified by:
+
+```bash
+python tools/a4_fixture_build.py            # writes the state + fixture-build.json
+python tools/a4_fixture_build.py --verify   # roster round-trip vs the receipt
+```
+
+Evidence: `outputs/autobattle/A4-demo/fixture-build.json` (roster, jobs,
+side bits, CTs at build, `players_same_job` + `enemy_same_job` both true).
+
+**Pinned dispatch route** (drives the key-poll channel from the A1
+engage state; the two failure-prone steps are called out):
+
+1. A — enter dispatch; A — dismiss NOTICE (lands on the LIST screen).
+2. A pick-0, A place-0, A back-to-list.
+3. A re-pick-0, A re-place-0, A re-back-to-list (refreshes the pedestal).
+4. **D-pad RIGHT (`0x10`) — NOT the R shoulder (`0x100`) — switches the
+   pedestal unit.** The R-shoulder candidate failed three build attempts
+   before the D-pad law was found (recorded in `docs/dead-ends.md`).
+5. A pick-1, A place-1, A back-to-list-2; settle 3 s.
+6. **START only from the LIST screen** (too early opens the unit roster),
+   then A confirm → ~40 s intro + walk-in.
+
+The same route plus the demo drive are exercised end-to-end by
+`tools/a4_divergence_demo.py` (fixture shape asserted from the guard's
+receipt before any input).
 
 ## Reproducibility (reload-twice check)
 

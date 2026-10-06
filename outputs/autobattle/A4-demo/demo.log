@@ -1,0 +1,9 @@
+[    2.1s] fixture shape: {'players': [(5, 'Montblanc', 5), (7, 'Marche', 5)], 'enemies': [(0, 'Jon', 41), (1, 'Velasquez', 5), (2, 'Godfrey', 40), (3, 'Schneider', 36), (4, 'Carson', 22)], 'two_same_job_players': True, 'same_job_enemy': True}
+[   60.3s] menu 1: owner=Marche slot=7 job=5 flashed=[5, 7]
+[   61.5s]   roster tiles populated: {5: (5, 10), 7: (4, 10)}
+[   81.6s]   commit move: plan=identified-move completed=True moved=True
+[  128.7s]   seeds after menu 1: {'after_menu': 1, 'actors': ['Carson', 'Jon', 'PP', 'Schneider', 'Velasquez']}
+[  151.5s] menu 2: owner=Montblanc slot=5 job=5 flashed=[]
+[  152.7s]   roster tiles populated: {5: (5, 10), 7: (4, 11)}
+[  166.7s]   commit wait: plan=identified-wait completed=True moved=False
+[  166.7s] two real behaviors committed; pumping for the same-job enemy turn
