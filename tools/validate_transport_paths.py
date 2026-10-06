@@ -203,6 +203,32 @@ class FakeSession:
                           "name": name, "name_text": name_text})
         self.receipt = {"roster": {"slots": slots, "ram_named_slots": [6]}}
         populate_roster(self.g)
+        # A5.1: project independently recorded identity fields too; the real
+        # adapter now decodes names and checks job/side/id on every drive.
+        from fixture_guard import read_roster, BATTLE_STRUCT
+        for j, b in enumerate((7).to_bytes(4, "little")):
+            self.g.mem[BATTLE_STRUCT + j] = b
+        for i, row in enumerate(slots[:7]):
+            base = ROSTER + STRIDE * i
+            ptr = 0x02001000 + 32 * i
+            for j, b in enumerate(ptr.to_bytes(4, "little")):
+                self.g.mem[base + j] = b
+            for j, b in enumerate(row["side_raw"].to_bytes(2, "little")):
+                self.g.mem[base + 0x28 + j] = b
+            self.g.mem[base + 0x104] = i
+            for off, val in ((4, 20 if i == 5 else 2), (5, 2), (6, 0), (7, 2), (9, 50)):
+                self.g.mem[base + off] = val
+            data = bytearray()
+            for c in row["name_text"]:
+                code = (0xB0 + ord(c)-ord('A') if c.isupper() else
+                        0xCA + ord(c)-ord('a') if c.islower() else
+                        0xA6 + int(c))
+                data.extend((0x80, code))
+            data.append(0)
+            for j, b in enumerate(data):
+                self.g.mem[ptr + j] = b
+        self.receipt = {"ok": True, "roster": read_roster(self.g, rom=self._rom)}
+        self.receipt["roster"]["ram_named_slots"] = [6]
 
     def read_rom_bytes(self):
         return self._rom
@@ -216,6 +242,8 @@ class FakeSession:
     # round-7: the CLI's guard-failure receipt reads keep_process (adopted
     # sessions keep their emulator); FakeSession never owns a real process.
     keep_process = False
+    pid = 12345
+    port = 2345
 
     def adopt_existing(self):
         raise RuntimeError("FakeSession has no live emulator to adopt")
@@ -857,6 +885,8 @@ def make_runtime(world, run_id, out_dir, **kw):
     # live runs assign rt.g inside live_guard(); the harness mirrors that
     # ordering (guards are fixture data, validated separately on hardware)
     rt.g = session.g
+    from autobattle_identity import ActorAdapter
+    rt.adapter = ActorAdapter(session)
     return rt
 
 
@@ -1031,18 +1061,29 @@ def run_scenario(name, out_root):
         if kinds.count("turn") != 1:
             errors.append(f"defeat: ghost menus were driven "
                           f"({kinds.count('turn')} turn events)")
-    elif name == "results":
+    elif name in ("results", "results-cleared"):
         # one committed turn, then the all-zero results shape held
         world.identified_move = True  # turn 1 commits via the identified flow
         world.allow_seeds = True
         world.after_commit = lambda w: w.mark_ending(1)
+        if name == "results-cleared":
+            def clear_early(w):
+                w.mark_ending(1)
+                w.ending_t -= RESULTS_SETTLE_SECONDS + 1
+            world.after_commit = clear_early
         state = rt.run()
         if state != "completed":
             errors.append(f"results: expected completed, got {state}")
         kinds = [e["kind"] for e in _events(rt.events_path)]
-        if kinds.count("turn") != 1:
-            errors.append(f"results: the results screen was driven "
-                          f"({kinds.count('turn')} turn events)")
+        if world.commits != 1 or kinds.count("boundary") != 1:
+            errors.append("results: input was issued beyond the one engine commit")
+        turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
+        if len(turns) > 1:
+            errors.append("results: more than one successful action was claimed")
+        if turns and not (turns[0].get("engine_result") or {}).get("verified"):
+            errors.append("results: unverified actor snapshot acquired a successful action label")
+        if name == "results-cleared" and turns:
+            errors.append("results-cleared: the early cleared snapshot acquired a turn claim")
     elif name == "pause":
         # manual takeover request (STOP file) MID-battle: after turn 1 has
         # committed, the runtime must hand the battle over to the player —
@@ -1293,7 +1334,7 @@ def run_scenario(name, out_root):
         if os.path.isdir(cli_dir):
             shutil.rmtree(cli_dir)  # events append across runs: start clean
         orig_ctor = _ra.FixtureSession
-        _ra.FixtureSession = lambda state, rom=None: session
+        _ra.FixtureSession = lambda state, rom=None, **kw: session
         try:
             base = ROSTER + _STRIDE * 6 + _OFF_NAME
             for i in range(4):
@@ -1402,20 +1443,11 @@ def run_scenario(name, out_root):
                           "its wrong tile — the control does not exercise "
                           "the demotion path")
         turns = [e for e in _events(rt.events_path) if e["kind"] == "turn"]
-        if len(turns) != 1:
-            errors.append(f"identified-move-wrong: expected 1 turn event, "
-                          f"got {len(turns)}")
-        else:
-            t = turns[0]
-            if t.get("selected_action") is not None or \
-                    t.get("selected_target") is not None:
-                errors.append(f"identified-move-wrong: the claim SURVIVED an "
-                              f"engine that executed a different tile — "
-                              f"action={t.get('selected_action')} "
-                              f"target={t.get('selected_target')}")
-            if "NOT claimed" not in (t.get("note") or ""):
-                errors.append(f"identified-move-wrong: the demotion must be "
-                              f"recorded in the turn note: {t.get('note')}")
+        if turns:
+            errors.append("identified-move-wrong: unverified result produced a successful turn event")
+        notes = [e.get("note") or "" for e in _events(rt.events_path)]
+        if not any("engine result rejected" in n for n in notes):
+            errors.append("identified-move-wrong: result rejection not recorded")
     elif name == "identified-move-occupied":
         # C3 b-ladder control (c3-live-a attempts 2/3 + probe4 law): the
         # confirmed destination tile is OCCUPIED — no walk happens, the
@@ -1504,12 +1536,13 @@ def run_scenario(name, out_root):
         world.identified_move = True
         world._cmd_cursor = 7           # unknown command byte: not 0/1/2
         world._target_cursor = [5, 9]   # stale target copy: a "readable" x/y
+        rt.stall_seed_seconds = 12.0  # rejection bound; no gameplay input is permitted
         state = rt.run()
         if state != "stalled":
             errors.append(f"identified-move-invalid: expected stalled "
                           f"(honest bound), got {state}")
         notes = [(e.get("note") or "") for e in _events(rt.events_path)]
-        if not any("plan rejected" in n for n in notes):
+        if not any("plan rejected" in n or "owner rejected" in n for n in notes):
             errors.append("identified-move-invalid: no planner-rejection "
                           f"note recorded: {notes}")
         # the input contract: the rejection must have prevented EVERY key
@@ -1872,7 +1905,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--scenario", default="all",
                             choices=["all", "takeover", "unknown", "disconnect",
-                                     "restart", "defeat", "results", "submenu",
+                                     "restart", "defeat", "results", "results-cleared", "submenu",
                                      "pause", "strict-press",
                                      "stop-before-start",
                                      "stop-during-drive",
@@ -1890,7 +1923,7 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     names = ["takeover", "unknown", "disconnect", "restart", "defeat",
-             "results", "submenu", "pause", "strict-press",
+             "results", "results-cleared", "submenu", "pause", "strict-press",
              "stop-before-start", "stop-during-drive",
              "stop-coincides-with-progress", "guard-failure",
              "identified-move", "identified-move-wrong",

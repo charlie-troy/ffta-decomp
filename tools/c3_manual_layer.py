@@ -305,20 +305,27 @@ def main(argv=None):
     # -- 3. wait for the player-command window --------------------------
     deadline = time.time() + args.window_timeout
     prev = None
+    stable_polls = 0
     while time.time() < deadline:
-        time.sleep(0.35)
+        # A pair 350 ms apart can catch an enemy animation with a frozen
+        # player copy. Ride out that transient before probing a live menu.
+        time.sleep(3.0)
         sample = {"t": round(time.time() - t0, 1),
-                  "cursor": cursor(), "ct": ct(), "keyinput": keyinput()}
+                  "cursor": cursor(), "ct": ct(), "keyinput": keyinput(),
+                  "target": target(), "tile": tile()}
         if sample["ct"] is not None and prev is not None:
             stable = (prev["ct"] == sample["ct"]
                       and prev["cursor"] == sample["cursor"]
                       and sample["cursor"] is not None
-                      and sample["ct"] is not None)
+                      and sample["ct"] is not None and sample["ct"] != 1000
+                      and sample["target"] == sample["tile"]
+                      and sample["tile"] is not None)
             sample["stable"] = stable
             # frozen CT + stable cursor = parked UI (a charging Marche
             # never holds two equal samples 0.35 s apart); the echo
             # probe is what actually proves the menu answers
-            if stable:
+            stable_polls = stable_polls + 1 if stable else 0
+            if stable_polls >= 2:
                 opened_at = sample["t"]
                 trace.append(sample)
                 break
@@ -373,48 +380,34 @@ def main(argv=None):
     # navigation and the A-open entirely and step from here. The echo
     # gate below still proves the UI answers before any commit input.
     tgt0 = target()
-    if tgt0 is not None and tile0 is not None and tgt0 == tile0:
-        say(f"target mode already open at turn start (target={tgt0}) — "
-            "stepping directly")
-    else:
-        # re-opened-menu path: navigate to Move(0) with echo-verified keys,
-        # prove the menu answers (DOWN 0->1), then A into target mode.
-        # UP from 0 wraps onto Status(3) — never press UP at 0; walk down
-        # through 3 with DOWN but never confirm there.
-        cur = cursor()
-        nav = 0
-        while cur != MOVE_CURSOR and nav < 4:
-            nav += 1
-            if cur == 1:
-                nxt = echo_key("UP")
-            else:                               # 2, 3, or unreadable
-                nxt = echo_key("DOWN")
-            if nxt is None:
-                return finish(1, menu_open=True,
-                              abort="cursor echo failed during navigation")
-            cur = nxt
-        if cur != MOVE_CURSOR:
-            say(f"FAIL: cursor never reached Move (last={cur})")
-            return finish(1, menu_open=True, abort="navigation exhausted")
-        say(f"cursor at Move after {nav} nav press(es)")
+    cur = cursor()
+    nav = 0
+    while cur != MOVE_CURSOR and nav < 4:
+        nav += 1
+        nxt = echo_key("UP" if cur == 1 else "DOWN")
+        if nxt is None:
+            return finish(1, menu_open=True, abort="cursor echo failed during navigation")
+        cur = nxt
+    if cur != MOVE_CURSOR:
+        return finish(1, menu_open=True, abort="navigation exhausted")
 
-        if echo_key("DOWN", expect_change=True) != 1:
-            # cursor 0 must be Move; a DOWN must reach Action(1). If the
-            # byte cannot move, this is not a live menu — abort before any A.
-            return finish(1, menu_open=True,
-                          abort="pre-commit echo failed at Move")
-        echo_key("UP", expect_change=True)      # back to Move(0)
-        cur = cursor()
-        if cur != MOVE_CURSOR:
-            return finish(1, menu_open=True,
-                          abort=f"echo UP did not return to Move (at {cur})")
-
-        sendkey(pid, "A:200")                   # open target mode
+    # A fresh command menu ALSO leaves the target copy on the owner's
+    # tile (A4/A5.1). Equality alone cannot distinguish targeting mode.
+    # Probe one DOWN: command echo proves a command menu; target echo
+    # with a frozen command byte proves the already-open target mode.
+    command_echo = echo_key("DOWN", expect_change=False)
+    target_echo = target()
+    if command_echo == 1:
+        if echo_key("UP") != MOVE_CURSOR:
+            return finish(1, menu_open=True, abort="echo UP did not return to Move")
+        sendkey(pid, "A:200")
         keys_sent.append("A")
         time.sleep(2.5)
-        t_target = target()                     # target-cursor byte, not the
-        say(f"target-mode target read: {t_target}")  # roster tile (unchanged
-                                                      # until the walk commits)
+        say(f"command menu echo verified; opened target at {target()}")
+    elif command_echo == MOVE_CURSOR and tgt0 == tile0 and target_echo != tgt0 and target_echo is not None:
+        say(f"target mode echo verified: {tgt0} -> {target_echo}")
+    else:
+        return finish(1, menu_open=True, abort="neither command nor target cursor echoed; no confirmation")
 
     try:
         capture(pid, os.path.join(out_dir, "manual-target-open.png"))
@@ -530,7 +523,13 @@ def main(argv=None):
     say(f"roster tile {tile0} -> {tile_now} "
         f"({'mirrored' if moved else 'not yet mirrored at turn close'})")
 
-    say("PASS: the manual turn committed through the window (move + Wait); "
+    if not moved:
+        say("FAIL: window input produced CT progress but the selected move "
+            "did not reach its destination; manual action remains unverified")
+        return finish(1, menu_open=True, observed_ct_progress=True,
+                      manual_turn_committed=None,
+                      abort="selected manual destination not verified")
+    say("PASS: manual move destination verified after window Move/Wait; "
         "emulator left alive for --resume leg 2")
     return finish(0, menu_open=True, manual_turn_committed=True)
 

@@ -1,0 +1,13 @@
+{
+  "scenario_id": "a4-two-player",
+  "title": "Verified A4 same-job allies with distinct identified Move/Wait actions",
+  "guard_expectations": {
+    "slot0_name": "0x085671ee", "slot0_id": 0,
+    "struct_count": 8, "live_units": 8, "player_name_text": "Marche"
+  },
+  "actor_actions": [
+    {"name": "Marche", "id": 7, "action": "move"},
+    {"name": "Montblanc", "id": 5, "action": "wait"}
+  ],
+  "note": "A5.1 fixture actions only; ordered conditional tactics remain gated by A5.2. State: outputs/lua-nav/a4-multi-ally-battle-start.ss0."
+}

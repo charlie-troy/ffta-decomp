@@ -10,6 +10,7 @@ terminal state. Turn events append to
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
@@ -87,12 +88,19 @@ def main(argv=None):
     # process cleanup, not only the receipt text — with the session created
     # explicitly, __exit__ is guaranteed to run on every path (finally) and
     # the paused handoff flips session.keep_process BEFORE it does.
-    session = FixtureSession(args.state, rom=args.rom)
+    expect = dict(scenario.get("guard_expectations", {}))
+    if isinstance(expect.get("slot0_name"), str):
+        expect["slot0_name"] = int(expect["slot0_name"], 0)
+    session = FixtureSession(args.state, rom=args.rom, expect=expect)
     if args.resume:
         try:
             session.adopt_existing()
         except Exception as exc:
             print(f"FAIL: could not adopt the running emulator: {exc}")
+            # A failed read-only adoption may have opened the transport.
+            # Close it while preserving the existing emulator.
+            session.keep_process = True
+            session.__exit__(None, None, None)
             return 2
         handoff_pid = (resumed_run.get("manual_handoff") or {}).get("pid")
         if handoff_pid and session.pid != handoff_pid:
@@ -128,7 +136,7 @@ def main(argv=None):
             # any receipt, leaving only stdout text behind.
             runtime.event("stop", note="stalled: live guard failed before start")
             guard_receipt = {
-                "schema": "a3-run/1",
+                "schema": "a3-run/2",
                 "run_id": run_id,
                 "scenario": scenario.get("scenario_id"),
                 "mode": args.mode,
@@ -170,7 +178,7 @@ def main(argv=None):
         keep_process = paused and args.on_stop == "leave-running"
         session.keep_process = keep_process
         receipt = {
-            "schema": "a3-run/1",
+            "schema": "a3-run/2",
             "run_id": run_id,
             "scenario": scenario.get("scenario_id"),
             "mode": args.mode,
@@ -182,7 +190,17 @@ def main(argv=None):
             "events": runtime.events_path,
             "emulator_handoff": ("left-running-for-player" if keep_process
                                  else "terminated"),
+            "emulator_pid": session.pid,
+            "player_identities": [list((r["name_text"], r["id"]))
+                                  for r in runtime.adapter.expected],
         }
+        receipt["input_sha256"] = {}
+        for path in (args.rom, args.state, args.scenario,
+                     "tools/run_autobattle.py", "tools/autobattle_runtime.py",
+                     "tools/autobattle_identity.py", "tools/probe_control_handoff.py"):
+            if os.path.isfile(path):
+                with open(path, "rb") as fh:
+                    receipt["input_sha256"][path] = hashlib.sha256(fh.read()).hexdigest()
         if args.resume:
             receipt["resumed"] = True
             # runtime.turn was preset to leg 1's count: it IS the battle's

@@ -9,14 +9,12 @@ Built directly on the A2.5 frozen contract (docs/player-ai-control.md,
   the battle for manual resume: input stops immediately, breakpoints are
   disarmed, and (with the CLI's --on-stop handoff) the emulator is left
   running so the player can continue from the live screen.
-- Boundary detection uses the value-agnostic frozen-CT menu signature
-  (`player_menu_frozen`): a re-opened menu freezes its owner's roster CT at
-  any value. The only proven commit shape is the full route DOWN DOWN A A at
-  frames=5; single keys are refuted (docs/dead-ends.md DE-020).
-- In `retail-ai` mode the runtime never overrides engine choices: enemy turns
-  run with retail AI and the runtime supplies the one proven engine-legal
-  player action (Wait) at each player menu boundary. Non-Wait choices need
-  A5's chooser and are out of scope here.
+- A5.1 resolves the verified fresh-menu owner by cursor-own-tile plus
+  stable CT and boot-verified name/id/job/side. CT values never name actors.
+  Targeting keeps a pinned identity; every new input revalidates that actor.
+- In the legacy `retail-ai` mode, enemies run unchanged retail AI and the
+  companion selects identified Move/Wait for player menus. Scenario actions
+  are a narrow fixture seam; ordered conditional tactics remain A5.2+ work.
 - Turn events append to outputs/autobattle/<run-id>/events.jsonl. Unknown
   fields are null, never inferred labels.
 - Stall detection is bounded by seed silence plus a wall-clock timeout.
@@ -31,6 +29,7 @@ import os
 import time
 
 from probe_control_handoff import Probe
+from autobattle_identity import ActorAdapter, IdentityError, key
 
 # Runtime states (roadmap A3: explicit state machine)
 IDLE = "idle"
@@ -52,6 +51,7 @@ EVENT_SCHEMA = {
     # silently-dropped-field behavior is exactly the bug class Astra
     # flagged in round 4 (a passed kwarg that never reaches the artifact).
     "input_log": None,
+    "actor_identity": None, "engine_result": None, "next_actor": None,
 }
 
 
@@ -131,6 +131,11 @@ class BattleRuntime:
         self._dead_seed_mark = 0  # seed count when the current dead streak began
         self._dead_grace_t = None  # wall time the defeat debounce first held
         self._stop_requested = False  # Astra 2026-09-17: checked INSIDE long
+        self.adapter = None
+        self.owner = None
+        self._pre_players = None
+        self._engine_result = None
+        self._boundary_seed_count = len(self.p.seeds)
         #                              waits, so a pause ends waits promptly
 
     def _stop_check(self):
@@ -199,24 +204,48 @@ class BattleRuntime:
     def live_guard(self):
         """Verify the fixture live before leaving `idle` (paused until then)."""
         g = self.g = self.s.g
-        from probe_control_handoff import ROSTER, STRIDE
-        from fixture_guard import (BATTLE_STRUCT, COUNT_OFF, OFF_NAME,
-                                   decode_ram_name, u16, u8)
-        count = u16(g, BATTLE_STRUCT + COUNT_OFF)
-        rom = self.s.read_rom_bytes()
-        names = []
-        for i in range(min(count, 8)):
-            base = ROSTER + STRIDE * i
-            ptr = u16(g, base + OFF_NAME) | (u16(g, base + OFF_NAME + 2) << 16)
-            names.append(decode_ram_name(g, ptr, rom=rom) if ptr else None)
-        expect = self.scenario.get("guard_expectations", {})
-        ok_count = count == expect.get("struct_count", count)
-        marche_ok = "Marche" in [n for n in names if n]
-        slot0_ok = bool(names) and names[0] is not None and \
-            names[0] != expect.get("player_name_text", "Marche")
-        self.event("guard", note=f"count={count} names={names}",
-                   control_mode=None)
-        return ok_count and marche_ok and slot0_ok
+        try:
+            if not self.s.receipt.get("ok"):
+                raise IdentityError("session fixture guard rejected")
+            self.adapter = ActorAdapter(self.s)
+            rows = self.adapter.snapshot()
+            actions = self.scenario.get("actor_actions", [])
+            if (not isinstance(actions, list) or any(
+                    not isinstance(a, dict) or set(a) != {"name", "id", "action"}
+                    or not isinstance(a["name"], str) or type(a["id"]) is not int
+                    for a in actions)):
+                raise IdentityError("malformed fixture action assignment")
+            keys = [(a.get("name"), a.get("id")) for a in actions]
+            if len(set(keys)) != len(keys) or any(k not in {key(r) for r in rows} for k in keys):
+                raise IdentityError("duplicate or absent action assignment")
+            if any(a.get("action") not in ("move", "wait") for a in actions):
+                raise IdentityError("unsupported action assignment")
+            self.event("guard", note=f"verified player identities: {[key(r) for r in rows]}")
+            return True
+        except IdentityError as exc:
+            self.event("guard", note=f"identity guard rejected: {exc}")
+            return False
+
+    def _actor_fields(self):
+        row = self.owner or {}
+        return {"actor": row.get("name_text"), "actor_slot": row.get("slot"),
+                "actor_identity": {f: row.get(f) for f in
+                                   ("name_text", "id", "job", "side_bit", "addr")}}
+
+    def _actor_valid_for_input(self):
+        if self._stop_check():
+            return False
+        try:
+            rows = self.adapter.snapshot()
+            row = next((r for r in rows if key(r) == key(self.owner)), None)
+            if row is None or row["slot"] != self.owner["slot"] or row["hp"] <= 0:
+                raise IdentityError("active actor invalidated during drive")
+        except IdentityError as exc:
+            self._saw_unknown_modal = True
+            self._terminal_reason_identity = str(exc)
+            self.event("note", **self._actor_fields(), note=f"input identity rejected: {exc}")
+            return False
+        return True
 
     # -- state classification ---------------------------------------------
     def _all_cts_zero(self):
@@ -225,7 +254,7 @@ class BattleRuntime:
 
     def _classify(self):
         """Return the next state from live engine observations."""
-        if self._saw_unknown_modal:
+        if time.time() - self.t0 >= self.wall_timeout or (self.max_turns and self.turn >= self.max_turns):
             return STALLED
         seeds_now = len(self.p.seeds)
         if seeds_now > self._last_seed_count:
@@ -239,7 +268,7 @@ class BattleRuntime:
         # a3-natural2 lesson: a transient wipe also shows seed traffic, so
         # seeds seen during the debounce window prove "mid-action copy",
         # not a real death — only a *silent* debounce trips the grace.
-        if self._marche_dead():
+        if self._party_dead():
             self._dead_polls += 1
             if len(self.p.seeds) > self._dead_seed_mark:
                 self._dead_polls = 0  # traffic during the wipe: copy, not death
@@ -248,7 +277,7 @@ class BattleRuntime:
             self._dead_polls = 0
             self._dead_seed_mark = len(self.p.seeds)
             self._dead_grace_t = None
-        # a3-natural1 lesson: after Marche is defeated the battle still ends
+        # a3-natural1 lesson: after the player party is defeated the battle still ends
         # naturally (defeat animation -> results screen) ~30 s later. Stopping
         # the run at the debounce pre-empted that conclusion, so a held defeat
         # suppresses takeover (menus no longer belong to him) and the stall
@@ -257,16 +286,24 @@ class BattleRuntime:
         in_grace = self._dead_polls >= 3
         if in_grace and self._dead_grace_t is None:
             self._dead_grace_t = time.time()
-            self.event("note", actor="Marche", actor_slot=6,
-                       note="player defeat held 3 polls with seed silence; "
+            self.event("note", **self._actor_fields(),
+                       note="party defeat held 3 polls with seed silence; "
                             "suppressing takeover until battle end")
         # completion: the contract's battle-end shape — all CTs zero, seed
         # silence, roster still allocated (not torn down), router idle
-        if (self._all_cts_zero() and quiet >= 45.0 and not torn
+        if (len(self.adapter.expected) == 1 and self._all_cts_zero() and quiet >= 45.0 and not torn
                 and self._last_seed_count > 0):
             return COMPLETED
-        if torn and quiet >= 45.0:
+        if len(self.adapter.expected) == 1 and torn and quiet >= 45.0:
             return COMPLETED
+        if self._saw_unknown_modal:
+            # Results may clear the actor before a commit result is read.
+            # Suppress all input and claims while allowing the previously
+            # verified solo end signature to settle; do not call a timeout
+            # a completed battle or an unverified move a successful turn.
+            if len(self.adapter.expected) == 1 and self._all_cts_zero():
+                return RUNNING
+            return STALLED
         # Excluded when the whole CT vector is zero: the results screen parks
         # every CT at a stable 0 (run 20 end shape), which is also a stable
         # player CT — driving there would send a route into a non-battle UI.
@@ -275,9 +312,18 @@ class BattleRuntime:
         # check's stability window, and a guard evaluated before the check
         # would be stale — the 2026-09-17 victory-path wedge (a drive into
         # the results screen, bounded by B-recovery) was exactly that race.
-        if (not in_grace and self.p.player_menu_frozen(2)
-                and not self._all_cts_zero()):
-            return TAKEOVER
+        if not in_grace and not self._all_cts_zero():
+            try:
+                rows = self.adapter.snapshot()
+                owner = self.adapter.observe(self.p, rows)
+                if owner is not None:
+                    self.owner = owner
+                    self.p.active_player_slot = owner["slot"]
+                    return TAKEOVER
+            except IdentityError:
+                # Transient copies during enemy execution have no input
+                # authority. Bound by the existing no-progress timeout.
+                self.adapter.prior = None
         if in_grace:
             # defeat held but the engine's conclusion never arrived: bounds
             # only, so a live battle with a dead tracked player is bounded,
@@ -314,6 +360,7 @@ class BattleRuntime:
             self.event("start", control_mode=self.mode,
                        input_log="input-log.jsonl")
         try:
+            self.p.arm()
             while True:
                 # latched stop (seen inside a wait or recovery) exits before
                 # any further classification or input (Astra 2026-09-17:
@@ -350,10 +397,12 @@ class BattleRuntime:
                     self._finish(COMPLETED, "battle end signature held")
                     break
                 elif nxt == STALLED:
-                    reason = ("player unit defeated (hp block zeroed); "
+                    reason = (getattr(self, "_terminal_reason_identity", None)
+                              or ("turn budget reached" if self.max_turns and self.turn >= self.max_turns else None)
+                              or ("party defeated (hp block zeroed); "
                               "battle end did not arrive within budget"
-                              if self._marche_dead()
-                              else "no-progress bound reached")
+                              if self._party_dead()
+                              else (self.adapter.last_rejection or "no-progress bound reached")))
                     self._finish(STALLED, reason)
                     break
         except (OSError, ConnectionError) as exc:
@@ -361,7 +410,7 @@ class BattleRuntime:
             self._finish(CONNECTION_LOST, f"transport lost: {exc}")
         return self.state
 
-    def _marche_pos(self):
+    def _actor_pos(self):
         from probe_control_handoff import ROSTER, STRIDE, u8
         ps = self.p.player_slot()
         if ps is None:
@@ -370,26 +419,29 @@ class BattleRuntime:
         return {"x": u8(self.g, base + self._TILE_X),
                 "y": u8(self.g, base + self._TILE_Y)}
 
-    def _marche_dead(self):
-        """True when the tracked player record lost its HP block.
-
-        a3-full1 evidence: Wait-only never attacks or heals; once Marche is
-        defeated his roster tile/hp read 0 while the engine keeps running
-        (the router keeps serving the remaining units). The unit can no
-        longer act, so every menu the runtime sees from then on belongs to
-        someone else — driving there is a partial route into unknown UI.
-        """
-        from probe_control_handoff import ROSTER, STRIDE, u16
-        ps = self.p.player_slot()
-        if ps is None:
+    def _party_dead(self):
+        # A dead known actor cannot suppress or authorize another ally.
+        # Missing/transient identities are unknown, never evidence of defeat.
+        if self.adapter is None:
             return False
-        base = ROSTER + STRIDE * ps
-        return u16(self.g, base + 0x18) == 0 and u16(self.g, base + 0x1A) == 0
+        try:
+            rows = self.adapter.snapshot()
+            return bool(rows) and all(r["hp"] == 0 for r in rows)
+        except IdentityError:
+            return False
 
     def _drive_player_boundary(self):
+        try:
+            self._pre_players = self.adapter.revalidate(self.owner, self.p)
+        except IdentityError as exc:
+            self._saw_unknown_modal = True
+            self.event("note", note=f"fresh-menu identity rejected: {exc}; no input")
+            return
+        self._engine_result = None
+        self._boundary_seed_count = len(self.p.seeds)
         prev = self.state
         self.state = TAKEOVER
-        before = self._marche_pos() or {"x": None, "y": None}
+        before = self._actor_pos() or {"x": None, "y": None}
         shot = None
         try:
             shot = self.s.screenshot(os.path.join(
@@ -397,7 +449,7 @@ class BattleRuntime:
                 f"boundary-turn{self.turn + 1}.png"))
         except Exception:
             shot = None
-        self.event("boundary", actor="Marche", actor_slot=6,
+        self.event("boundary", **self._actor_fields(),
                    control_mode="external", position_before=before,
                    note=shot)
         # -- C2 identified-candidate path -----------------------------------
@@ -408,9 +460,12 @@ class BattleRuntime:
         # navigates the real cursors (re-reading RAM between legs) and
         # finishes the turn with the proven Wait commit (probe5/6: the move
         # re-opens the command menu, so the turn only closes after Wait).
+        self.adapter.prior = None
+        action = next((a["action"] for a in self.scenario.get("actor_actions", [])
+                       if (a["name"], a["id"]) == key(self.owner)), "move")
         plan = None
         try:
-            plan = self.p.plan_identified_move()
+            plan = self.p.plan_identified_move() if action == "move" else None
         except Exception:
             plan = None
         if plan is None:
@@ -426,7 +481,7 @@ class BattleRuntime:
             except Exception:
                 waitplan = None
             if waitplan is not None:
-                self.event("note", actor="Marche", actor_slot=6,
+                self.event("note", **self._actor_fields(),
                            control_mode="external",
                            note="identified-wait candidate (sticky cursor "
                                 f"byte {waitplan['command_id']}) — echo-gated "
@@ -435,6 +490,7 @@ class BattleRuntime:
                                 "no further input fires")
                 wdone, _wlog = self.p.commit_identified_wait(
                     waitplan, stop_check=self._stop_check,
+                    input_guard=self._actor_valid_for_input,
                     log_leg=lambda rec: self._log_input(rec))
                 if wdone:
                     self._failed_boundaries = 0
@@ -459,14 +515,14 @@ class BattleRuntime:
                 self._failed_boundaries += 1
                 if self._failed_boundaries >= 3:
                     self._saw_unknown_modal = True
-                    self.event("note", actor="Marche", actor_slot=6,
+                    self.event("note", **self._actor_fields(),
                                note="menu never answered after 3 "
                                     "echo-ladder boundaries: bounding run "
                                     "— battle left on the open menu for "
                                     "manual play")
                     self.state = prev
                     return
-                self.event("note", actor="Marche", actor_slot=6,
+                self.event("note", **self._actor_fields(),
                            note="menu not answering (echo landed, byte "
                                 "frozen): turn-transition panel suspected "
                                 "— re-arming the menu boundary (no further "
@@ -479,7 +535,7 @@ class BattleRuntime:
             # A planner rejection is a rejected candidate, not a degraded
             # one: driving a fixed route from here would select by key
             # sequence (the exact unfalsifiable claim the contract bans).
-            self.event("note", actor="Marche", actor_slot=6,
+            self.event("note", **self._actor_fields(),
                        note="identified-move plan rejected: menu state "
                             "not identified from RAM — no input issued "
                             "(candidate rejected, battle left on the "
@@ -501,6 +557,7 @@ class BattleRuntime:
 
         drove, dest_used, _leglog = self.p.commit_identified_move(
             plan, stop_check=self._stop_check,
+            input_guard=self._actor_valid_for_input,
             log_leg=_move_leg)
         if drove:
             self._failed_boundaries = 0
@@ -529,13 +586,13 @@ class BattleRuntime:
         self._failed_boundaries += 1
         if self._failed_boundaries >= 3:
             self._saw_unknown_modal = True
-            self.event("note", actor="Marche", actor_slot=6,
+            self.event("note", **self._actor_fields(),
                        note="menu never answered after 3 echo-ladder "
                             "boundaries: bounding run — battle left on the "
                             "open menu for manual play")
             self.state = prev
             return
-        self.event("note", actor="Marche", actor_slot=6,
+        self.event("note", **self._actor_fields(),
                    note="identified-move drive did not close the turn "
                         "(echo landed, byte frozen): turn-transition "
                         "panel suspected — re-arming the menu boundary "
@@ -562,7 +619,7 @@ class BattleRuntime:
                              "manual play")
                 return
             self._saw_unknown_modal = True
-            self.event("note", actor="Marche", actor_slot=6,
+            self.event("note", **self._actor_fields(),
                        note=f"{plan_kind} drive failed without a stop "
                             "(menu shape did not answer the identified "
                             "legs): bounding run — battle left on the "
@@ -586,12 +643,33 @@ class BattleRuntime:
             sel_target = {"kind": "tile", "dest": list(dest_used),
                           "identified_from":
                               "RAM target cursor read before confirm"}
+        deadline = time.time() + 20.0
+        result_error = None
+        while True:
+            if self._stop_check():
+                self._finish(PAUSED, "STOP requested: battle left running for manual play")
+                return
+            try:
+                post = self.adapter.snapshot()
+                self._engine_result = self.adapter.result(
+                    self.owner, self._pre_players, post, plan_kind, dest_used)
+                break
+            except IdentityError as exc:
+                result_error = str(exc)
+                if time.time() >= deadline:
+                    self._saw_unknown_modal = True
+                    self.event("note", **self._actor_fields(),
+                               note=f"engine result rejected: {result_error}; no action claimed")
+                    self.state = RUNNING
+                    return
+                self.p.pump(2.0, "result-copy", sample_every=60.0,
+                            stop_when=lambda _p: self._stop_check())
         # the Wait commit ends the turn: same wall-aware progress wait
         # as the route paths
         committed = self.p.wait_progress(
             seconds=min(150.0, max(10.0, self.wall_timeout -
                                    (time.time() - self.t0))),
-            min_new_seeds=1, stop_check=self._stop_check)
+            want_seeds=self._boundary_seed_count + 1, stop_check=self._stop_check)
         if not committed:
             # C1 rule: a latched STOP owns the exit — the wait returns
             # False on stop too, and a paused handoff must win over the
@@ -606,7 +684,7 @@ class BattleRuntime:
             # with NO recovery input — recovery drives un-identified routes,
             # which the contract bans from a rejected/unidentified state.
             self._saw_unknown_modal = True
-            self.event("note", actor="Marche", actor_slot=6,
+            self.event("note", **self._actor_fields(),
                        note=f"{plan_kind} commit shape produced no "
                             "sequencer progress: bounding run — battle "
                             "left on the open menu for manual play (no "
@@ -621,54 +699,36 @@ class BattleRuntime:
                          "STOP requested: battle left running for "
                          "manual play")
             return
-        # C2 verification: movement IS the observable result. The roster
-        # tile updates at commit, which wait_progress's seed condition
-        # may precede — verify on a bounded retry loop.
-        dest = tuple(dest_used) if dest_used else None
-        tile_verified = None
-        if dest is not None:
-            deadline = time.time() + 20.0
-            while time.time() < deadline:
-                if self._stop_check():
-                    break
-                pos = self._marche_pos()
-                if pos and (pos["x"], pos["y"]) == dest:
-                    tile_verified = pos
-                    break
-                try:
-                    self.p.wait_progress(seconds=2.0,
-                                         min_new_seeds=9999999,
-                                         stop_check=self._stop_check)
-                except Exception:
-                    pass
-        if self._stop_check():
-            self._finish(PAUSED,
-                         "STOP requested: battle left running for "
-                         "manual play")
-            return
-        after = self._marche_pos() or {"x": None, "y": None}
-        if dest is not None and tile_verified is not None:
-            route_note += (f"; roster tile verified at "
-                           f"({tile_verified['x']}, "
-                           f"{tile_verified['y']}) == RAM-read dest "
-                           f"(verified)")
-        elif dest is not None:
-            # engine disagreed with a CLAIMED move: demote honestly —
-            # identified and driven, but the observable result is not
-            # proven. A wait commit carries no tile claim to demote.
-            sel_action = None
-            sel_target = None
-            route_note += ("; identified-move driven but the roster "
-                           "tile did not reach the identified "
-                           "destination: NOT claimed (engine disagreed "
-                           "with the RAM-read destination)")
+        # Report the actor's independently checked commit snapshot, rather
+        # than a later enemy-phase read that can transiently wipe the record.
+        row = next(r for r in self._engine_result["players_after"]
+                   if key(r) == key(self.owner))
+        after = {"x": row["x"], "y": row["y"]}
+        if dest_used is not None:
+            route_note += f"; full-party result verified at ({row['x']}, {row['y']})"
         self.turn += 1
-        self.event("turn", turn=self.turn, actor="Marche", actor_slot=6,
+        self.event("turn", turn=self.turn, **self._actor_fields(),
                    control_mode="external", selected_action=sel_action,
                    selected_target=sel_target,
                    position_before=before, position_after=after,
+                   engine_result=self._engine_result,
+                   next_actor=self._next_seed_actor(),
                    note=f"committed via {route_note}")
         self.state = RUNNING
+
+    def _next_seed_actor(self):
+        # Only independently decoded sequencer context names are reported.
+        if not self.p.seeds:
+            return None
+        names = [u.get("name") for u in self.p.seeds[-1].get("ctx_units", [])
+                 if u.get("off") == 0 and u.get("name")]
+        matches = [r for r in self.s.receipt["roster"]["slots"]
+                   if r.get("name_text") in names and r.get("live")]
+        if len(matches) != 1:
+            return None
+        row = matches[0]
+        return {"source": "sequencer actor context", "name": row["name_text"],
+                "id": row["id"], "job": row["job"], "side_bit": row["side_bit"]}
 
     def _finish(self, state, reason):
         self.state = state

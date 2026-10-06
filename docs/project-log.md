@@ -1,5 +1,43 @@
 # Project log
 
+## 2026-10-06 — A5.1 public-runner identity integration (partial)
+
+Implemented the A4 actor method in the public runner: read-only identity
+adapter, fresh cursor/CT observations, name/id/job/side revalidation before
+each input, actor-aware planning and receipts, party-wide death handling,
+and independent full-party movement checks. Added the two-player scenario.
+Two reload-based runs named Marche slot 7 Move `(4,10)->(4,11)` and Montblanc
+slot 5 Wait with no player movement. Inspected both character-menu frames;
+next sequencer actors remain decoded retail enemies. Final bounded run:
+`outputs/autobattle/a51-two-player-final` (2 turns, turn-budget stop, not a
+completed-battle claim). The receipt validator passes on that run.
+
+Fresh AI gates pass 10/10 and strategy gates 9/9. Identity checks pass 21/21
+including the real CLI with a renamed synthetic player; manual-helper
+controls pass 4/4. Initial full transport run exposed stale wrong-result
+expectations and a genuine results-transition regression. Targeted reruns
+and their precise outcomes are recorded in `docs/receipts/autobattle/A5.json`.
+The correction allows the known solo results signature to settle without
+claiming an action whose actor snapshot was cleared. Multi-player end
+acceptance remains unknown. No ROM/source matching changes or rebuild.
+
+Live handoff is **not accepted**: solo run `a51-solo-resume-01` paused after
+a verified Move and left PID 32928 alive; window Move/Wait produced CT
+progress but never reached the selected `(5,11)` destination. The old
+manual helper nevertheless printed PASS; corrected it to reject that
+case and distinguish command-menu echo from target echo. Reconnect probes
+failed; the first was mistakenly started before the held manual monitor
+closed, so that failure is not independent transport evidence. The second
+could not halt the stub. Terminated only our recorded emulator and retained
+all failed receipts. **A5.1 stays partial; A5.2 is still gated.** Next slice:
+fresh owned emulator, wait for the manual monitor to finish, independently
+verify the manual actor/destination, then adopt that same PID and continue.
+
+Preserved Astra's pre-existing roadmap/log/scope edits. Canonical acceptance
+and source/artifact hashes are in the A5 receipt; raw local artifacts contain
+no committed ROM bytes.
+
+
 ## 2026-09-06 — Orchestrator roadmap reset around playable auto-battle
 
 Charlie reaffirmed the product goal: autonomous, faster battles with highly

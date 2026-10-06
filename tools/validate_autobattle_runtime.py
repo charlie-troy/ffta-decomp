@@ -20,7 +20,8 @@ KNOWN_KINDS = {"start", "guard", "boundary", "turn", "note", "stop"}
 KNOWN_FIELDS = {"t", "kind", "scenario", "turn", "actor", "actor_slot",
                 "control_mode", "selected_action", "selected_target",
                 "position_before", "position_after", "state", "seeds",
-                "router_hits", "note", "input_log"}
+                "router_hits", "note", "input_log", "actor_identity",
+                "engine_result", "next_actor"}
 # kinds whose presence after the terminal stop means the run kept driving:
 # boundaries, turns, and notes about recovery cycles are all input activity
 INPUT_EVENT_KINDS = {"boundary", "turn", "note"}
@@ -173,6 +174,48 @@ def validate(out_dir):
     if first_turn is not None and (first_boundary is None
                                    or first_boundary > first_turn):
         fail("a turn event precedes its boundary event", errors)
+
+    # A5.1 receipts bind EVERY turn to its latest actor boundary and verify
+    # raw party tile deltas rather than trusting the engine_result label.
+    boundary = None
+    for i, rec in enumerate(events):
+        if rec.get("kind") in ("start", "stop"):
+            boundary = None
+        elif rec.get("kind") == "boundary":
+            boundary = rec
+        elif rec.get("kind") == "turn" and (run.get("schema") == "a3-run/2" or rec.get("actor_identity")):
+            identity = rec.get("actor_identity") or {}
+            if (boundary is None or identity != boundary.get("actor_identity")
+                    or rec.get("actor") != identity.get("name_text")
+                    or rec.get("actor_slot") != boundary.get("actor_slot")
+                    or identity.get("side_bit") is not False
+                    or identity.get("id") is None):
+                fail(f"turn event {i}: actor identity disagrees with boundary", errors)
+            result = rec.get("engine_result") or {}
+            action = rec.get("selected_action") or {}
+            try:
+                pre = {(r["name_text"], r["id"]): r for r in result["players_before"]}
+                post = {(r["name_text"], r["id"]): r for r in result["players_after"]}
+                if (not result.get("verified") or not pre or set(pre) != set(post)
+                        or len(pre) != len(result["players_before"])
+                        or len(post) != len(result["players_after"])):
+                    raise ValueError("missing/duplicate result identities")
+                actor = (identity["name_text"], identity["id"])
+                row = pre[actor]
+                if row["slot"] != rec["actor_slot"] or row["job"] != identity["job"] or row["side_bit"] is not False:
+                    raise ValueError("result actor/job/side mismatch")
+                moved = [k for k in pre if (pre[k]["x"], pre[k]["y"]) != (post[k]["x"], post[k]["y"])]
+                if action.get("kind") == "identified-move":
+                    if moved != [actor] or [post[actor]["x"], post[actor]["y"]] != action.get("dest"):
+                        raise ValueError("wrong player/destination moved")
+                elif action.get("kind") == "identified-wait":
+                    if moved:
+                        raise ValueError("Wait moved a player")
+                else:
+                    raise ValueError("missing supported selected action")
+            except (KeyError, TypeError, ValueError) as exc:
+                fail(f"turn event {i}: invalid actor-linked result ({exc})", errors)
+            boundary = None
 
     # monotonic timestamps
     ts = [r.get("t") for r in events if r.get("t") is not None]

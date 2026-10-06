@@ -172,6 +172,9 @@ class Probe:
         # scratch clear (observed between the turn-ready flash and the menu
         # park) cannot gate the injected keys mid-route.
         self._last_router = None
+        # Set only by the A5.1 verified menu-owner adapter. Legacy research
+        # probes retain their original single RAM-named-player behavior.
+        self.active_player_slot = None
 
     # -- helpers ----------------------------------------------------------
     def now(self):
@@ -443,6 +446,8 @@ class Probe:
             return False
 
     def player_slot(self):
+        if self.active_player_slot is not None:
+            return self.active_player_slot
         slots = self.s.receipt["roster"]["ram_named_slots"]
         return slots[0] if slots else None
 
@@ -868,7 +873,7 @@ class Probe:
                 "from": self.player_tile()}
 
     def commit_identified_wait(self, plan, stop_check=None, max_nav=8,
-                               log_leg=None):
+                               log_leg=None, input_guard=None):
         """Select and confirm Wait from the identified open menu.
 
         Shares the driver's guarded-press discipline (stop gate before
@@ -891,6 +896,9 @@ class Probe:
                 time.sleep(0.1)
 
         def _guarded_press(mask, tag):
+            if input_guard is not None and not input_guard():
+                add("identity-rejected", {"at": tag})
+                return -1
             started = time.time()
             hits = self.press(mask, stop_check=stop_check, tag=tag)
             if log_leg:
@@ -984,7 +992,7 @@ class Probe:
         return True, log
 
     def commit_identified_move(self, plan, stop_check=None, max_nav=8,
-                               log_leg=None):
+                               log_leg=None, input_guard=None):
         """Execute an identified-move plan leg-by-leg, reading RAM between legs.
 
         Returns (completed, dest_used, log). Every leg is guarded by
@@ -1024,6 +1032,9 @@ class Probe:
                 time.sleep(0.1)
 
         def _guarded_press(mask, tag):
+            if input_guard is not None and not input_guard():
+                add("identity-rejected", {"at": tag})
+                return -1
             started = time.time()
             hits = self.press(mask, stop_check=stop_check, tag=tag)
             if log_leg:
