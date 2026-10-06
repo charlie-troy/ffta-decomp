@@ -1,0 +1,93 @@
+{
+  "packet": "A6",
+  "date": "2026-10-06",
+  "base_revision": "f903da4dedb784d2d13944607f2d2a6cf87816e3",
+  "status": "partial",
+  "scope": "Reviewed pure policy/resource contract and preset; no live recovery acceptance",
+  "criteria": [
+    {
+      "id": "resource-consumers",
+      "status": "unknown",
+      "expected": "Engine-backed item counts, ability MP costs and legal targets as required by concrete rules",
+      "observed": "Roster MP offsets are documented; the live adapter offers only zero-cost Move/Wait. Item inventory and Action submenu availability/targeting are not decoded by this work.",
+      "command": null
+    },
+    {
+      "id": "recovery-policy",
+      "status": "unknown",
+      "expected": "Heal under threshold, revive before attack, MP reserve, never use items by default",
+      "observed": "Schema v2 and healer preset implement host selection: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve on all casts, consumables disabled. Regression rejects unrelated ally abilities and Cure on KO. No live cast proven.",
+      "command": "python tools/validate_tactics_policy.py --out-root outputs/autobattle/a6-review-policy"
+    },
+    {
+      "id": "host-boundaries",
+      "status": "pass",
+      "expected": "Threshold boundaries, zero max HP, KO vs living, insufficient MP, missing revive and last consumable",
+      "observed": "119/119 policy checks; seven mutation controls rejected with an unmutated isolated positive control. Broad rules prove disabled-items and empty-count rejection independently of item predicates.",
+      "evidence": "outputs/autobattle/a6-review-policy/checks.json",
+      "command": "python tools/validate_tactics_policy.py --out-root outputs/autobattle/a6-review-policy"
+    },
+    {
+      "id": "wounded-party-replay",
+      "status": "unknown",
+      "expected": "Compare healer and damage-focused policies on a wounded party; prove executed recovery, consumed resource and fallback when unavailable",
+      "observed": "Not run. Ability candidate availability, legal target and engine execution are prerequisites; synthetic candidates cannot establish this criterion.",
+      "command": null
+    }
+  ],
+  "review_findings": [
+    "Healer rules matched any ally ability; corrected to named Life/Cure and living-target Cure.",
+    "Life bypassed the eight-MP reserve; reserve now applies to revive too.",
+    "Enabled kind:item alone bypassed configuration opt-in rejection; now rejected.",
+    "Mutation subprocesses lacked preset paths; repaired with absolute --configs and an unmutated positive control. Two previously surviving mutants now fail on broad-rule controls.",
+    "A5 threshold-30 live boundary was 84/241 HP, not 177/241; corrected A5 receipt and docs. Future policy turn receipts carry the actual chooser snapshot.",
+    "pause-at-boundary test expected a wall-clock frame on an immediate pump; retained failure, then corrected observation window passes without runtime changes."
+  ],
+  "next_dependency": "Decode Action submenu ability identity, availability, MP cost and legal targeting; verify one real recovery cast with actor/target HP and MP deltas before extending candidate support.",
+  "limits": [
+    "No live A6 ability/item execution or resource consumption evidence.",
+    "A5 artifact validation was rerun; no new live A5 run.",
+    "Adopted-process cleanup still has host evidence only after its fix.",
+    "Known optional identified-wait-noecho transport failure remains outside the default suite."
+  ],
+  "delivered_source_sha256": {
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "b1f27df8a6ff634acc396ad15cc3fb7d77c1f07831fd496dc2f64fd40d70dad0",
+    "tools/autobattle_runtime.py": "5fef6bd415afa0b9ba4a857d86a7f2f92c8644563ced638b09ea9c489c71aee4",
+    "tools/validate_tactics_policy.py": "8cc503bcccdc122fe979a8d5d3d2316bb51c43c6af7216203438dfd840b1d5e3",
+    "tools/validate_tactics_adapter.py": "8bf2bacb47e3e3b3661075dd4582bae6b029b83bc7a783b441c933233ec1ecc9",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
+    "tools/validate_transport_paths.py": "e5998c7d1cf1c95168bbc3b35845c65431108ccb2516db9dd41e70927844a6fe"
+  },
+  "host_checks": {
+    "policy": 119,
+    "adapter": 12,
+    "identity": 19,
+    "cleanup": 4,
+    "ai": 10,
+    "ai_strategy": 9,
+    "transport": 23
+  },
+  "evidence": [
+    "outputs/autobattle/a6-review-policy/checks.json",
+    "outputs/autobattle/a6-review-adapter/checks.json",
+    "outputs/autobattle/a6-review-cleanup/checks.json",
+    "outputs/autobattle/a6-review-identity/checks.json",
+    "outputs/a6-review-old-mutation-control.log",
+    "outputs/a6-review-snapshot-before.log",
+    "outputs/autobattle/a6-review-transport-parallel/pause-at-boundary.log",
+    "outputs/a6-review-pause-corrected.log",
+    "outputs/a6-review-transport-summary.json"
+  ],
+  "tested_revision": "base_revision plus delivered_source_sha256",
+  "commands": [
+    "python tools/validate_tactics_policy.py --out-root outputs/autobattle/a6-review-policy",
+    "python tools/validate_tactics_adapter.py --out-root outputs/autobattle/a6-review-adapter",
+    "python tools/validate_actor_identity.py --out-root outputs/autobattle/a6-review-identity",
+    "python tools/validate_session_cleanup.py --out-root outputs/autobattle/a6-review-cleanup",
+    "python tools/validate_ai.py baserom.gba",
+    "python tools/validate_ai_strategy.py baserom.gba",
+    "python tools/validate_transport_paths.py --scenario pause-at-boundary --out-root outputs/autobattle/a6-review-transport-corrected"
+  ],
+  "transport_note": "22 scenarios passed on the first attempt; pause-at-boundary passed after adding its missing wall-time observation window. Original failure is retained."
+}

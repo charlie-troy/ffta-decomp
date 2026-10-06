@@ -1,0 +1,4 @@
+scenario stop-during-drive
+  [stop-during-drive] state=paused turns=1 seeds=2 presses=35
+  PASS stop-during-drive (32.0s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

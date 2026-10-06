@@ -1,0 +1,106 @@
+PASS empty policy falls back to the explicit legal Wait
+PASS fallback none returns None (documented no-match path)
+PASS fallback wait with no legal Wait candidate returns None
+PASS empty candidate set returns None
+PASS relation+HP threshold selects the wounded enemy, not the wounded ally
+PASS healthy enemy does not satisfy the wounded threshold (falls back)
+PASS HP-percent boundaries are inclusive for lte and strict for lt
+PASS HP percent is floored and rejects missing/zero-max facts
+PASS actor HP-percent predicate reads actor facts and fails closed when absent
+PASS remaining MP after cost predicate handles the exact boundary and missing MP
+PASS ability-name predicate matches identified abilities only
+PASS action-id predicate matches the engine command id
+PASS status present/absent predicates decode the frozen bits and fail closed on unknown
+PASS actor status predicates read actor bytes and fail closed when absent
+PASS assignment precedence is character -> job -> party
+PASS a matched scope governs; it does not fall through to a lower scope
+PASS a character assignment for an absent unit falls through to party
+PASS a scope-level fallback overrides the policy default
+PASS disabled rules are skipped by the ordered walk
+PASS equal-priority targets tie-break deterministically on candidate id
+PASS duplicate ability names resolve deterministically by candidate id
+PASS repeated evaluation returns an identical decision
+PASS highest/remaining-MP selectors order by their fact and skip unorderable candidates
+PASS rejects policy: unknown top-level key
+PASS rejects policy: unknown assignment scope
+PASS rejects policy: unknown observation key
+PASS rejects policy: unknown fallback
+PASS rejects policy: unknown ruleset key
+PASS rejects policy: unknown rule key
+PASS rejects policy: unknown when key
+PASS rejects policy: unknown selector
+PASS rejects policy: duplicate rule id
+PASS rejects policy: unknown relation
+PASS rejects policy: unknown kind
+PASS rejects policy: unknown status name
+PASS rejects policy: case-sensitive status name
+PASS rejects policy: empty status list
+PASS rejects policy: missing schema
+PASS rejects policy: wrong schema
+PASS rejects policy: policy not an object
+PASS unknown keys, values and schema versions are rejected
+PASS rejects threshold 101
+PASS rejects threshold -1
+PASS rejects threshold 25.5
+PASS rejects threshold True
+PASS rejects threshold '25'
+PASS rejects threshold {}
+PASS rejects threshold {'lte': 25, 'gte': 10}
+PASS rejects threshold {'around': 25}
+PASS rejects threshold None
+PASS rejects threshold [25]
+PASS rejects MP threshold -1
+PASS rejects MP threshold 1.5
+PASS rejects MP threshold True
+PASS rejects MP threshold '0'
+PASS rejects negative action id
+PASS rejects boolean action id
+PASS invalid thresholds and malformed comparisons are rejected
+PASS rejects character key 'Marche'
+PASS rejects character key 'Marche#'
+PASS rejects character key 'Marche#07'
+PASS rejects character key 'Marche#-1'
+PASS rejects character key 'Marche#999'
+PASS rejects character key 'Marche#7#8'
+PASS rejects character key '#7'
+PASS rejects character key 'Marche#x'
+PASS rejects job key '05'
+PASS rejects job key 'abc'
+PASS rejects job key '-1'
+PASS rejects job key '5.0'
+PASS rejects job key ''
+PASS rejects party key 'monsters'
+PASS rejects party key 'PLAYER'
+PASS rejects party key ''
+PASS malformed assignment keys are rejected
+PASS an unverified actor identity never commits
+PASS a stale snapshot never commits; a missing age is invalid
+PASS rejects and never commits: duplicate candidate id
+PASS rejects and never commits: missing actor job
+PASS rejects and never commits: bad side
+PASS rejects and never commits: actor hp not an integer
+PASS rejects and never commits: unknown snapshot key
+PASS rejects and never commits: unknown candidate key
+PASS rejects and never commits: unknown status byte key
+PASS rejects and never commits: status byte out of range
+PASS rejects and never commits: wrong snapshot schema
+PASS rejects and never commits: negative age
+PASS malformed snapshots are rejected and never commit
+PASS engine-illegal candidates are never selectable
+PASS the selector is total: empty input yields no decision
+Traceback (most recent call last):
+  File "C:\Users\charl\AppData\Local\Temp\tmp0a9teb87\validate_tactics_policy.py", line 812, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\charl\AppData\Local\Temp\tmp0a9teb87\validate_tactics_policy.py", line 525, in main
+    check("every shipped preset validates against the frozen schema",
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          shipped_presets_validate)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\charl\AppData\Local\Temp\tmp0a9teb87\validate_tactics_policy.py", line 93, in check
+    fn()
+    ~~^^
+  File "C:\Users\charl\AppData\Local\Temp\tmp0a9teb87\validate_tactics_policy.py", line 516, in shipped_presets_validate
+    assert files, f"no presets under {args.configs}"
+           ^^^^^
+AssertionError: no presets under configs/tactics

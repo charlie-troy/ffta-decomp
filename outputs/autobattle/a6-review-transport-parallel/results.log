@@ -1,0 +1,4 @@
+scenario results
+  [results] state=completed turns=1 seeds=1 presses=30
+  PASS results (72.9s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

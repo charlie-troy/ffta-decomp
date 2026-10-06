@@ -1,0 +1,4 @@
+scenario pause-at-boundary
+  [pause-at-boundary] state=paused turns=0 seeds=0 presses=0
+  PASS pause-at-boundary (7.1s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

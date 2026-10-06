@@ -5,7 +5,7 @@ adapter** (live, A5.3+) and the **pure policy chooser**
 (`tools/tactics_policy.py`). It freezes before A6/A7/A10 start, so those
 packets extend by adding a schema version, not by editing these meanings.
 
-Status: **A5.2 contract frozen; pure host suite 94/94 PASS**
+Status: **A5.2 v1 frozen; A6 v2 host extension reviewed, live recovery open**
 (`python tools/validate_tactics_policy.py`). No engine semantics are claimed
 by that suite: only the adapter's live legality read can establish that a
 candidate is engine-legal, and only live runs can show a chosen candidate
@@ -279,15 +279,47 @@ duplicate candidate id, missing `age_seconds`, negative age, wrong schema.
 Never committed (no exception, `outcome: "none"`): identity other than
 `"verified"`; snapshot older than `max_age_seconds`; any malformed snapshot.
 
-## Explicitly unsupported today
+## A6 resource/recovery extension (schema v2, 2026-10-06)
+
+`ffta-tactics-policy/2` retains v1's ordering, fallback, freshness and identity
+rules. `ffta-tactics-snapshot/2` adds item candidates. These are host contracts;
+the current live adapter still emits v1 Move/Wait snapshots, so loading a
+healer policy does not enable casting, targeting or inventory access.
+
+| v2 addition | Meaning |
+|---|---|
+| policy/ruleset `consumables` | Boolean, default false. The governing scope may override the policy value; no lower-scope inheritance. When false, all item candidates are removed before rule evaluation. |
+| `when.target_hp` | Absolute nonnegative HP comparison (`lt/lte/gt/gte/eq`). Missing HP makes the rule ineligible. `eq: 0` separates KO from living 1/200 HP, which also floors to 0 percent. |
+| candidate `kind: item` | Requires nonempty `item_name` and nonnegative integer `count`, alongside the ordinary candidate fields. `count: 0` is unusable even if marked legal. |
+| `when.item_name`, `when.item_count` | Exact item name and remaining-count comparison. Enabled item predicates, including `kind: item`, require consumables opt-in. Disabled rules may document future intent. |
+
+V1 documents reject v2-only keys and item kinds. The existing
+`remaining_mp_after_cost` predicate implements the MP reserve; absent actor MP
+or a negative remainder rejects the candidate. Inventory count consumers and
+live ability cost/target availability are **not decoded by this extension**.
+
+The deliberately narrow `healer.json` preset names **Life** for a KO ally and
+**Cure** for a living wounded ally/self. Each cast keeps eight MP in reserve.
+Ally relation and low HP alone do not establish recovery semantics: a legal
+Protect candidate must not satisfy a heal or revive rule. Ability names are
+contract inputs here, not evidence that the live engine offers those casts.
+Future adapter work must prove their legal targets and actual effects (including
+status interactions), then verify HP/MP deltas. Consumables remain disabled.
+
+Reviewed host evidence: `outputs/autobattle/a6-review-policy/checks.json`,
+119 checks including non-vacuity mutants and regressions for unrelated ally
+abilities, Cure on KO, Life's reserve boundary and kind-only item opt-in.
+See [A6 receipt](receipts/autobattle/A6.json) for required unknown live gates.
+
+## Remaining unsupported live capabilities
 
 Position/distance predicates, reachability, damage or hit-chance estimation,
-item/consumable counts, revive, law constraints, multi-turn planning,
+item/consumable reads, ability/revive execution, law constraints, multi-turn planning,
 movement preference (approach/hold/kite), enemy-party control, and any
 predicate naming a status that is not in the frozen vocabulary above. A
-policy that uses any of these **fails to load** rather than being ignored, so
-an unsupported family can never silently become an enabled option. A6/A7 add
-families by extending this document and `tools/tactics_policy.py` together.
+policy with an unknown predicate fails to load. Supported host predicates whose
+facts the live adapter cannot supply remain ineligible. A6's schema support
+does not establish live recovery support. A7 will extend the contract explicitly.
 
 ## Shipped presets (`configs/tactics/`)
 
@@ -298,10 +330,10 @@ families by extending this document and `tools/tactics_policy.py` together.
 | `contrast-two-ally.json` | per-character divergence on the proven Move/Wait candidates (`Marche#7` takes a Move, `Montblanc#5` holds with Wait) — a contract demonstration, not tactics quality |
 | `hp-split.json` | one party rule set conditioned on the actor's own engine-read HP percent (`<= 80%` holds, otherwise advance); calibrated to the A4 two-ally fixture so one live run exercises both rules |
 | `hold-below-30.json` | the A5.4 condition-change twin of `hp-split.json`: identical rules, one value different (threshold 30 instead of 80) |
+| `healer.json` | v2 host preset: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve; items disabled. Live adapter currently cannot offer these abilities. |
 
-All of them are validated by the host suite on every run. The healer and
-resource-preservation presets are A6's (they need MP/item/recovery facts that
-are not part of this freeze).
+All are validated by the host suite on every run. Resource preservation and
+live healer execution remain A6 work.
 
 ## Live adapter seam (A5.3, 2026-10-06)
 
@@ -369,10 +401,21 @@ decision and the result. Full detail and criteria live in the `a5_4` object of
 `hp-split.json` vs `hold-below-30.json` on the same starting state — identical
 rules and notes, one threshold changed:
 
-| policy | Marche (100% HP) | Montblanc (73% HP) |
+| policy | Marche (100% HP) | Montblanc (HP differs; see audit below) |
 |---|---|---|
 | `hp-split.json` (`<= 80`) | `advance-when-above-threshold` -> Move `(4,10)->(4,11)` | `hold-when-below-threshold` -> Wait, no movement |
 | `hold-below-30.json` (`<= 30`) | `advance-when-above-threshold` -> Move `(4,10)->(4,11)` | `advance-when-above-threshold` -> Move `(5,10)->(5,11)` |
+
+Audit correction (2026-10-06): Montblanc was **177/241 (73%)** in the
+threshold-80 run, but **84/241 (34%, floored)** in the threshold-30 run.
+The second figure agrees between `engine_result.players_before` and the
+boundary screenshot. The saved fixture is identical; intervening damage
+differs, so these are not identical decision states. Both HP values lie in
+the interval where threshold 80 selects Wait and threshold 30 selects Move.
+The live pair is consistent with the rule contrast, but does not isolate
+one changed input at the decision boundary. Future turn metadata includes
+the exact chooser `snapshot`, allowing direct host replay without inferring
+policy facts from nearby engine-result observations.
 
 Marche is the control (unchanged decision in both runs); Montblanc's decision
 and engine result both change with the condition. Runs:

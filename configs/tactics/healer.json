@@ -12,8 +12,10 @@
             "id": "revive-before-attack",
             "when": {
               "kind": "ability",
+              "ability_name": "Life",
               "relation": "ally",
-              "target_hp": { "lte": 0 }
+              "target_hp": { "eq": 0 },
+              "remaining_mp_after_cost": { "gte": 8 }
             },
             "select": "first",
             "note": "a KO'd ally is exactly HP 0; the absolute predicate is used because a percent floors a 1-HP high-max ally to 0 too"
@@ -22,7 +24,9 @@
             "id": "heal-wounded-ally",
             "when": {
               "kind": "ability",
+              "ability_name": "Cure",
               "relation": "ally",
+              "target_hp": { "gt": 0 },
               "target_hp_pct": { "lte": 50 },
               "remaining_mp_after_cost": { "gte": 8 }
             },
@@ -33,7 +37,9 @@
             "id": "heal-self",
             "when": {
               "kind": "ability",
+              "ability_name": "Cure",
               "relation": "self",
+              "target_hp": { "gt": 0 },
               "actor_hp_pct": { "lte": 40 },
               "remaining_mp_after_cost": { "gte": 8 }
             },

@@ -1,0 +1,4 @@
+scenario boundary-panel
+  [boundary-panel] state=stalled turns=2 seeds=11 presses=70
+  PASS boundary-panel (84.4s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

@@ -1,0 +1,190 @@
+{
+  "scope": "host transport control flow; 22 original passes plus corrected timing test; no live engine acceptance",
+  "passed": 23,
+  "cases": [
+    {
+      "scenario": "takeover",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario takeover --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/takeover.log",
+      "log_sha256": "b9918a9425b713e2aecd3148e8a1d228174b7d4d1bada70e5a99bcf8b101a927"
+    },
+    {
+      "scenario": "unknown",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario unknown --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/unknown.log",
+      "log_sha256": "fc5113c39420f7a99d8a8594548aaae2ac7a89a767c54387fab36bf90ed7ecf7"
+    },
+    {
+      "scenario": "disconnect",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario disconnect --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/disconnect.log",
+      "log_sha256": "1df381195827239ad229a2d2f5c00f48febc1b7064d65e7b0409a5384ede4672"
+    },
+    {
+      "scenario": "restart",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario restart --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/restart.log",
+      "log_sha256": "aca0ce9de8657b02301f8f64fb7b3e68b422322bf89e0970fbe48b04d452a06a"
+    },
+    {
+      "scenario": "defeat",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario defeat --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/defeat.log",
+      "log_sha256": "e1a9904d506fdee46704d6e8d50c3032a15889c58b13610d207a1be1e00508e9"
+    },
+    {
+      "scenario": "results",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario results --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/results.log",
+      "log_sha256": "ac75d29e4eb6bb1f567ff08f4716df0574a4c56039ef0eb086b94e6ffbd609fb"
+    },
+    {
+      "scenario": "results-cleared",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario results-cleared --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/results-cleared.log",
+      "log_sha256": "90b8496b58554eb54b8b7c9bf663c96da19e596a56bc78ed2fbcce3b60bf2673"
+    },
+    {
+      "scenario": "submenu",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario submenu --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/submenu.log",
+      "log_sha256": "355a7cd979ed8a3424890822902a56bc7051c7526746c72c97a2e68cec3d9d17"
+    },
+    {
+      "scenario": "pause",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario pause --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/pause.log",
+      "log_sha256": "0afb0969abfef616d74f31d893e9122cddfa24838455b7c1b49f7239f42ef766"
+    },
+    {
+      "scenario": "strict-press",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario strict-press --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/strict-press.log",
+      "log_sha256": "7add8405f936d5f3e8d72ad2ad3df17ae0d24f7fdd22966dfadcba971b217669"
+    },
+    {
+      "scenario": "stop-before-start",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario stop-before-start --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/stop-before-start.log",
+      "log_sha256": "a06bf865d9371f570165674d13e60780201a286584fd14c631ddf2f41f3d6d94"
+    },
+    {
+      "scenario": "stop-during-drive",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario stop-during-drive --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/stop-during-drive.log",
+      "log_sha256": "8af0f13ea012fff22c44f22500c1a000964b649fb57f84c79464ace3018a2256"
+    },
+    {
+      "scenario": "stop-coincides-with-progress",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario stop-coincides-with-progress --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/stop-coincides-with-progress.log",
+      "log_sha256": "dff47b8c6b0f173b3f8714fe31f259b8afba80acb5721b27277ab74bbd5874c1"
+    },
+    {
+      "scenario": "guard-failure",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario guard-failure --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/guard-failure.log",
+      "log_sha256": "2f8f5301a6e03d100138b818c6ba1e6f7508ccaf978a25d42ba7aa230a68f250"
+    },
+    {
+      "scenario": "identified-move",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario identified-move --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/identified-move.log",
+      "log_sha256": "145c2b06b7f5b7a94a0ce67603451d61ebcd8452170b2a84d4927fd1a2498fe4"
+    },
+    {
+      "scenario": "identified-move-wrong",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario identified-move-wrong --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/identified-move-wrong.log",
+      "log_sha256": "ea73d842ce7127fad287575508b5355593ff6fddfa7155cab7d6085a225317d4"
+    },
+    {
+      "scenario": "identified-move-invalid",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario identified-move-invalid --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/identified-move-invalid.log",
+      "log_sha256": "091be700c3d1d887139fcd99c749298ee3e54892e53d0eb982d45b7753999d55"
+    },
+    {
+      "scenario": "identified-move-occupied",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario identified-move-occupied --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/identified-move-occupied.log",
+      "log_sha256": "568da8f696efc3d4211c8b253bc7f20d10b897840289c7fed3209bd128fb7bae"
+    },
+    {
+      "scenario": "identified-wait-control",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario identified-wait-control --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/identified-wait-control.log",
+      "log_sha256": "188eb86e5b1d30acd273686cf5bb36758081690f70b2209b5ed908d132fc0e6c"
+    },
+    {
+      "scenario": "boundary-panel",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario boundary-panel --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/boundary-panel.log",
+      "log_sha256": "a3cf8b0e7b3a37bd272603ffa70c5fef84888afb8b17d07836e6d367e21e18f8"
+    },
+    {
+      "scenario": "boundary-dead",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario boundary-dead --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/boundary-dead.log",
+      "log_sha256": "44e955ade5b12cf28ac192fd8f37e1f2ae2831b8b406b282a55c79302098520f"
+    },
+    {
+      "scenario": "pause-at-boundary",
+      "original_exit": 1,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario pause-at-boundary --out-root outputs/autobattle/a6-review-transport-corrected",
+      "log": "outputs/a6-review-pause-corrected.log",
+      "log_sha256": "ea75084931415703046064add6d7b1fd39cba1435cfaf00772187b2366151180"
+    },
+    {
+      "scenario": "resume-after-pause",
+      "original_exit": 0,
+      "exit": 0,
+      "command": "python tools/validate_transport_paths.py --scenario resume-after-pause --out-root outputs/autobattle/a6-review-transport-parallel",
+      "log": "outputs/autobattle/a6-review-transport-parallel/resume-after-pause.log",
+      "log_sha256": "cf7b362e01cf9bdee53a97396f8fcc33ec8c93f4889dcdb43cb2c19190ec7c18"
+    }
+  ]
+}

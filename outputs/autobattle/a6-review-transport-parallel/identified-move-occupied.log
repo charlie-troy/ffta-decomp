@@ -1,0 +1,4 @@
+scenario identified-move-occupied
+  [identified-move-occupied] state=stalled turns=1 seeds=2 presses=75
+  PASS identified-move-occupied (58.3s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

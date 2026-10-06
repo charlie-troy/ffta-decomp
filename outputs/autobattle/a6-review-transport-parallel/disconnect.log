@@ -1,0 +1,4 @@
+scenario disconnect
+  [disconnect] state=connection_lost turns=0 seeds=0 presses=30
+  PASS disconnect (21.7s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

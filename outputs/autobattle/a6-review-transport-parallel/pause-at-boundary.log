@@ -1,0 +1,5 @@
+scenario pause-at-boundary
+  [pause-at-boundary] state=paused turns=0 seeds=0 presses=0
+  FAIL pause-at-boundary (6.0s)
+    - pause-at-boundary: the engine stopped advancing; the handoff must leave the battle live for the player
+TRANSPORT VALIDATION FAILED: ['pause-at-boundary']

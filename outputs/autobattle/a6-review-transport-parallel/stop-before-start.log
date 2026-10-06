@@ -1,0 +1,4 @@
+scenario stop-before-start
+  [stop-before-start] state=paused turns=0 seeds=0 presses=0
+  PASS stop-before-start (0.0s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

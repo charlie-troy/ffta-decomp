@@ -1,0 +1,4 @@
+scenario pause
+  [pause] state=paused turns=1 seeds=2 presses=30
+  PASS pause (27.9s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

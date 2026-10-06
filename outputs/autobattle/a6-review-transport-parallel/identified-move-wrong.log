@@ -1,0 +1,4 @@
+scenario identified-move-wrong
+  [identified-move-wrong] state=stalled turns=0 seeds=8 presses=30
+  PASS identified-move-wrong (44.8s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

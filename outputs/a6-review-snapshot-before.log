@@ -1,0 +1,43 @@
+PASS the adapter offers only the commands the engine menu names, in id order
+PASS an unnamed command offers no candidates (no-legal-candidate, no commit)
+PASS a rule selects each offered candidate through the adapter
+PASS an engine-read HP condition flips the same policy from Move to Wait
+PASS character scope beats party scope and an explicit no-match returns None
+PASS a stale or timestamp-less observation never commits
+PASS unknown policy key rejected by the adapter
+PASS a bad policy cannot even construct the adapter
+PASS a policy-chosen candidate the engine no longer offers cancels with zero input
+PASS no rule match and no fallback issues zero input on the real runtime path
+tactics policy outputs/autobattle/a6-review-snapshot-before\cli\policy.json (ffta-tactics-policy/1) validated
+scenario policy-wait -> run cli
+paused: booting guarded fixture before any input is issued
+  EV {"t": 0.0, "kind": "guard", "scenario": "policy-wait", "turn": null, "actor": null, "actor_slot": null, "control_mode": null, "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "idle", "seeds": 0, "router_hits": 0, "note": "verified player identities: [('Marche', 6)]", "input_log": null, "actor_identity": null, "engine_result": null, "next_actor": null, "tactics": null}
+  EV {"t": 0.0, "kind": "start", "scenario": "policy-wait", "turn": null, "actor": null, "actor_slot": null, "control_mode": "retail-ai", "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "running", "seeds": 0, "router_hits": 0, "note": null, "input_log": "input-log.jsonl", "actor_identity": null, "engine_result": null, "next_actor": null, "tactics": null}
+  EV {"t": 6.0, "kind": "boundary", "scenario": "policy-wait", "turn": null, "actor": "Marche", "actor_slot": 6, "control_mode": "external", "selected_action": null, "selected_target": null, "position_before": {"x": 4, "y": 10}, "position_after": null, "state": "takeover", "seeds": 0, "router_hits": 0, "note": "outputs/autobattle/a6-review-snapshot-before\\cli\\boundary-turn1.png", "input_log": null, "actor_identity": {"name_text": "Marche", "id": 6, "job": 2, "side_bit": false, "addr": "02016018"}, "engine_result": null, "next_actor": null, "tactics": null}
+  EV {"t": 6.0, "kind": "note", "scenario": "policy-wait", "turn": null, "actor": "Marche", "actor_slot": 6, "control_mode": "external", "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "takeover", "seeds": 0, "router_hits": 0, "note": "tactics policy matched rule 'hold' in the 'party' scope -> wait (rule:matched, age 0.00s)", "input_log": null, "actor_identity": {"name_text": "Marche", "id": 6, "job": 2, "side_bit": false, "addr": "02016018"}, "engine_result": null, "next_actor": null, "tactics": null}
+  EV {"t": 6.0, "kind": "note", "scenario": "policy-wait", "turn": null, "actor": "Marche", "actor_slot": 6, "control_mode": "external", "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "takeover", "seeds": 0, "router_hits": 0, "note": "identified-wait candidate (sticky cursor byte 0) \u2014 echo-gated Wait commit: the first DOWN must move the decoded cursor or the menu is not open and no further input fires", "input_log": null, "actor_identity": {"name_text": "Marche", "id": 6, "job": 2, "side_bit": false, "addr": "02016018"}, "engine_result": null, "next_actor": null, "tactics": null}
+  key 0x80 x5 c3:echo-down t=7.2
+  key 0x80 x5 c3:wait-nav-down t=9.6
+  key 0x01 x5 c3:select-wait t=12.1
+  key 0x01 x5 c3:confirm-wait t=14.5
+  SEED t=16.1 ctx=[] progress
+  EV {"t": 19.1, "kind": "turn", "scenario": "policy-wait", "turn": 1, "actor": "Marche", "actor_slot": 6, "control_mode": "external", "selected_action": {"kind": "identified-wait", "command_id": 0, "dest": null, "from": [4, 10]}, "selected_target": null, "position_before": {"x": 4, "y": 10}, "position_after": {"x": 4, "y": 10}, "state": "takeover", "seeds": 1, "router_hits": 0, "note": "committed via identified-wait: cmd cursor 0 read from RAM before input", "input_log": null, "actor_identity": {"name_text": "Marche", "id": 6, "job": 2, "side_bit": false, "addr": "02016018"}, "engine_result": {"verified": true, "moved_actors": [], "players_before": [{"slot": 6, "addr": "02016018", "name": 33558720, "side_raw": 0, "ct": 188, "ea": 0, "id": 6, "type": 2, "base_job": 2, "race": 0, "job": 2, "level": 50, "hp": 388, "max_hp": 442, "mp": 60, "max_mp": 96, "is_rom_name": false, "is_ram_name": true, "name_text": "Marche", "side_bit": false, "unaffiliated": false, "live": true, "x": 4, "y": 10}], "players_after": [{"slot": 6, "addr": "02016018", "name": 33558720, "side_raw": 0, "ct": 36, "ea": 0, "id": 6, "type": 2, "base_job": 2, "race": 0, "job": 2, "level": 50, "hp": 388, "max_hp": 442, "mp": 60, "max_mp": 96, "is_rom_name": false, "is_ram_name": true, "name_text": "Marche", "side_bit": false, "unaffiliated": false, "live": true, "x": 4, "y": 10}]}, "next_actor": null, "tactics": {"policy": "outputs/autobattle/a6-review-snapshot-before\\cli\\policy.json", "outcome": "selected", "reason": "rule:matched", "scope": "party", "rule_id": "hold", "detail": null, "age_seconds": 0.0009150505065917969, "candidates": ["move", "wait"]}}
+  SEED t=19.1 ctx=[] runtime
+  EV {"t": 22.1, "kind": "stop", "scenario": "policy-wait", "turn": null, "actor": null, "actor_slot": null, "control_mode": null, "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "stalled", "seeds": 2, "router_hits": 0, "note": "turn budget reached [terminal screenshot: terminal-stalled.png]", "input_log": null, "actor_identity": null, "engine_result": null, "next_actor": null, "tactics": null}
+final state: stalled; receipt outputs/autobattle/a6-review-snapshot-before\cli/run.json
+Traceback (most recent call last):
+  File "C:\Users\charl\Projects\ffta-decomp\tools\validate_tactics_adapter.py", line 329, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\charl\Projects\ffta-decomp\tools\validate_tactics_adapter.py", line 302, in main
+    check("the real CLI records the matched rule on a policy-driven turn",
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+          cli_records_the_matched_rule)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\charl\Projects\ffta-decomp\tools\validate_tactics_adapter.py", line 56, in check
+    fn()
+    ~~^^
+  File "C:\Users\charl\Projects\ffta-decomp\tools\validate_tactics_adapter.py", line 286, in cli_records_the_matched_rule
+    assert snapshot is not None, "receipt omits the actual policy inputs"
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: receipt omits the actual policy inputs

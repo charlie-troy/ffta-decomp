@@ -1,6 +1,6 @@
 # Customizable auto-battle roadmap
 
-Updated 2026-10-06. Reviewed checkout: `7c6f1b8` (clean before this documentation change). Current acceptance status
+Updated 2026-10-06. Reviewed checkout: `f903da4` plus the A6 audit fixes. Current acceptance status
 is maintained here; dated discoveries remain in `docs/project-log.md`.
 For every auto-battle implementation or completion claim, follow
 [Worker acceptance contract](autobattle-worker-contract.md). It defines the
@@ -13,8 +13,10 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 A5 is closed for the narrow family (2026-10-06): the public runner follows
 per-character rules (two job-5 allies take different commands in one battle),
 and on equivalent starting states changing one condition value changes both the
-decision and the engine result (Montblanc at 73% HP: Wait under a `<= 80`
-threshold, Move under `<= 30`), with Marche as an unchanged control. STOP, the
+decision and the engine result (Montblanc: 177/241 HP, Wait under `<= 80`;
+84/241 HP, Move under `<= 30`), with Marche as an unchanged control. Audit:
+the saved fixture matches but intervening damage differs, so these are not
+identical decision states; both HP values fall between the thresholds. STOP, the
 monitor-client handoff and same-PID resume were re-run on this revision, and two
 integration defects found by that evidence are fixed with regressions (adopted-
 session cleanup; resume scenario mismatch). Ability targeting, movement
@@ -37,7 +39,7 @@ engine-legality claim belongs to A5.2; A5.3 proves the adapter seam.
 A4 remains a bounded feasibility demonstration, not a completed
 multi-character product. C1–C3 are accepted for the documented fixture and
 same-process handoff. A8 investigation is complete; selectable acceleration
-and two-speed equivalence remain UNKNOWN. A6/A7/A10 wait for A5; A9 final
+and two-speed equivalence remain UNKNOWN. A6/A7/A10 are unlocked; A9 final
 acceptance also waits for A8.
 
 This checkout remains the decompilation/modding and Windows companion project.
@@ -76,7 +78,7 @@ First release scope: Windows mGBA companion plus guarded ROM patches where neede
 | AI internals | Candidate construction, sign-gated priority ordering, help/harm pools, evaluator and turn phases are documented and probed. Impact magnitude is not a retail ranking key. Do not revive the old magnitude-based interpretation. |
 | Live scenario | Normal-battle C3 completion/handoff and A4 two-ally divergence are accepted within named fixtures. Snowball remains a narrow enemy-turn research fixture. |
 | Normal-battle access | A1 captured a repeatable encounter and enemy movement/action (`123ea91`). A2.4a reconciled fixture identity/guards; A4 added a purpose-built two-ally fixture. Revalidate each fixture for its named use. |
-| Missing product pieces | Multi-character public-runner integration, conditional tactics, resource/movement policy, broader battle recovery, selectable acceleration, usable configuration workflow. |
+| Missing product pieces | Ability/item conditional tactics, resource/movement policy, broader battle recovery, selectable acceleration, usable configuration workflow. |
 
 Read `CLAUDE.md`, the current section of `docs/project-log.md`, `docs/dead-ends.md`, and the task-specific files below. Historical entries are evidence, not an instruction to reopen completed investigations.
 
@@ -105,7 +107,7 @@ control results. A3 has an unattended failed-encounter result (`a3-natural6`),
 and the CLI now preserves its process on pause. These are reusable evidence,
 not proof of player action selection or complete cancellation behavior.
 
-**Default assignment:** start A5.1; revisit A8 only for a new discriminating
+**Default assignment:** continue A6; revisit A8 only for a new discriminating
 mechanism/host hypothesis. C1–C3 and A4 are
 accepted for the documented fixture and one-handoff flow. Work within an
 ongoing request to continue auto-battle work. Read the contract and the current
@@ -541,9 +543,18 @@ Done: reproducible per-character conditional tactics, with unsupported predicate
 
 Depends on A5. Modify `tools/tactics_policy.py` and its validator; add a healer preset under `configs/tactics/`.
 
+2026-10-06 status: **host contract partial; live recovery open**. Schema v2,
+the healer preset and 119 host checks are reviewed. The preset now names Life
+and Cure, excludes KO from Cure, and applies the MP reserve to Life too;
+enabled kind-only item rules require opt-in. See
+[`A6.json`](receipts/autobattle/A6.json). Next dependency: decode the Action
+submenu's ability identity/availability and legal target selection, then prove
+one recovery cast and its resource delta. Do not extend the pure schema again
+to substitute for this engine evidence.
+
 - [ ] Trace missing item-count/MP consumers only as required by concrete rules; document the evidence in `docs/tactics-policy.md`.
 - [ ] Add heal-under-threshold, revive-before-attack where a legal revive candidate exists, MP reserve, and never-use-item rules. Consumables default to disabled.
-- [ ] Test exact threshold boundaries, zero max HP, KO vs living targets, insufficient MP, no revive ability, and the last consumable.
+- [x] Test exact threshold boundaries, zero max HP, KO vs living targets, insufficient MP, no revive ability, and the last consumable (host contract only; 119 checks).
 - [ ] Replay a wounded-party fixture and compare its chosen actions to a damage-focused policy.
 
 Done: the rule changes the executed action, consumes the expected resource, and explains fallback when unavailable. Do not invent a heal/revive candidate that the engine rejected.

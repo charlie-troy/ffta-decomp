@@ -1,0 +1,4 @@
+scenario defeat
+  [defeat] state=completed turns=1 seeds=6 presses=30
+  PASS defeat (85.0s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

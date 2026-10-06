@@ -1,0 +1,4 @@
+scenario stop-coincides-with-progress
+  [stop-coincides-with-progress] state=paused turns=0 seeds=1 presses=30
+  PASS stop-coincides-with-progress (21.9s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

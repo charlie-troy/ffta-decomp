@@ -87,6 +87,7 @@ def main(argv=None):
         candidate = os.path.join(repo_root, args.configs)
         if os.path.isdir(candidate):
             args.configs = candidate
+    args.configs = os.path.abspath(args.configs)
     checks = []
 
     def check(label, fn):
@@ -581,16 +582,25 @@ def main(argv=None):
         survivors = []
         with tempfile.TemporaryDirectory() as tmp:
             shutil.copy(validator, os.path.join(tmp, os.path.basename(validator)))
+            env = dict(os.environ)
+            env["PYTHONDONTWRITEBYTECODE"] = "1"
+            command = [sys.executable, os.path.join(tmp, os.path.basename(validator)),
+                       "--no-mutation-check", "--configs", args.configs,
+                       "--out-root", os.path.join(tmp, "out")]
+            # Establish that this isolated test environment actually works.
+            # Otherwise missing presets can make every mutant fail vacuously.
+            with open(os.path.join(tmp, "tactics_policy.py"), "w", encoding="utf-8") as fh:
+                fh.write(source)
+            control = subprocess.run(command, cwd=tmp, capture_output=True,
+                                     text=True, env=env)
+            assert control.returncode == 0, (
+                "unmutated isolated suite failed:\n" + control.stdout + control.stderr)
             for label, (old, new) in mutations.items():
                 assert old in source, f"mutation anchor missing: {label}"
                 with open(os.path.join(tmp, "tactics_policy.py"), "w", encoding="utf-8") as fh:
                     fh.write(source.replace(old, new, 1))
-                env = dict(os.environ)
-                env["PYTHONDONTWRITEBYTECODE"] = "1"
-                result = subprocess.run(
-                    [sys.executable, os.path.join(tmp, os.path.basename(validator)),
-                     "--no-mutation-check", "--out-root", os.path.join(tmp, "out")],
-                    cwd=tmp, capture_output=True, text=True, env=env)
+                result = subprocess.run(command, cwd=tmp, capture_output=True,
+                                        text=True, env=env)
                 if result.returncode == 0:
                     survivors.append(label)
         assert not survivors, f"mutants survived the suite: {survivors}"
@@ -757,6 +767,17 @@ def main(argv=None):
             rule("wait-only", {"kind": "wait"}, "first"), fallback="wait")}})
         assert evaluate(snap2(candidates=[last, cand("w1")]), off)["decision"]["candidate_id"] == "w1"
         assert choose_action(snap2(candidates=[last]), off) is None
+        # Broad rules must still obey these global guards. The item-specific
+        # predicates above independently reject count=0 and can mask a broken
+        # inventory gate; a wait-only rule cannot expose a broken opt-in gate.
+        broad_off = policy2(assignments={"party": {"player": ruleset(rule("any"))}})
+        result = choose_action(snap2(candidates=[last, cand("w1")]), broad_off)
+        assert result["candidate_id"] == "w1", result
+        broad_on = policy2(consumables=True, assignments={
+            "party": {"player": ruleset(rule("any"))}})
+        assert choose_action(snap2(candidates=[last]), broad_on)["candidate_id"] == "potion-last"
+        result = evaluate(snap2(candidates=[empty, cand("w1")]), broad_on)
+        assert result["decision"]["candidate_id"] == "w1", result
     check("the last consumable is usable, an empty one is not, and consumables default off",
           last_consumable_and_the_disabled_default)
 
@@ -785,13 +806,49 @@ def main(argv=None):
             check(f"rejects and never commits: {label}", run)
     check("a v2 item candidate must carry item_name and count", v2_snapshot_requires_item_facts)
 
+    def healer_preset_rejects_unrelated_abilities():
+        doc = load_policy_file(os.path.join(args.configs, "healer.json"))
+        for hp in (0, 40):
+            # Legal ally-targeted actions need not recover HP or revive.
+            buff = heal("a-protect", hp, ability_name="Protect")
+            result = evaluate(snap2(candidates=[buff, cand("wait")]), doc)
+            assert result["reason"] == REASON_FALLBACK_WAIT, result
+        cure_ko = heal("cure-ko", 0, ability_name="Cure")
+        result = evaluate(snap2(candidates=[cure_ko, cand("wait")]), doc)
+        assert result["reason"] == REASON_FALLBACK_WAIT, result
+    check("the healer preset does not mistake an ally buff or Cure on a KO for recovery",
+          healer_preset_rejects_unrelated_abilities)
+
+    def healer_preset_reserves_mp_for_revive():
+        doc = load_policy_file(os.path.join(args.configs, "healer.json"))
+        life = heal("life", 0, ability_name="Life", cost=10)
+        for mp in (9, 10, 17):
+            result = evaluate(snap2(actors=actor(mp=mp, max_mp=20),
+                                   candidates=[life, cand("wait")]), doc)
+            assert result["reason"] == REASON_FALLBACK_WAIT, (mp, result)
+        result = choose_action(snap2(actors=actor(mp=18, max_mp=20),
+                                     candidates=[life, cand("wait")]), doc)
+        assert result["candidate_id"] == "life", result
+    check("the healer preset applies the eight-MP reserve to Life too",
+          healer_preset_reserves_mp_for_revive)
+
+    def item_kind_requires_opt_in():
+        try:
+            validate_policy(policy2(assignments={"party": {"player": ruleset(
+                rule("items", {"kind": "item"}))}}))
+        except PolicyError:
+            return
+        raise AssertionError("an enabled kind:item rule requires consumables opt-in")
+    check("kind:item alone requires consumables opt-in", item_kind_requires_opt_in)
+
     def healer_preset_revives_before_healing():
         doc = load_policy_file(os.path.join(args.configs, "healer.json"))
         assert doc["schema"] == SCHEMA2
-        result = choose_action(snap2(candidates=[heal("ally-40", 40), heal("ally-ko", 0),
+        result = choose_action(snap2(candidates=[heal("ally-40", 40, ability_name="Cure"),
+                                                heal("ally-ko", 0, ability_name="Life"),
                                                 enemy("e", 90)]), doc)
         assert result["rule_id"] == "revive-before-attack" and result["candidate_id"] == "ally-ko"
-        result = choose_action(snap2(candidates=[heal("ally-40", 40), enemy("e", 90)]), doc)
+        result = choose_action(snap2(candidates=[heal("ally-40", 40, ability_name="Cure"), enemy("e", 90)]), doc)
         assert result["rule_id"] == "heal-wounded-ally" and result["candidate_id"] == "ally-40"
         result = evaluate(snap2(candidates=[enemy("e", 90)]), doc)
         assert result["outcome"] == "selected" and result["rule_id"] == "pressure-enemy"

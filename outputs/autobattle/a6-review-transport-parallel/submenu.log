@@ -1,0 +1,4 @@
+scenario submenu
+  [submenu] state=stalled turns=0 seeds=0 presses=75
+  PASS submenu (59.0s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

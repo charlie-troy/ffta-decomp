@@ -1,0 +1,1 @@
+{"schema": "ffta-tactics-policy/1", "fallback": "wait", "assignments": {"party": {"player": {"rules": [{"id": "hold", "when": {"kind": "wait"}, "select": "first"}]}}}}

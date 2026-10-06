@@ -1,0 +1,4 @@
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 6.034, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:wait-nav-down", "t": 8.458, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 10.868, "duration": 1.2, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 13.277, "duration": 1.2, "hits": 5, "aborted": false}

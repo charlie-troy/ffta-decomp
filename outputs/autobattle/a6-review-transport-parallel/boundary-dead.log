@@ -1,0 +1,4 @@
+scenario boundary-dead
+  [boundary-dead] state=stalled turns=0 seeds=0 presses=75
+  PASS boundary-dead (58.5s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

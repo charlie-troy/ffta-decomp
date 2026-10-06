@@ -287,6 +287,8 @@ def _rule(value, where, seen_ids, version, consumables):
         out["when"][key] = operand
     if version == 2 and enabled and not consumables:
         used = sorted(set(out["when"]) & set(ITEM_WHEN_KEYS))
+        if out["when"].get("kind") == "item":
+            used.append("kind:item")
         if used:
             raise PolicyError(
                 f"{where}.when: {used} require the consuming scope to enable "

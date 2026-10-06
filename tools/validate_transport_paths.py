@@ -1187,6 +1187,9 @@ def run_scenario(name, out_root):
             errors.append("pause-at-boundary: breakpoints still armed after "
                           "the handoff")
         vt = world.vt
+        # This fake advances on wall time, not on reads. An immediate pump
+        # can occur within the same frame and cannot establish a frozen core.
+        time.sleep(1.0)
         world.pump(session.g)
         if world.vt <= vt:
             errors.append("pause-at-boundary: the engine stopped advancing; "

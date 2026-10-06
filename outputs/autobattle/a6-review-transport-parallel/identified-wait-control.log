@@ -1,0 +1,4 @@
+scenario identified-wait-control
+  [identified-wait-control] state=stalled turns=1 seeds=2 presses=15
+  PASS identified-wait-control (19.7s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

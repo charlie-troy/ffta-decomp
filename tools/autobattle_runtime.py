@@ -544,6 +544,9 @@ class BattleRuntime:
                 "detail": evaluation["detail"],
                 "age_seconds": self.tactics.last_age,
                 "candidates": list(self.tactics.last_candidate_ids),
+                # Keep the actual chooser input, rather than making later
+                # audits reconstruct HP/MP from a nearby engine-result row.
+                "snapshot": self.tactics.last_snapshot,
             }
             if decision is None:
                 self.event("note", **self._actor_fields(),

@@ -282,6 +282,15 @@ def main(argv=None):
         assert first["outcome"] == "selected" and first["reason"] == "rule:matched"
         assert first["candidates"] == [MOVE_CANDIDATE, WAIT_CANDIDATE], first
         assert isinstance(first["age_seconds"], float) and first["age_seconds"] < 3.0
+        snapshot = first.get("snapshot")
+        assert snapshot is not None, "receipt omits the actual policy inputs"
+        assert snapshot["actor"]["name"] == "Marche"
+        assert snapshot["age_seconds"] == first["age_seconds"]
+        assert [c["id"] for c in snapshot["candidates"]] == first["candidates"]
+        from tactics_policy import evaluate
+        replay = evaluate(snapshot, json.load(open(policy_path, encoding="utf-8")))
+        assert replay["rule_id"] == first["rule_id"]
+        assert replay["decision"]["candidate_id"] == "wait"
         events = [json.loads(line) for line in
                   open(os.path.join(run_dir, "events.jsonl"), encoding="utf-8")
                   if line.strip()]

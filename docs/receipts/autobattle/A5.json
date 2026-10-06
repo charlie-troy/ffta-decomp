@@ -481,7 +481,7 @@
         "status": "pass",
         "command": "python tools/run_autobattle.py --run-id a53-live-hp-split-01 ... --tactics-policy configs/tactics/hp-split.json ; python tools/run_autobattle.py --run-id a53-live-hp-split-30-01 ... --tactics-policy configs/tactics/hold-below-30.json",
         "expected": "on equivalent starting states, changing one relevant condition changes the decision AND the engine result, with a control actor whose decision does not change",
-        "observed": "Same fixture, same rules and notes, only the HP threshold changed (80 -> 30). Marche (100% HP) is the control: Move (4,10)->(4,11) in BOTH runs via 'advance-when-above-threshold'. Montblanc (73% HP) flips: under <=80 he matched 'hold-when-below-threshold' and waited with no movement; under <=30 he matched 'advance-when-above-threshold' and moved (5,10)->(5,11), engine-verified. Observation ages 1.6 s both runs.",
+        "observed": "Same saved fixture and policy rules except the threshold (80 -> 30). Marche (100% HP) moved (4,10)->(4,11) in both runs. Audit correction 2026-10-06: Montblanc's boundary HP differs: players_before and screenshots show 177/241 (73%) in the threshold-80 run, but 84/241 (34%, floored) in threshold-30. He Waited under <=80 and Moved (5,10)->(5,11) under <=30, engine-verified. Both HP values lie in the rule-contrast interval; these are not identical decision states and the pair does not isolate a single changed decision input. Observation ages about 1.6 s. Older prose saying 73% in both runs is superseded.",
         "evidence": [
           "outputs/autobattle/a53-live-hp-split-01/events.jsonl",
           "outputs/autobattle/a53-live-hp-split-30-01/events.jsonl",

@@ -1,0 +1,4 @@
+scenario strict-press
+  [strict-press] state=paused turns=0 seeds=0 presses=5
+  PASS strict-press (9.3s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

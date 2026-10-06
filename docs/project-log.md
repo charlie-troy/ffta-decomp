@@ -1,5 +1,50 @@
 # Project log
 
+## 2026-10-06 — Review A5 evidence and repair A6 host policy defects
+
+Reviewed the other worker's changes through `f903da4`. Four retained A5 live
+run artifact contracts pass fresh validation (the HP threshold pair, STOP,
+and policy handoff/resume). Screenshot inspection corrected the threshold
+pair's write-up: Montblanc is 177/241 HP in the threshold-80 boundary but
+84/241 in threshold-30, agreeing with each run's `players_before`. Both are
+between the thresholds, so the actions agree with the contrast; these are
+not identical decision inputs. Updated the living A5 receipt without editing
+historical run artifacts. Future policy turns retain the actual chooser
+snapshot in events/run receipts; the real CLI host regression replays it.
+
+A6's initial healer preset could select Protect as a revive/heal because its
+rules specified ally relation/HP but no ability. Reproduced before fixing.
+It now names Life and Cure, excludes KO targets from Cure, and applies the
+eight-MP reserve to Life as well. An enabled `kind:item` rule also now requires
+consumables opt-in, just like item-name/count predicates. The preset remains
+a host contract: no legal live recovery candidate or consumed MP is proven.
+
+The mutation harness had a vacuity defect: temporary suite copies could fail
+for missing presets. Passing absolute `--configs` plus an unmutated isolated
+positive control exposed two survivors (disabled-items and empty-count gates).
+Added broad-rule cases that actually need those guards; the repaired harness
+rejects all seven mutants. Policy suite: **119/119**, adapter: **12/12**,
+identity: **19/19**, cleanup: **4/4**. The snapshot regression failed before
+the runtime change and passes through the real CLI afterwards.
+
+The transport recheck exposed a timing defect in `pause-at-boundary`'s test:
+it pumped the wall-clock fake immediately and expected virtual time to
+advance even if no 1/60-second frame had elapsed. The retained run failed
+with zero inputs and the correct paused state. Added the same one-second
+observation window already used by the neighboring pause case; corrected
+case passes in 7.1 s. This changes the test, not the handoff implementation.
+AI semantics remain **10/10** and strategy compiler checks **9/9**.
+Default transport set: **23/23** with 22 initial passes plus the corrected
+timing case. Individual commands, original exit statuses and log hashes are
+retained in `outputs/a6-review-transport-summary.json`; original failed case
+is retained separately. Same-process resume reaches three turns/completed.
+
+Documented schema v2 and opened `docs/receipts/autobattle/A6.json` as partial.
+Next dependency is the Action submenu's ability identity/availability and
+legal targeting, then a witnessed recovery cast/MP delta. No ROM source or
+matching build changes; no new live battle claimed. The pre-existing
+`docs/roadmap.md` edit is preserved separately.
+
 ## 2026-10-06 — A5.4 closed: conditional tactics, and two defects the evidence found
 
 Closed the A5 packet for the narrow family and re-ran the retained live gates on

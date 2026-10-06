@@ -1,0 +1,11 @@
+scenario guard-failure
+scenario normal-battle -> run transport-guard-failure
+paused: booting guarded fixture before any input is issued
+  EV {"t": 0.0, "kind": "guard", "scenario": "normal-battle", "turn": null, "actor": null, "actor_slot": null, "control_mode": null, "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "idle", "seeds": 0, "router_hits": 0, "note": "identity guard rejected: missing or ambiguous player identity", "input_log": null, "actor_identity": null, "engine_result": null, "next_actor": null, "tactics": null}
+  EV {"t": 0.0, "kind": "start", "scenario": "normal-battle", "turn": null, "actor": null, "actor_slot": null, "control_mode": "retail-ai", "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "stalled", "seeds": 0, "router_hits": 0, "note": null, "input_log": "input-log.jsonl", "actor_identity": null, "engine_result": null, "next_actor": null, "tactics": null}
+  EV {"t": 0.0, "kind": "stop", "scenario": "normal-battle", "turn": null, "actor": null, "actor_slot": null, "control_mode": null, "selected_action": null, "selected_target": null, "position_before": null, "position_after": null, "state": "stalled", "seeds": 0, "router_hits": 0, "note": "stalled: live guard failed before start", "input_log": null, "actor_identity": null, "engine_result": null, "next_actor": null, "tactics": null}
+final state: stalled (guard failure); receipt outputs\autobattle\a6-review-transport-parallel\transport-guard-failure/run.json
+  [guard-failure] note: CLI receipt in outputs\autobattle\a6-review-transport-parallel\transport-guard-failure, harness rt dir outputs\autobattle\a6-review-transport-parallel\guard-failure stays empty (guard failed before run)
+  [guard-failure] state=stalled turns=0 (real CLI main path)
+  PASS guard-failure (0.0s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

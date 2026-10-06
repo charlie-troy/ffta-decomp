@@ -1,0 +1,4 @@
+scenario resume-after-pause
+  [resume-after-pause] state=completed turns=3 seeds=7 presses=90
+  PASS resume-after-pause (132.6s)
+TRANSPORT VALIDATION PASSED: all recorded transport paths hold the receipts contract

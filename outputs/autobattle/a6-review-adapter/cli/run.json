@@ -1,0 +1,92 @@
+{
+  "schema": "a3-run/2",
+  "run_id": "cli",
+  "scenario": "policy-wait",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 1,
+  "seeds": 2,
+  "router_hits": 0,
+  "terminal_reason": "turn budget reached",
+  "events": "outputs/autobattle/a6-review-adapter\\cli\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "emulator_pid": 12345,
+  "player_identities": [
+    [
+      "Marche",
+      6
+    ]
+  ],
+  "input_sha256": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/lua-nav/battle-start.ss0": "4da58bfe0e162210383c28aa8f66659fca33c91c69da0e965b87b3b7a730abe5",
+    "outputs/autobattle/a6-review-adapter\\cli\\scenario.json": "dcc8c673817b198e69d3fa847a757de244ec5f50dea130432b19246e5a167d3f",
+    "tools/run_autobattle.py": "7468daf973de5ab5ded33669c63018f0284da4f9be553afcba04b59407157132",
+    "tools/autobattle_runtime.py": "5fef6bd415afa0b9ba4a857d86a7f2f92c8644563ced638b09ea9c489c71aee4",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "bfbd9bf7e4474f63e7906ff275e4ddb71f6755f83bc21df1bb61ef4bb3c7e9cf",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "b1f27df8a6ff634acc396ad15cc3fb7d77c1f07831fd496dc2f64fd40d70dad0",
+    "outputs/autobattle/a6-review-adapter\\cli\\policy.json": "00e8324203d4369c6e8a6a5554a57dbb1c0e98d89b89ec39ae87787fa60aa0c3"
+  },
+  "tactics_policy": {
+    "path": "outputs/autobattle/a6-review-adapter\\cli\\policy.json",
+    "schema": "ffta-tactics-policy/1",
+    "fallback": "wait",
+    "scopes": [
+      "party"
+    ],
+    "decisions": [
+      {
+        "policy": "outputs/autobattle/a6-review-adapter\\cli\\policy.json",
+        "outcome": "selected",
+        "reason": "rule:matched",
+        "scope": "party",
+        "rule_id": "hold",
+        "detail": null,
+        "age_seconds": 0.0028769969940185547,
+        "candidates": [
+          "move",
+          "wait"
+        ],
+        "snapshot": {
+          "schema": "ffta-tactics-snapshot/1",
+          "identity": "verified",
+          "actor": {
+            "name": "Marche",
+            "id": 6,
+            "job_id": 2,
+            "side": "player",
+            "hp": 388,
+            "max_hp": 442,
+            "mp": 60,
+            "max_mp": 96,
+            "ct": 188,
+            "tile": [
+              4,
+              10
+            ]
+          },
+          "candidates": [
+            {
+              "id": "move",
+              "kind": "move",
+              "action_id": 0,
+              "legal": true,
+              "cost": 0
+            },
+            {
+              "id": "wait",
+              "kind": "wait",
+              "action_id": 2,
+              "legal": true,
+              "cost": 0
+            }
+          ],
+          "age_seconds": 0.0028769969940185547
+        }
+      }
+    ],
+    "note": "choices made by the frozen chooser among the commands the engine offered; the scenario's fixed actor_actions are not used in this run"
+  }
+}
