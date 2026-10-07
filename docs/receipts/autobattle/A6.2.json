@@ -39,6 +39,11 @@
       "id": "public-party-recovery",
       "status": "unknown",
       "observed": "Existing self-only public bounds unchanged"
+    },
+    {
+      "id": "acceptance-coordinate-copy-rom",
+      "status": "pass",
+      "observed": "Four synthetic ROM fragments copy0200F3B8/+4 to processor+109/+10A independently of UI cursor; live coordinate agreement unknown"
     }
   ],
   "source_sha256": {
@@ -49,7 +54,8 @@
     "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
     "tools/build_party_recovery_fixture.py": "e26725d707ecda395ae5d87ea8205ffc43017d46c1d4106b82dc40f8aba0de2a",
     "tools/probe_recovery_ally_overlay.py": "58c987ac98aacf7c2d9f803053292fccdaad4d112fec61c95285938813649fe8",
-    "tools/validate_recovery_ally_overlay.py": "7e701ce7359cbe77881c052e4c87d17617e74e259903738e8f2162b059e215ce"
+    "tools/validate_recovery_ally_overlay.py": "7e701ce7359cbe77881c052e4c87d17617e74e259903738e8f2162b059e215ce",
+    "tools/validate_recovery_target_cursor.py": "58f922c7646077bbaf1de7f11d34839aa2cb103b6baba88454ac2c93c62393b9"
   },
   "evidence_sha256": {
     "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
@@ -101,7 +107,8 @@
     "outputs/autobattle/a62-ally-overlay-01/before-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
     "outputs/autobattle/a62-ally-overlay-01/before-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
     "outputs/autobattle/a62-ally-overlay-01/before-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
-    "outputs/autobattle/a62-ally-overlay-01/before-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b"
+    "outputs/autobattle/a62-ally-overlay-01/before-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
+    "outputs/autobattle/a62-target-cursor/checks.json": "85288d234636a19b12e1a59c1a23a7f04f596c45184add162844a1d54f4ae877"
   },
   "retained_failures": [
     {
@@ -117,7 +124,7 @@
       "error": "RAM pointer outside EWRAM"
     }
   ],
-  "next_packet": "Observe target acceptance from the guarded ally cursor; join selected wrapper and menu peer to canonical Montblanc before any final cast. Cursor location alone is insufficient.",
+  "next_packet": "Capture UI cursor0200FFC9/+1 and acceptance coordinates0200F3B8/+4 under one halt; join both to canonical ally before observing target acceptance/selected wrapper/peer. No final cast yet.",
   "limitations": [
     "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
     "Two pre-targeting reloads are not two successful ally-target casts.",

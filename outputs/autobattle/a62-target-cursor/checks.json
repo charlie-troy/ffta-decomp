@@ -1,0 +1,69 @@
+{
+  "status": "pass",
+  "scope": "Execute the target-acceptance coordinate-copy fragment on synthetic RAM.\n\nThis does not execute the surrounding acceptance branch or prove live target\nlegality. The UI cursor and acceptance-coordinate structure are distinct.\n",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "source_sha256": "58f922c7646077bbaf1de7f11d34839aa2cb103b6baba88454ac2c93c62393b9",
+  "fragment": [
+    134969084,
+    134969104
+  ],
+  "cases": [
+    {
+      "acceptance_coordinates": [
+        4,
+        10
+      ],
+      "display_cursor": [
+        4,
+        10
+      ],
+      "copied_processor_coordinates": [
+        4,
+        10
+      ]
+    },
+    {
+      "acceptance_coordinates": [
+        5,
+        10
+      ],
+      "display_cursor": [
+        5,
+        10
+      ],
+      "copied_processor_coordinates": [
+        5,
+        10
+      ]
+    },
+    {
+      "acceptance_coordinates": [
+        5,
+        10
+      ],
+      "display_cursor": [
+        4,
+        10
+      ],
+      "copied_processor_coordinates": [
+        5,
+        10
+      ]
+    },
+    {
+      "acceptance_coordinates": [
+        4,
+        10
+      ],
+      "display_cursor": [
+        5,
+        10
+      ],
+      "copied_processor_coordinates": [
+        4,
+        10
+      ]
+    }
+  ],
+  "live_coordinate_agreement": "unknown"
+}

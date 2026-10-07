@@ -49,6 +49,14 @@ Static switch entry080B74E0 invokes the helper at080B751E. This identifies
 concrete fields to capture live; it does not prove they currently name an ally
 or establish the meaning of menu context+0x1C.
 
+Four additional actual ROM fragment cases at080B76FC..080B7710 copy coordinates
+from0200F3B8/+4 into processor+0x109/+0x10A. They intentionally vary the UI
+cursor0200FFC9/+1 independently: this fragment reads the former structure,
+not the latter. The earlier live overlay capture recorded only the UI cursor;
+agreement with the acceptance-coordinate structure is UNKNOWN. The next live
+capture must read both under the same halt and join them to the canonical
+target tile. These fragment tests do not execute surrounding acceptance checks.
+
 ## Next live gate: UNKNOWN
 
 Overlay experiment `a62-ally-overlay-01` reaches engine-enabled Cure through

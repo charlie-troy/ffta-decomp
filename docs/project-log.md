@@ -1,5 +1,13 @@
 # Project log
 
+## 2026-10-07 - Separate display and acceptance target coordinates
+
+Four ROM fragment cases show080B76FC..080B7710 copies0200F3B8/+4 into
+processor+0x109/+0x10A, independently of UI cursor0200FFC9/+1. Earlier live
+overlay proof captured only the display cursor, so live coordinate agreement
+remains unknown. Next target acceptance must capture both under one halt;
+synthetic coordinate-copy proof does not certify the surrounding legality path.
+
 ## 2026-10-07 - Exact receipt packaging audit
 
 Added `audit_recovery_receipt_hashes.py` to compare local evidence and all
