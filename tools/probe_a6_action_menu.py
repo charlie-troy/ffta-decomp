@@ -18,6 +18,9 @@ from autobattle_identity import ActorAdapter, IdentityError, key
 from c2_menu_probe import sweep
 from fixture_guard import FixtureSession, ROSTER, STRIDE, u8, u16, u32
 from probe_control_handoff import Probe
+from recovery_menu import RecoveryMenu
+from recovery_executor import SelfCureExecutor, RecoveryStopped
+from tactics_policy import validate_policy
 
 KEYS = {"A": 1, "B": 2, "DOWN": 0x80, "UP": 0x40,
         "RIGHT": 0x10, "LEFT": 0x20}
@@ -34,9 +37,21 @@ def main():
     parser.add_argument("--edit-members", action="store_true",
                         help="also edit the unique matching clan-member record; research only")
     parser.add_argument("--settle-end", type=float, default=0.0)
-    parser.add_argument("--route", default="DOWN,A,DOWN,DOWN,A,DOWN,UP,B,B")
+    parser.add_argument("--verify-menu", action="store_true",
+                        help="require pinned canonical identity and known modal state before every research key")
+    parser.add_argument("--route")
+    parser.add_argument("--policy", help="state-driven bounded self-Cure research using this policy")
+    parser.add_argument("--stop-file", help="observe STOP when this file exists; policy executor only")
     args = parser.parse_args()
-    route = args.route.split(",") if args.route else []
+    if args.policy and args.route is not None:
+        parser.error("policy execution and an explicit research route are mutually exclusive")
+    if args.stop_file and not args.policy:
+        parser.error("STOP file requires policy execution")
+    route_text = args.route if args.route is not None else "DOWN,A,DOWN,DOWN,A,DOWN,UP,B,B"
+    route = route_text.split(",") if route_text else []
+    policy_bytes = Path(args.policy).read_bytes() if args.policy else None
+    policy_document = json.loads(policy_bytes) if policy_bytes is not None else None
+    policy = validate_policy(policy_document) if policy_document is not None else None
     if any(k not in KEYS for k in route):
         parser.error("route contains an unsupported key")
     root = Path(args.out)
@@ -46,9 +61,16 @@ def main():
               "state_sha256": hashlib.sha256(Path(args.state).read_bytes()).hexdigest(),
               "phases": [], "writes": [], "keys": [], "status": "unknown"}
     result["engine_calls"] = []
+    if policy:
+        result["policy_document"] = policy_document
+        result["policy_sha256"] = hashlib.sha256(policy_bytes).hexdigest()
     started = time.time()
+    probe = None
     try:
         with FixtureSession(args.state, rom=args.rom, quiet=True) as session:
+            if policy:
+                session.g.sock.settimeout(1.0)
+                result["blocking_timeouts_seconds"] = {"debugger_packet": 1, "screenshot_process": 45}
             result["writes"] = session.writes
             result["pid"] = session.pid
             probe = Probe(session, intervene="none")
@@ -94,18 +116,37 @@ def main():
                 for edit_base in edit_bases:
                     session.write_bytes(edit_base + 0x1C, args.mp.to_bytes(2, "little"),
                                         "A6 disposable research fixture: actor MP")
+            menu = RecoveryMenu(session.g, session.read_rom_bytes(), owner) if args.verify_menu or policy else None
+            result["menu_guards"] = []
+
+            def stop_check():
+                stopped = bool(args.stop_file and Path(args.stop_file).exists())
+                if stopped and "stop_requested" not in result:
+                    result["stop_requested"] = time.monotonic()
+                    result["stop_input_t"] = time.time() - probe.t0
+                return stopped
+
+            def checkpoint():
+                if stop_check():
+                    raise RecoveryStopped("STOP observed during evidence capture")
+
+            class CheckedReads:
+                def read_mem(self, addr, size):
+                    checkpoint()
+                    return session.g.read_mem(addr, size)
 
             def phase(tag):
+                checkpoint()
                 probe.disarm()
-                # press() re-arms router hooks; a pending stop can precede
-                # the menu redraw. Run untraced before taking a halted,
-                # screenshot-matched snapshot, rather than pairing old RAM
-                # with the next visible frame.
+                # Allow redraw before the bulk capture. The guarded read and
+                # screenshot below are separate observations, not one atomic
+                # RAM/image pair; their facts must be checked independently.
                 session.g.cont()
                 time.sleep(0.5)
-                # Served reads halt the core (DE-029). Bulk sweeps occur in
-                # one halted window; the raw game bytes stay local/untracked.
-                data = sweep(session.g)
+                # Served reads halt the core (DE-029). Raw sweeps remain
+                # local/untracked; only the guarded reader checks coherence.
+                data = sweep(CheckedReads() if policy else session.g)
+                checkpoint()
                 for lo, hi, name in ((0x02000000, 0x02030000, "ewram"),
                                      (0x03000000, 0x03008000, "iwram")):
                     if any(a not in data for a in range(lo, hi)):
@@ -154,13 +195,17 @@ def main():
                                 "enabled": [read(enabled_ptr + i, 1) for i in range(count)]}
                 if transient is not None:
                     entry["roster_rejected"] = transient
+                if menu is not None:
+                    entry["guarded_menu"] = menu.snapshot().receipt()
                 if member is not None:
                     entry["member"] = {"addr": f"{member:08x}",
                                        "secondary_job": u8(session.g, member + 8),
                                        "hp": u16(session.g, member + 0x18),
                                        "mp": u16(session.g, member + 0x1C)}
                 shot = root / f"{tag}.png"
+                checkpoint()
                 session.screenshot(str(shot))
+                checkpoint()
                 entry["screenshot"] = str(shot)
                 result["phases"].append(entry)
                 (root / "probe.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
@@ -168,23 +213,45 @@ def main():
                 session.g.cont()
 
             phase("00-initial")
-            for i, name in enumerate(route, 1):
+            if policy:
+                def after_key(name):
+                    delivered = executor.events[-1]
+                    result["keys"].append({"key": name, "hits": delivered["hits"]})
+                    phase(f"{len(result['keys']):02d}-{name}")
+
+                executor = SelfCureExecutor(menu, probe, policy, after_key=after_key,
+                    stop_check=stop_check)
+                result["executor_events"] = executor.events
+                result["policy"] = args.policy
+                result["recovery"] = executor.run()
+                phase("99-settled")
+            for i, name in enumerate([] if policy else route, 1):
+                if menu is not None:
+                    token = menu.snapshot()
+                    verified = menu.revalidate(token)
+                    result["menu_guards"].append({"before_key": i, "key": name,
+                                                  "facts": verified.receipt()})
                 hits = probe.press(KEYS[name], tag=f"a6-research:{name}", pause=1.2)
                 result["keys"].append({"key": name, "hits": hits})
                 if hits < 1:
                     raise RuntimeError(f"key {name} was not delivered")
                 phase(f"{i:02d}-{name}")
-            if args.settle_end:
+            if args.settle_end and not policy:
                 probe.pump(args.settle_end, "a6-settle", sample_every=10.0)
                 phase("99-settled")
             probe.disarm()
             result["writes"] = session.writes
             result["key_writes"] = probe.key_write_log
             result["status"] = "observed"
+    except RecoveryStopped as exc:
+        result["status"] = "paused"
+        result["error"] = str(exc)
     except Exception as exc:
         result["error"] = repr(exc)
         raise
     finally:
+        if probe is not None:
+            result["key_writes"] = list(getattr(probe, "key_write_log", []))
         (root / "probe.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
 
 

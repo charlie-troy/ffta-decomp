@@ -1,0 +1,1826 @@
+{
+  "scope": "menu research only; fixture edits are not engine actions",
+  "state": "outputs/lua-nav/battle-start.ss0",
+  "rom": "baserom.gba",
+  "state_sha256": "4da58bfe0e162210383c28aa8f66659fca33c91c69da0e965b87b3b7a730abe5",
+  "phases": [
+    {
+      "tag": "00-initial",
+      "elapsed": 14.994,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 4,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 127287.0300814,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\00-initial.png"
+    },
+    {
+      "tag": "01-DOWN",
+      "elapsed": 18.864,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 4,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 127290.8927969,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\01-DOWN.png"
+    },
+    {
+      "tag": "02-A",
+      "elapsed": 22.735,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        0,
+        0
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 5,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 127294.7608818,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\02-A.png"
+    },
+    {
+      "tag": "03-DOWN",
+      "elapsed": 26.564,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        1,
+        1
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 5,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 127298.5899921,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\03-DOWN.png"
+    },
+    {
+      "tag": "04-DOWN",
+      "elapsed": 30.424,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        2,
+        0
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 5,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 127302.458298,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\04-DOWN.png"
+    },
+    {
+      "tag": "05-A",
+      "elapsed": 34.398,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        194,
+        90
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 7,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 1,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 127306.4244619,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\05-A.png"
+    },
+    {
+      "tag": "06-A",
+      "elapsed": 38.313,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        194,
+        90
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 1,
+        "mode": 7,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 1,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 127310.3388599,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 7,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "target-overlay",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\06-A.png"
+    },
+    {
+      "tag": "07-A",
+      "elapsed": 42.166,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 12,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 127314.1996185,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 258,
+        "mode": 12,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "description",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\07-A.png"
+    },
+    {
+      "tag": "08-A",
+      "elapsed": 46.145,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 11,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 127318.1862875,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386653,
+        "controller_state": 258,
+        "mode": 11,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "confirmation",
+        "cursor": 0,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\08-A.png"
+    },
+    {
+      "tag": "09-A",
+      "elapsed": 50.176,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 12,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 127322.2018535,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\09-A.png"
+    },
+    {
+      "tag": "99-settled",
+      "elapsed": 64.777,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 158,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 4,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 127336.8051944,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 158,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 158,
+        "mp": 79
+      },
+      "screenshot": "outputs\\autobattle\\a6-modal-cure-02\\99-settled.png"
+    }
+  ],
+  "writes": [
+    {
+      "addr": "02016020",
+      "width": 1,
+      "old": "08",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: secondary job"
+    },
+    {
+      "addr": "02000088",
+      "width": 1,
+      "old": "08",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: secondary job"
+    },
+    {
+      "addr": "02016030",
+      "width": 2,
+      "old": "8401",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: wounded actor"
+    },
+    {
+      "addr": "02000098",
+      "width": 2,
+      "old": "8401",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: wounded actor"
+    },
+    {
+      "addr": "02016034",
+      "width": 2,
+      "old": "5500",
+      "new": "5500",
+      "requested": "5500",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: actor MP"
+    },
+    {
+      "addr": "0200009c",
+      "width": 2,
+      "old": "5500",
+      "new": "5500",
+      "requested": "5500",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: actor MP"
+    }
+  ],
+  "keys": [
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    }
+  ],
+  "status": "observed",
+  "engine_calls": [],
+  "pid": 66844,
+  "owner": {
+    "slot": 6,
+    "addr": "02016018",
+    "name": 33562396,
+    "side_raw": 129,
+    "ct": 0,
+    "ea": 0,
+    "id": 6,
+    "type": 2,
+    "base_job": 80,
+    "race": 1,
+    "job": 2,
+    "level": 50,
+    "hp": 388,
+    "max_hp": 442,
+    "mp": 85,
+    "max_mp": 85,
+    "is_rom_name": false,
+    "is_ram_name": true,
+    "name_text": "Marche",
+    "side_bit": false,
+    "unaffiliated": false,
+    "live": true,
+    "x": 4,
+    "y": 10
+  },
+  "member_addr": "02000080",
+  "menu_guards": [
+    {
+      "before_key": 1,
+      "key": "DOWN",
+      "facts": {
+        "observed_at": 127288.5879912,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 2,
+      "key": "A",
+      "facts": {
+        "observed_at": 127292.4183918,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 3,
+      "key": "DOWN",
+      "facts": {
+        "observed_at": 127296.2955207,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 4,
+      "key": "DOWN",
+      "facts": {
+        "observed_at": 127300.0998506,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 5,
+      "key": "A",
+      "facts": {
+        "observed_at": 127304.0362151,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 6,
+      "key": "A",
+      "facts": {
+        "observed_at": 127308.0047842,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 7,
+      "key": "A",
+      "facts": {
+        "observed_at": 127311.8603185,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 7,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "target-overlay",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 8,
+      "key": "A",
+      "facts": {
+        "observed_at": 127315.7596521,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 258,
+        "mode": 12,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "description",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    },
+    {
+      "before_key": 9,
+      "key": "A",
+      "facts": {
+        "observed_at": 127319.7078928,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386653,
+        "controller_state": 258,
+        "mode": 11,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "confirmation",
+        "cursor": 0,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ]
+      }
+    }
+  ],
+  "key_writes": [
+    {
+      "t": 14.501,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 14.553,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 14.605,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 14.658,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 14.71,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 18.331,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 18.383,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 18.435,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 18.487,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 18.54,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 22.209,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 22.26,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 22.312,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 22.363,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 22.414,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 26.012,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 26.065,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 26.118,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 26.17,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 26.222,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 29.949,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 30.001,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 30.053,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 30.106,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 30.158,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 33.917,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 33.97,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 34.022,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 34.075,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 34.128,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 37.784,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 37.836,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 37.888,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 37.941,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 37.994,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 41.672,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 41.725,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 41.777,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 41.829,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 41.881,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 45.62,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 45.673,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 45.726,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 45.779,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 45.831,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    }
+  ]
+}

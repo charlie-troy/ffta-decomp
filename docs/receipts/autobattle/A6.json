@@ -3,7 +3,7 @@
   "date": "2026-10-06",
   "base_revision": "3b8bb4f054afcda2cbe7e81e7451c3f114a2a24e",
   "status": "partial",
-  "scope": "Reviewed host policy and bounded live self-Cure/MP research; no public-runner recovery acceptance",
+  "scope": "Reviewed host policy, pinned modal reader and bounded state-driven policy self-Cure; no public-runner recovery acceptance",
   "criteria": [
     {
       "id": "resource-consumers",
@@ -16,7 +16,7 @@
       "id": "recovery-policy",
       "status": "unknown",
       "expected": "Heal under threshold, revive before attack, MP reserve, never use items by default",
-      "observed": "Schema v2 and healer preset implement host selection: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve on all casts, consumables disabled. Regression rejects unrelated ally abilities and Cure on KO. Constructed-fixture self-Cure heals 100 to 156/163 HP and consumes six MP in two runs, but the policy chooser does not drive either run.",
+      "observed": "Schema v2 and healer preset implement host selection: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve on all casts, consumables disabled. Regression rejects unrelated ally abilities and Cure on KO. Constructed-fixture self-Cure heals 100 to 156/163 HP and consumes six MP in two runs, but the policy chooser does not drive either run. Later state-driven research runs a6-policy-cure-03/-04 choose heal-self and consume MP85->79, HP100->166; MP6 reserve decline and MP5 refusal preserve resources. Public recovery remains open.",
       "command": "python tools/validate_tactics_policy.py --out-root outputs/autobattle/a6-review-policy"
     },
     {
@@ -59,7 +59,7 @@
       "id": "guarded-recovery-integration",
       "status": "unknown",
       "expected": "Policy-selected recovery with verified modal actor/target, stop/cancel handling and resource fallback",
-      "observed": "Not implemented. Existing battle-roster identity guard rejects targeting scratch state. Public adapter remains Move/Wait only."
+      "observed": "Bounded research executor now selects self-Cure through the healer policy, proves reserve/low-MP cancellation and prompt STOP. Public runner still Move/Wait; safe Wait/facing fallback, full turn completion and public integration remain UNKNOWN."
     },
     {
       "id": "exact-cost-cancellation-research",
@@ -67,6 +67,40 @@
       "expected": "At six MP Cure opens, then cancellation consumes no HP/MP",
       "observed": "a6-cure-cancel-01: Cure enabled at MP6; self preview opens; B/B returns to Action group, HP100 MP6 unchanged. This does not establish safe identity restoration.",
       "evidence": "outputs/autobattle/a6-cure-cancel-01/probe.json"
+    },
+    {
+      "id": "pinned-modal-reader-research",
+      "status": "pass",
+      "expected": "Independent canonical actor and active UI/target ownership during borrowed roster, with stale/drift rejection",
+      "observed": "14 retained captured states plus one labeled derived settling state; 46 rejection controls. Driver wrapper and active target processor distinguish returned overlay from cached finished description. No ActorAdapter guard is relaxed.",
+      "evidence": "outputs/autobattle/a6-modal-reader/checks.json"
+    },
+    {
+      "id": "bounded-policy-self-cure-research",
+      "status": "pass",
+      "expected": "Two constructed-fixture state-driven self-Cure reloads selected by exact healer policy; one final confirmation, exact resource cost, restored mirror",
+      "observed": "a6-policy-cure-03/-04: heal-self, HP100->166 MP85->79, Action disabled, restored mirror agrees; inspected confirmation/result screenshots. Narrow action acceptance only; no turn completion/public runner claim.",
+      "evidence": [
+        "outputs/autobattle/a6-policy-cure-03/probe.json",
+        "outputs/autobattle/a6-policy-cure-04/probe.json"
+      ]
+    },
+    {
+      "id": "bounded-policy-decline-cancel-research",
+      "status": "pass",
+      "expected": "Enabled Cure declined at MP reserve boundary; unavailable Cure not selected; no HP/MP consumption",
+      "observed": "a6-policy-reserve-03: MP6 available but policy declines eight-MP reserve; cancellation returns to command with HP100/MP6. low-mp-01: MP5 disabled Cure skipped, command returned HP100/MP5. Fallback unexecuted; normal roster still scratch after reserve cancellation.",
+      "evidence": [
+        "outputs/autobattle/a6-policy-reserve-03/probe.json",
+        "outputs/autobattle/a6-policy-low-mp-01/probe.json"
+      ]
+    },
+    {
+      "id": "bounded-recovery-stop-research",
+      "status": "pass",
+      "expected": "Live STOP at final prompt suppresses final confirmation and further gameplay writes",
+      "observed": "a6-policy-stop-01 paused at Do it/Cancel: 8 keys/40 raw writes; no ninth confirmation; zero writes after observed STOP. Owned process cleaned up. This is not leave-running/manual-handoff acceptance.",
+      "evidence": "outputs/autobattle/a6-policy-stop-01/probe.json"
     }
   ],
   "review_findings": [
@@ -180,5 +214,72 @@
     "recovery_artifact_controls": 3,
     "recovery_artifact_mutations": 9,
     "note": "Current-slice checks; cleanup/identity/transport counts above are inherited from the preceding verified audit, not rerun here."
+  },
+  "modal_executor_slice": {
+    "base_revision": "6b1faedfa1e93caa6ef33cda653436de365f52a7",
+    "delivered_source_sha256": {
+      "tools/recovery_menu.py": "db5a3208481cc688d149bf89035c5389ac1a0896c8b2e2a0b15db900252f444f",
+      "tools/recovery_executor.py": "518cc84542d168dab89f1cab0f99bba64535c03106a2a6aca50f6f0ed85543e2",
+      "tools/validate_recovery_menu.py": "349aec64f0c5171cfdb85271e3a8dc6fc7df5d695ab5bca62cde4131254a111b",
+      "tools/validate_recovery_executor.py": "196037bd58ed2e9993591af6680f6a44d3306a7673657179144ba35c30700a68",
+      "tools/validate_recovery_execution.py": "61db085400e190a23faf6b1ba057748ce9872791f2012e01f79277c2d38e2862",
+      "tools/probe_a6_action_menu.py": "2fa7c5ce074295ccacfef82967d9e4f350a9dfdadc8eab4d080c086253e27bf0"
+    },
+    "evidence_sha256": {
+      "outputs/autobattle/a6-modal-cure-02/probe.json": "20b80caf9edf72d5a2830c2c15f0e3e915b12bc97e3d9d040af8d09f15d0b635",
+      "outputs/autobattle/a6-modal-cure-05/probe.json": "c4f20a87ab5c2188f3b2bdd7b0a536cc4f07d05bcf47ac13ea89b7383b0ee651",
+      "outputs/autobattle/a6-modal-cancel-01/probe.json": "10b5e816a7a9d314ffba088fe28589a95d970f13e4c6e51b353f2c395586edb9",
+      "outputs/autobattle/a6-policy-cure-03/probe.json": "4a971466333919c32a719c0512bbeb5eb43e3a6ad4888b1fae74aa22b0b77f12",
+      "outputs/autobattle/a6-policy-cure-04/probe.json": "430efa482ba8b5b51231e439a495a25e35963ac94a8e27a075472d3b0f1b71e8",
+      "outputs/autobattle/a6-policy-reserve-02/probe.json": "3fac283541c8aa77d2a47924cb89713ff7d4bd710428d42b912930aabf906c0c",
+      "outputs/autobattle/a6-policy-reserve-03/probe.json": "997baa473430beeb624009035671df5f2d91deeb5644444bda3f898688ddb31b",
+      "outputs/autobattle/a6-policy-low-mp-01/probe.json": "8248aa1d23db479e951c813a0a7757be518324b58e6d017ebb0b0d0abbb21c97",
+      "outputs/autobattle/a6-policy-stop-01/probe.json": "57e05c996d497c21658e8ce8d8c0edddefcae076f2010bd64d46c62ce4c39d58",
+      "outputs/autobattle/a6-modal-reader/checks.json": "67c84e9a1b9de703e3acca2a4a060c8fbc6845a53c141195c974637f669a87bf",
+      "outputs/autobattle/a6-executor-host/checks.json": "e40cf3a6b98823a629d74ab49cf908cb31cefaac03b480a39db89e7ab28fcc47",
+      "outputs/autobattle/a6-policy-artifacts/checks.json": "0d51c307e14b9b5535498f41da43b2be5b39e5ee00486c101edf8030fff2c453",
+      "outputs/autobattle/a6-policy-repeat-artifacts/checks.json": "d1b250b3841beaa7003500f8865bb5856c7e8fc1e65533a6da7d527dcb0dfe4c",
+      "outputs/autobattle/a6-modal-artifacts/checks.json": "26ecf75c7ec2e4fc67138d9ef6d0f908af576e00eab4de2e8c8f2a3bf06c12de",
+      "outputs/autobattle/a6-modal-policy-check/checks.json": "445aca9c73df97647e95bb70cc6c318164ca59a3c736be27eade02ff40a594e8",
+      "outputs/autobattle/a6-modal-adapter-check/checks.json": "dec36652a18665890396c73a5a2b08a8152d4bac4c79de38aaddc0f3b16cc9df"
+    },
+    "checks": {
+      "modal_captured_states": 14,
+      "modal_derived_states": 1,
+      "modal_rejections": 46,
+      "executor_host_checks": 23,
+      "policy_artifact_controls": 4,
+      "policy_artifact_mutations": 14,
+      "repeat_cast_mutations": 12,
+      "policy": 119,
+      "adapter": 12,
+      "ai": 10,
+      "strategy": 9
+    },
+    "limits": [
+      "Constructed self-Cure fixture only; no ally/KO/item or public-runner recovery acceptance",
+      "Research CLI kills its owned process; no live manual handoff or full-turn continuation claim",
+      "Screenshot subprocess can block STOP observation up to its 45-second timeout; debugger packet timeout one second",
+      "Existing ActorAdapter still rejects borrowed roster; no fallback is injected on unreadable state"
+    ],
+    "retained_failures": [
+      "a6-modal-cure-01: unknown finished controller after confirmation",
+      "a6-modal-cure-03: overbroad animation-byte coherence rejected before any input",
+      "a6-modal-cure-04: flagged finished controller 0x103 rejected after confirmation",
+      "a6-policy-cure-01: command opening 0x101 rejected during passive wait",
+      "a6-policy-reserve-01/-02: cached finished description hid returned range-input state"
+    ],
+    "commands": [
+      "python tools/validate_recovery_menu.py --out outputs/autobattle/a6-modal-reader/checks.json",
+      "python tools/validate_recovery_executor.py --out outputs/autobattle/a6-executor-host/checks.json",
+      "python tools/validate_recovery_execution.py --cast outputs/autobattle/a6-policy-cure-04/probe.json --declined outputs/autobattle/a6-policy-reserve-03/probe.json --declined outputs/autobattle/a6-policy-low-mp-01/probe.json --stopped outputs/autobattle/a6-policy-stop-01/probe.json --out outputs/autobattle/a6-policy-artifacts/checks.json"
+    ],
+    "local_screenshot_sha256": {
+      "outputs/autobattle/a6-policy-cure-03/99-settled.png": "b4f2a05510699c954f026ef910f29fb9190a3ce5bce70c97988200d8101bac56",
+      "outputs/autobattle/a6-policy-cure-04/08-A.png": "6c9d5a8ccb337eb3a9fa1486995304242c645ab2cb731ad6f8024521aa695673",
+      "outputs/autobattle/a6-policy-cure-04/99-settled.png": "57edcb5ee5c1e22b35d8a8f9a030e32204d5de03f350eacf68d69d1c16980229",
+      "outputs/autobattle/a6-policy-reserve-03/99-settled.png": "bc2a365b536a2e59f351e3f6fca1a604f511774c561e8f266c7401d29d89f3e6",
+      "outputs/autobattle/a6-policy-stop-01/08-A.png": "420c0edc9563fd60ec457e2f00fb2db6dcc1dd11fe8ea0a562d1e13d9e913b8e"
+    }
   }
 }

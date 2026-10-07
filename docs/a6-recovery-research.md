@@ -28,12 +28,12 @@ These directories already exist; choose a new run ID to repeat. Reuse rejects.
 |---|---|---|
 | White Magic list, Cure first row | Enabled | Disabled |
 | A on Cure | Ability 1 latched; self target `(4,10)` opens | Remains in list; ability remains 0 |
-| HP after confirmation/settle | 100 → **163/442** | **100/442**, unchanged |
-| MP after confirmation/settle | 85 → **79/85** | **5/85**, unchanged |
+| HP after confirmation/settle | 100 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **163/442** | **100/442**, unchanged |
+| MP after confirmation/settle | 85 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **79/85** | **5/85**, unchanged |
 | Final menu | Command list restored; Action disabled | White Magic list retained |
 | Member and restored battle mirror | Agree | Agree |
 
-The earlier positive `a6-cure-cast-02` healed 100 → **156** and also spent
+The earlier positive `a6-cure-cast-02` healed 100 ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ **156** and also spent
 6 MP. These observations prove healing and the consumed resource, not a
 deterministic heal magnitude. Screenshots of the final command menus show
 156/79 and 163/79 respectively. In `a6-cure-cast-01`, the route ended at
@@ -91,7 +91,7 @@ The menu state root is `*(0200F438)`, observed at `0202D8A0`. In these runs:
   its payload at `+0x18` is the list object, observed at `0202DD70`.
 - Object `+0x50/+0x52`: row count/scroll; `+0x69`: cursor;
   `+0x94/+0x98`: row array/enable-byte array. White Magic rows are race-table
-  indices **58–66**, not global ability IDs. For race 1, table entry 58's
+  indices **58ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“66**, not global ability IDs. For race 1, table entry 58's
   `+4` u16 resolves Cure **1** (`08028A70` accepted-selection branch).
 - `08028970` computes the selected row via `08017B68`, writes one-based
   selection to the context, and calls `080287C4`. That gate rejects a zero
@@ -104,8 +104,9 @@ The first mirror-only experiment (`a6-menu-01`) changed RAM reads but the UI
 still offered Black Magic. Editing the canonical member as well
 (`a6-menu-02`) exposed White Magic. The latter's initial snapshots were taken
 before redraw, so its raw list bytes cannot be paired with later screenshots.
-The delivered probe disarms router hooks and runs briefly before taking a
-halted RAM/screenshot pair. Corrected positive/negative runs agree.
+The delivered probe disarms router hooks and permits redraw before bulk
+RAM, guarded-reader and screenshot observations. These are separate captures,
+not one atomic pair. Corrected positive/negative runs agree.
 
 An exploratory breakpoint probe at AI/general usability `08133E18` and cost
 `0812ED98` saw zero calls in the menu route. A follow-up trace failed at
@@ -116,11 +117,10 @@ live enable-byte contrast establish the narrower facts above.
 The battle roster at `020159E4` becomes scratch while selecting/confirming a
 target. `ActorAdapter.snapshot()` correctly rejects it, then succeeds again
 after the cast. Do not bypass that rejection or run a fresh-menu ownership
-heuristic inside targeting. Implement a separate verified modal reader that
-pins the original actor, validates the canonical unit/peer and selected
-ability, distinguishes preview from final confirmation, and stops on stale,
-changed or unknown states. Prove cancellation and insufficient-MP refusal
-before connecting the policy chooser. Then test ally targets, KO/Life and
+heuristic inside targeting. The read-only modal reader below now pins the original actor and separates
+preview from final confirmation. Next connect it to a state-driven policy
+executor, proving cancellation and insufficient-MP refusal without bypassing
+the existing roster rejection. Then test ally targets, KO/Life and
 the wounded-party policy comparison. Item counts remain undecoded.
 
 ```powershell
@@ -132,3 +132,117 @@ mutations (missing input log, wrong ability/target, unspent MP, no healing,
 low-MP enabled flag, extra fixture write, cancellation resource/state errors).
 It validates the saved observations;
 it does not run fresh gameplay or certify public-runner policy behavior.
+
+
+## Pinned modal reader (2026-10-06)
+
+`tools/recovery_menu.py` binds the independently verified player owner to the
+unique canonical clan member, name bytes, identity, support, resource maxima
+and tile. It pins the menu root, actor/peer and callback allocation. Every
+observation checks decoded list bounds, race/global ability join and enable
+bytes; pre-input revalidation rejects changed facts or observations older than
+two seconds. End-of-read checks reject drift in actor, target, controller and
+decoded list facts. Undecoded animation counters are excluded.
+
+The Action group uses a dynamic child at parent callback `+0x10`, back-pointer
+at child `+0xC`, function `08028DE1`, state `0x102`; parent state is `0x106`.
+The group cursor comes from that child's payload, not a fixed scratch address.
+Ability list: function `08028DE1`, mode 7, state `0x102`. Target overlay:
+same function/mode, state 3. Description: `08029189`, mode 12, state `0x102`.
+Final Do it/Cancel: `080293DD`, mode 11, state `0x102`, cursor 0/1.
+Input handler `08029350` writes selection 1/2 for A and `0xFFFF` for B.
+These signatures are bounded to the documented fixture.
+
+The description callback is reused after final confirmation. States 3/0x103 under
+description/confirmation is read-only settling and cannot authorize input.
+The future executor must also track lifecycle so a reused description cannot
+cause a duplicate A. A cached ability ID or cursor is not freshness proof.
+
+```powershell
+python tools/validate_recovery_menu.py --out outputs/autobattle/a6-modal-reader/checks.json
+```
+
+Reader checks pass 14 retained captured states plus one explicitly derived
+settling signature and reject 46 altered/stale/mid-read cases. The derived
+case uses a later live guard's state with the earlier bulk bytes; it is labeled
+constructed. Bulk RAM, guarded reads and screenshots are separate observations,
+not one atomic capture. The first live guarded cast stopped after confirmation
+on settling (`a6-modal-cure-01`); the overbroad animation-coherence check then
+stopped `a6-modal-cure-03` before any key. Both failed runs remain local.
+`a6-modal-cancel-01` reaches command state with HP100/MP6 unchanged while the
+original ActorAdapter still rejects scratch storage. The reader supplies an
+independent canonical observation; it does not relax that guard or restore it.
+
+No public ability execution is enabled by this slice. Policy selection,
+STOP during recovery, safe fallback, ally/KO targets and item counts remain
+separate acceptance work.
+
+
+## State-driven research executor
+
+`tools/recovery_executor.py` navigates decoded row IDs (command Action 9,
+secondary group 10 with pinned secondary job 7, global Cure 1), checking enable
+bytes before selection. It verifies the self cursor, selected ability and
+canonical target through the engine's final Do it/Cancel prompt. Only then
+does it supply that single candidate and current resources to schema-v2 policy
+evaluation. It repeats revalidation/evaluation before the final A, latches
+confirmation once and permits only passive waiting afterwards.
+
+Post-cast command opening (`08028DE1`, mode 4, state `0x101`) is a distinct
+transient error: it never authorizes input, but the committed executor can
+wait for the stable command controller. The first policy run stopped on this
+opening transition (`a6-policy-cure-01`), preserving the failure. The next run
+(`a6-policy-cure-02`) selected `heal-self`, healed HP100→162 and spent MP85→79;
+the restored mirror agrees and Action is disabled. This is a constructed
+self-Cure research proof, not public-runner or full-turn acceptance.
+
+```powershell
+python tools/validate_recovery_executor.py --out outputs/autobattle/a6-executor-host/checks.json
+python tools/probe_a6_action_menu.py --out outputs/autobattle/a6-policy-cure-02 --secondary-job 7 --hp 100 --mp 85 --edit-members --policy configs/tactics/healer.json
+python tools/validate_recovery_execution.py --cast outputs/autobattle/a6-policy-cure-02/probe.json --out outputs/autobattle/a6-policy-artifacts/checks.json
+```
+
+The real executor passes 23 host checks with a fake menu/transport: reordered
+rows, reserve/healthy/unavailable declines, identity failure, enemy-only healing,
+unspent MP, duplicate confirmation suppression and STOP at input/cancel
+boundaries. These tests prove host control flow, not ROM behavior. Saved-receipt
+checks replay the exact policy and reject fourteen altered input/target/resource/
+terminal cases. `--stop-file` polls at route/cancel/wait boundaries and between
+bulk evidence reads. Debugger packets time out at one second; the existing
+screenshot subprocess can block up to 45 seconds and is an explicit STOP
+latency limit. No gameplay input follows observed STOP.
+
+Policy declines unwind known modal states and report fallback **unexecuted**.
+The normal battle-roster adapter can still reject the returned command storage.
+A safe Wait/facing executor and public runtime integration remain separate work.
+
+
+### Target processor and cancellation ownership
+
+The MP6 decline exposed a second callback-lifetime trap (DE-034). B/B from
+the final prompt returns to the range overlay, but mode 12 and the finished
+description callback remain cached. Passive waiting cannot change this idle
+input state. `a6-policy-reserve-01/-02` failed closed without spending resources.
+
+The reader now separately pins the player driver's actor wrapper and reads its
+active target processor (`0200F4E8+0x60`). Static caller `08095406` drives
+`080B7E08` → `080B5A08`. The processor reuses `020159E4`, with `+0` actor wrapper,
+`+0xEC` ability, `+0x1112` flags and `+0x1118` state. State 10 / flags 0 is the
+range-input switch entry at `080B74E0`; its wrapper must resolve to the pinned
+canonical member, ability must be Cure, and the UI scheduler must have no active
+callback. The reader joins those facts before recognizing a returned overlay.
+It checks them again at the end of each observation and before input. Changed
+processor allocation, actor, ability, flags/state, wrapper and UI ownership
+prevent input. This extends the fixture-bound modal contract, not roster bounds.
+
+
+Final strengthened-reader casts `a6-policy-cure-03/-04` both healed HP100 to166
+and consumed MP85 to79; final screenshots were inspected. MP6 reserve decline
+(`a6-policy-reserve-03`) and MP5 unavailable Cure (`a6-policy-low-mp-01`) return
+to command with resources unchanged and fallback explicitly unexecuted. Live
+STOP at the final prompt (`a6-policy-stop-01`) leaves eight delivered keys /40
+raw writes, no ninth confirmation and zero writes after observed STOP. All
+owned emulator processes were cleaned up. Saved receipt validation passes four
+controls and rejects fourteen mutations, including coherent extra terminal
+input, internally consistent wrong chooser cost/target and post-STOP writes.
+The repeat-cast receipt independently passes twelve applicable mutations.

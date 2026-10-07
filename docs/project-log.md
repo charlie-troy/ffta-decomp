@@ -1,5 +1,39 @@
 # Project log
 
+## 2026-10-06 - A6 pinned modal ownership and policy-driven self-Cure research
+
+Added a read-only modal reader that pins the verified owner, unique canonical
+member, name, job/support/maxima/tile, player-driver wrapper and UI allocation.
+Dynamic Action child cursors and race-table ability IDs replace fixed scratch
+cursor assumptions. Fresh pre-input validation and end-of-read coherence checks
+reject changed identity, resources, rows, flags, target and controller state.
+Retained reader validation: 14 captured states, one derived settling signature,
+46 rejected stale/altered/mid-read cases. No existing roster guard was relaxed.
+
+The bounded executor navigates observed menu row IDs, obtains engine self-target
+confirmation, evaluates the exact healer policy and revalidates before one final
+A. It permits only passive waiting afterwards. Research runs `a6-policy-cure-03/-04`
+selected `heal-self`, healed HP100 to166, spent MP85 to79 and restored the
+battle mirror with Action disabled. Public-runner recovery stays UNKNOWN.
+
+MP6 reserve cancellation first failed safely: B/B returns to the range overlay,
+but the description callback remains cached as finished. Waiting alone cannot
+close an input state. DE-034 records the independent target processor: driver
+`0200F4E8+0x60` points to borrowed `020159E4`; actor wrapper, ability +0xEC,
+flags +0x1112 and state +0x1118 distinguish live targeting from cached UI.
+State10/flags0 identifies this fixture's active range input. The strengthened
+reader lets `a6-policy-reserve-03` cancel fully with HP100/MP6 unchanged.
+The normal battle adapter still rejects the borrowed roster, as expected.
+
+The real executor passes 23 host flow checks (fake transport; no ROM proof),
+including reordered rows, decline/unavailable controls, identity rejection,
+STOP at key/cancel boundaries and no duplicate/post-confirmation input. Retained
+policy receipts replay exact chooser inputs and reject fourteen mutations. Initial
+failed runs remain local and are named in the A6 research notes. MP5 is rejected without selecting Cure; a live STOP at the final prompt
+suppresses confirmation with zero post-STOP raw writes. Safe Wait/facing
+fallback, full turn completion, public integration, ally/KO targets, item counts
+and the wounded-party comparison remain open. `docs/roadmap.md` stays separate.
+
 ## 2026-10-06 — A6 self-Cure, menu enable gate and effective MP consumer proven
 
 Continued A6 after the audit at `3b8bb4f`. The new owned research probe builds

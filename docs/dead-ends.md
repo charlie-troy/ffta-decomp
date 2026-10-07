@@ -558,3 +558,27 @@ CLAUDE.md carries the slogan.
   actor/target and modal lifecycle independently before enabling recovery.
   These are constructed-fixture observations, not a general heap-lifetime
   proof or safe public-runner cancellation acceptance.
+
+### DE-034 — Finished description callback can be the live target overlay
+
+- **Tried (A6, 2026-10-06):** decline Cure at the final prompt with the
+  healer's eight-MP reserve, then B/B. `a6-policy-reserve-01` stopped on
+  description state 3; `-02` passively waited 72 bounded observations and
+  never reached command. Neither sent another input or spent HP/MP.
+- **Observed:** screenshot `10-B.png` shows the range overlay again. The
+  root still reports description mode 12 / callback `08029189` / state 3.
+  This is not necessarily animation. The UI manager has no active callback;
+  the root's callback pointer is retained after the scheduler removes it.
+  `08005A24` removes finished state-3 callbacks through `080058A4`.
+- **Decode:** player driver at `0200F4E8`, `+4/+8` actor wrappers, `+0x60`
+  target processor. `08095400/08095406` drives that processor through
+  `080B7E08` → `080B5A08`. For this fixture its allocation is `020159E4`,
+  explaining the borrowed roster. Processor `+0` is the actor wrapper,
+  `+0xEC` the ability, `+0x1112` flags, `+0x1118` the state-switch index.
+  Switch entry 10 (`080B74E0`) drives target selection via `080B50F0`.
+  Captured range overlays have state 10 / flags 0 / Cure 1, with the wrapper
+  resolving to the pinned canonical member and no active UI callback.
+- **Do not:** infer current input ownership from the cached callback, mode,
+  selected ability or fixed roster. Read and validate the active target
+  processor and actor wrapper separately. Post-confirmation execution still
+  permits no more input, regardless of a reused signature.

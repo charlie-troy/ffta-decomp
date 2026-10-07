@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "scope": "retained policy recovery receipts; no fresh gameplay claim",
+  "controls": 1,
+  "rejected": [
+    "missing input log",
+    "empty input log",
+    "missing final policy",
+    "wrong final target",
+    "unspent MP",
+    "enemy-only healing",
+    "mirror mismatch",
+    "coherent post-terminal input",
+    "consistent but wrong chooser cost",
+    "consistent but wrong chooser target",
+    "STOP marked completed",
+    "extra fixture write"
+  ]
+}

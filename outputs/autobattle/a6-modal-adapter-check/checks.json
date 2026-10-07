@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "the adapter offers only the commands the engine menu names, in id order",
+    "an unnamed command offers no candidates (no-legal-candidate, no commit)",
+    "a rule selects each offered candidate through the adapter",
+    "an engine-read HP condition flips the same policy from Move to Wait",
+    "character scope beats party scope and an explicit no-match returns None",
+    "a stale or timestamp-less observation never commits",
+    "unknown policy key rejected by the adapter",
+    "a bad policy cannot even construct the adapter",
+    "a policy-chosen candidate the engine no longer offers cancels with zero input",
+    "no rule match and no fallback issues zero input on the real runtime path",
+    "the real CLI records the matched rule on a policy-driven turn",
+    "a bad policy is rejected before the emulator is touched"
+  ],
+  "passed": 12,
+  "scope": "synthetic control-flow evidence only; no engine legality or live acceptance claimed"
+}
