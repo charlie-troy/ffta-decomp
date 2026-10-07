@@ -7,7 +7,11 @@ separate zero HP(class1) from living critical(class2) and healthy(class3).
 Petrify snapshot controls reproduce the living-class distinction; zero HP
 still returns1. These synthetic cases do not establish engine KO lifecycle,
 fixture validity, Life targeting or revival. Existing living-only readers are
-unchanged. See `docs/a64-ko-target-research.md` and `A6.4.json`.
+unchanged. Read-only effect dispatch maps Life raw15/case68 to08133389 and
+Full-Life raw14/case39 to08132551 (handler table stride12); no revival handler
+execution is claimed. Existing status/state regression passes21/21, including
+the bounded forced-KO counter fragment. See `docs/a64-ko-target-research.md`
+and `A6.4.json`.
 
 ## 2026-10-07 - Public bounded ally Cure, policy refusal and lifecycle evidence
 

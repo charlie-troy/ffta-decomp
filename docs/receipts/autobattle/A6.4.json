@@ -37,12 +37,13 @@
     "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812"
   },
   "evidence_sha256": {
-    "outputs/autobattle/a64-ability-metadata.json": "87e21a3339a72e95d1aeace27df61168d0be6c5a8ea39ef28823fd1a85ed31dd",
+    "outputs/autobattle/a64-ability-metadata.json": "e69a6d90fb4c680d71af08396121748d39b13461347a2359bcac16386038aab6",
     "outputs/autobattle/a64-ko-classifier.json": "ba393556ff4dfe3a810ec8062d754ba17f7ad2aab48e8074f47f61c91c69058d"
   },
   "observations": [
     "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20.",
-    "Actual ROM fragment080A2218..080A225E: eight synthetic cases distinguish HP0 class1, living critical class2 and healthy class3; Petrify critical snapshot changes living classification. Surrounding KO lifecycle remains unknown."
+    "Actual ROM fragment080A2218..080A225E: eight synthetic cases distinguish HP0 class1, living critical class2 and healthy class3; Petrify critical snapshot changes living classification. Surrounding KO lifecycle remains unknown.",
+    "Read-only effect dispatch uses handler-table stride12: Life raw15/case68; Full-Life raw14/case39. No handler execution or live revival claim."
   ],
   "limitations": [
     "Table metadata is not engine availability, KO semantics, target acceptance or revival proof.",

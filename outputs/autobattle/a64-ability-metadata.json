@@ -60,5 +60,20 @@
   ],
   "limits": [
     "Table metadata alone does not prove menu availability, KO semantics or legal targeting."
-  ]
+  ],
+  "effect_dispatch": [
+    {
+      "ability_id": 5,
+      "raw_effect": 15,
+      "descriptor_case": 68,
+      "handler": "08133389"
+    },
+    {
+      "ability_id": 6,
+      "raw_effect": 14,
+      "descriptor_case": 39,
+      "handler": "08132551"
+    }
+  ],
+  "handler_table_stride": 12
 }
