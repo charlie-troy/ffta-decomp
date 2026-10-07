@@ -31,13 +31,18 @@
   ],
   "source_sha256": {
     "tools/ability_table.py": "9ec959131119d9d4cdd491e3cbbdfdecf7778f0f6634572df02458f079e01f41",
-    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983"
+    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
+    "tools/validate_recovery_ko_classifier.py": "a645ee4b82b439e018751c2b4032e2de35539acc965cb17048ffb4c417718d36",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812"
   },
   "evidence_sha256": {
-    "outputs/autobattle/a64-ability-metadata.json": "87e21a3339a72e95d1aeace27df61168d0be6c5a8ea39ef28823fd1a85ed31dd"
+    "outputs/autobattle/a64-ability-metadata.json": "87e21a3339a72e95d1aeace27df61168d0be6c5a8ea39ef28823fd1a85ed31dd",
+    "outputs/autobattle/a64-ko-classifier.json": "ba393556ff4dfe3a810ec8062d754ba17f7ad2aab48e8074f47f61c91c69058d"
   },
   "observations": [
-    "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20."
+    "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20.",
+    "Actual ROM fragment080A2218..080A225E: eight synthetic cases distinguish HP0 class1, living critical class2 and healthy class3; Petrify critical snapshot changes living classification. Surrounding KO lifecycle remains unknown."
   ],
   "limitations": [
     "Table metadata is not engine availability, KO semantics, target acceptance or revival proof.",

@@ -58,3 +58,12 @@ attributed revivals, Wait/continuation and negative controls. Public revive
 integration needs a later packet with its own adapter, policy comparison,
 STOP/manual/same-PID and self/ally/ordinary regression gates. Inventory and
 consumable legality remain separate work.
+
+## Initial bounded ROM evidence
+
+`validate_recovery_ko_classifier.py` executes080A2218..080A225E for eight
+synthetic inputs: HP0 returns class1, HP1/25 of100 class2, HP26 class3.
+Petrify snapshots change living classification but HP0 still returns1.
+This fragment distinguishes zero HP from living critical HP; it does not
+execute the surrounding KO lifecycle, scheduler, target eligibility or revival.
+All required A6.4 criteria remain UNKNOWN. Capture: `a64-ko-classifier.json`.

@@ -1,5 +1,14 @@
 # Project log
 
+## 2026-10-07 - Initial KO classifier fragment research
+
+A6.4 remains UNKNOWN. Eight actual-ROM fragment cases at080A2218..080A225E
+separate zero HP(class1) from living critical(class2) and healthy(class3).
+Petrify snapshot controls reproduce the living-class distinction; zero HP
+still returns1. These synthetic cases do not establish engine KO lifecycle,
+fixture validity, Life targeting or revival. Existing living-only readers are
+unchanged. See `docs/a64-ko-target-research.md` and `A6.4.json`.
+
 ## 2026-10-07 - Public bounded ally Cure, policy refusal and lifecycle evidence
 
 A6.3 implements a separate `--bounded-ally-cure` public opt-in; schema2 and

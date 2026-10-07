@@ -1,0 +1,74 @@
+{
+  "status": "pass-bounded-ROM-fragment",
+  "scope": "Execute the bounded retail HP/Petrify classifier fragment; not KO lifecycle proof.",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "start": "080A2218",
+  "stop": "080A225E",
+  "source_sha256": {
+    "tools/validate_recovery_ko_classifier.py": "a645ee4b82b439e018751c2b4032e2de35539acc965cb17048ffb4c417718d36",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812"
+  },
+  "cases": [
+    {
+      "hp": 0,
+      "max_hp": 100,
+      "petrify": 0,
+      "critical_snapshot": 0,
+      "class": 1
+    },
+    {
+      "hp": 1,
+      "max_hp": 100,
+      "petrify": 0,
+      "critical_snapshot": 0,
+      "class": 2
+    },
+    {
+      "hp": 25,
+      "max_hp": 100,
+      "petrify": 0,
+      "critical_snapshot": 0,
+      "class": 2
+    },
+    {
+      "hp": 26,
+      "max_hp": 100,
+      "petrify": 0,
+      "critical_snapshot": 0,
+      "class": 3
+    },
+    {
+      "hp": 0,
+      "max_hp": 100,
+      "petrify": 1,
+      "critical_snapshot": 0,
+      "class": 1
+    },
+    {
+      "hp": 0,
+      "max_hp": 100,
+      "petrify": 1,
+      "critical_snapshot": 1,
+      "class": 1
+    },
+    {
+      "hp": 100,
+      "max_hp": 100,
+      "petrify": 1,
+      "critical_snapshot": 0,
+      "class": 3
+    },
+    {
+      "hp": 100,
+      "max_hp": 100,
+      "petrify": 1,
+      "critical_snapshot": 1,
+      "class": 2
+    }
+  ],
+  "limitations": [
+    "Synthetic unit inputs; no live KO, fixture reload, target acceptance or revival.",
+    "Numeric classes distinguish HP0 from living HP; the surrounding lifecycle is not executed."
+  ]
+}
