@@ -1,5 +1,23 @@
 # Project log
 
+## 2026-10-07 - Raw-write receipt rejection and resumed terminal bounds
+
+While preparing A6.1 modal transport, reproduced an offline receipt defect:
+`key_write` after observed STOP passed because the validator inspected only
+high-level press/drive records. Actual automation writes now have independent
+shape and timestamp checks; aborted/failed request labels cannot excuse them.
+The same audit found that resumed runs checked the handoff gap but omitted the
+second leg's own terminal threshold. Both legs now have their own input bound.
+
+Twenty artifact cases pass, including malformed/nonfinite timestamps, manual
+flag spoofing, post-STOP/post-terminal raw writes, handoff-gap leaks and valid
+resumed/manual input. Replaying against c927e40 rejects the test's expectation
+because its post-STOP mutant is accepted, establishing the pre-fix defect.
+The real runtime's host transport resume scenario also passes: three turns,
+seven seeds, ninety synthetic transport writes. This is artifact/control-flow
+proof, not fresh live manual handoff or evidence of an actual escaped input.
+See `docs/receipts/autobattle/C1-raw-input.json`. A6.1 remains open.
+
 ## 2026-10-06 - A6 successful Cure through guarded turn finish
 
 Added research-only `--finish-recovery-turn`: after Cure acceptance, a separate

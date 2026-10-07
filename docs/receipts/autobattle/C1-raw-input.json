@@ -1,0 +1,26 @@
+{
+  "packet": "C1-raw-input",
+  "date": "2026-10-07",
+  "base_revision": "c927e40",
+  "status": "pass",
+  "scope": "Artifact validator defect; no fresh live cancellation or resume certification",
+  "observed": "20 artifact cases pass. Pre-fix source accepts post-STOP key_write. Existing real-runtime host resume scenario passes (3 turns, 7 seeds, 90 synthetic writes).",
+  "commands": [
+    "python tools/validate_autobattle_raw_input.py --out-root outputs/autobattle/a61-raw-fixed-final",
+    "python tools/validate_transport_paths.py --scenario resume-after-pause --out-root outputs/autobattle/a61-transport-regressions/resume",
+    "python tools/validate_autobattle_runtime.py outputs/autobattle/a61-transport-regressions/resume/resume-after-pause"
+  ],
+  "hashes": {
+    "tools/validate_autobattle_runtime.py": "6b70338c80be9d876b4e1ba40d5a048f4debbb332019790ba8d5d8fa03cc300b",
+    "tools/validate_autobattle_raw_input.py": "548664a584bba28870f1b1296b84b898b621c0e7bf84831ad882a4137b5ce8a7",
+    "outputs/autobattle/a61-raw-fixed-final/checks.json": "37ee411d1fc51febd8e80f4c80c1a85961b0a7ff35dea499291b04fe67436aca",
+    "outputs/autobattle/a61-transport-regressions/resume/resume-after-pause/run.json": "aedb5aad0ab044817439605e7a761b224fb268456839e622c6dc4e1d5fe7e727",
+    "outputs/autobattle/a61-transport-regressions/resume/resume-after-pause/events.jsonl": "33dfff6d674d7a283a3d2fe95a436e9bacd9f44e34a838ee0b651d7b13e20c3a",
+    "outputs/autobattle/a61-transport-regressions/resume/resume-after-pause/input-log.jsonl": "c194466e1fa8e4b54a276fe5449e82182fa5a624c9dffee816cca4cb80827c54",
+    "outputs/autobattle/a61-raw-red-replay.log": "818f9984f80ca04d9d8a471cdd0ed815ea8daba8f578a7bae36bbbbbba6bab4d"
+  },
+  "limits": [
+    "Raw events are enforced when present; legacy Move/Wait receipts use high-level input logs. Requiring complete raw recovery logs remains an A6.1 integration criterion.",
+    "No actual runtime leak is claimed from an injected artifact."
+  ]
+}

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import sys
 
@@ -262,6 +263,28 @@ def validate(out_dir):
                 ilog.append(json.loads(line))
             except json.JSONDecodeError as exc:
                 fail(f"input-log line {ln}: not JSON ({exc})", errors)
+    # Actual transport writes cannot inherit the aborted/completed labels of
+    # a surrounding request. A delivered write remains input in every case.
+    valid_raw = []
+    for index, record in enumerate(ilog):
+        if record.get("event") != "key_write":
+            continue
+        stamp = record.get("t")
+        if (type(stamp) not in (int, float) or not math.isfinite(stamp) or stamp < 0
+                or type(record.get("val")) is not int or not 0 < record["val"] <= 0x3FF
+                or type(record.get("hits")) is not int or record["hits"] < 1
+                or record.get("manual") is not False):
+            fail(f"input-log record {index}: malformed automation key_write", errors)
+        else:
+            valid_raw.append(record)
+
+    valid_raw_ids = {id(record) for record in valid_raw}
+
+    def owns_input(record):
+        if record.get("event") == "key_write":
+            return id(record) in valid_raw_ids
+        return (record.get("event") in ("press", "drive")
+                and not (record.get("aborted") or record.get("completed") is False))
     # C3 resume: the leak threshold is the TERMINAL stop of the run's own
     # leg — a resumed battle's leg-2 presses start AFTER leg 1's paused
     # stop on purpose (the player's move and the continuation). The leg-1
@@ -289,15 +312,18 @@ def validate(out_dir):
         # leg 2's presses are audited against leg 2's OWN terminal; leg 1's
         # window (first stop .. resume marker) must contain NO automation
         # press — anything there is either the manual write or a leak
+        leg1_stop_t = stops_il[0].get("t", 0) if stops_il else stops[0].get("t", 0)
         leg1_leaks = [r for r in ilog
-                      if r.get("event") in ("press", "drive")
-                      and not (r.get("aborted") or r.get("completed") is False)
-                      and stops_il and r.get("t", 0) > stops_il[0].get("t", 0) + 0.001
+                      if owns_input(r)
+                      and r.get("t", 0) > leg1_stop_t + 0.001
                       and r.get("t", 0) < resume_marker_t]
         if leg1_leaks:
             fail(f"input-log: {len(leg1_leaks)} automation press/drive "
                  "between leg 1's paused stop and the resume marker "
                  "(input during the handoff gap must be manual)", errors)
+        # Leg 1's handoff does not exempt leg 2 from its own terminal latch.
+        later_stops = [r["t"] for r in stops_il if r.get("t", 0) >= resume_marker_t]
+        stop_t = min(later_stops) if later_stops else (stops[-1].get("t") if stops else None)
     elif stops_il:
         stop_t = stops_il[0].get("t")
     else:
@@ -305,9 +331,7 @@ def validate(out_dir):
     if stop_t is not None:
         leaks = []
         for r in ilog:
-            if r.get("event") in ("press", "drive"):
-                if r.get("aborted") or r.get("completed") is False:
-                    continue  # the gate caught it: no input fired
+            if owns_input(r):
                 if r.get("t", 0) > stop_t + 0.001:
                     leaks.append(r)
             elif r.get("event") == MANUAL_WRITE_EVENT:
