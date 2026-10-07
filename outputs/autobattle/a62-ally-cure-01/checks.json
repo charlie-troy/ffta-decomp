@@ -1,0 +1,26 @@
+{
+  "status": "pass",
+  "scope": "Audit retained ally-Cure effect and actual final-prompt RAM, not continuation.",
+  "capture": "outputs/autobattle/a62-ally-cure-01",
+  "target_before": 100,
+  "target_after": 157,
+  "caster_mp_before": 85,
+  "caster_mp_after": 79,
+  "mutations_rejected": [
+    "missing-ledger",
+    "post-final-input",
+    "missing-final-policy",
+    "false-continuation",
+    "wrong-target-report",
+    "wrong-policy",
+    "STOP",
+    "fixture-write",
+    "self-target",
+    "cancel",
+    "unspent-MP",
+    "no-heal",
+    "target-MP",
+    "alias-ID"
+  ],
+  "continuation": "unknown"
+}

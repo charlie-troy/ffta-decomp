@@ -1,0 +1,26 @@
+{
+  "status": "pass",
+  "scope": "Replay final ally-Cure candidate joins; cursor0 is derived from the inspected prompt.",
+  "rejected": [
+    "cancel-cursor",
+    "wrong-cost",
+    "insufficient-mp",
+    "wrong-final-state",
+    "wrong-final-flags",
+    "forged-free-cure-token",
+    "caster-wrapper",
+    "caster-copy",
+    "target-copy",
+    "target-table",
+    "target-count",
+    "target-index",
+    "committed-coordinates",
+    "display-coordinates",
+    "acceptance-coordinates",
+    "target-canonical",
+    "target-hp",
+    "caster-mp"
+  ],
+  "policy_candidate": "healer selects cure-ally from final target joins",
+  "limit": "Retained replay with derived cursor0; no input, effect or continuation"
+}

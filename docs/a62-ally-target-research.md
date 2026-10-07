@@ -1,5 +1,16 @@
 # A6.2 living ally target research
 
+First effect-only cast: `a62-ally-cure-01` verifies the actual final cursor0
+and canonical ally join, supplies the schema2 `cure-ally` candidate, rechecks
+policy after screenshot and confirms once. Montblanc HP100->157; Marche
+MP85->79 with HP442 unchanged; target MP221 unchanged; Action consumed.
+50 raw writes, no fixture writes or changed inputs. Full captured RAM replay
+rejects14 mutated receipts/fields; separate candidate and executor host checks
+reject18 controls each. This run stops before Wait: continuation UNKNOWN and
+zero verified turns. Final-reader proof supersedes the earlier derived cursor
+host fixture for this observation only. Public party integration and the
+preview-label discrepancy remain open.
+
 2026-10-07 baseline: `deff57e` plus the source hashes in the A6.2 receipt.
 The A6.1 opt-in remains self-only; no public target guard has changed.
 

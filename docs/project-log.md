@@ -1,5 +1,19 @@
 # Project log
 
+## 2026-10-07 - First guarded ally Cure effect
+
+`a62-ally-cure-01` independently reloads the wounded party and joins the
+actual Do-it cursor0, target wrapper and three coordinate sources before a
+single final A. The schema2 healer selects `cure-ally` for canonical Montblanc;
+policy and target are rechecked after the observation screenshot. Montblanc
+HP100->157, Marche MP85->79, Marche HP442 unchanged, target MP221 unchanged,
+Action consumed.50 raw writes; no fixture writes or changed inputs. Actual
+full-RAM reader replay and14 adversarial receipt/RAM mutations pass. Separate
+candidate/executor host controls pass18 each. No Wait was executed and no
+turn is verified. Two cast/Wait/independent eight-unit continuation reloads,
+live STOP and public party recovery remain open. Preview label discrepancy
+remains unknown. Public self-only bounds are unchanged.
+
 ## 2026-10-07 - Guarded ally preview reaches final prompt without casting
 
 The preview reader rejects12 identity/resource/table/coordinate controls.

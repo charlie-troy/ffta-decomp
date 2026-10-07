@@ -3,7 +3,7 @@
   "date": "2026-10-07",
   "base_revision": "deff57e",
   "status": "partial",
-  "scope": "Read-only pre-targeting party identity and synthetic target-table ROM semantics only",
+  "scope": "Bounded ally target research and first guarded effect; continuation/public recovery open",
   "criteria": [
     {
       "id": "pre-targeting-party-identity",
@@ -54,6 +54,11 @@
       "id": "live-ally-final-prompt",
       "status": "pass",
       "observed": "Guarded preview to Do-it/Cancel; processor+8 preserves ally, state2/flags20;45 raw writes, no cast/effect;8 mutants; final cursor payload still requires fresh reader"
+    },
+    {
+      "id": "first-ally-cure-effect",
+      "status": "pass",
+      "observed": "Actual final cursor0/ally wrapper/policy joins; Montblanc HP100 to157, Marche MP85 to79; 50 raw writes; 14 retained mutants; no Wait or continuation"
     }
   ],
   "source_sha256": {
@@ -73,7 +78,13 @@
     "tools/recovery_ally_preview.py": "f1d77ae16b908306bec1d74596f8cca679c434bdbcb31ae858f61a6b6270a95f",
     "tools/probe_recovery_ally_confirmation.py": "0dc85ecc1fc1f0d489816c6faee74aa1f4d04eecf5ee5b2cec4f4d935165c6d6",
     "tools/validate_recovery_ally_preview.py": "c71bdce649ec157601990b5962f9bb1c824927c92f18cdae30cc40ba94cd9944",
-    "tools/validate_recovery_ally_confirmation.py": "7f461a1e56104559482b5df94eb4e7f574622e83b78529e3341b676ecc15caa7"
+    "tools/validate_recovery_ally_confirmation.py": "7f461a1e56104559482b5df94eb4e7f574622e83b78529e3341b676ecc15caa7",
+    "tools/recovery_ally_confirmation.py": "fe670132d75754a892c2ad926ed39137f0bb061cf0af27250e18c41329c6bf7f",
+    "tools/recovery_ally_executor.py": "8b0e1aac7eb7505cc475c871244e6179b0c0a5f69800a72e293bf35789e313c4",
+    "tools/probe_recovery_ally_cure.py": "0c97a95b97acaa4bb58e7020686dd04fbbbca381679964d5dc6f3e47fb996ef7",
+    "tools/validate_recovery_ally_candidate.py": "705084551c4623b2168e4ce6071eb4d5d053b5fe11379a692c44ff8faea35a1f",
+    "tools/validate_recovery_ally_executor.py": "d5f445cd6ac5aca7dbde18fe4660fcc53f29921df8a76d836e54eea0d61b9094",
+    "tools/validate_recovery_ally_execution.py": "60632ce887a5c043ffa3fbd43ff042ba83a1e0dbdfec038067afb9b172dd0a2c"
   },
   "evidence_sha256": {
     "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
@@ -183,7 +194,18 @@
     "outputs/autobattle/a62-ally-confirmation-01/selected-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
     "outputs/autobattle/a62-ally-confirmation-01/selected-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
     "outputs/autobattle/a62-ally-confirmation-01/selected-wrapper-0202267c.bin": "aa6321a96a655d04a97d079bad8d8e984519e105b4ffb70df22dad5d588afe73",
-    "outputs/autobattle/a62-ally-confirmation-01/selected-wrapper-0202270c.bin": "52b9527f0713f51d89eaa6b7e1652429e8654d50d369ee66600d0abac63b1e3b"
+    "outputs/autobattle/a62-ally-confirmation-01/selected-wrapper-0202270c.bin": "52b9527f0713f51d89eaa6b7e1652429e8654d50d369ee66600d0abac63b1e3b",
+    "outputs/autobattle/a62-ally-cure-01/after-cure-ewram.bin": "e375008a834af049f69212dda72f7f0692f4f3641ba4f5cb04ff02d0d29fae80",
+    "outputs/autobattle/a62-ally-cure-01/after-cure.png": "b1e3c53e24e437f8dc32f08ea98bf4847b6936372527f1434d6ad9275b377ef7",
+    "outputs/autobattle/a62-ally-cure-01/checks.json": "476e27762742311381181e350511186b12de8b646b5443bd230972573e1e5f2c",
+    "outputs/autobattle/a62-ally-cure-01/confirmation-ewram.bin": "573eefed595bd1f0ee1bf6b0b8e730e35a1c50e7a3f4525eb8c0353a31e30483",
+    "outputs/autobattle/a62-ally-cure-01/confirmation-marker.json": "9e6f83fbf7c77ef3b15de6aee53a7ceecdb3cead17c1ceafaafd78659dec3c36",
+    "outputs/autobattle/a62-ally-cure-01/confirmation.png": "4906e2fa560cd3388f150039292c57f1c8572cf2003af118abb137d7d2eec0fb",
+    "outputs/autobattle/a62-ally-cure-01/initial-ewram.bin": "d4af7201480c3dc2f951514f368bb9d0136e6d84e8ce3173b3905ce5fe195230",
+    "outputs/autobattle/a62-ally-cure-01/initial.png": "7a7448877ad960b69c54a042d816ac2e6838857ab28f8e615b61b212b40259e4",
+    "outputs/autobattle/a62-ally-cure-01/probe.json": "bda8de69cd2480a1c98f0ea00a2522cde4ef23ddfad44aea77156f8887056960",
+    "outputs/autobattle/a62-ally-candidate-reader/checks.json": "eca5f10760b1abaf1637760f854286de6da2a427ce8ec87effc2dcab7d59d0b5",
+    "outputs/autobattle/a62-ally-executor/checks.json": "d3d0dd42abb688be7ae6f798165153dc5ed02525165b265c6d20363792f447e4"
   },
   "retained_failures": [
     {
@@ -199,7 +221,7 @@
       "error": "RAM pointer outside EWRAM"
     }
   ],
-  "next_packet": "Guard the live final-prompt cursor0 and ally target joins, offer the engine-accepted schema2 ally-Cure candidate, re-evaluate policy after screenshot, confirm once, then prove effect/guarded Wait/independent eight-unit continuation on two fresh reloads.",
+  "next_packet": "Guard Wait and independent eight-unit continuation; two fresh complete reloads and live STOP; investigate preview label before public party recovery",
   "limitations": [
     "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
     "Two pre-targeting reloads are not two successful ally-target casts.",

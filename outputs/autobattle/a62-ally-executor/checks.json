@@ -1,0 +1,24 @@
+{
+  "status": "pass",
+  "scope": "Synthetic ally executor composition/STOP/policy tests, not gameplay proof.",
+  "checks": [
+    "ally effect and unchanged caster HP with spent caster MP",
+    "post-final input rejected",
+    "wrong-target rejected after one final input",
+    "unspent rejected after one final input",
+    "target-mp rejected after one final input",
+    "identity rejected after one final input",
+    "STOP after 0 keys suppresses final/subsequent input",
+    "STOP after 1 keys suppresses final/subsequent input",
+    "STOP after 2 keys suppresses final/subsequent input",
+    "STOP after 3 keys suppresses final/subsequent input",
+    "STOP after 4 keys suppresses final/subsequent input",
+    "STOP after 5 keys suppresses final/subsequent input",
+    "STOP after 6 keys suppresses final/subsequent input",
+    "STOP after 7 keys suppresses final/subsequent input",
+    "STOP after 8 keys suppresses final/subsequent input",
+    "STOP after 9 keys suppresses final/subsequent input",
+    "stop after observation prevents final input",
+    "policy-change after observation prevents final input"
+  ]
+}
