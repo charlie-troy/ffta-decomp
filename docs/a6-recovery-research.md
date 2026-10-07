@@ -325,6 +325,74 @@ ally/KO/item handling, wounded-party comparison and manual continuation remain
 separate. The research screenshot subprocess can still delay STOP observation
 up to its45-second timeout; this slice does not claim a general latency bound.
 
+## Successful Cure through turn finish
+
+The research-only `--finish-recovery-turn` option also invokes the guarded Wait
+executor after successful Cure. Its independent command observation must join
+the same actor and the newly healed HP/spent MP. The engine-disabled Action
+row is preserved as Cure acceptance evidence; Wait remains separately offered
+and policy-evaluated. Two executor-local final latches cover distinct engine
+operations: Cure's Do it, then Wait's facing. Neither retries ambiguous input.
+
+`a6-cure-complete-turn-01` healed but stopped during a passive settling read
+when the main controller advanced between reads. That rejected observation
+remains invalid. The reader now emits `RecoveryTransient` specifically for
+main-state coherence failure in read-only settling; the already-committed Cure
+loop may passively retry within its existing15-second deadline. Command/facing
+drift still fails hard, and settling never authorizes input. The facing suite
+executes its additional mid-read rejection control (sixteen total).
+
+The host composition check runs the real Cure executor and then the real Wait
+executor with fake dependencies, including one rejected settling observation.
+The fake transport's effect is now one-shot and resets the command cursor as
+captured live; it previously reapplied healing on each passive tick and retained
+the Action cursor. These are test-model corrections, not ROM semantics proof.
+The Wait suite has sixteen host checks; Cure's existing23 still pass.
+
+Live accepted runs and receipt hashes are recorded in A6.json. They must join
+Cure's exact six-MP cost, HP increase and consumed Action to the following
+engine-enabled Wait and distinct enemy actors after roster restoration.
+`validate_recovery_turn_execution.py` rejects ten mutations: missing healing,
+wrong cost/Action consumption, mismatched finish actor/resources, missing policy
+recheck, coherent duplicate terminal input, missing raw input, false completion
+and enemy-only effects. No public recovery or manual handoff is claimed.
+
+The first repeat (`-03`) mismatched bulk/live main-state observations. Explicit
+debugger halts in `-04/-05` removed that race but exposed a separate fact: a
+later enemy's targeting can borrow the same roster again. Their fixed-delay
+last captures are therefore unaccepted. The final research observer halts and
+polls passively, within20 seconds, for a readable roster and two distinct later
+enemy wrappers, then captures without resuming between the check and sweep.
+Unknown polls remain labeled unknown, with rejection reasons. Final acceptance
+still independently joins each canonical actor to the restored battle record;
+neither a halt reply nor a readable player alone proves enemy attribution.
+This changes capture timing, not the action policy, and sends no more keys.
+Polling runs06/07 additionally showed the next wrapper before its cursor update;
+their independent validator rejects actor4 tile7,4 versus stale cursor9,2. The
+final observer requires wrapper-pair agreement, a living enemy and its own
+in-bounds cursor/tile before capture. It retains rejected polling states rather
+than upgrading a changed wrapper to current input ownership. See DE-036.
+
+Current-source reloads `a6-cure-complete-turn-08/-09` pass the final halted,
+cursor-coherent observer: HP100->165 and100->156, MP85->79, Action consumed,
+then guarded Wait and two distinct enemy actors. Each has13 delivered keys
+and none after facing confirmation. Enemy canonical and battle records now
+cross-check type/job/race/level/HP/MP as well as name/id/side/tile; all must fit
+the verified fixture bounds. Each turn receipt rejects thirteen mutations,
+including missing halt evidence and coherent invalid enemy coordinates/stats.
+
+`probe_recovery_stop.py` replaces the ad-hoc screenshot watcher with a bounded,
+reusable CLI. Fresh `a6-complete-stop-regression-01` confirms STOP at Wait facing
+still suppresses the final A:15 keys/75 raw writes, none after STOP. All current
+screenshots named in the receipt were inspected. The broader A6 public-runtime,
+wounded-party and manual-continuation gates remain open.
+
+```powershell
+python tools/validate_recovery_turn_execution.py --capture outputs/autobattle/a6-cure-complete-turn-08 --out outputs/autobattle/a6-complete-turn-current-artifacts/checks.json
+python tools/validate_recovery_turn_execution.py --capture outputs/autobattle/a6-cure-complete-turn-09 --out outputs/autobattle/a6-complete-turn-current-repeat-artifacts/checks.json
+python tools/probe_recovery_stop.py --out outputs/autobattle/NEW-UNUSED-RUN --phase 15-A --mp 6
+```
+
 
 ### Target processor and cancellation ownership
 

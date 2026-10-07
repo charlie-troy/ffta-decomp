@@ -1,0 +1,101 @@
+{
+  "status": "pass",
+  "scope": "Validate retained policy-decline -> guarded Wait -> enemy continuation.",
+  "capture": "outputs\\autobattle\\a6-policy-wait-reserve-01",
+  "stopped": "outputs/autobattle/a6-complete-stop-regression-01/probe.json",
+  "continuation": [
+    {
+      "tag": "16-A",
+      "raw_sha256": "5fdc13aa5398766735599a38f5d8a1e63e19f994a7fc6ee5cfd7f5edf7b0d185",
+      "driver_state": 27,
+      "wrapper": 33695212,
+      "canonical": 33567716,
+      "actor": {
+        "slot": 3,
+        "addr": "02015d00",
+        "name": 139881681,
+        "side_raw": 32769,
+        "ct": 935,
+        "ea": 0,
+        "id": 3,
+        "type": 1,
+        "base_job": 36,
+        "race": 5,
+        "job": 36,
+        "level": 41,
+        "hp": 323,
+        "max_hp": 323,
+        "mp": 114,
+        "max_mp": 114,
+        "is_rom_name": true,
+        "is_ram_name": false,
+        "name_text": "Schneider",
+        "side_bit": true,
+        "unaffiliated": false,
+        "live": true,
+        "tile": [
+          9,
+          2
+        ]
+      },
+      "target_tile": [
+        9,
+        2
+      ]
+    },
+    {
+      "tag": "99-settled",
+      "raw_sha256": "4db4fedc7de0da45d3135c185abb52f338ae3ad6cdc2bfd4197b205d57da8c41",
+      "driver_state": 27,
+      "wrapper": 33695068,
+      "canonical": 33567452,
+      "actor": {
+        "slot": 4,
+        "addr": "02015e08",
+        "name": 139881253,
+        "side_raw": 32769,
+        "ct": 692,
+        "ea": 0,
+        "id": 4,
+        "type": 1,
+        "base_job": 22,
+        "race": 3,
+        "job": 22,
+        "level": 40,
+        "hp": 231,
+        "max_hp": 231,
+        "mp": 179,
+        "max_mp": 179,
+        "is_rom_name": true,
+        "is_ram_name": false,
+        "name_text": "Carson",
+        "side_bit": true,
+        "unaffiliated": false,
+        "live": true,
+        "tile": [
+          7,
+          4
+        ]
+      },
+      "target_tile": [
+        7,
+        4
+      ]
+    }
+  ],
+  "rejections": [
+    "missing final policy",
+    "consistent wrong Wait cost",
+    "consistent wrong Wait action",
+    "coherent post-final input",
+    "empty raw input",
+    "claimed executor completion",
+    "different fallback actor",
+    "disabled engine Wait",
+    "unspent resource mismatch",
+    "missing Cure rejection evidence",
+    "consistent wrong Cure rejection",
+    "STOP missing raw input",
+    "STOP post-terminal raw input"
+  ]
+}

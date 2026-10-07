@@ -29,7 +29,7 @@ class RecoveryStateError(ValueError):
 
 
 class RecoveryTransient(RecoveryStateError):
-    """A known opening controller; only passive post-commit waiting is allowed."""
+    """Known opening/settling rejection; permits a bounded passive retry only."""
 
 
 def require(condition, message):
@@ -289,9 +289,11 @@ class RecoveryMenu:
                 "player driver changed during snapshot")
         require(all(exact(g, address, len(data)) == data for address, data in processor_reads),
                 "target processor changed during snapshot")
-        require(exact(g, PLAYER_DRIVER + 0xD0, 4) == driver_control[:4]
-                and exact(g, PLAYER_DRIVER + 0xDC, 2) == driver_control[0xC:0xE],
-                "main player controller changed during snapshot")
+        coherent = (exact(g, PLAYER_DRIVER + 0xD0, 4) == driver_control[:4]
+                    and exact(g, PLAYER_DRIVER + 0xDC, 2) == driver_control[0xC:0xE])
+        if not coherent and kind == "settling":
+            raise RecoveryTransient("main controller changed during read-only settling")
+        require(coherent, "main player controller changed during snapshot")
         require(all(exact(g, address, len(data)) == data for address, data in facing_reads),
                 "facing controller changed during snapshot")
         self.last = observed

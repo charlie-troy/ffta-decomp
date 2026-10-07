@@ -11,7 +11,7 @@ from pathlib import Path
 from unicorn import UC_HOOK_CODE
 
 from emulate import Gba, REGS
-from recovery_menu import RecoveryMenu, RecoveryStateError, PLAYER_DRIVER, FACING
+from recovery_menu import RecoveryMenu, RecoveryStateError, RecoveryTransient, PLAYER_DRIVER, FACING
 from validate_recovery_menu import Memory
 
 
@@ -140,6 +140,23 @@ def main():
         rejected.append("derived closing 0x104 cannot authorize input")
     else:
         raise AssertionError("closing callback authorized input")
+    original = memory.read_mem
+    control_reads = [0]
+
+    def transitioning_settle(addr, width):
+        if addr == PLAYER_DRIVER + 0xD0:
+            control_reads[0] += 1
+            if control_reads[0] == 2:
+                memory.put(PLAYER_DRIVER + 0xDC, 37, 2)
+        return original(addr, width)
+
+    memory.read_mem = transitioning_settle
+    try:
+        reader.snapshot()
+    except RecoveryTransient:
+        rejected.append("settling controller drift remains rejected; passive retry only")
+    else:
+        raise AssertionError("settling controller drift authorized input")
     result = {"status": "pass", "scope": __doc__, "capture": str(directory),
               "observation": obs.receipt(), "rejections": rejected,
               "derived_closing": {"capture": str(closing), "facts": closing_obs.receipt(),

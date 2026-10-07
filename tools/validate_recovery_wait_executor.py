@@ -5,8 +5,8 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
-from recovery_executor import WaitFacingExecutor, RecoveryStopped
-from recovery_menu import MenuObservation, RecoveryStateError
+from recovery_executor import SelfCureExecutor, WaitFacingExecutor, RecoveryStopped
+from recovery_menu import MenuObservation, RecoveryStateError, RecoveryTransient
 from tactics_policy import load_policy_file
 from validate_recovery_executor import Menu, Probe
 
@@ -57,6 +57,31 @@ def main():
         probe = WaitProbe(menu, effect=effect)
         executor = WaitFacingExecutor(menu, probe, copy.deepcopy(policy), clock=lambda: 0)
         return menu, probe, executor
+
+    menu = Menu(mp=85)
+    cure_probe = Probe(menu)
+    original = menu.snapshot
+    pending = [True]
+
+    def settling_transition():
+        if menu.final and pending[0]:
+            pending[0] = False
+            raise RecoveryTransient("main controller changed during read-only settling")
+        return original()
+
+    menu.snapshot = settling_transition
+    cure = SelfCureExecutor(menu, cure_probe, copy.deepcopy(policy), clock=lambda: 0, sleep=lambda _: None)
+    healed = cure.run()
+    after = menu.states["command"]
+    assert healed["outcome"] == "accepted" and after.hp == 150 and after.mp == 79
+    menu.states["facing"] = replace(facing, observed_at=0, hp=after.hp, mp=after.mp)
+    finish_probe = WaitProbe(menu)
+    finish = WaitFacingExecutor(menu, finish_probe, copy.deepcopy(policy), clock=lambda: 0)
+    assert finish.run()["outcome"] == "confirmed"
+    assert sum(e.get("final", False) for e in cure.events) == 1
+    assert any(e["event"] == "passive_transient" for e in cure.events)
+    assert finish_probe.keys == [128, 128, 1, 1]
+    checks.append("Cure read-only transient retries passively, then joins post-heal resources to guarded Wait")
 
     for reordered in (False, True):
         menu, probe, executor = setup()

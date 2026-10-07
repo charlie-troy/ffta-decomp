@@ -559,8 +559,9 @@ fourteen reader controls and nine receipt mutations reject wrong ownership.
 The ROM facing branch passes 1,024 input cases. State-driven policy-decline
 Wait research now passes reserve/insufficient-MP reloads, a live facing STOP
 control and fifteen host flow checks; retained receipts reject thirteen mutations
-each. Next dependencies: finish successful Cure's turn, public-runner integration,
-and ally/KO targeting. The
+each. Guarded successful-Cure turn finishing is now exercised independently;
+see the research notes and receipt for accepted reloads and its passive-only
+settling retry. Next dependencies: public-runner integration and ally/KO targeting. The
 roster is scratch during targeting; do not bypass identity rejection or
 substitute a fixed research route for an adapter.
 
@@ -570,6 +571,42 @@ substitute a fixed research route for an adapter.
 - [ ] Replay a wounded-party fixture and compare its chosen actions to a damage-focused policy.
 
 Done: the rule changes the executed action, consumes the expected resource, and explains fallback when unavailable. Do not invent a heal/revive candidate that the engine rejected.
+
+#### A6.1 — Integrate the bounded self-Cure path before widening targets
+
+Prerequisite: accepted current-source successful-Cure/Wait continuation reloads
+in `A6.json`, plus the policy-decline/STOP receipt. Keep their fixture limits.
+This is an integration packet, not closure of the wounded-party/ally/KO gates.
+
+- Reuse `RecoveryMenu`, `SelfCureExecutor` and `WaitFacingExecutor` through
+  `BattleRuntime._drive_player_boundary`; preserve the existing fresh-owner
+  adapter. Never call its fixed-roster revalidation while targeting borrows
+  that storage. The canonical modal pin owns only the validated interval.
+- Extend `TacticsAdapter` deliberately: navigation/engine acceptance must
+  establish Cure legality before it becomes a chooser candidate. Do not
+  advertise learned Cure, item counts or generic ability targeting. Keep
+  unsupported actor/job/target shapes fail-closed and Move/Wait regressions.
+- Add runtime event fields explicitly to `EVENT_SCHEMA` and CLI receipt input
+  hashes. Record exact chooser snapshots, canonical actor/target, six-MP cost,
+  consumed Action, separate Wait confirmation and independent continuation.
+  Missing fields must fail receipt validation rather than disappear silently.
+- Reconcile Probe router tracing with the recovery observer's explicit halts;
+  do not copy the research probe's disabled tracing into the public runtime.
+  Restore required tracing only after the terminal input latch, without
+  introducing another gameplay key or accepting an unsolicited stop packet.
+- Translate `RecoveryStopped` to the existing paused lifecycle. Preserve raw
+  writes across all modal legs and never retry an ambiguous final input. Keep
+  research fixture edits and screenshot subprocesses outside the public action
+  executor. STOP during targeting/facing must leave the live process usable.
+- Run the real public CLI on an owned constructed fixture: accepted Cure,
+  reserve decline, engine-disabled Cure and no-match/disabled fallback; then
+  STOP before Cure confirmation and before Wait facing confirmation. Inspect
+  screenshots, reject post-terminal/raw-input mutations, and prove manual
+  continuation plus same-PID resume under the worker contract. Host-only tests
+  and standalone probe receipts cannot close this integration gate.
+
+Then continue A6's wounded-party policy comparison and ally/KO/resource facts;
+keep item execution disabled until engine inventory/availability is proven.
 
 ### A7 — Movement tactics (P1, bounded research then implementation)
 

@@ -11,8 +11,8 @@ from validate_recovery_execution import validate as validate_cure
 from validate_recovery_facing_execution import MASKS, continuation, validate as validate_facing
 
 
-def decline_prefix(run):
-    """Validate the explicitly bounded Cure segment before fallback input."""
+def recovery_prefix(run, outcome="declined"):
+    """Validate the explicitly bounded Cure segment before subsequent input."""
     prefix = copy.deepcopy(run)
     count = sum(e["event"] == "input_delivered" for e in run["executor_events"])
     prefix["keys"] = prefix["keys"][:count]
@@ -21,7 +21,9 @@ def decline_prefix(run):
     # A later STOP does not undo the completed decline segment. The caller
     # separately validates terminal STOP and all subsequent input ordering.
     prefix.pop("stop_requested", None)
-    validate_cure(prefix, "declined")
+    validate_cure(prefix, outcome)
+    if outcome == "accepted":
+        return count
     policies = [e for e in run["executor_events"] if e["event"] == "policy"]
     if policies:
         require(len(policies) == 1, "ambiguous Cure decline policy")
@@ -52,13 +54,13 @@ def decline_prefix(run):
     return count
 
 
-def validate(run, later):
-    count = decline_prefix(run)
+def validate(run, later, *, segment="fallback", cure_outcome="declined"):
+    count = recovery_prefix(run, cure_outcome)
     require(run["status"] == "observed" and "stop_requested" not in run, "terminal STOP or failure")
-    fallback = run["fallback"]
+    fallback = run[segment]
     require(fallback["outcome"] == "confirmed" and fallback["continuation"] == "unverified",
             "executor upgraded confirmation to continuation")
-    events = run["fallback_events"]
+    events = run[f"{segment}_events"]
     policies = [e for e in events if e["event"] in ("policy", "final_policy")]
     require([e["event"] for e in policies] == ["policy", "final_policy"], "missing policy recheck")
     policy = validate_policy(run["policy_document"])
@@ -97,7 +99,7 @@ def validate(run, later):
 
 
 def validate_stop(run):
-    count = decline_prefix(run)
+    count = recovery_prefix(run)
     require(run["status"] == "paused" and "stop_requested" in run and "stop_input_t" in run,
             "missing STOP terminal")
     require("fallback" not in run and "facing_confirmation" not in run, "STOP incorrectly confirmed Wait")
@@ -122,8 +124,9 @@ def main():
     directory = Path(args.capture)
     run = json.loads((directory / "probe.json").read_text(encoding="utf-8"))
     rom = Path(args.rom).read_bytes()
-    later = [continuation(directory, f"{len(run['keys']):02d}-A", rom),
-             continuation(directory, "99-settled", rom)]
+    tags = run.get("continuation_tags", [f"{len(run['keys']):02d}-A", "99-settled"])
+    require(len(tags) == 2 and len(set(tags)) == 2, "continuation capture tags differ")
+    later = [continuation(directory, tag, rom) for tag in tags]
     validate(run, later)
     rejected = []
 

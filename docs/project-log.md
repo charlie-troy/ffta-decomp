@@ -1,5 +1,38 @@
 # Project log
 
+## 2026-10-06 - A6 successful Cure through guarded turn finish
+
+Added research-only `--finish-recovery-turn`: after Cure acceptance, a separate
+Wait executor independently verifies the same actor's healed HP/spent MP,
+engine-enabled Wait row and owned facing, then confirms once and observes only.
+The reader rejects main-controller drift during settling as a transient that
+allows bounded passive retry only. Command/facing drift remains a hard failure.
+The first fresh run healed but stopped on that passive transition; preserve its
+failure and do not upgrade its rejected observation. See A6 research notes.
+
+Host composition now exercises both real executors plus a rejected settling
+observation. Corrected the fake transport to apply its effect once and reset
+the post-cast command cursor as captured live. Wait16/Cure23 host checks pass;
+reader46 and facing16 rejection controls pass, including read-only mid-snapshot
+drift. The turn receipt validator rejects ten altered action/cost/actor/input
+and false-completion receipts. Public integration, ally/KO/item/wounded-party
+acceptance and live manual handoff remain open; bounded research is separate.
+Repeat03 exposed bulk/live main-state drift; explicit debugger halts in04/05
+then exposed enemy targeting borrowing the roster again. Their final captures
+remain unaccepted. Replaced the fixed post-Wait delay with a bounded passive
+observer for two distinct enemy wrappers while the roster is readable, capturing
+under the same halt and retaining unknown poll reasons. No gate was relaxed.
+The final observer also waits for the enemy's own cursor/tile, avoiding the
+wrapper-before-cursor transition seen in06/07. Current-source reloads08/09
+both pass: HP100->165/156, MP85->79, Action consumed, guarded Wait and two
+coherently attributed enemy actors, with13 keys and no post-final input.
+Each retained turn receipt rejects13 mutations, including missing halt evidence
+and invalid continuing-enemy stats/coordinates. A fresh facing STOP control
+using the reusable `probe_recovery_stop.py` delivers15 keys/75 raw writes and
+zero post-STOP writes. Inspected both reloads' post-heal screens and later
+enemy screen plus the STOP-facing screen. AI10/10 and strategy9/9 pass.
+The roadmap now names A6.1's concrete public-runtime integration gates.
+
 ## 2026-10-06 - A6 state-driven policy-decline Wait fallback research
 
 Added `WaitFacingExecutor`: unique engine-enabled Wait row, chooser evaluation,

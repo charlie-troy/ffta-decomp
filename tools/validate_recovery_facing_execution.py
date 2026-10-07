@@ -15,6 +15,16 @@ from validate_recovery_menu import Memory
 MASKS = {"A": 1, "B": 2, "DOWN": 128, "UP": 64}
 
 
+def enemy_bounds(actor):
+    return (actor["id"] in range(7) and actor["type"] in (1, 2)
+            and actor["job"] in range(116) and actor["base_job"] in range(116)
+            and 1 <= actor["race"] <= 8 and 1 <= actor["level"] <= 50
+            and 0 < actor["hp"] <= actor["max_hp"] <= 999
+            and 0 <= actor["mp"] <= actor["max_mp"] <= 999
+            and all(0 <= value < 64 for value in actor["tile"])
+            and not actor["unaffiliated"])
+
+
 def continuation(directory, tag, rom):
     raw = (directory / f"{tag}-ewram.bin").read_bytes()
     memory = Memory(raw)
@@ -24,7 +34,8 @@ def continuation(directory, tag, rom):
     unit = memory.read_mem(member, STRIDE)
     roster = read_roster(memory, rom=rom)
     require(roster["struct_count"] == roster["live_count"] == 7
-            and roster["ids_distinct"] and roster["live_contiguous"], "roster not restored")
+            and roster["ids_distinct"] and roster["live_contiguous"]
+            and {r["id"] for r in roster["slots"] if r["live"]} == set(range(7)), "roster not restored")
     matches = [r for r in roster["slots"] if r["live"]
                and r["name"] == integer(unit, 0) and r["id"] == unit[0x104]]
     require(len(matches) == 1, "driver actor missing or ambiguous in restored roster")
@@ -34,6 +45,11 @@ def continuation(directory, tag, rom):
     require(list(memory.read_mem(mirror + 0xF6, 2)) == tile
             and row["job"] == unit[7] and row["side_raw"] == integer(unit, 0x28, 2),
             "driver actor differs from restored battle identity")
+    for field, offset, size in [("type", 4, 1), ("base_job", 5, 1), ("race", 6, 1),
+                                ("level", 9, 1), ("hp", 0x18, 2), ("max_hp", 0x1A, 2),
+                                ("mp", 0x1C, 2), ("max_mp", 0x1E, 2)]:
+        require(row[field] == integer(unit, offset, size), "canonical/roster enemy stats disagree")
+    require(enemy_bounds(row | {"tile": tile}), "continuing enemy outside verified bounds")
     require(get(PLAYER_DRIVER + 8) == wrapper, "driver wrappers disagree")
     return {"tag": tag, "raw_sha256": hashlib.sha256(raw).hexdigest(),
             "driver_state": get(PLAYER_DRIVER + 0xDC, 2),
@@ -66,7 +82,7 @@ def validate(run, later):
             "distinct continuing actors missing")
     for entry in later:
         actor = entry["actor"]
-        require(entry["wrapper"] != facts["actor_wrapper"] and entry["canonical"] != facts["member"]
+        require(enemy_bounds(actor) and entry["wrapper"] != facts["actor_wrapper"] and entry["canonical"] != facts["member"]
                 and actor["id"] != owner["id"] and actor["side_raw"] & SIDE_BIT
                 and actor["hp"] > 0 and entry["target_tile"] == actor["tile"],
                 "continuation is not an independently joined enemy")

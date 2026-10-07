@@ -44,6 +44,7 @@ class Menu:
 class Probe:
     def __init__(self, menu):
         self.menu, self.keys, self.g = menu, [], self
+        self.effect_applied = False
 
     def disarm(self):
         pass
@@ -52,13 +53,14 @@ class Probe:
         m = self.menu
         if not m.final and m.state == "settling":
             m.state = "target-overlay"
-        if m.final:
+        if m.final and not self.effect_applied:
             before = m.states["command"]
             hp = before.hp if m.effect == "enemy-only" else before.hp + 50
             mp = before.mp if m.effect == "unspent" else before.mp - 6
             flags = tuple(0 if row == 9 else flag for row, flag in zip(before.rows, before.enabled))
-            m.states["command"] = replace(before, hp=hp, mp=mp, enabled=flags)
+            m.states["command"] = replace(before, hp=hp, mp=mp, enabled=flags, cursor=0)
             m.state = "command"
+            self.effect_applied = True
 
     def press(self, mask, **kwargs):
         kwargs["stop_check"]()

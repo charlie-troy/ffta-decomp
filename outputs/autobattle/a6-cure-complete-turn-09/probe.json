@@ -1,0 +1,5681 @@
+{
+  "scope": "menu research only; fixture edits are not engine actions",
+  "state": "outputs/lua-nav/battle-start.ss0",
+  "rom": "baserom.gba",
+  "state_sha256": "4da58bfe0e162210383c28aa8f66659fca33c91c69da0e965b87b3b7a730abe5",
+  "phases": [
+    {
+      "tag": "00-initial",
+      "elapsed": 6.681,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 37,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 4,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130910.1697046,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\00-initial.png"
+    },
+    {
+      "tag": "01-DOWN",
+      "elapsed": 10.238,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 37,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 4,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130913.7266156,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\01-DOWN.png"
+    },
+    {
+      "tag": "02-A",
+      "elapsed": 13.797,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        0,
+        1
+      ],
+      "player_driver": {
+        "state": 37,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 5,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130917.2849672,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\02-A.png"
+    },
+    {
+      "tag": "03-DOWN",
+      "elapsed": 17.357,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        1,
+        1
+      ],
+      "player_driver": {
+        "state": 37,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 5,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130920.8452946,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\03-DOWN.png"
+    },
+    {
+      "tag": "04-DOWN",
+      "elapsed": 20.973,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        2,
+        1
+      ],
+      "player_driver": {
+        "state": 37,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 5,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "00000000"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130924.4612656,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\04-DOWN.png"
+    },
+    {
+      "tag": "05-A",
+      "elapsed": 24.52,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        194,
+        90
+      ],
+      "player_driver": {
+        "state": 75,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 7,
+        "selected_ability": 0,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 1,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130928.0087496,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 75,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\05-A.png"
+    },
+    {
+      "tag": "06-A",
+      "elapsed": 28.061,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        194,
+        90
+      ],
+      "player_driver": {
+        "state": 49,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "020159e4"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 1,
+        "mode": 7,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 1,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 130931.549061,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 7,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "target-overlay",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 49,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\06-A.png"
+    },
+    {
+      "tag": "07-A",
+      "elapsed": 31.636,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 49,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "020159e4"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 12,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 130935.1244559,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 258,
+        "mode": 12,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "description",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 108,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 49,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\07-A.png"
+    },
+    {
+      "tag": "08-A",
+      "elapsed": 35.249,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 49,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "020159e4"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 11,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 130938.7378156,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386653,
+        "controller_state": 258,
+        "mode": 11,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "confirmation",
+        "cursor": 0,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 2,
+        "target_flags": 32,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 49,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\08-A.png"
+    },
+    {
+      "tag": "09-A",
+      "elapsed": 38.972,
+      "actor": null,
+      "command_cursor": 0,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 92,
+        "flags": 73,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 12,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "roster_rejected": "roster outside verified fixture bounds",
+      "guarded_menu": {
+        "observed_at": 130942.4609055,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 258,
+        "mode": 12,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "description",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 92,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 100,
+        "mp": 85
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\09-A.png"
+    },
+    {
+      "tag": "10-DOWN",
+      "elapsed": 51.314,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 1,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 37,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 4,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130954.8046915,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 156,
+        "mp": 79
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\10-DOWN.png"
+    },
+    {
+      "tag": "11-DOWN",
+      "elapsed": 54.868,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 2,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 37,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 0,
+        "mode": 4,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130958.3564265,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 156,
+        "mp": 79
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\11-DOWN.png"
+    },
+    {
+      "tag": "12-A",
+      "elapsed": 58.418,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 0,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 2,
+      "target_cursor": [
+        4,
+        10
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 47,
+        "flags": 72,
+        "actor_wrapper": "0202267c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 3,
+        "mode": 4,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "guarded_menu": {
+        "observed_at": 130961.9069435,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 4,
+        "selection": 3,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "facing",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 47,
+        "facing_direction": 2
+      },
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 156,
+        "mp": 79
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\12-A.png"
+    },
+    {
+      "tag": "13-A",
+      "elapsed": 61.962,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 188,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 2,
+      "target_cursor": [
+        9,
+        2
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 97,
+        "flags": 68,
+        "actor_wrapper": "020225ec",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 3,
+        "mode": 4,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "guarded_menu_error": "RecoveryStateError('player driver actor wrapper changed')",
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 156,
+        "mp": 79
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\13-A.png"
+    },
+    {
+      "tag": "98-continuation",
+      "elapsed": 63.859,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 188,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 2,
+      "target_cursor": [
+        9,
+        2
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 27,
+        "flags": 68,
+        "actor_wrapper": "020225ec",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 3,
+        "mode": 4,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "guarded_menu_error": "RecoveryStateError('player driver actor wrapper changed')",
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 156,
+        "mp": 79
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\98-continuation.png"
+    },
+    {
+      "tag": "99-settled",
+      "elapsed": 73.26,
+      "actor": {
+        "slot": 6,
+        "addr": "02016018",
+        "name": 33562396,
+        "side_raw": 129,
+        "ct": 257,
+        "ea": 0,
+        "id": 6,
+        "type": 2,
+        "base_job": 80,
+        "race": 1,
+        "job": 2,
+        "level": 50,
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "is_rom_name": false,
+        "is_ram_name": true,
+        "name_text": "Marche",
+        "side_bit": false,
+        "unaffiliated": false,
+        "live": true,
+        "x": 4,
+        "y": 10
+      },
+      "command_cursor": 2,
+      "target_cursor": [
+        7,
+        4
+      ],
+      "action_cursor": [
+        178,
+        30
+      ],
+      "player_driver": {
+        "state": 96,
+        "flags": 68,
+        "actor_wrapper": "0202255c",
+        "target_processor": "00000000"
+      },
+      "menu_context": {
+        "addr": "0202d8a0",
+        "selection": 3,
+        "mode": 4,
+        "selected_ability": 1,
+        "unit": "02000080",
+        "peer": "02000080"
+      },
+      "menu_list": {
+        "object": "0202dd70",
+        "race": 0,
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "guarded_menu_error": "RecoveryStateError('player driver actor wrapper changed')",
+      "member": {
+        "addr": "02000080",
+        "secondary_job": 7,
+        "hp": 156,
+        "mp": 79
+      },
+      "screenshot": "outputs\\autobattle\\a6-cure-complete-turn-09\\99-settled.png"
+    }
+  ],
+  "writes": [
+    {
+      "addr": "02016020",
+      "width": 1,
+      "old": "08",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: secondary job"
+    },
+    {
+      "addr": "02000088",
+      "width": 1,
+      "old": "08",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: secondary job"
+    },
+    {
+      "addr": "02016030",
+      "width": 2,
+      "old": "8401",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: wounded actor"
+    },
+    {
+      "addr": "02000098",
+      "width": 2,
+      "old": "8401",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: wounded actor"
+    },
+    {
+      "addr": "02016034",
+      "width": 2,
+      "old": "5500",
+      "new": "5500",
+      "requested": "5500",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: actor MP"
+    },
+    {
+      "addr": "0200009c",
+      "width": 2,
+      "old": "5500",
+      "new": "5500",
+      "requested": "5500",
+      "reply": "OK",
+      "note": "A6 disposable research fixture: actor MP"
+    }
+  ],
+  "keys": [
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "key": "A",
+      "hits": 5
+    }
+  ],
+  "status": "observed",
+  "engine_calls": [],
+  "policy_document": {
+    "schema": "ffta-tactics-policy/2",
+    "fallback": "wait",
+    "observation": {
+      "max_age_seconds": 3.0
+    },
+    "assignments": {
+      "party": {
+        "player": {
+          "rules": [
+            {
+              "id": "revive-before-attack",
+              "when": {
+                "kind": "ability",
+                "ability_name": "Life",
+                "relation": "ally",
+                "target_hp": {
+                  "eq": 0
+                },
+                "remaining_mp_after_cost": {
+                  "gte": 8
+                }
+              },
+              "select": "first",
+              "note": "a KO'd ally is exactly HP 0; the absolute predicate is used because a percent floors a 1-HP high-max ally to 0 too"
+            },
+            {
+              "id": "heal-wounded-ally",
+              "when": {
+                "kind": "ability",
+                "ability_name": "Cure",
+                "relation": "ally",
+                "target_hp": {
+                  "gt": 0
+                },
+                "target_hp_pct": {
+                  "lte": 50
+                },
+                "remaining_mp_after_cost": {
+                  "gte": 8
+                }
+              },
+              "select": "lowest-target-hp",
+              "note": "heal the weakest wounded ally; the MP predicate is the reserve that keeps at least 8 MP after the cast"
+            },
+            {
+              "id": "heal-self",
+              "when": {
+                "kind": "ability",
+                "ability_name": "Cure",
+                "relation": "self",
+                "target_hp": {
+                  "gt": 0
+                },
+                "actor_hp_pct": {
+                  "lte": 40
+                },
+                "remaining_mp_after_cost": {
+                  "gte": 8
+                }
+              },
+              "select": "first",
+              "note": "self-heal below 40% while still holding the MP reserve"
+            },
+            {
+              "id": "pressure-enemy",
+              "when": {
+                "relation": "enemy"
+              },
+              "select": "lowest-target-hp",
+              "note": "otherwise take the engine-offered action on the weakest enemy"
+            },
+            {
+              "id": "use-potion-last-resort",
+              "enabled": false,
+              "when": {
+                "kind": "item",
+                "item_name": "Potion",
+                "item_count": {
+                  "gte": 1
+                }
+              },
+              "select": "first",
+              "note": "never-use-item by default: consumables are disabled, so this rule stays disabled and the party consumes nothing"
+            }
+          ],
+          "note": "Healer preset for every player-side actor without its own character assignment. Ordered revive -> heal ally -> heal self -> attack; every choice still comes only from the engine-legal candidates the adapter supplies."
+        }
+      }
+    },
+    "note": "A6 resource/recovery preset. Consumables stay disabled (no `consumables` flag), so the item rule cannot fire; the MP reserve is the remaining_mp_after_cost predicate. A learned heal is never a candidate by itself -- the engine must offer it."
+  },
+  "policy_sha256": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
+  "blocking_timeouts_seconds": {
+    "debugger_packet": 1,
+    "screenshot_process": 45
+  },
+  "pid": 69336,
+  "owner": {
+    "slot": 6,
+    "addr": "02016018",
+    "name": 33562396,
+    "side_raw": 129,
+    "ct": 0,
+    "ea": 0,
+    "id": 6,
+    "type": 2,
+    "base_job": 80,
+    "race": 1,
+    "job": 2,
+    "level": 50,
+    "hp": 388,
+    "max_hp": 442,
+    "mp": 85,
+    "max_mp": 85,
+    "is_rom_name": false,
+    "is_ram_name": true,
+    "name_text": "Marche",
+    "side_bit": false,
+    "unaffiliated": false,
+    "live": true,
+    "x": 4,
+    "y": 10
+  },
+  "member_addr": "02000080",
+  "menu_guards": [],
+  "router_trace": "disabled after independent initial owner verification",
+  "capture_halts": [
+    {
+      "tag": "00-initial",
+      "reply": "S02"
+    },
+    {
+      "tag": "01-DOWN",
+      "reply": "S02"
+    },
+    {
+      "tag": "02-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "03-DOWN",
+      "reply": "S02"
+    },
+    {
+      "tag": "04-DOWN",
+      "reply": "S02"
+    },
+    {
+      "tag": "05-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "06-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "07-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "08-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "09-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "10-DOWN",
+      "reply": "S02"
+    },
+    {
+      "tag": "11-DOWN",
+      "reply": "S02"
+    },
+    {
+      "tag": "12-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "13-A",
+      "reply": "S02"
+    },
+    {
+      "tag": "98-continuation",
+      "reply": "S02"
+    },
+    {
+      "tag": "99-settled",
+      "reply": "S02"
+    }
+  ],
+  "executor_events": [
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130911.6708461,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130911.6725271,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 130911.6740773,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130915.2338229,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 130915.2354558,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130918.8032364,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 130918.8049044,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130922.4017189,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 130922.4036272,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130925.9615786,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 130925.9632795,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130929.5121802,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 75,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 130929.5137227,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 75,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130933.066534,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 7,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "target-overlay",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 130933.0680582,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 7,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "target-overlay",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130936.6860684,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 258,
+        "mode": 12,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "description",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 108,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 130936.6876047,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 258,
+        "mode": 12,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "description",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 108,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130940.4088999,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386653,
+        "controller_state": 258,
+        "mode": 11,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "confirmation",
+        "cursor": 0,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 2,
+        "target_flags": 32,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "policy",
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 0.0006345000001601875,
+        "actor": {
+          "name": "Marche",
+          "id": 6,
+          "job_id": 2,
+          "side": "player",
+          "hp": 100,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "cure-self",
+            "kind": "ability",
+            "action_id": 1,
+            "legal": true,
+            "cost": 6,
+            "ability_name": "Cure",
+            "relation": "self",
+            "target": {
+              "kind": "unit",
+              "id": 6
+            },
+            "target_hp": 100,
+            "target_max_hp": 442,
+            "target_mp": 85
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "selected",
+        "reason": "rule:matched",
+        "scope": "party",
+        "rule_id": "heal-self",
+        "decision": {
+          "candidate_id": "cure-self",
+          "kind": "ability",
+          "action_id": 1,
+          "target": {
+            "kind": "unit",
+            "id": 6
+          },
+          "target_id": 6,
+          "scope": "party",
+          "rule_id": "heal-self",
+          "fallback": false,
+          "reason": "rule:matched"
+        },
+        "detail": null
+      }
+    },
+    {
+      "event": "final_policy",
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 0.0007329999934881926,
+        "actor": {
+          "name": "Marche",
+          "id": 6,
+          "job_id": 2,
+          "side": "player",
+          "hp": 100,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "cure-self",
+            "kind": "ability",
+            "action_id": 1,
+            "legal": true,
+            "cost": 6,
+            "ability_name": "Cure",
+            "relation": "self",
+            "target": {
+              "kind": "unit",
+              "id": 6
+            },
+            "target_hp": 100,
+            "target_max_hp": 442,
+            "target_mp": 85
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "selected",
+        "reason": "rule:matched",
+        "scope": "party",
+        "rule_id": "heal-self",
+        "decision": {
+          "candidate_id": "cure-self",
+          "kind": "ability",
+          "action_id": 1,
+          "target": {
+            "kind": "unit",
+            "id": 6
+          },
+          "target_id": 6,
+          "scope": "party",
+          "rule_id": "heal-self",
+          "fallback": false,
+          "reason": "rule:matched"
+        },
+        "detail": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": true,
+      "facts": {
+        "observed_at": 130940.4127309,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386653,
+        "controller_state": 258,
+        "mode": 11,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "confirmation",
+        "cursor": 0,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 2,
+        "target_flags": 32,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130944.2409806,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 258,
+        "mode": 12,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "description",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 92,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130944.497095,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 100,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 57,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130944.7702189,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130945.0410245,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130945.2927246,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130945.5495914,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130945.8519383,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130946.1037263,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130946.3854552,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130946.6507111,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130946.9041492,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130947.1704591,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130947.4495247,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130947.7046445,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130947.9702903,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130948.2219855,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130948.473417,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130948.7426473,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130949.0114626,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130949.2753067,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130949.5551069,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130949.8067563,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130950.0901329,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130950.3422871,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130950.6212192,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130950.9006661,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130951.1708215,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130951.4295233,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130951.7001994,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130951.9812794,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 60,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130952.2348489,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 22,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130952.5008322,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134386057,
+        "controller_state": 3,
+        "mode": 12,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "settling",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 32,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130952.753279,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    }
+  ],
+  "policy": "configs/tactics/healer.json",
+  "recovery": {
+    "outcome": "accepted",
+    "before": {
+      "observed_at": 130911.6708461,
+      "context": 33740960,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 258,
+      "mode": 4,
+      "selection": 0,
+      "selected_ability": 0,
+      "member": 33554560,
+      "peer": 0,
+      "state": "command",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "max_hp": 442,
+      "mp": 85,
+      "max_mp": 85,
+      "cure_cost": 6,
+      "target_tile": [
+        4,
+        10
+      ],
+      "target_processor": 0,
+      "target_state": 0,
+      "target_flags": 0,
+      "actor_wrapper": 33695356,
+      "ui_active": 33742168,
+      "driver_state": 37,
+      "facing_direction": null
+    },
+    "after": {
+      "observed_at": 130952.753279,
+      "context": 33740960,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 258,
+      "mode": 4,
+      "selection": 0,
+      "selected_ability": 1,
+      "member": 33554560,
+      "peer": 33554560,
+      "state": "command",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "enabled": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 156,
+      "max_hp": 442,
+      "mp": 79,
+      "max_mp": 85,
+      "cure_cost": 6,
+      "target_tile": [
+        4,
+        10
+      ],
+      "target_processor": 0,
+      "target_state": 0,
+      "target_flags": 0,
+      "actor_wrapper": 33695356,
+      "ui_active": 33742168,
+      "driver_state": 37,
+      "facing_direction": null
+    },
+    "decision": {
+      "outcome": "selected",
+      "reason": "rule:matched",
+      "scope": "party",
+      "rule_id": "heal-self",
+      "decision": {
+        "candidate_id": "cure-self",
+        "kind": "ability",
+        "action_id": 1,
+        "target": {
+          "kind": "unit",
+          "id": 6
+        },
+        "target_id": 6,
+        "scope": "party",
+        "rule_id": "heal-self",
+        "fallback": false,
+        "reason": "rule:matched"
+      },
+      "detail": null
+    }
+  },
+  "finish_events": [
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130952.7806355,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "policy",
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 0.0004763999895658344,
+        "actor": {
+          "name": "Marche",
+          "id": 6,
+          "job_id": 2,
+          "side": "player",
+          "hp": 156,
+          "max_hp": 442,
+          "mp": 79,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "recovery-wait",
+            "kind": "wait",
+            "action_id": 10,
+            "legal": true,
+            "cost": 0
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "fallback",
+        "reason": "fallback:wait",
+        "scope": "party",
+        "rule_id": "fallback",
+        "decision": {
+          "candidate_id": "recovery-wait",
+          "kind": "wait",
+          "action_id": 10,
+          "target": null,
+          "target_id": null,
+          "scope": "party",
+          "rule_id": "fallback",
+          "fallback": true,
+          "reason": "fallback:wait"
+        },
+        "detail": null
+      }
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130952.7866131,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 130952.8108249,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130956.3190898,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 130956.320842,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130959.8672852,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 130959.8688841,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "command",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 130963.4078754,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 4,
+        "selection": 3,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "facing",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 47,
+        "facing_direction": 2
+      }
+    },
+    {
+      "event": "final_policy",
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 0.0005721999914385378,
+        "actor": {
+          "name": "Marche",
+          "id": 6,
+          "job_id": 2,
+          "side": "player",
+          "hp": 156,
+          "max_hp": 442,
+          "mp": 79,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "recovery-wait",
+            "kind": "wait",
+            "action_id": 10,
+            "legal": true,
+            "cost": 0
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "fallback",
+        "reason": "fallback:wait",
+        "scope": "party",
+        "rule_id": "fallback",
+        "decision": {
+          "candidate_id": "recovery-wait",
+          "kind": "wait",
+          "action_id": 10,
+          "target": null,
+          "target_id": null,
+          "scope": "party",
+          "rule_id": "fallback",
+          "fallback": true,
+          "reason": "fallback:wait"
+        },
+        "detail": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": true,
+      "facts": {
+        "observed_at": 130963.41108,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 4,
+        "selection": 3,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "facing",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 156,
+        "max_hp": 442,
+        "mp": 79,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 47,
+        "facing_direction": 2
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    }
+  ],
+  "facing_confirmation": {
+    "before_key": 13,
+    "facts": {
+      "observed_at": 130963.41108,
+      "context": 33740960,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 3,
+      "mode": 4,
+      "selection": 3,
+      "selected_ability": 1,
+      "member": 33554560,
+      "peer": 33554560,
+      "state": "facing",
+      "cursor": null,
+      "scroll": null,
+      "rows": [],
+      "enabled": [],
+      "ability_ids": [],
+      "hp": 156,
+      "max_hp": 442,
+      "mp": 79,
+      "max_mp": 85,
+      "cure_cost": 6,
+      "target_tile": [
+        4,
+        10
+      ],
+      "target_processor": 0,
+      "target_state": 0,
+      "target_flags": 0,
+      "actor_wrapper": 33695356,
+      "ui_active": 0,
+      "driver_state": 47,
+      "facing_direction": 2
+    }
+  },
+  "finish": {
+    "outcome": "confirmed",
+    "continuation": "unverified",
+    "before": {
+      "observed_at": 130952.7806355,
+      "context": 33740960,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 258,
+      "mode": 4,
+      "selection": 0,
+      "selected_ability": 1,
+      "member": 33554560,
+      "peer": 33554560,
+      "state": "command",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "enabled": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 156,
+      "max_hp": 442,
+      "mp": 79,
+      "max_mp": 85,
+      "cure_cost": 6,
+      "target_tile": [
+        4,
+        10
+      ],
+      "target_processor": 0,
+      "target_state": 0,
+      "target_flags": 0,
+      "actor_wrapper": 33695356,
+      "ui_active": 33742168,
+      "driver_state": 37,
+      "facing_direction": null
+    },
+    "facing": {
+      "observed_at": 130963.4094649,
+      "context": 33740960,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 3,
+      "mode": 4,
+      "selection": 3,
+      "selected_ability": 1,
+      "member": 33554560,
+      "peer": 33554560,
+      "state": "facing",
+      "cursor": null,
+      "scroll": null,
+      "rows": [],
+      "enabled": [],
+      "ability_ids": [],
+      "hp": 156,
+      "max_hp": 442,
+      "mp": 79,
+      "max_mp": 85,
+      "cure_cost": 6,
+      "target_tile": [
+        4,
+        10
+      ],
+      "target_processor": 0,
+      "target_state": 0,
+      "target_flags": 0,
+      "actor_wrapper": 33695356,
+      "ui_active": 0,
+      "driver_state": 47,
+      "facing_direction": 2
+    },
+    "decision": {
+      "outcome": "fallback",
+      "reason": "fallback:wait",
+      "scope": "party",
+      "rule_id": "fallback",
+      "decision": {
+        "candidate_id": "recovery-wait",
+        "kind": "wait",
+        "action_id": 10,
+        "target": null,
+        "target_id": null,
+        "scope": "party",
+        "rule_id": "fallback",
+        "fallback": true,
+        "reason": "fallback:wait"
+      },
+      "detail": null
+    }
+  },
+  "continuation_polls": [
+    {
+      "elapsed": 63.784,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "capture",
+      "wrapper": "020225ec",
+      "actor_id": 3,
+      "tag": "98-continuation"
+    },
+    {
+      "elapsed": 65.649,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified"
+    },
+    {
+      "elapsed": 65.903,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified"
+    },
+    {
+      "elapsed": 66.158,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified"
+    },
+    {
+      "elapsed": 66.424,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified"
+    },
+    {
+      "elapsed": 66.68,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 66.936,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 67.194,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 67.448,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 67.713,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 67.97,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 68.233,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 68.502,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 68.763,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 69.018,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 69.273,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 69.527,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 69.783,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 70.038,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 70.294,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 70.548,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 70.814,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 71.068,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 71.334,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 71.613,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 71.893,
+      "halt": "S02",
+      "roster": "unknown",
+      "candidate": "unverified",
+      "rejection": "roster outside verified fixture bounds"
+    },
+    {
+      "elapsed": 72.15,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified",
+      "rejection": "active actor/cursor not yet coherent"
+    },
+    {
+      "elapsed": 72.414,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified",
+      "rejection": "active actor/cursor not yet coherent"
+    },
+    {
+      "elapsed": 72.669,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified",
+      "rejection": "active actor/cursor not yet coherent"
+    },
+    {
+      "elapsed": 72.929,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "unverified",
+      "rejection": "active actor/cursor not yet coherent"
+    },
+    {
+      "elapsed": 73.185,
+      "halt": "S02",
+      "roster": "verified",
+      "candidate": "capture",
+      "wrapper": "0202255c",
+      "actor_id": 4,
+      "tag": "99-settled"
+    }
+  ],
+  "continuation_tags": [
+    "98-continuation",
+    "99-settled"
+  ],
+  "key_writes": [
+    {
+      "t": 6.178,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 6.229,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 6.281,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 6.333,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 6.385,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 9.739,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 9.792,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 9.843,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 9.895,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 9.948,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 13.309,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 13.361,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 13.413,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 13.466,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 13.519,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 16.908,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 16.96,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 17.011,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 17.068,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 17.12,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 20.468,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 20.521,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 20.572,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 20.624,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 20.677,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 24.017,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 24.07,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 24.122,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 24.174,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 24.227,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 27.572,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 27.624,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 27.676,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 27.729,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 27.782,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 31.192,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 31.244,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 31.297,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 31.35,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 31.403,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 34.916,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 34.967,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 35.02,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 35.072,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 35.125,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 47.263,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 47.314,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 47.366,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 47.417,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 47.469,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 50.824,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 50.877,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 50.93,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 50.982,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 51.034,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 54.371,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 54.422,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 54.475,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 54.528,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 54.58,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 57.914,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 57.966,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 58.018,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 58.071,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 58.123,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    }
+  ]
+}

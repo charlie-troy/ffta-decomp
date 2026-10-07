@@ -599,3 +599,19 @@ CLAUDE.md carries the slogan.
   canonical active actor to the restored battle roster. The suspected reply
   race is an inference from the failure and successful discriminating rerun,
   not a wire-level packet trace.
+
+### DE-036 — A fixed delay after Wait does not identify a continuing actor
+
+- **Tried (A6, 2026-10-06):** successful Cure followed by guarded Wait, then
+  a fixed-delay continuation capture. `a6-cure-complete-turn-03` disagreed on
+  bulk/live main state; explicit halts in04/05 then caught an enemy's temporary
+  borrowed roster. All remain unaccepted continuation receipts.
+- **Observed:** passive polling for a restored roster alone (06/07) still
+  captured the next enemy wrapper before its cursor had updated: actor4's
+  canonical tile7,4 versus the previous enemy's cursor9,2. The independent
+  continuation validator rejects that mismatch.
+- **Do not:** use elapsed time, a changed wrapper, restored player stats or
+  CT alone to name the next owner. Halt explicitly, require readable roster,
+  distinct live enemy identity and current cursor/actor-tile coherence, then
+  independently join canonical and battle records in the retained validator.
+  Keep rejected polling states unknown and send no more terminal input.

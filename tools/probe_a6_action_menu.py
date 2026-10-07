@@ -16,7 +16,7 @@ import time
 
 from autobattle_identity import ActorAdapter, IdentityError, key
 from c2_menu_probe import sweep
-from fixture_guard import FixtureSession, ROSTER, STRIDE, u8, u16, u32
+from fixture_guard import FixtureSession, ROSTER, STRIDE, SIDE_BIT, u8, u16, u32
 from probe_control_handoff import Probe
 from recovery_menu import RecoveryMenu, RecoveryStateError
 from recovery_executor import SelfCureExecutor, WaitFacingExecutor, RecoveryStopped
@@ -45,14 +45,16 @@ def main():
     parser.add_argument("--policy", help="state-driven bounded self-Cure research using this policy")
     parser.add_argument("--wait-fallback", action="store_true",
                         help="after policy Cure decline, evaluate/confirm engine-enabled Wait then observe only")
+    parser.add_argument("--finish-recovery-turn", action="store_true",
+                        help="also evaluate guarded Wait after a successful Cure; research only")
     parser.add_argument("--stop-file", help="observe STOP when this file exists; policy executor only")
     args = parser.parse_args()
     if args.policy and args.route is not None:
         parser.error("policy execution and an explicit research route are mutually exclusive")
     if args.stop_file and not args.policy:
         parser.error("STOP file requires policy execution")
-    if args.wait_fallback and not args.policy:
-        parser.error("Wait fallback requires policy execution")
+    if (args.wait_fallback or args.finish_recovery_turn) and not args.policy:
+        parser.error("recovery Wait requires policy execution")
     if args.confirm_facing and (args.policy or not args.verify_menu):
         parser.error("facing research requires a guarded explicit route")
     route_text = args.route if args.route is not None else "DOWN,A,DOWN,DOWN,A,DOWN,UP,B,B"
@@ -152,16 +154,23 @@ def main():
                     checkpoint()
                     return session.g.read_mem(addr, size)
 
-            def phase(tag):
+            def phase(tag, *, halted_reply=None):
                 checkpoint()
                 probe.disarm()
                 # Allow redraw before the bulk capture. The guarded read and
                 # screenshot below are separate observations, not one atomic
                 # RAM/image pair; their facts must be checked independently.
-                session.g.cont()
-                time.sleep(0.5)
-                # Served reads halt the core (DE-029). Raw sweeps remain
-                # local/untracked; only the guarded reader checks coherence.
+                if halted_reply is None:
+                    session.g.cont()
+                    time.sleep(0.5)
+                # Explicitly halt: individual memory requests alone can race
+                # an advancing main-controller state after terminal facing.
+                stop = halted_reply if halted_reply is not None else session.g.interrupt()
+                if not stop or stop[:1] not in ("S", "T") or stop == "S04":
+                    raise RuntimeError(f"capture did not establish a debugger halt: {stop!r}")
+                result.setdefault("capture_halts", []).append({"tag": tag, "reply": stop})
+                # Raw sweeps stay local; the guarded reader also rechecks
+                # identity/coherence. Screenshots remain separate evidence.
                 data = sweep(CheckedReads() if policy else session.g)
                 checkpoint()
                 for lo, hi, name in ((0x02000000, 0x02030000, "ewram"),
@@ -243,6 +252,54 @@ def main():
                     raise guard_error
                 session.g.cont()
 
+            def capture_continuation():
+                """Observe two independently readable later actors; never input."""
+                seen, tags = set(), []
+                deadline = time.monotonic() + 20
+                while len(tags) < 2 and time.monotonic() < deadline:
+                    checkpoint()
+                    probe.disarm()
+                    session.g.cont()
+                    time.sleep(0.25)
+                    stop = session.g.interrupt()
+                    if not stop or stop[:1] not in ("S", "T") or stop == "S04":
+                        raise RuntimeError("continuation poll did not establish halt")
+                    poll = {"elapsed": round(time.time() - started, 3), "halt": stop,
+                            "roster": "unknown", "candidate": "unverified"}
+                    result.setdefault("continuation_polls", []).append(poll)
+                    try:
+                        adapter.snapshot()
+                    except IdentityError as exc:
+                        poll["rejection"] = str(exc)
+                        continue  # later enemy targeting may borrow the roster
+                    poll["roster"] = "verified"
+                    wrapper = u32(session.g, 0x0200F4EC)
+                    if wrapper == menu.wrapper or wrapper in seen:
+                        continue
+                    if not wrapper or not 0x02000000 <= wrapper <= 0x0203FFFC:
+                        continue
+                    current = u32(session.g, wrapper)
+                    if not current or not 0x02000000 <= current <= 0x02040000 - STRIDE:
+                        continue
+                    side, identity = u16(session.g, current + 0x28), u8(session.g, current + 0x104)
+                    if side is None or not side & SIDE_BIT or identity in (None, owner["id"], 0xFF):
+                        continue
+                    tile = (u8(session.g, current + 0xF6), u8(session.g, current + 0xF7))
+                    hp = u16(session.g, current + 0x18)
+                    if (hp is None or hp <= 0 or any(v is None or not 0 <= v < 64 for v in tile)
+                            or probe.read_target_cursor() != tile
+                            or u32(session.g, 0x0200F4F0) != wrapper):
+                        poll["rejection"] = "active actor/cursor not yet coherent"
+                        continue
+                    tag = "98-continuation" if not tags else "99-settled"
+                    poll.update(candidate="capture", wrapper=f"{wrapper:08x}", actor_id=identity, tag=tag)
+                    phase(tag, halted_reply=stop)
+                    seen.add(wrapper)
+                    tags.append(tag)
+                if len(tags) != 2:
+                    raise TimeoutError("two independently readable continuing actors not observed")
+                result["continuation_tags"] = tags
+
             phase("00-initial")
             if policy:
                 def after_key(name):
@@ -255,7 +312,9 @@ def main():
                 result["executor_events"] = executor.events
                 result["policy"] = args.policy
                 result["recovery"] = executor.run()
-                if args.wait_fallback and result["recovery"]["outcome"] == "declined":
+                outcome = result["recovery"]["outcome"]
+                if ((args.wait_fallback or args.finish_recovery_turn) and outcome == "declined"
+                        or args.finish_recovery_turn and outcome == "accepted"):
                     def latch_facing(obs):
                         nonlocal facing_committed
                         facing_committed = True
@@ -264,13 +323,13 @@ def main():
 
                     executor = WaitFacingExecutor(menu, probe, policy, after_key=after_key,
                         before_final=latch_facing, stop_check=stop_check)
-                    result["fallback_events"] = executor.events
-                    result["fallback"] = executor.run()
+                    segment = "finish" if outcome == "accepted" else "fallback"
+                    result[f"{segment}_events"] = executor.events
+                    result[segment] = executor.run()
                     if facing_committed:
-                        probe.disarm()
-                        session.g.cont()
-                        time.sleep(5)
-                phase("99-settled")
+                        capture_continuation()
+                if not facing_committed:
+                    phase("99-settled")
             for i, name in enumerate([] if policy else route, 1):
                 if menu is not None:
                     token = menu.snapshot()

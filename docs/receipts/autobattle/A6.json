@@ -396,5 +396,69 @@
       "outputs/autobattle/a6-policy-wait-stop-01/15-A.png": "ebf41a01c6dbbaddbf11fbab2f2d2a23304f522c663ef176dbdad7b67071d694",
       "outputs/autobattle/a6-wait-cure-regression-01/99-settled.png": "e7b2c3c545f294f4b82cd0eb9227cb1d5030c5e4f3a96f0090ab58e5388bae59"
     }
+  },
+  "successful_cure_turn_slice": {
+    "base_revision": "6b8e441",
+    "status": "bounded successful self-Cure through guarded turn finish proven on two current-source reloads; public recovery unknown",
+    "delivered_source_sha256": {
+      "tools/probe_a6_action_menu.py": "c6ee2daa9c6fc4ac67bda26cb5d2cc9d924f5d5ba2ca2db264e2cee6cc650466",
+      "tools/recovery_menu.py": "008deed98ecacbdbf0033be486e54b4fd2c0eb68669186b45b1e940d55999941",
+      "tools/validate_recovery_executor.py": "031fa04cdf315a262b278cb56e0f9c3ad14585677a699206a2c6c8066e5ae989",
+      "tools/validate_recovery_facing.py": "4072e19c1e729fa908b9dc5b98fffbfc74112bc074ad3a2f6b68d723895096e5",
+      "tools/validate_recovery_facing_execution.py": "3d1401a55fd8d0704a0a6e75a20a780d5cb01066a1d2ba42d598ba68c076e3ce",
+      "tools/validate_recovery_wait_execution.py": "ea89b684bf486f9703e20d65ef9e882c45ea62490179bd860f035f05efe07b2b",
+      "tools/validate_recovery_wait_executor.py": "fcae984c5f6748c55bbbbd3179c7b6c003474dbbfc2ebf84430cc955845613c3",
+      "tools/validate_recovery_turn_execution.py": "3eca5bee158ef96b276c79b1a824f0b5e1367e909b61e8b1e36e6c94449f4efd",
+      "tools/probe_recovery_stop.py": "1f4586e0b5417b795886f6d61ee214119e8503d6d2673cd2904c3cef392d64cf"
+    },
+    "evidence_sha256": {
+      "outputs/autobattle/a6-cure-complete-turn-08/probe.json": "98f3ad75b9ee86c56dea6fa79dbabe298a238216a5bf5e346a685a223e6e3138",
+      "outputs/autobattle/a6-cure-complete-turn-09/probe.json": "650ce8aec22c949ca4204f7b10a718311b85733ca127e43443bb366f0170ebe0",
+      "outputs/autobattle/a6-complete-stop-regression-01/probe.json": "6bd7776e426ba782d3fdd39b7e3dea139de59dbd0bb22c8e4b22501ff620572a",
+      "outputs/autobattle/a6-complete-facing-regression/checks.json": "d54c3a8e4aa517c1d313ddca5367d37b32a4af1ce594abf97d07ea5d1f92d93d",
+      "outputs/autobattle/a6-complete-modal-regression/checks.json": "49f56094b96dde42ffee6939af8e78bb751a263eaece1e5c5cfae6ce6a31a613",
+      "outputs/autobattle/a6-complete-cure-host/checks.json": "e40cf3a6b98823a629d74ab49cf908cb31cefaac03b480a39db89e7ab28fcc47",
+      "outputs/autobattle/a6-complete-turn-host/checks.json": "7fc8c32d700531b4c82a0d6df4be136cc321b1e87506010855b6691b95df3e2b",
+      "outputs/autobattle/a6-complete-wait-regression/checks.json": "5e8dfa37d2a2cdfe69c344b14796388540026cb1d2f9fafcde08e5e798f2a269",
+      "outputs/autobattle/a6-complete-low-mp-regression/checks.json": "a0e9a74a512f58563f6ba73717516f3dca1e8ed78d2faf99b19f93ea53c65462",
+      "outputs/autobattle/a6-complete-turn-current-artifacts/checks.json": "c4441f8d264e1bc7f8f3d434f0740e6728cebb0869d783135a3887f88f9aa2e9",
+      "outputs/autobattle/a6-complete-turn-current-repeat-artifacts/checks.json": "d426fe74900601cfb09e251560d816e4d92f6e96731e8a52b1dbdfde0c254dba",
+      "outputs/autobattle/a6-complete-stop-artifacts/checks.json": "0b4ab7361c34e300021279d7761b4358624a25c88387807143427af20a2e3d49",
+      "outputs/autobattle/a6-complete-retained-research/summary.json": "fe646153f25a5b4351d36f00eca34095bc12716ef0bc63dc77e65d8acfbd509c"
+    },
+    "checks": {
+      "cure_executor_host": 23,
+      "wait_executor_host": 16,
+      "modal_captured_states": 14,
+      "modal_derived_states": 1,
+      "modal_rejections": 46,
+      "facing_rejections": 16,
+      "facing_rom_input_cases": 1024,
+      "turn_artifact_mutations_per_reload": 13,
+      "stop_artifact_mutations": 13,
+      "ai": 10,
+      "strategy": 9
+    },
+    "live": {
+      "reload08": "HP100->165, MP85->79, Action disabled, guarded Wait, enemies3 then4, 13 keys",
+      "reload09": "HP100->156, MP85->79, Action disabled, guarded Wait, enemies3 then4, 13 keys",
+      "stop": "a6-complete-stop-regression-01: paused at facing;15 keys/75 raw writes, zero after STOP"
+    },
+    "capture_contract": "explicit debugger halt; bounded20-second passive polling; readable roster, living distinct enemy wrapper pair and own cursor/tile before capture; independent canonical/roster attribution after capture",
+    "limits": [
+      "Constructed self-Cure fixture only; no public runner, ally/KO/item/wounded-party acceptance",
+      "No manual handoff/resume proof; research cleanup kills its owned PID",
+      "Cure/Wait executors report local acceptance/confirmation; continuation is independently validated",
+      "Screenshot subprocess can delay STOP observation up to45 seconds",
+      "Historical rejected and superseded probes summarized separately; they are not current-source acceptance"
+    ],
+    "next_packet": "docs/auto-battle-roadmap.md A6.1 public-runtime integration",
+    "local_screenshot_sha256": {
+      "outputs/autobattle/a6-cure-complete-turn-08/10-DOWN.png": "359158dcc42f8eea46aa5133297f5b3e96f8f493273b44e11be843a7702bdf1f",
+      "outputs/autobattle/a6-cure-complete-turn-08/99-settled.png": "abf2c7706973b10e286935c004d464827745ae3bb99b0341a76d4c4fb6aa838b",
+      "outputs/autobattle/a6-cure-complete-turn-09/10-DOWN.png": "782224a38d1b4e2aeb290d40e1c65faf0a59f40ed93ac2d0caf9f20a6eabee42",
+      "outputs/autobattle/a6-cure-complete-turn-09/99-settled.png": "f2d19b68081bb8315a4419595ae610467fff32ee445c55747d826e7d46a8d56d",
+      "outputs/autobattle/a6-complete-stop-regression-01/15-A.png": "a1e13dff30f2ccb91c4314e77d5b9549e18a2bd7e005ac915f0ffed525029ff4"
+    }
   }
 }
