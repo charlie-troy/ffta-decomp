@@ -2,6 +2,13 @@
 
 ## 2026-10-07 - A6.2 read-only party joins and target-index ROM proof
 
+Overlay research navigates engine-enabled Cure and moves the cursor once onto
+Montblanc. The live target table contains both pinned canonical allies, but
+index0 and empty selected-wrapper copies persist.35 raw writes, no target
+acceptance or cast; inspected Montblanc HP100/241 at the range cursor. Eight
+retained raw-join/input mutations reject. Cursor location alone cannot name
+an accepted target; selection/peer transitions remain the next unknown gate.
+
 Follow-on scratch construction passes: four ledgered writes, owned export and
 independent read-only reload establish caster secondary White Mage/MP85 and
 living Montblanc HP100/241. No gameplay keys; another37 reader rejection cases

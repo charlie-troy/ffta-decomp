@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "scope": "Audit retained overlay observations; this authorizes no target or cast.",
+  "mutations_rejected": [
+    "false-cast",
+    "wrong-caster",
+    "cursor-not-ally",
+    "index-invented",
+    "accepted-wrapper-invented",
+    "ally-alias",
+    "missing-raw",
+    "extra-final-input"
+  ],
+  "observation": "Cursor reaches ally while index stays0 and selected copies remain empty",
+  "target_acceptance": "unknown"
+}

@@ -1,0 +1,1121 @@
+{
+  "status": "captured-overlay-only",
+  "scope": "Observe one guarded Cure overlay cursor move; NEVER accept or cast.\n\nResearch navigation only. Public self-only guards are preserved. After the\nsingle RIGHT input, read raw target facts and terminate the owned session.\n",
+  "source_sha256": {
+    "outputs/autobattle/a62-party-fixture-01/party-recovery.ss0": "17d477e182453eadc497da7096de640ba8fc464085db587b994c2c7cae140929",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/probe_recovery_ally_overlay.py": "58c987ac98aacf7c2d9f803053292fccdaad4d112fec61c95285938813649fe8",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/build_recovery_fixture.py": "3dd32d1e2379641b3f4c73f99e276edf30debd23b254e8be2b9c557c2017eb13",
+    "tools/probe_recovery_party.py": "ff08f4a42968d45afd45d1dc7c77eec87e2434c4cb51a964739135409c2fc7a5"
+  },
+  "raw_writes": [
+    {
+      "event": "key_write",
+      "t": 12.088,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.141,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.194,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.246,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.298,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.808,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.861,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.914,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.966,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 14.019,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.529,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.582,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.634,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.687,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.739,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.253,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.305,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.358,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.41,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.462,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 18.972,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.024,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.077,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.129,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.181,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.688,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.739,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.791,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.844,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.896,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.412,
+      "val": 16,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.465,
+      "val": 16,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.518,
+      "val": 16,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.57,
+      "val": 16,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.623,
+      "val": 16,
+      "hits": 5,
+      "manual": false
+    }
+  ],
+  "final_confirmation": false,
+  "phases": [
+    {
+      "tag": "before",
+      "cursor": [
+        4,
+        10
+      ],
+      "index": 0,
+      "count": 2,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "name": 33562396,
+          "id": 7,
+          "hp": 442,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        {
+          "wrapper": 33695500,
+          "canonical": 33554824,
+          "name": 139793095,
+          "id": 5,
+          "hp": 100,
+          "tile": [
+            5,
+            10
+          ]
+        }
+      ],
+      "processor_sha256": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d"
+    },
+    {
+      "tag": "after",
+      "cursor": [
+        5,
+        10
+      ],
+      "index": 0,
+      "count": 2,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "name": 33562396,
+          "id": 7,
+          "hp": 442,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        {
+          "wrapper": 33695500,
+          "canonical": 33554824,
+          "name": 139793095,
+          "id": 5,
+          "hp": 100,
+          "tile": [
+            5,
+            10
+          ]
+        }
+      ],
+      "processor_sha256": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d"
+    }
+  ],
+  "pid": 73236,
+  "owner": {
+    "slot": 7,
+    "addr": "02016120",
+    "name": 33562396,
+    "side_raw": 129,
+    "ct": 306,
+    "ea": 0,
+    "id": 7,
+    "type": 2,
+    "base_job": 5,
+    "race": 1,
+    "job": 5,
+    "level": 50,
+    "hp": 442,
+    "max_hp": 442,
+    "mp": 85,
+    "max_mp": 85,
+    "is_rom_name": false,
+    "is_ram_name": true,
+    "name_text": "Marche",
+    "side_bit": false,
+    "unaffiliated": false,
+    "live": true,
+    "x": 4,
+    "y": 10
+  },
+  "navigation": [
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 178845.9325639,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 178845.9344883,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 178847.6524372,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 178847.6542753,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 178849.3737128,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 178849.3755601,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 178851.0973951,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 178851.0991552,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 178852.8162951,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 178852.8187025,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 178854.5326858,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 75,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 178854.5343775,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 75,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 178856.253359,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 7,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "target-overlay",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    }
+  ],
+  "transport": [
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "trace_suspended"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "trace_restored",
+      "write_count": 35
+    }
+  ],
+  "inputs_unchanged": true,
+  "capture_sha256": {
+    "after-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "after-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "after-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "after-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "after-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
+    "before-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "before-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "before-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "before-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "before-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b"
+  }
+}

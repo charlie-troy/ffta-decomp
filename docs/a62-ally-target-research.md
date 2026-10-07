@@ -51,6 +51,19 @@ or establish the meaning of menu context+0x1C.
 
 ## Next live gate: UNKNOWN
 
+Overlay experiment `a62-ally-overlay-01` reaches engine-enabled Cure through
+the unchanged self-only reader, then performs one guarded RIGHT and stops.
+Seven navigation/cursor keys produce35 raw writes; no target acceptance A or
+cast follows. The cursor moves(4,10)->(5,10), and the live table contains
+Marche wrapper0202267C/canonical02000080 and Montblanc wrapper0202270C/
+canonical02000188 with HP442/100. Both processor captures are identical:
+ability1, state10, flags0, index0, count2, selected copies+0x0C/+0x10 both0.
+Inspected the final screen: Montblanc HP100/241 under the Cure range cursor.
+The retained raw joins pass eight altered metadata/input controls. This proves
+an overlay observation, not an accepted ally target: cursor and selected index
+are distinct. Next capture must establish how target acceptance populates the
+selected wrapper and menu peer before any final cast is authorized.
+
 Scratch construction `a62-party-fixture-01` now passes: four ledgered RAM
 writes set Marche's secondary job7 and Montblanc's living HP100 in both copies.
 Owned export and a fresh read-only reload agree on HP100/241, caster MP85 and

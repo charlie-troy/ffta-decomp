@@ -16,6 +16,11 @@
       "observed": "Four ledgered scratch RAM writes; owned export; independent read-only reload joins Marche secondaryjob7 MP85 and Montblanc HP100/241; zero gameplay keys"
     },
     {
+      "id": "live-ally-overlay-observation",
+      "status": "pass",
+      "observed": "Engine-enabled Cure navigation and one guarded RIGHT; cursor reaches Montblanc while index remains0 and selected wrapper copies empty;35 raw writes, no target acceptance/cast;8 rejected mutations"
+    },
+    {
       "id": "target-index-rom-semantics",
       "status": "pass",
       "observed": "6 helper cases and 2 selected-wrapper copy fragments on synthetic RAM"
@@ -42,7 +47,9 @@
     "tools/validate_recovery_party.py": "90c73945d826d0377b0e034fff26d5609fa858154f228a3c5cfe4b80f6e992f0",
     "tools/validate_recovery_target_table.py": "384032c16e34f362af79971054b2dc82be97cdebc034fa5773b44fde3c8c3bb4",
     "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
-    "tools/build_party_recovery_fixture.py": "e26725d707ecda395ae5d87ea8205ffc43017d46c1d4106b82dc40f8aba0de2a"
+    "tools/build_party_recovery_fixture.py": "e26725d707ecda395ae5d87ea8205ffc43017d46c1d4106b82dc40f8aba0de2a",
+    "tools/probe_recovery_ally_overlay.py": "58c987ac98aacf7c2d9f803053292fccdaad4d112fec61c95285938813649fe8",
+    "tools/validate_recovery_ally_overlay.py": "7e701ce7359cbe77881c052e4c87d17617e74e259903738e8f2162b059e215ce"
   },
   "evidence_sha256": {
     "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
@@ -81,7 +88,20 @@
     "outputs/autobattle/a62-party-fixture-01/reload/0200f438.bin": "1043ec9f96256b24df0baad57a3f32096f22aca1e7ed88ccd9076de8b2162efb",
     "outputs/autobattle/a62-party-fixture-01/reload/0202d8a0.bin": "b6d3c53f9a2230a3664fc7feccf8102feed7b8911a05bb64724f215cc49f7ec8",
     "outputs/autobattle/a62-party-fixture-01/reload/0200f4e8.bin": "d944f6f1dbb49615f9217a2fe944d2e3c13e19722ba18031f9e6fc6771f8b232",
-    "outputs/autobattle/a62-party-fixture-01/reload/0202267c.bin": "57cb8fc92c024467290ec93591f3d4a4677ca08709e00afed0dedeed55e5eada"
+    "outputs/autobattle/a62-party-fixture-01/reload/0202267c.bin": "57cb8fc92c024467290ec93591f3d4a4677ca08709e00afed0dedeed55e5eada",
+    "outputs/autobattle/a62-ally-overlay-01/probe.json": "7b79a905b4804783a00a1d358747b00d8b5c28e26efd3d21cc06a15258fed450",
+    "outputs/autobattle/a62-ally-overlay-01/checks.json": "cf33470e748e0a016c871b6d654656820962ef4a000ab483e8e24831555d56ba",
+    "outputs/autobattle/a62-ally-overlay-01/overlay-after.png": "a268cc09bfed2a9db9133bff69b3f4c48ede7e0cb0e6ff13326ff6fb9c9ee720",
+    "outputs/autobattle/a62-ally-overlay-01/after-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "outputs/autobattle/a62-ally-overlay-01/after-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "outputs/autobattle/a62-ally-overlay-01/after-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "outputs/autobattle/a62-ally-overlay-01/after-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "outputs/autobattle/a62-ally-overlay-01/after-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
+    "outputs/autobattle/a62-ally-overlay-01/before-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "outputs/autobattle/a62-ally-overlay-01/before-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "outputs/autobattle/a62-ally-overlay-01/before-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "outputs/autobattle/a62-ally-overlay-01/before-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "outputs/autobattle/a62-ally-overlay-01/before-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b"
   },
   "retained_failures": [
     {
@@ -97,7 +117,7 @@
       "error": "RAM pointer outside EWRAM"
     }
   ],
-  "next_packet": "Navigate engine-enabled Cure to the range overlay; capture target table/index/wrappers and cursor before/after one guarded cursor input. No final commit until ally target joined.",
+  "next_packet": "Observe target acceptance from the guarded ally cursor; join selected wrapper and menu peer to canonical Montblanc before any final cast. Cursor location alone is insufficient.",
   "limitations": [
     "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
     "Two pre-targeting reloads are not two successful ally-target casts.",
