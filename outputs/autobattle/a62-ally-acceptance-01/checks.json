@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "scope": "Retained raw joins for ally selection into preview; no final cast proof.",
+  "mutations_rejected": [
+    "wrong-target-token",
+    "wrong-target-wrapper",
+    "wrong-acceptance-coordinate",
+    "false-final-cast",
+    "missing-selection-delivery",
+    "extra-post-selection-input",
+    "missing-preview",
+    "wrong-preview-handler"
+  ],
+  "preview_target": "processor+8 joins canonical Montblanc",
+  "final_cast": "unknown"
+}

@@ -44,6 +44,11 @@
       "id": "acceptance-coordinate-copy-rom",
       "status": "pass",
       "observed": "Four synthetic ROM fragments copy0200F3B8/+4 to processor+109/+10A independently of UI cursor; live coordinate agreement unknown"
+    },
+    {
+      "id": "live-ally-preview-selection",
+      "status": "pass",
+      "observed": "One guarded target-selection A; both coordinate sources agree; processor+8 joins canonical ally, preview state102/mode12, no HP/MP effects;40 raw writes;8 rejection controls; final cast unknown"
     }
   ],
   "source_sha256": {
@@ -55,7 +60,11 @@
     "tools/build_party_recovery_fixture.py": "e26725d707ecda395ae5d87ea8205ffc43017d46c1d4106b82dc40f8aba0de2a",
     "tools/probe_recovery_ally_overlay.py": "58c987ac98aacf7c2d9f803053292fccdaad4d112fec61c95285938813649fe8",
     "tools/validate_recovery_ally_overlay.py": "7e701ce7359cbe77881c052e4c87d17617e74e259903738e8f2162b059e215ce",
-    "tools/validate_recovery_target_cursor.py": "58f922c7646077bbaf1de7f11d34839aa2cb103b6baba88454ac2c93c62393b9"
+    "tools/validate_recovery_target_cursor.py": "58f922c7646077bbaf1de7f11d34839aa2cb103b6baba88454ac2c93c62393b9",
+    "tools/recovery_ally_target.py": "3221800edce967464be71815facb3085233dd6a7a541da7b22cb859c06696a2e",
+    "tools/probe_recovery_ally_acceptance.py": "ddef301da973b43d9269700ed92a73b5f359ca9595f76087e95e2a24e644ba1e",
+    "tools/validate_recovery_ally_target.py": "92f12ea308f96290f6b8c69a7774d99a102bff500e77844b79ff7078d831d829",
+    "tools/validate_recovery_ally_acceptance.py": "3993e40fcfebafff2c754c005d9c10fda07cfc665c09e76d4f5819c24401ea6f"
   },
   "evidence_sha256": {
     "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
@@ -108,7 +117,32 @@
     "outputs/autobattle/a62-ally-overlay-01/before-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
     "outputs/autobattle/a62-ally-overlay-01/before-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
     "outputs/autobattle/a62-ally-overlay-01/before-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
-    "outputs/autobattle/a62-target-cursor/checks.json": "85288d234636a19b12e1a59c1a23a7f04f596c45184add162844a1d54f4ae877"
+    "outputs/autobattle/a62-target-cursor/checks.json": "85288d234636a19b12e1a59c1a23a7f04f596c45184add162844a1d54f4ae877",
+    "outputs/autobattle/a62-ally-acceptance-01/probe.json": "b3bd3cdcce1e2beccf1d08e7734b56bb2d0a8c69464fae969bddd59d3482d841",
+    "outputs/autobattle/a62-ally-acceptance-01/checks.json": "e13c9640a37e87bbfd5f20fed48c98bdae478032c970d7243acba937d86bdf87",
+    "outputs/autobattle/a62-ally-acceptance-01/overlay-after.png": "89eff8f041556b167e21ee490e0f0e154fce2e9d777b451bf4e8512782cbdffb",
+    "outputs/autobattle/a62-ally-target-reader/checks.json": "f3c496e41937c11fa793dba267ec2e9e185ac58a8eb64a0386d2970b77ba171b",
+    "outputs/autobattle/a62-ally-acceptance-01/after-callback.bin": "1ada3f27f70a03b44207fb1d2ea6f08b8b1b6c069a5c74e9469df0a6a274ec5e",
+    "outputs/autobattle/a62-ally-acceptance-01/after-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "outputs/autobattle/a62-ally-acceptance-01/after-root.bin": "6568ba64cd342034cd94311318fb6b923aeb722524361e9408a1cdc621e9e2c5",
+    "outputs/autobattle/a62-ally-acceptance-01/after-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "outputs/autobattle/a62-ally-acceptance-01/after-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "outputs/autobattle/a62-ally-acceptance-01/after-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "outputs/autobattle/a62-ally-acceptance-01/after-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
+    "outputs/autobattle/a62-ally-acceptance-01/before-callback.bin": "1ada3f27f70a03b44207fb1d2ea6f08b8b1b6c069a5c74e9469df0a6a274ec5e",
+    "outputs/autobattle/a62-ally-acceptance-01/before-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "outputs/autobattle/a62-ally-acceptance-01/before-root.bin": "6568ba64cd342034cd94311318fb6b923aeb722524361e9408a1cdc621e9e2c5",
+    "outputs/autobattle/a62-ally-acceptance-01/before-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "outputs/autobattle/a62-ally-acceptance-01/before-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "outputs/autobattle/a62-ally-acceptance-01/before-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "outputs/autobattle/a62-ally-acceptance-01/before-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
+    "outputs/autobattle/a62-ally-acceptance-01/selected-callback.bin": "281c976bff80c6df6843ee3deb02b839d447f8696df607c2064649e20c0316c0",
+    "outputs/autobattle/a62-ally-acceptance-01/selected-processor.bin": "599b06aef154eaab8f2b226d5d4b6798c974f2a69c8c0093d78eba9320fa523f",
+    "outputs/autobattle/a62-ally-acceptance-01/selected-root.bin": "22d8f947269d17fde8ace749294471fc384e78e473b8a554f8c3244208bdc080",
+    "outputs/autobattle/a62-ally-acceptance-01/selected-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "outputs/autobattle/a62-ally-acceptance-01/selected-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "outputs/autobattle/a62-ally-acceptance-01/selected-wrapper-0202267c.bin": "aa6321a96a655d04a97d079bad8d8e984519e105b4ffb70df22dad5d588afe73",
+    "outputs/autobattle/a62-ally-acceptance-01/selected-wrapper-0202270c.bin": "52b9527f0713f51d89eaa6b7e1652429e8654d50d369ee66600d0abac63b1e3b"
   },
   "retained_failures": [
     {
@@ -124,12 +158,13 @@
       "error": "RAM pointer outside EWRAM"
     }
   ],
-  "next_packet": "Capture UI cursor0200FFC9/+1 and acceptance coordinates0200F3B8/+4 under one halt; join both to canonical ally before observing target acceptance/selected wrapper/peer. No final cast yet.",
+  "next_packet": "Decode preview target/name discrepancy and guard the description-to-confirmation transition; require processor+8/canonical ally agreement before any final policy candidate or cast.",
   "limitations": [
     "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
     "Two pre-targeting reloads are not two successful ally-target casts.",
     "Synthetic wrappers prove ROM field semantics only, not live range, availability or Cure legality.",
-    "AI10/10 and strategy9/9 freshly pass; no ROM source changed."
+    "AI10/10 and strategy9/9 freshly pass; no ROM source changed.",
+    "Cure preview rendered label Blizzard despite canonical Montblanc join; preview-name interpretation remains unknown."
   ],
   "party_fixture": {
     "state": "outputs/autobattle/a62-party-fixture-01/party-recovery.ss0",

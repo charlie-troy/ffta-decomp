@@ -59,6 +59,28 @@ target tile. These fragment tests do not execute surrounding acceptance checks.
 
 ## Next live gate: UNKNOWN
 
+Selection experiment `a62-ally-acceptance-01` independently pins both party
+records, then uses a separate read-only `AllyOverlayReader` token for the one
+target-selection A. Both coordinate structures agree on(5,10). Fourteen
+derived reader mutations reject before that step; this reader does not expose
+a policy candidate or authorize a final cast.
+
+The live selection reaches DESCRIPTION/mode12/state0x102. Processor+0 and+4
+join caster wrapper0202267C; processor+8 joins ally wrapper0202270C and canonical
+02000188/id5/HP100. The table reorders the ally first, while index0 and empty
++0x0C/+0x10 remain. Flags become0x6C with target state10. Context+0x1C still
+names the caster; it is not the selected ally reference on this path. Both
+units' HP/MP remain unchanged.40 raw writes, no input after selection; eight
+retained preview/input mutations reject. Final Do-it confirmation, legal policy
+candidate and healing remain UNKNOWN.
+
+The inspected preview displays the Cure description and ally HP100/241, but
+its right-side label reads "Blizzard" despite canonical/mirror identity joining
+Montblanc. Retain that UI-label discrepancy; do not use the rendered label to
+certify target identity or dismiss the independent wrapper join. The retagged
+A4 fixture's preview-name interpretation needs investigation before broader
+product claims.
+
 Overlay experiment `a62-ally-overlay-01` reaches engine-enabled Cure through
 the unchanged self-only reader, then performs one guarded RIGHT and stops.
 Seven navigation/cursor keys produce35 raw writes; no target acceptance A or

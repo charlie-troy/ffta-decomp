@@ -1,5 +1,18 @@
 # Project log
 
+## 2026-10-07 - Guarded ally selection into Cure preview
+
+Fresh scratch reload independently pins both canonical allies; a separate
+read-only overlay token verifies display and acceptance coordinates both(5,10),
+the living ally wrapper and unchanged resources before one target-selection A.
+Fourteen derived reader controls pass. Live preview joins target through
+processor+8 to canonical Montblanc; the table reorders, but cached context peer
+still names the caster and selected copies+0x0C/+0x10 remain empty.40 raw writes,
+no final cast or post-selection input. Eight retained preview mutations reject.
+The preview's right-side label reads "Blizzard" while the wrapper/canonical join
+names Montblanc; this rendering discrepancy remains unknown. See A6.2 research.
+Final confirmation, legal chooser candidate and healing are still unproven.
+
 ## 2026-10-07 - Separate display and acceptance target coordinates
 
 Four ROM fragment cases show080B76FC..080B7710 copies0200F3B8/+4 into

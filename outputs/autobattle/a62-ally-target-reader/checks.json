@@ -1,0 +1,25 @@
+{
+  "status": "pass",
+  "scope": "Derived ally-overlay reader controls; not live target-selection proof.",
+  "rejected": [
+    "display-cursor-drift",
+    "acceptance-x-drift",
+    "acceptance-y-drift",
+    "missing-processor",
+    "target-count",
+    "target-index",
+    "accepted-copies",
+    "wrapper-alias",
+    "ally-ko",
+    "ally-cross-side",
+    "ally-stale-hp",
+    "caster-stale-mp",
+    "ally-id",
+    "target-wrapper-foreign"
+  ],
+  "derived_acceptance_coordinates": [
+    5,
+    10
+  ],
+  "live_agreement": "unknown"
+}
