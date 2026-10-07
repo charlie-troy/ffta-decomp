@@ -1,5 +1,14 @@
 # A6.2 living ally target research
 
+Live research controls now pass: `a62-ally-stop-confirmation-01` suppresses
+Cure after45 raw writes; `a62-ally-stop-facing-01` suppresses final Wait after65
+writes following the cast. Each retains exactly its STOP count and restored
+tracing, with6 rejected receipt mutants. Owned sessions exit; no manual
+takeover or resume is claimed. `a62-ally-reserve-01` changes only reserve8 to80
+and declines the same observed ally Cure candidate that normal policy selects;
+45 writes, no final A,6 rejected mutants. Its post-decline resources were not
+captured. Public party integration and preview-label investigation remain open.
+
 Two fresh research turn reloads, `a62-ally-turn-01` and `-02`, now pass the
 bounded ally Cure / separately guarded Wait / independent next-enemy gate.
 Both join Schneider/id3 through changed canonical driver/wrapper, restored

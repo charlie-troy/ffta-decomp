@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "scope": "Validate owned research STOP suppression; no manual handoff or resume claim.",
+  "phase": "facing",
+  "raw_writes": 65,
+  "mutations_rejected": [
+    "post-STOP-input",
+    "missing-ledger",
+    "wrong-STOP-count",
+    "missing-STOP-time",
+    "false-turn",
+    "missing-cleanup"
+  ],
+  "cleanup": "owned FixtureSession exited; no manual takeover or resume exercised"
+}

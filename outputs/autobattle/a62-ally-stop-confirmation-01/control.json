@@ -1,0 +1,16 @@
+{
+  "phase": "confirmation",
+  "runner": "tools/probe_recovery_ally_cure.py",
+  "command": [
+    "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+    "tools/probe_recovery_ally_cure.py",
+    "--out",
+    "outputs\\autobattle\\a62-ally-stop-confirmation-01",
+    "--stop-file",
+    "outputs\\autobattle\\a62-ally-stop-confirmation-01.stop"
+  ],
+  "runner_pid": 34300,
+  "exit_code": 1,
+  "triggered": true,
+  "trigger_marker": "outputs\\autobattle\\a62-ally-stop-confirmation-01\\confirmation-marker.json"
+}

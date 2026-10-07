@@ -1,0 +1,18 @@
+{
+  "phase": "reserve",
+  "runner": "tools/probe_recovery_ally_cure.py",
+  "command": [
+    "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+    "tools/probe_recovery_ally_cure.py",
+    "--out",
+    "outputs\\autobattle\\a62-ally-reserve-01",
+    "--stop-file",
+    "outputs\\autobattle\\a62-ally-reserve-01.stop",
+    "--policy",
+    "outputs\\autobattle\\a62-ally-reserve-01-policy.json"
+  ],
+  "runner_pid": 5316,
+  "exit_code": 1,
+  "triggered": false,
+  "trigger_marker": null
+}

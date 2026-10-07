@@ -1,5 +1,19 @@
 # Project log
 
+## 2026-10-07 - Live ally STOP and reserve refusal controls
+
+`a62-ally-stop-confirmation-01` stops at the observed Do-it prompt after45
+raw writes, before any cast. `a62-ally-stop-facing-01` heals first, then stops
+at facing after65 writes without final Wait. Both preserve the exact STOP
+ledger count, restore tracing and exit their owned sessions; each rejects6
+mutated receipts. These are research suppression/cleanup controls, not manual
+takeover or resume. `a62-ally-reserve-01` changes only the ally reserve from8
+to80: the same observed six-MP/85-MP candidate selects Cure under the normal
+policy and is declined under the control, with45 writes and no final A.
+Six reserve receipt mutants reject. No post-decline RAM resource capture is
+retained, so that case claims refused input only. Public integration and
+preview-label investigation remain open.
+
 ## 2026-10-07 - Two ally Cure/Wait reloads reach an independent enemy
 
 `a62-ally-turn-01` and `-02` each freshly load the wounded scratch state,

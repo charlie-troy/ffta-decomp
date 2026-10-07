@@ -1,0 +1,16 @@
+{
+  "phase": "facing",
+  "runner": "tools/probe_recovery_ally_turn.py",
+  "command": [
+    "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+    "tools/probe_recovery_ally_turn.py",
+    "--out",
+    "outputs\\autobattle\\a62-ally-stop-facing-01",
+    "--stop-file",
+    "outputs\\autobattle\\a62-ally-stop-facing-01.stop"
+  ],
+  "runner_pid": 51552,
+  "exit_code": 1,
+  "triggered": true,
+  "trigger_marker": "outputs\\autobattle\\a62-ally-stop-facing-01\\facing-ewram.bin"
+}

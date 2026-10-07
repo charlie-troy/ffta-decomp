@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "scope": "Audit live reserve-policy refusal at the ally Do-it prompt; no fallback-turn claim.",
+  "raw_writes": 45,
+  "mutations_rejected": [
+    "post-decline-input",
+    "missing-policy",
+    "free-Cure",
+    "wrong-target",
+    "false-turn",
+    "missing-cleanup"
+  ],
+  "comparison": "same live candidate: reserve8 selects Cure, reserve80 declines",
+  "effect": "No final Cure input; no post-decline RAM resource capture retained"
+}
