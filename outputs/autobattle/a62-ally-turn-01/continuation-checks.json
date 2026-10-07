@@ -1,0 +1,74 @@
+{
+  "status": "pass",
+  "scope": "Replay actual eight-unit next-actor capture and reject misleading joins.",
+  "observed": {
+    "source": "canonical driver / restored eight-unit roster / own cursor",
+    "wrapper": 33695212,
+    "canonical": 33567716,
+    "actor": {
+      "slot": 3,
+      "addr": "02015d00",
+      "name": 139881681,
+      "side_raw": 32769,
+      "ct": 140,
+      "ea": 0,
+      "id": 3,
+      "type": 1,
+      "base_job": 36,
+      "race": 5,
+      "job": 36,
+      "level": 41,
+      "hp": 323,
+      "max_hp": 323,
+      "mp": 114,
+      "max_mp": 114,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Schneider",
+      "side_bit": true,
+      "unaffiliated": false,
+      "live": true,
+      "tile": [
+        9,
+        2
+      ]
+    },
+    "relation": "enemy",
+    "party_after": [
+      {
+        "id": 5,
+        "canonical": 33554824,
+        "hp": 153,
+        "mp": 221,
+        "tile": [
+          5,
+          10
+        ]
+      },
+      {
+        "id": 7,
+        "canonical": 33554560,
+        "hp": 442,
+        "mp": 79,
+        "tile": [
+          4,
+          10
+        ]
+      }
+    ]
+  },
+  "mutations_rejected": [
+    "borrowed-roster",
+    "wrapper-disagreement",
+    "stale-caster-wrapper",
+    "invalid-canonical",
+    "stale-cursor",
+    "coherent-foreign-job",
+    "coherent-wrong-name",
+    "coherent-KO-actor",
+    "coherent-impossible-tile",
+    "party-alias",
+    "party-MP-disagreement",
+    "party-tile-drift"
+  ]
+}

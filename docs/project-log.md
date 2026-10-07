@@ -1,5 +1,19 @@
 # Project log
 
+## 2026-10-07 - Two ally Cure/Wait reloads reach an independent enemy
+
+`a62-ally-turn-01` and `-02` each freshly load the wounded scratch state,
+guard one ally Cure and separately re-evaluate policy for Wait/facing. Each
+records70 raw writes, consumes6 caster MP, heals only the intended ally and
+reaches Schneider/id3 with a changed canonical driver/wrapper, restored
+eight-unit roster and matching actor-owned cursor. Party resources at that
+next actor still equal the post-Cure resources. One independent next actor is
+the scope: not two later enemies, a complete battle or public integration.
+Each full-turn receipt rejects8 mutations and its continuation reader rejects
+12 misleading joins; actual screenshots inspected. Live STOP/policy controls
+and the earlier preview-label discrepancy remain open. No original input or
+fixture writes changed. Existing seven-unit continuation is unchanged.
+
 ## 2026-10-07 - First guarded ally Cure effect
 
 `a62-ally-cure-01` independently reloads the wounded party and joins the

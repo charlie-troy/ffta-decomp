@@ -1,0 +1,46 @@
+{
+  "status": "pass",
+  "scope": "Audit a bounded research ally Cure/Wait and one independently attributed next actor.\n\nThis gate does not certify public integration, two later enemies or battle completion.\n",
+  "capture": "outputs/autobattle/a62-ally-turn-02",
+  "ally_hp_after": 150,
+  "caster_mp_after": 79,
+  "raw_writes": 70,
+  "next_actor": {
+    "slot": 3,
+    "addr": "02015d00",
+    "name": 139881681,
+    "side_raw": 32769,
+    "ct": 140,
+    "ea": 0,
+    "id": 3,
+    "type": 1,
+    "base_job": 36,
+    "race": 5,
+    "job": 36,
+    "level": 41,
+    "hp": 323,
+    "max_hp": 323,
+    "mp": 114,
+    "max_mp": 114,
+    "is_rom_name": true,
+    "is_ram_name": false,
+    "name_text": "Schneider",
+    "side_bit": true,
+    "unaffiliated": false,
+    "live": true,
+    "tile": [
+      9,
+      2
+    ]
+  },
+  "mutations_rejected": [
+    "extra-input",
+    "missing-Wait-final",
+    "wrong-Wait-policy",
+    "wrong-facing",
+    "missing-continuation",
+    "wrong-next-actor",
+    "false-two-turns",
+    "STOP"
+  ]
+}

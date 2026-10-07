@@ -1,5 +1,14 @@
 # A6.2 living ally target research
 
+Two fresh research turn reloads, `a62-ally-turn-01` and `-02`, now pass the
+bounded ally Cure / separately guarded Wait / independent next-enemy gate.
+Both join Schneider/id3 through changed canonical driver/wrapper, restored
+eight-unit roster and matching cursor; party resources remain those observed
+after the cast. Each has70 raw writes,8 rejected turn-receipt mutants and12
+rejected continuation joins. This certifies one next actor per reload, not two
+later enemies or battle completion. Public integration, live STOP/policy
+controls and preview-label investigation remain separate open gates.
+
 First effect-only cast: `a62-ally-cure-01` verifies the actual final cursor0
 and canonical ally join, supplies the schema2 `cure-ally` candidate, rechecks
 policy after screenshot and confirms once. Montblanc HP100->157; Marche

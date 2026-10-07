@@ -9,7 +9,9 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**Start A6.2's read-only ally-target research below. A6.1 is accepted within its seven-unit self-Cure fixture.**
+**Continue A6.2 with live STOP/policy controls and preview-label investigation.
+Two bounded research ally-Cure/Wait reloads now independently reach the next
+enemy; public party recovery remains open. A6.1 is accepted within its seven-unit self-Cure fixture.**
 The opt-in public self-Cure matrix now has six passing current-source cases:
 two accepted casts, reserve decline, engine-disabled Cure and both no-match
 fallbacks. Both final STOP/manual/same-PID receipts pass, including eight

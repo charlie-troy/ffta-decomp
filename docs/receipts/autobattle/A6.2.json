@@ -3,7 +3,7 @@
   "date": "2026-10-07",
   "base_revision": "deff57e",
   "status": "partial",
-  "scope": "Bounded ally target research and first guarded effect; continuation/public recovery open",
+  "scope": "Bounded research ally Cure, guarded Wait and one independently attributed next enemy on two fresh reloads; public integration open",
   "criteria": [
     {
       "id": "pre-targeting-party-identity",
@@ -27,13 +27,13 @@
     },
     {
       "id": "live-ally-target-legality",
-      "status": "unknown",
-      "observed": "No targeting entered; peer semantics and legal ally target unproven"
+      "status": "pass",
+      "observed": "Bounded final cursor0 / ally wrapper / canonical / three-coordinate join revalidated before one policy-selected cast"
     },
     {
       "id": "ally-cure-effects-and-continuation",
-      "status": "unknown",
-      "observed": "No cast, MP effect, Wait or later-actor acceptance"
+      "status": "pass",
+      "observed": "Two fresh reloads: ally HP100 to153/150, caster MP85 to79, other resources unchanged; guarded Wait and next Schneider id3 independently joined; 70 raw writes each; 8 turn and12 continuation mutations each"
     },
     {
       "id": "public-party-recovery",
@@ -59,6 +59,11 @@
       "id": "first-ally-cure-effect",
       "status": "pass",
       "observed": "Actual final cursor0/ally wrapper/policy joins; Montblanc HP100 to157, Marche MP85 to79; 50 raw writes; 14 retained mutants; no Wait or continuation"
+    },
+    {
+      "id": "live-ally-STOP-and-policy-controls",
+      "status": "unknown",
+      "observed": "Host STOP/policy controls pass; live confirmation/facing controls remain open"
     }
   ],
   "source_sha256": {
@@ -84,7 +89,11 @@
     "tools/probe_recovery_ally_cure.py": "0c97a95b97acaa4bb58e7020686dd04fbbbca381679964d5dc6f3e47fb996ef7",
     "tools/validate_recovery_ally_candidate.py": "705084551c4623b2168e4ce6071eb4d5d053b5fe11379a692c44ff8faea35a1f",
     "tools/validate_recovery_ally_executor.py": "d5f445cd6ac5aca7dbde18fe4660fcc53f29921df8a76d836e54eea0d61b9094",
-    "tools/validate_recovery_ally_execution.py": "60632ce887a5c043ffa3fbd43ff042ba83a1e0dbdfec038067afb9b172dd0a2c"
+    "tools/validate_recovery_ally_execution.py": "60632ce887a5c043ffa3fbd43ff042ba83a1e0dbdfec038067afb9b172dd0a2c",
+    "tools/probe_recovery_ally_turn.py": "c82165a2245e253c03994a84adf412f8ac2fe4a3b3b3acc03529521be95a1592",
+    "tools/recovery_party_continuation.py": "e3ba10612af1207b9873af8d45c826085ccf98acc736c9f00643bd9e5f9ab4f9",
+    "tools/validate_recovery_ally_turn.py": "47747f66798b21b5a124b6830e83344d642a84d17615433f801eb7f246441571",
+    "tools/validate_recovery_party_continuation.py": "d15550a4f79a13a76337e0b5a2c452f02670578eda1660924dead44406185d89"
   },
   "evidence_sha256": {
     "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
@@ -205,7 +214,39 @@
     "outputs/autobattle/a62-ally-cure-01/initial.png": "7a7448877ad960b69c54a042d816ac2e6838857ab28f8e615b61b212b40259e4",
     "outputs/autobattle/a62-ally-cure-01/probe.json": "bda8de69cd2480a1c98f0ea00a2522cde4ef23ddfad44aea77156f8887056960",
     "outputs/autobattle/a62-ally-candidate-reader/checks.json": "eca5f10760b1abaf1637760f854286de6da2a427ce8ec87effc2dcab7d59d0b5",
-    "outputs/autobattle/a62-ally-executor/checks.json": "d3d0dd42abb688be7ae6f798165153dc5ed02525165b265c6d20363792f447e4"
+    "outputs/autobattle/a62-ally-executor/checks.json": "d3d0dd42abb688be7ae6f798165153dc5ed02525165b265c6d20363792f447e4",
+    "outputs/autobattle/a62-ally-turn-01/after-cure-ewram.bin": "66fcc53da68e893b41b6c01049587304137f94170186c54ededa3f1b95b745ef",
+    "outputs/autobattle/a62-ally-turn-01/after-cure.png": "83f79e600f5de7fb4202c9850513e571715ed698cade147ae325acbf42798b61",
+    "outputs/autobattle/a62-ally-turn-01/after-wait-ewram.bin": "1cf31a425047f1811c742f6e48bf17648c98c9c5a62d55de385977231e545fef",
+    "outputs/autobattle/a62-ally-turn-01/after-wait.png": "cdcd81b5007b780f812cffeffa08341b257961ddf121b7ad8c4d0c8edf9618f1",
+    "outputs/autobattle/a62-ally-turn-01/checks.json": "92709376a73b5598774026d9128e63008a9abbc72788dcfa4ac0abfa39d2c19e",
+    "outputs/autobattle/a62-ally-turn-01/confirmation-ewram.bin": "874e9ff07c2796dbd2bccec5fc86f4a004e3e1988c3bf18a1ffb43eccaa4580c",
+    "outputs/autobattle/a62-ally-turn-01/confirmation-marker.json": "e3a90185fe0606eb89e11e54ab622ff080975d2043f22699b09cdb8760c1c549",
+    "outputs/autobattle/a62-ally-turn-01/confirmation.png": "19595c8a003ff79c12a9b1707fdbedc421591d4bbbb44d4507738a2d28a2c9ab",
+    "outputs/autobattle/a62-ally-turn-01/continuation-checks.json": "254fd141fecb46a784ac93b080f05747f5e318d969764c8d6c1327635488653f",
+    "outputs/autobattle/a62-ally-turn-01/continuation-ewram.bin": "7dc71febd478296697bf9fce9c84f2cd292c334a3c43dd74616f6546cef565a6",
+    "outputs/autobattle/a62-ally-turn-01/continuation.png": "7024abab1fd1283780bf355f03f5916532d681a653d94cebc85a28f8851e192f",
+    "outputs/autobattle/a62-ally-turn-01/facing-ewram.bin": "af8b27622b616645da347d2d07403ce21b2cfcebc6b12f7241f9d5914f19ce55",
+    "outputs/autobattle/a62-ally-turn-01/facing.png": "0875f115b73b112096cb346a7a0a9602efa2016e016750e9a4e85ec5acae5dfe",
+    "outputs/autobattle/a62-ally-turn-01/initial-ewram.bin": "4a3b90e998f320cf0fa02fa5016f0c9085b276c93a163ce4bc4cd8c1d98ded7f",
+    "outputs/autobattle/a62-ally-turn-01/initial.png": "4fb1bed48d240d6247e288967ad4503fdfbc56d93a2bda552e2ee2cdb457b390",
+    "outputs/autobattle/a62-ally-turn-01/probe.json": "f7668e7663f771545a04eab457f0779bf323c56c3cd8e5d6795f2efb69f8a564",
+    "outputs/autobattle/a62-ally-turn-02/after-cure-ewram.bin": "e8be7b701eb11f21e5ed137998de680fd8bd3000bc9d860e681be872a0c3fdee",
+    "outputs/autobattle/a62-ally-turn-02/after-cure.png": "028426e88d486c728dba4ea92d0e8d8f009009adb73bd38d9d00fc9ed189d088",
+    "outputs/autobattle/a62-ally-turn-02/after-wait-ewram.bin": "aae2b990e7d9a5943a6d4efef14ba602ebb89fc708cf7c438077c93769dab9e9",
+    "outputs/autobattle/a62-ally-turn-02/after-wait.png": "5e4b22ecebdff4e324b49cc5a0d016c0f7e252abdfc34d7cd005084eaec04653",
+    "outputs/autobattle/a62-ally-turn-02/checks.json": "b911de8b06f02a6d4061d3ea424d7bf3e8407b218aced8fe763966c8ca18731a",
+    "outputs/autobattle/a62-ally-turn-02/confirmation-ewram.bin": "e0126f66201f100114ed49657730d5189c9ec83669dd02f6c6f3e305b6bee8b6",
+    "outputs/autobattle/a62-ally-turn-02/confirmation-marker.json": "35f03a0879019915965394f3dc992f42018af9a0ae4e5c311da3d563cb863295",
+    "outputs/autobattle/a62-ally-turn-02/confirmation.png": "c0463c626dfd629fd47fb4eaf12aefe1ddbf85380d9e4505d36002809b8cc28f",
+    "outputs/autobattle/a62-ally-turn-02/continuation-checks.json": "95d3516206ec497a4043474c02fdfe16ea88c4abb809d48003741837ecc1d8c0",
+    "outputs/autobattle/a62-ally-turn-02/continuation-ewram.bin": "056eaf5ab40456b73cbfd127153bb5e44378478183a7b8337940156470894fa6",
+    "outputs/autobattle/a62-ally-turn-02/continuation.png": "81698aae4f47997e115409141e6d4c482e2f42bb98d5c8fadd06e0476b901ed5",
+    "outputs/autobattle/a62-ally-turn-02/facing-ewram.bin": "c29b414c9ff5422fe622cab892a951b19570978f3666f3f458c071820a35a3c2",
+    "outputs/autobattle/a62-ally-turn-02/facing.png": "271825e415ff126a93f2890116877febd919b70f0d287aa698b8813540f0b02c",
+    "outputs/autobattle/a62-ally-turn-02/initial-ewram.bin": "a7048388a18e12ece8b59fc4d394997efb93ae08540311c615ea4b5abd73022c",
+    "outputs/autobattle/a62-ally-turn-02/initial.png": "7a7448877ad960b69c54a042d816ac2e6838857ab28f8e615b61b212b40259e4",
+    "outputs/autobattle/a62-ally-turn-02/probe.json": "91df60de939f669ec27515cba76d43cfcfb6f71eb8d9a5405fcb89b5ee82a913"
   },
   "retained_failures": [
     {
@@ -221,7 +262,7 @@
       "error": "RAM pointer outside EWRAM"
     }
   ],
-  "next_packet": "Guard Wait and independent eight-unit continuation; two fresh complete reloads and live STOP; investigate preview label before public party recovery",
+  "next_packet": "Live STOP at ally final confirmation/facing and changed-policy/reserve controls; investigate preview name; public integration remains separate",
   "limitations": [
     "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
     "Two pre-targeting reloads are not two successful ally-target casts.",
