@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "scope": "Explicit A6.2 target guard controls on retained RAM, plus disabled-row host control.",
+  "capture": "outputs/autobattle/a62-ally-turn-02",
+  "mutations_rejected": [
+    "KO-target",
+    "cross-side-target",
+    "unaffiliated-target",
+    "same-job-ID-alias",
+    "same-job-name-alias",
+    "stale-target-tile",
+    "stale-acceptance-tile",
+    "changed-caster-MP",
+    "insufficient-caster-MP",
+    "changed-target-MP",
+    "foreign-ability",
+    "stale-controller",
+    "engine-disabled-ability-row-host-only"
+  ],
+  "live_scope": "Negative RAM mutations are offline reader controls, not live fixture mutations"
+}

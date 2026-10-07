@@ -1,5 +1,24 @@
 # A6.2 living ally target research
 
+The bounded research target contract is now PASS. Public recovery remains a
+later integration packet. Thirteen explicit retained/host controls reject KO,
+cross-side/unaffiliated targets, same-job name/id aliases, stale tiles, changed
+MP, foreign ability/controller state and an engine-disabled Cure row. These
+offline controls complement the fresh successful turns and live STOP/reserve
+receipts; they are not live mutated-fixture casts.
+
+Full-region preview capture `a62-ally-panel-02` joins UI callback0802D551,
+payload+0x0C and canonical Montblanc. Its flags0xE3 select the ROM's cached
+bitmap branch in0802C8C4: the copy arguments are destination payload+0x28,
+source UI root+0x8FC, length0x100. Those cached bytes were already present and
+remain identical from initial menu to preview. Executed branch fragments,
+omitting the BIOS buffer-clear helper, confirm that path; clearing only bit1
+instead reaches the canonical name accessor, which returns Montblanc's text
+pointer. This narrows the "Blizzard" discrepancy to cached rendering on this
+path; the earlier bitmap draw/provenance is still UNKNOWN. No identity claim
+uses that label, and no ROM/UI fix is made. The first panel probe mislabeled
+the callback allocation as a unit;02 corrects that metadata interpretation.
+
 Live research controls now pass: `a62-ally-stop-confirmation-01` suppresses
 Cure after45 raw writes; `a62-ally-stop-facing-01` suppresses final Wait after65
 writes following the cast. Each retains exactly its STOP count and restored

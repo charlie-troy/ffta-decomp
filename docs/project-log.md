@@ -1,5 +1,20 @@
 # Project log
 
+## 2026-10-07 - Bounded ally target contract passes; preview cache identified
+
+A6.2 research now has two fresh cast/Wait/next-enemy reloads, live STOP and
+reserve refusal, and13 explicit KO/side/alias/stale/MP/ability controls. Its
+public-party integration criterion remains a later packet. Full-region
+`a62-ally-panel-02` joins the UI callback payload to canonical Montblanc;
+executed ROM branches show flags0xE3 choose cached name pixels instead of the
+canonical-name accessor. Cache bytes predate navigation and remain unchanged.
+The cleared-cache-bit negative control reaches Montblanc's actual text
+pointer. The earlier "Blizzard" bitmap provenance remains unknown; no UI fix
+or pixel decoding is claimed.01's callback-as-unit metadata inference was
+wrong;02 records the actual callback/payload/canonical chain. Original inputs
+remain unchanged; no cast in the panel probe. Next: separately bounded public
+ally recovery integration with its own lifecycle and policy comparisons.
+
 ## 2026-10-07 - Live ally STOP and reserve refusal controls
 
 `a62-ally-stop-confirmation-01` stops at the observed Do-it prompt after45

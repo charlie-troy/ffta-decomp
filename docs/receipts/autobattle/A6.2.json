@@ -2,7 +2,7 @@
   "milestone": "A6.2",
   "date": "2026-10-07",
   "base_revision": "deff57e",
-  "status": "partial",
+  "status": "pass-bounded-target-contract",
   "scope": "Bounded research ally Cure, guarded Wait and one independently attributed next enemy on two fresh reloads; public integration open",
   "criteria": [
     {
@@ -64,6 +64,16 @@
       "id": "live-ally-STOP-and-policy-controls",
       "status": "pass",
       "observed": "Live confirmation STOP45 / facing STOP65 with no subsequent input; reserve8 to80 comparison declines before final A45; six rejected receipts each; owned cleanup only, no manual takeover/resume"
+    },
+    {
+      "id": "explicit-target-negative-controls",
+      "status": "pass",
+      "observed": "13 retained/host KO, cross-side, unaffiliated, same-job name/id alias, stale tile, MP, foreign ability/controller and disabled-row controls"
+    },
+    {
+      "id": "preview-cache-branch",
+      "status": "pass",
+      "observed": "Full-region UI payload joins canonical Montblanc; actual ROM branch selects preexisting cached bitmap; cleared cache flag reaches Montblanc name accessor; earlier bitmap provenance unknown"
     }
   ],
   "source_sha256": {
@@ -96,7 +106,10 @@
     "tools/validate_recovery_party_continuation.py": "d15550a4f79a13a76337e0b5a2c452f02670578eda1660924dead44406185d89",
     "tools/exercise_recovery_ally_controls.py": "5c826f92b33e7cfea00a90246cf7765ce16d8111e64802299fbc492510528ff5",
     "tools/validate_recovery_ally_stop.py": "b3cb1fa836b170cee1b243c4d2feb98d0c1ca05d0aae35d8a7eb3fcc89fc2eb3",
-    "tools/validate_recovery_ally_reserve.py": "daddfeebe36ac22e19ff9d717424cba8ccd03bc2feb78cd6fc6b04f6cef9f48e"
+    "tools/validate_recovery_ally_reserve.py": "daddfeebe36ac22e19ff9d717424cba8ccd03bc2feb78cd6fc6b04f6cef9f48e",
+    "tools/probe_recovery_ally_panel.py": "468ba018770a5f1382c64e3ae27c029a20eba7bcaac6aadf076d11bb5cc466af",
+    "tools/validate_recovery_ally_panel.py": "58f66139a585c717d89d29049e36cdd8da9c4f13c9a8f24f16d926bf52591091",
+    "tools/validate_recovery_ally_guards.py": "4176cdccc8586340520fa93e57b86aec9e694c7a51abb5f4d635886e994eefda"
   },
   "evidence_sha256": {
     "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
@@ -275,7 +288,14 @@
     "outputs/autobattle/a62-ally-reserve-01/initial-ewram.bin": "cd551ac7d15715259658569ee16162273b0b86a85e8cea784f4e69b74cafb13e",
     "outputs/autobattle/a62-ally-reserve-01/initial.png": "8a6cd3ae1907292f4aac059617cca9264e20e2fa2a8f0532e8570bb2a3adba5a",
     "outputs/autobattle/a62-ally-reserve-01/probe.json": "35b09fe001cf35220f82637aa58546656cd32412e95506065e99f9bfd88f339b",
-    "outputs/autobattle/a62-ally-reserve-01-policy.json": "947f1e8baba2c514ac846bdaa59458d473108e28a83e003c1edd4688542b5e0e"
+    "outputs/autobattle/a62-ally-reserve-01-policy.json": "947f1e8baba2c514ac846bdaa59458d473108e28a83e003c1edd4688542b5e0e",
+    "outputs/autobattle/a62-ally-panel-02/checks.json": "263cc3e96ebbad7451162fd7b9a4e2edaa2012c60bdd4526250be2ee73a95e12",
+    "outputs/autobattle/a62-ally-panel-02/initial-ewram.bin": "3e906df43fd2d729419a9dd4ab8293a611967ce5c8142b242b7b6748bf1a2b1e",
+    "outputs/autobattle/a62-ally-panel-02/initial.png": "5c7cfa8317f0fd07f4ceea90ef43282964c4313e696f2ff0bd7664fbeed8c4ec",
+    "outputs/autobattle/a62-ally-panel-02/preview-ewram.bin": "f5c693aedfb3a776cd7b4077dcbf1a8836f37dfe008314cca748df5f67bf68d4",
+    "outputs/autobattle/a62-ally-panel-02/preview.png": "73934045028c03acc370b9b5cf8f4c21cc985ab3ba03d5d1c364d572aeaef416",
+    "outputs/autobattle/a62-ally-panel-02/probe.json": "1dd431b2eddadcf4c7de12da7ed151674367695e00f214d58df42a570da1e038",
+    "outputs/autobattle/a62-ally-guard-controls/checks.json": "e0c4260674c28dc721315f562c70d339440e190317bc539a9df458d5306690e7"
   },
   "retained_failures": [
     {
@@ -291,7 +311,7 @@
       "error": "RAM pointer outside EWRAM"
     }
   ],
-  "next_packet": "Investigate Cure preview label, then design separately bounded public party recovery integration including lifecycle/manual resume gates",
+  "next_packet": "A6.3 separately bounded public ally recovery integration, policy comparison, STOP/manual handoff/same-PID resume and self-Cure regressions",
   "limitations": [
     "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
     "Two pre-targeting reloads are not two successful ally-target casts.",

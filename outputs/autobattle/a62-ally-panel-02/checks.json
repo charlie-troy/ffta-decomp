@@ -1,0 +1,23 @@
+{
+  "status": "pass",
+  "scope": "Execute actual ROM panel branches on retained preview RAM; no live input or cast claim.\n\nIdentifies the cached-name rendering path. It does not decode bitmap pixels or\nprove which earlier draw produced the displayed Blizzard label.\n",
+  "capture": "outputs/autobattle/a62-ally-panel-02",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "preview_panel": {
+    "root": 33746604,
+    "callback": 33756616,
+    "payload": 33756640,
+    "flags": 227,
+    "canonical": 33554824,
+    "name": 139793095,
+    "name_text": "Montblanc"
+  },
+  "observed_cache_branch": {
+    "r0": 33756680,
+    "r1": 33748904,
+    "r2": 256
+  },
+  "cleared_cache_flag_name_pointer": 139793095,
+  "verdict": "Captured preview selects cached bitmap branch; canonical/name-accessor join remains Montblanc",
+  "unknown": "Provenance and pixel interpretation of the cached Blizzard label"
+}

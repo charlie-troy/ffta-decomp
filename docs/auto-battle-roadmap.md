@@ -9,9 +9,9 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**Continue A6.2 with live STOP/policy controls and preview-label investigation.
-Two bounded research ally-Cure/Wait reloads now independently reach the next
-enemy; public party recovery remains open. A6.1 is accepted within its seven-unit self-Cure fixture.**
+**A6.2's bounded ally target research contract passes. Continue A6.3 public
+integration below. Two research ally-Cure/Wait reloads independently reach the
+next enemy; public party recovery remains open. A6.1 is accepted within its seven-unit self-Cure fixture.**
 The opt-in public self-Cure matrix now has six passing current-source cases:
 two accepted casts, reserve decline, engine-disabled Cure and both no-match
 fallbacks. Both final STOP/manual/same-PID receipts pass, including eight
@@ -639,11 +639,13 @@ keep `RecoveryMenu`'s self-only peer/target rejection and public opt-in bounds
 until the new target contract is independently proven. Record exact sources,
 fixture changes and binary-capture hashes; raw RAM/states remain local.
 
-Prerequisite progress (2026-10-07): two fresh read-only party captures join
-both canonical allies, with37 rejection controls each. Six actual ROM helper
-cases and two caller fragments establish target-list index/wrapper semantics
-on synthetic tables. Live ally legality and context-peer meaning remain
-UNKNOWN. See `docs/a62-ally-target-research.md` and `A6.2.json` before proceeding.
+Acceptance (2026-10-07): bounded target contract PASS. Two fresh research
+Cure/Wait reloads independently reach Schneider/id3; live STOP and reserve
+refusal pass. Context peer stays the caster; processor+8 independently joins
+the accepted ally. Explicit target/disabled-row controls pass13 cases. The
+preview uses a cached name bitmap; its earlier draw remains unknown, while
+canonical and UI-payload identity agree. See `docs/a62-ally-target-research.md`
+and `A6.2.json` for exact scope. Public integration is not cleared by research.
 
 - Pin the caster and one living wounded ally by canonical name/id, job/race,
   side, maxima and tile. Verify both battle mirrors before entering targeting;
@@ -670,6 +672,28 @@ Next integration comparison: replay the same wounded-party fixture with the
 healer policy versus the damage preset, reporting only candidates actually
 offered. A damage preset falling back to Wait is not a demonstrated attack.
 Revive/KO, item inventory and broader tactical quality remain later A6 gates.
+
+#### A6.3 — Bounded public ally-Cure integration
+
+Prerequisite: the A6.2 target contract above. Keep the public self-only flag
+unchanged; add a mutually exclusive opt-in for the exact eight-unit wounded
+party family, with schema2 policy required. Pin both canonical/mirror allies
+before targeting and use the independent final target reader for candidates.
+
+- Route the candidate through the public tactics adapter and re-evaluate
+  after observations. Record target/resource facts, raw input and fresh
+  source hashes in the public journal. Unsupported caster/party fails before
+  input; unexecuted policy results cannot count a turn.
+- Require two fresh public casts with attributed ally HP, exact caster MP,
+  unchanged other party HP, guarded Wait and independent next enemy. Compare
+  healer versus damage preset on the same fixture; fallback Wait is not attack.
+- Exercise STOP at Do-it and facing, manual handoff and same-PID resume;
+  no post-STOP or post-terminal input. Retain raw ledgers and adversarially
+  reject missing logs, wrong target, stale policy and false effect/continuation.
+- Re-run the accepted seven-unit self-Cure matrix and ordinary Move/Wait
+  regressions. Research receipts do not substitute for these public gates.
+
+Status: UNKNOWN; implementation and public acceptance remain to be proved.
 
 ### A7 — Movement tactics (P1, bounded research then implementation)
 
