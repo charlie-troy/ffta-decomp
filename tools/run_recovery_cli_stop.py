@@ -13,6 +13,7 @@ def main():
     parser.add_argument("--state", required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--phase", choices=("confirmation", "facing"), required=True)
+    parser.add_argument("--ally", action="store_true", help="eight-unit public ally-Cure transaction")
     args = parser.parse_args()
     if Path(args.run_id).name != args.run_id or any(c in args.run_id for c in (":", "\\", "/")):
         parser.error("run-id must be a filename")
@@ -21,8 +22,11 @@ def main():
     if root.exists() or log_path.exists():
         parser.error("run and log must be new")
     command = [sys.executable, "tools/run_autobattle.py", "--state", args.state,
-               "--tactics-policy", "configs/tactics/healer.json", "--bounded-self-cure",
+               "--tactics-policy", "configs/tactics/healer.json",
+               "--bounded-ally-cure" if args.ally else "--bounded-self-cure",
                "--run-id", args.run_id, "--wall-timeout", "150", "--yes"]
+    if args.ally:
+        command.extend(["--scenario", "configs/battle-scenarios/a4-two-player.json"])
     with log_path.open("w", encoding="utf-8") as log:
         process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT,
                                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)

@@ -1,0 +1,100 @@
+{
+  "status": "pass",
+  "run": "outputs/autobattle/a63-public-damage-01",
+  "scope": "Reject invented healing or policy selection in a real public ally decline.",
+  "rejections": [
+    {
+      "case": "missing adapter refusal",
+      "errors": [
+        "event 3: invalid recovery journal (public ally adapter observations missing)"
+      ]
+    },
+    {
+      "case": "invented adapter selection",
+      "errors": [
+        "event 3: invalid recovery journal (public ally candidate/policy differs)"
+      ]
+    },
+    {
+      "case": "wrong legal target",
+      "errors": [
+        "event 3: invalid recovery journal (public ally candidate/policy differs)"
+      ]
+    },
+    {
+      "case": "wrong policy actor job",
+      "errors": [
+        "event 3: invalid recovery journal (public ally candidate/policy differs)"
+      ]
+    },
+    {
+      "case": "wrong policy actor side",
+      "errors": [
+        "event 3: invalid recovery journal (public ally candidate/policy differs)"
+      ]
+    },
+    {
+      "case": "stale policy actor tile",
+      "errors": [
+        "event 3: invalid recovery journal (public ally candidate/policy differs)"
+      ]
+    },
+    {
+      "case": "MP spent on refusal",
+      "errors": [
+        "event 3: invalid recovery journal (party Wait resources differ)"
+      ]
+    },
+    {
+      "case": "target healed despite refusal",
+      "errors": [
+        "turn event 3: invalid actor-linked result (party recovery engine result differs)",
+        "event 3: invalid recovery journal (party effect differs at next enemy)"
+      ]
+    },
+    {
+      "case": "fabricated cure action",
+      "errors": [
+        "turn event 3: invalid actor-linked result (ally-Cure actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "empty ledger",
+      "errors": [
+        "event 3: invalid recovery journal (party raw ledger missing or changed)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run"
+      ]
+    },
+    {
+      "case": "missing modal cancel input",
+      "errors": [
+        "event 3: invalid recovery journal (party raw ledger missing or changed)"
+      ]
+    },
+    {
+      "case": "missing Wait final policy",
+      "errors": [
+        "event 3: invalid recovery journal (party final policy missing)"
+      ]
+    },
+    {
+      "case": "no next enemy",
+      "errors": [
+        "turn event 3: invalid actor-linked result (list index out of range)",
+        "event 3: invalid recovery journal (party next actor missing)"
+      ]
+    },
+    {
+      "case": "input after terminal",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=52.4): ['key_write']"
+      ]
+    },
+    {
+      "case": "cleanup count changed",
+      "errors": [
+        "event 3: invalid recovery journal (party trace lifecycle differs)"
+      ]
+    }
+  ]
+}

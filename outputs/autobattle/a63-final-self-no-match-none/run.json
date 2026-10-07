@@ -1,0 +1,71 @@
+{
+  "schema": "a3-run/2",
+  "run_id": "a63-final-self-no-match-none",
+  "scenario": "normal-battle",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 0,
+  "seeds": 0,
+  "router_hits": 0,
+  "terminal_reason": "bounded recovery: policy selected no Wait; no retry",
+  "events": "outputs/autobattle\\a63-final-self-no-match-none\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "emulator_pid": 61508,
+  "bounded_self_cure": true,
+  "bounded_ally_cure": false,
+  "player_identities": [
+    [
+      "Marche",
+      6
+    ]
+  ],
+  "input_sha256": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0": "08f3ae0ff17983eb6c6a415852ea0ca079a8f465b6d4de516dd5b1242103d6f1",
+    "configs/battle-scenarios/normal-battle.json": "b2fd70740eff7383fac461d69c13b73ef6a191046bac86050192c9324ad81b00",
+    "tools/run_autobattle.py": "dcfb79caae0bd7c17a26f61a10e2ec83a722432fbae605e2fae375ea17f726ad",
+    "tools/autobattle_runtime.py": "14bc87935095c2a60bc2c396127a19fa45157a0df567b20983056923297bff67",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/recovery_runtime.py": "53ed22a50d7bb451733ce818cd37534516f638485ea5e60da74c0675a930a640",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_continuation.py": "2063b48329e8953ec32d25f11dda48c79a0ed0d58e2c24af0c60d68fdfcb0216",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220",
+    "outputs\\autobattle\\a63-final-self-no-match-none-policy.json": "027efe0178867ba36bc514755b7338891bd54bdf277b6ec85e361059163d1e90"
+  },
+  "input_sha256_after": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0": "08f3ae0ff17983eb6c6a415852ea0ca079a8f465b6d4de516dd5b1242103d6f1",
+    "configs/battle-scenarios/normal-battle.json": "b2fd70740eff7383fac461d69c13b73ef6a191046bac86050192c9324ad81b00",
+    "tools/run_autobattle.py": "dcfb79caae0bd7c17a26f61a10e2ec83a722432fbae605e2fae375ea17f726ad",
+    "tools/autobattle_runtime.py": "14bc87935095c2a60bc2c396127a19fa45157a0df567b20983056923297bff67",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/recovery_runtime.py": "53ed22a50d7bb451733ce818cd37534516f638485ea5e60da74c0675a930a640",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_continuation.py": "2063b48329e8953ec32d25f11dda48c79a0ed0d58e2c24af0c60d68fdfcb0216",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220",
+    "outputs\\autobattle\\a63-final-self-no-match-none-policy.json": "027efe0178867ba36bc514755b7338891bd54bdf277b6ec85e361059163d1e90"
+  },
+  "inputs_unchanged": true,
+  "tactics_policy": {
+    "path": "outputs\\autobattle\\a63-final-self-no-match-none-policy.json",
+    "schema": "ffta-tactics-policy/2",
+    "fallback": "none",
+    "scopes": [],
+    "decisions": [],
+    "note": "choices made by the frozen chooser among the commands the engine offered; the scenario's fixed actor_actions are not used in this run"
+  }
+}

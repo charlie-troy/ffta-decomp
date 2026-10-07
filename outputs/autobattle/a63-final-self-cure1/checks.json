@@ -1,0 +1,163 @@
+{
+  "status": "pass",
+  "run": "outputs\\autobattle\\a63-final-self-cure1",
+  "scope": "Mutate real public-runner recovery artifacts through the full validator.",
+  "rejections": [
+    {
+      "case": "missing journal",
+      "errors": [
+        "turn event 3: bounded recovery journal missing",
+        "turn event 3: invalid actor-linked result (self-Cure actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "empty raw journal",
+      "errors": [
+        "event 3: invalid recovery journal (recovery raw ledger missing or changed)"
+      ]
+    },
+    {
+      "case": "empty raw ledger",
+      "errors": [
+        "event 3: invalid recovery journal (recovery raw ledger missing or changed)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run"
+      ]
+    },
+    {
+      "case": "truncated raw ledger",
+      "errors": [
+        "event 3: invalid recovery journal (recovery raw ledger missing or changed)"
+      ]
+    },
+    {
+      "case": "wrong self target",
+      "errors": [
+        "turn event 3: invalid actor-linked result (self-Cure actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "wrong ability",
+      "errors": [
+        "turn event 3: invalid actor-linked result (self-Cure actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "missing healing",
+      "errors": [
+        "event 3: invalid recovery journal (recovery heal/cost/Action effect missing)"
+      ]
+    },
+    {
+      "case": "no MP spent",
+      "errors": [
+        "event 3: invalid recovery journal (recovery heal/cost/Action effect missing)"
+      ]
+    },
+    {
+      "case": "Action remains enabled",
+      "errors": [
+        "event 3: invalid recovery journal (recovery heal/cost/Action effect missing)"
+      ]
+    },
+    {
+      "case": "Wait outside facing",
+      "errors": [
+        "event 3: invalid recovery journal (guarded Wait facing missing)"
+      ]
+    },
+    {
+      "case": "missing Wait final policy",
+      "errors": [
+        "event 3: invalid recovery journal (recovery final policy missing)"
+      ]
+    },
+    {
+      "case": "coherent duplicate final input",
+      "errors": [
+        "event 3: invalid recovery journal (duplicate or post-final recovery input)"
+      ]
+    },
+    {
+      "case": "missing second later actor",
+      "errors": [
+        "event 3: invalid recovery journal (independent later actors missing)"
+      ]
+    },
+    {
+      "case": "same continuing actor twice",
+      "errors": [
+        "event 3: invalid recovery journal (independent later actors missing)"
+      ]
+    },
+    {
+      "case": "wrong later side",
+      "errors": [
+        "event 3: invalid recovery journal (continuing enemy attribution differs)"
+      ]
+    },
+    {
+      "case": "invalid later tile",
+      "errors": [
+        "event 3: invalid recovery journal (continuing enemy attribution differs)"
+      ]
+    },
+    {
+      "case": "dead continuing actor",
+      "errors": [
+        "event 3: invalid recovery journal (continuing enemy attribution differs)"
+      ]
+    },
+    {
+      "case": "completed player resources change",
+      "errors": [
+        "event 3: invalid recovery journal (completed player changed during continuation)"
+      ]
+    },
+    {
+      "case": "missing restoration",
+      "errors": [
+        "event 3: invalid recovery journal (recovery trace lifecycle invalid)"
+      ]
+    },
+    {
+      "case": "invalid explicit halt",
+      "errors": [
+        "event 3: invalid recovery journal (recovery halt reply invalid)"
+      ]
+    },
+    {
+      "case": "write after restoration",
+      "errors": [
+        "event 3: invalid recovery journal (recovery input after trace restoration)"
+      ]
+    },
+    {
+      "case": "borrowed owner",
+      "errors": [
+        "turn event 3: invalid actor-linked result (recovery owner disagrees with boundary)",
+        "event 3: invalid recovery journal (recovery fixture owner differs)"
+      ]
+    },
+    {
+      "case": "wrong chooser target",
+      "errors": [
+        "event 3: invalid recovery journal (recovery policy replay differs)"
+      ]
+    },
+    {
+      "case": "input owner drift",
+      "errors": [
+        "event 3: invalid recovery journal (recovery input owner/resources drifted)"
+      ]
+    },
+    {
+      "case": "modal timing excludes writes",
+      "errors": [
+        "event 3: invalid recovery journal (recovery raw ledger missing or changed)"
+      ]
+    },
+    {
+      "case": "missing raw ledger"
+    }
+  ]
+}

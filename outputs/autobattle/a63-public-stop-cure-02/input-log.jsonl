@@ -1,0 +1,60 @@
+{"event": "key_write", "t": 13.823, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 13.875, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 13.928, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 13.981, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 14.034, "val": 128, "hits": 5, "manual": false}
+{"event": "key_write", "t": 15.542, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 15.595, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 15.648, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 15.701, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 15.753, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 17.262, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 17.315, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 17.367, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 17.419, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 17.472, "val": 128, "hits": 5, "manual": false}
+{"event": "key_write", "t": 18.989, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 19.04, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 19.091, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 19.146, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 19.198, "val": 128, "hits": 5, "manual": false}
+{"event": "key_write", "t": 20.71, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 20.762, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 20.815, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 20.868, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 20.921, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 22.432, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 22.483, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 22.536, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 22.589, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 22.641, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 24.148, "val": 16, "hits": 1, "manual": false}
+{"event": "key_write", "t": 24.202, "val": 16, "hits": 2, "manual": false}
+{"event": "key_write", "t": 24.254, "val": 16, "hits": 3, "manual": false}
+{"event": "key_write", "t": 24.307, "val": 16, "hits": 4, "manual": false}
+{"event": "key_write", "t": 24.36, "val": 16, "hits": 5, "manual": false}
+{"event": "key_write", "t": 25.875, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 25.927, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 25.979, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 26.032, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 26.085, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 27.6, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 27.653, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 27.705, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 27.758, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 27.81, "val": 1, "hits": 5, "manual": false}
+{"event": "recovery_confirmation", "state": "confirmation", "t": 29.276, "actor_id": 7}
+{"event": "stop_requested", "t": 30.837, "detection_latency_s": 0.04, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "manual_key_write", "val": 2, "t": 35.951}
+{"event": "manual_key_write", "val": 2, "t": 37.537}
+{"event": "manual_key_write", "val": 2, "t": 38.612}
+{"event": "manual_key_write", "val": 2, "t": 40.203}
+{"event": "manual_key_write", "val": 2, "t": 41.275}
+{"event": "manual_key_write", "val": 128, "t": 42.368}
+{"event": "manual_key_write", "val": 1, "t": 43.446}
+{"event": "manual_key_write", "val": 1, "t": 46.107}
+{"event": "resume", "t": 47.107}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 107.095, "duration": 1.464, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:wait-nav-down", "t": 109.77, "duration": 1.432, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 112.435, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 115.056, "duration": 1.412, "hits": 5, "aborted": false}

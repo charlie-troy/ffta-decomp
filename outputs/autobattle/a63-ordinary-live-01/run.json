@@ -1,0 +1,49 @@
+{
+  "schema": "a3-run/2",
+  "run_id": "a63-ordinary-live-01",
+  "scenario": "a4-two-player",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 2,
+  "seeds": 4,
+  "router_hits": 178,
+  "terminal_reason": "turn budget reached",
+  "events": "outputs/autobattle\\a63-ordinary-live-01\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "emulator_pid": 65180,
+  "bounded_self_cure": false,
+  "bounded_ally_cure": false,
+  "player_identities": [
+    [
+      "Montblanc",
+      5
+    ],
+    [
+      "Marche",
+      7
+    ]
+  ],
+  "input_sha256": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/lua-nav/a4-multi-ally-battle-start.ss0": "7cbe2f661279d148dd659e023d2cbd89bd6044e9eeca21a171420ffff222491b",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "dcfb79caae0bd7c17a26f61a10e2ec83a722432fbae605e2fae375ea17f726ad",
+    "tools/autobattle_runtime.py": "14bc87935095c2a60bc2c396127a19fa45157a0df567b20983056923297bff67",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18"
+  },
+  "input_sha256_after": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/lua-nav/a4-multi-ally-battle-start.ss0": "7cbe2f661279d148dd659e023d2cbd89bd6044e9eeca21a171420ffff222491b",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "dcfb79caae0bd7c17a26f61a10e2ec83a722432fbae605e2fae375ea17f726ad",
+    "tools/autobattle_runtime.py": "14bc87935095c2a60bc2c396127a19fa45157a0df567b20983056923297bff67",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18"
+  },
+  "inputs_unchanged": true
+}

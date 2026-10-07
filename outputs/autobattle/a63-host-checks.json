@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "scope": "Named host/ROM regressions, separate from live public acceptance",
+  "checks": {
+    "tactics_policy": 119,
+    "tactics_adapter": 12,
+    "actor_identity": 19,
+    "recovery_transport": 13,
+    "self_executor": 23,
+    "raw_input": 20,
+    "interface": 7,
+    "resume_clock": 3,
+    "ai": 10,
+    "strategy": 9
+  }
+}

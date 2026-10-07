@@ -1,0 +1,47 @@
+{
+  "milestone": "A6.4",
+  "date": "2026-10-07",
+  "status": "unknown",
+  "scope": "Research-only KO/Life target contract; entry depends on A6.3 public acceptance",
+  "criteria": [
+    {
+      "id": "engine-KO-lifecycle",
+      "status": "unknown"
+    },
+    {
+      "id": "independent-scratch-fixture-reload",
+      "status": "unknown"
+    },
+    {
+      "id": "enabled-Life-and-effective-cost",
+      "status": "unknown"
+    },
+    {
+      "id": "accepted-canonical-KO-target",
+      "status": "unknown"
+    },
+    {
+      "id": "two-fresh-revive-Wait-continuations",
+      "status": "unknown"
+    },
+    {
+      "id": "STOP-reserve-and-adversarial-guards",
+      "status": "unknown"
+    }
+  ],
+  "source_sha256": {
+    "tools/ability_table.py": "9ec959131119d9d4cdd491e3cbbdfdecf7778f0f6634572df02458f079e01f41",
+    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a64-ability-metadata.json": "87e21a3339a72e95d1aeace27df61168d0be6c5a8ea39ef28823fd1a85ed31dd"
+  },
+  "observations": [
+    "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20."
+  ],
+  "limitations": [
+    "Table metadata is not engine availability, KO semantics, target acceptance or revival proof.",
+    "Existing Cure/living-only readers remain unchanged.",
+    "No public revive or item support."
+  ]
+}

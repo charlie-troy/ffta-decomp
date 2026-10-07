@@ -71,7 +71,8 @@ class BattleRuntime:
                  mode="retail-ai", stall_seed_seconds=150.0,
                  wall_timeout=600.0, max_turns=None, verbose=True,
                  resume=False, pause_at_boundary=False,
-                 tactics_policy=None, tactics_policy_source=None, bounded_self_cure=False):
+                 tactics_policy=None, tactics_policy_source=None, bounded_self_cure=False,
+                 bounded_ally_cure=False):
         self.s = session
         self.p = Probe(session, verbose=verbose)
         # A5.3: with a policy, the scenario's fixed per-actor assignment is
@@ -82,6 +83,9 @@ class BattleRuntime:
                         if tactics_policy is not None else None)
         self._tactics_meta = None
         self.bounded_self_cure = bool(bounded_self_cure)
+        self.bounded_ally_cure = bool(bounded_ally_cure)
+        if self.bounded_self_cure and self.bounded_ally_cure:
+            raise ValueError('recovery fixture opt-ins are mutually exclusive')
         self._owner_observed_at = None
         self.scenario = scenario
         self.scenario_id = scenario.get("scenario_id", "unknown")
@@ -531,7 +535,7 @@ class BattleRuntime:
         # re-opens the command menu, so the turn only closes after Wait).
         self.adapter.prior = None
         self._tactics_meta = None
-        if self.bounded_self_cure:
+        if self.bounded_self_cure or self.bounded_ally_cure:
             self._drive_recovery_boundary(before)
             return
         # -- A5.3 conditional tactics --------------------------------------
@@ -727,6 +731,7 @@ class BattleRuntime:
 
     def _drive_recovery_boundary(self, before):
         from recovery_runtime import drive_recovery
+        from party_recovery_runtime import drive_party_recovery
         from recovery_executor import RecoveryStopped
         journal = {}
         def capture_confirmation(observation):
@@ -734,7 +739,8 @@ class BattleRuntime:
             self.s.screenshot(os.path.join(os.path.dirname(self.events_path),
                                            f"recovery-{observation.state}{suffix}.png"))
         try:
-            confirmed = drive_recovery(self, journal, before_confirmation=capture_confirmation)
+            drive = drive_party_recovery if self.bounded_ally_cure else drive_recovery
+            confirmed = drive(self, journal, before_confirmation=capture_confirmation)
         except RecoveryStopped as exc:
             self.event("note", **self._actor_fields(), recovery=journal, note=str(exc))
             self._finish(PAUSED, "STOP requested during bounded recovery: manual handoff")
@@ -758,18 +764,31 @@ class BattleRuntime:
             self.event("note", **self._actor_fields(), recovery=journal, note="policy left Wait unexecuted")
             self._finish(STALLED, "bounded recovery: policy selected no Wait; no retry")
             return
-        after_row = journal["continuations"][0]["player_after"]
-        accepted = journal["recovery"]["outcome"] == "accepted"
+        if self.bounded_ally_cure:
+            baseline = {r['id']:r for r in journal['baseline_roster']}
+            after_rows = []
+            for row in journal['continuations'][0]['party_after']:
+                observed = {f:baseline[row['id']][f] for f in
+                            ('name','name_text','id','type','base_job','race','job','level','side_raw',
+                             'side_bit','unaffiliated','max_hp','max_mp','slot','live')}
+                observed.update(hp=row['hp'],mp=row['mp'],x=row['tile'][0],y=row['tile'][1])
+                after_rows.append(observed)
+            after_row = next(r for r in after_rows if r['id']==self.owner['id'])
+        else:
+            after_row = journal["continuations"][0]["player_after"]
+            after_rows = [after_row]
+        accepted = journal["recovery"]["outcome"] in ("accepted", "accepted-effect-only")
         self._engine_result = {"verified": True, "players_before": self._pre_players,
-                               "players_after": [after_row], "source": "recovery independent continuation"}
+                               "players_after": after_rows, "source": "recovery independent continuation"}
         self.turn += 1
         self.event("turn", turn=self.turn, **self._actor_fields(), control_mode="external",
-                   selected_action={"kind": "identified-self-cure" if accepted else "identified-wait",
+                   selected_action={"kind": ("identified-ally-cure" if self.bounded_ally_cure else "identified-self-cure") if accepted else "identified-wait",
                                     "ability_id": 1 if accepted else None},
-                   selected_target={"kind": "unit", "id": self.owner["id"]} if accepted else None,
+                   selected_target={"kind": "unit", "id": 5 if self.bounded_ally_cure else self.owner["id"]} if accepted else None,
                    position_before=before, position_after={"x": after_row["x"], "y": after_row["y"]},
                    engine_result=self._engine_result, recovery=journal,
-                   note="bounded recovery: guarded Wait and two independently joined later enemies")
+                   note=("bounded party recovery: guarded Wait and one independently joined next enemy"
+                         if self.bounded_ally_cure else "bounded recovery: guarded Wait and two independently joined later enemies"))
         self.state = RUNNING
 
     def _record_identified_turn(self, plan_kind, plan, dest_used, drove,

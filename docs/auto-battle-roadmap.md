@@ -9,9 +9,13 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**A6.2's bounded ally target research contract passes. Continue A6.3 public
-integration below. Two research ally-Cure/Wait reloads independently reach the
-next enemy; public party recovery remains open. A6.1 is accepted within its seven-unit self-Cure fixture.**
+**A6.3 passes for its bounded public eight-unit living-ally Cure fixture.
+Continue A6.4 KO/Life target research below. A6.1 self-Cure and A6.2 research
+retain their independent limits; broad recovery and item support remain open.**
+Two public ally casts, damage-policy refusal/Wait, both STOP/manual/same-PID
+handoffs, two unsupported-family zero-input controls, the six-case self-Cure
+matrix and ordinary live Move/Wait pass on current production sources.
+See `docs/a63-public-ally-recovery.md` and `A6.3.json` for exact hashes.
 The opt-in public self-Cure matrix now has six passing current-source cases:
 two accepted casts, reserve decline, engine-disabled Cure and both no-match
 fallbacks. Both final STOP/manual/same-PID receipts pass, including eight
@@ -575,7 +579,7 @@ substitute a fixed research route for an adapter.
 - [ ] Trace missing item-count/MP consumers only as required by concrete rules; document the evidence in `docs/tactics-policy.md`.
 - [ ] Add heal-under-threshold, revive-before-attack where a legal revive candidate exists, MP reserve, and never-use-item rules. Consumables default to disabled.
 - [x] Test exact threshold boundaries, zero max HP, KO vs living targets, insufficient MP, no revive ability, and the last consumable (host contract only; 119 checks).
-- [ ] Replay a wounded-party fixture and compare its chosen actions to a damage-focused policy.
+- [x] Replay a wounded-party fixture and compare its chosen actions to a damage-focused policy (A6.3 bounded ally Cure versus declined Cure/fallback Wait; no attack claim).
 
 Done: the rule changes the executed action, consumes the expected resource, and explains fallback when unavailable. Do not invent a heal/revive candidate that the engine rejected.
 
@@ -693,7 +697,21 @@ before targeting and use the independent final target reader for candidates.
 - Re-run the accepted seven-unit self-Cure matrix and ordinary Move/Wait
   regressions. Research receipts do not substitute for these public gates.
 
-Status: UNKNOWN; implementation and public acceptance remain to be proved.
+Status: PASS within the exact eight-unit fixture (2026-10-07). Two public
+casts heal target100->157/153 with caster85->79MP; both stop/manual/resume
+cases and all named regressions pass. A6 broader KO/item criteria remain open.
+
+#### A6.4 — Bounded KO/Life target research
+
+Prerequisite: A6.3. Follow `docs/a64-ko-target-research.md` and initialize every
+required criterion in `docs/receipts/autobattle/A6.4.json` as UNKNOWN. First
+prove genuine engine KO lifecycle and independently reload a disposable
+fixture. Keep living-only pins/Cure readers unchanged. Observe enabled Life,
+effective MP cost and canonical KO-target acceptance before a guarded final
+input; require two attributed revivals, separate Wait/continuation, STOP,
+reserve and adversarial controls. Public revive integration is a later packet.
+Read-only table Life ID5/base cost10 is metadata, not target/availability proof.
+
 
 ### A7 — Movement tactics (P1, bounded research then implementation)
 

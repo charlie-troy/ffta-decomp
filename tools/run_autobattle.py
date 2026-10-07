@@ -33,6 +33,14 @@ def _input_hashes(args):
                        "tools/recovery_menu.py", "tools/recovery_executor.py",
                        "tools/recovery_continuation.py", "tools/ability_resources.py",
                        "tools/fixture_guard.py", "tools/trace_mgba.py"])
+    if args.bounded_ally_cure:
+        inputs.extend(['tools/party_recovery_runtime.py','tools/recovery_party.py',
+                       'tools/recovery_ally_confirmation.py','tools/recovery_ally_preview.py',
+                       'tools/recovery_ally_target.py','tools/recovery_ally_executor.py',
+                       'tools/recovery_party_continuation.py','tools/recovery_menu.py',
+                       'tools/recovery_executor.py','tools/recovery_transport.py',
+                       'tools/probe_recovery_party.py','tools/ability_resources.py',
+                       'tools/fixture_guard.py','tools/trace_mgba.py'])
     if args.tactics_policy:
         inputs.append(args.tactics_policy)
     result = {}
@@ -94,8 +102,11 @@ def main(argv=None):
                          "commands the engine currently offers, instead of the "
                          "scenario's fixed per-actor assignment. Validated "
                          "before the emulator is touched; a bad document exits 2.")
-    ap.add_argument("--bounded-self-cure", action="store_true",
+    recovery_flags = ap.add_mutually_exclusive_group()
+    recovery_flags.add_argument("--bounded-self-cure", action="store_true",
                     help="A6.1 opt-in seven-unit self-Cure fixture transaction; requires schema-2 tactics")
+    recovery_flags.add_argument('--bounded-ally-cure',action='store_true',
+                    help='A6.3 opt-in eight-unit living ally-Cure fixture; requires schema-2 tactics')
     ap.add_argument("--resume", metavar="RUN_ID", default=None,
                     help="continue the battle of a previously paused run: "
                          "adopt the ALREADY-RUNNING emulator (no reboot — "
@@ -120,8 +131,8 @@ def main(argv=None):
         print(f"tactics policy {args.tactics_policy} "
               f"({tactics_policy['schema']}) validated")
 
-    if args.bounded_self_cure and (tactics_policy or {}).get("schema") != "ffta-tactics-policy/2":
-        print("FAIL: --bounded-self-cure requires a schema-2 --tactics-policy")
+    if (args.bounded_self_cure or args.bounded_ally_cure) and (tactics_policy or {}).get("schema") != "ffta-tactics-policy/2":
+        print("FAIL: bounded recovery requires a schema-2 --tactics-policy")
         return 2
     resumed_run = None
     if args.resume:
@@ -206,7 +217,8 @@ def main(argv=None):
                                 pause_at_boundary=args.pause_at_boundary,
                                 tactics_policy=tactics_policy,
                                 tactics_policy_source=args.tactics_policy,
-                                bounded_self_cure=args.bounded_self_cure)
+                                bounded_self_cure=args.bounded_self_cure,
+                                bounded_ally_cure=args.bounded_ally_cure)
         if not args.yes:
             ans = input("guards will run now; continue? [y/N] ").strip().lower()
             if ans != "y":
@@ -281,6 +293,7 @@ def main(argv=None):
                                  else "terminated"),
             "emulator_pid": session.pid,
             "bounded_self_cure": args.bounded_self_cure,
+            "bounded_ally_cure": args.bounded_ally_cure,
             "player_identities": [list((r["name_text"], r["id"]))
                                   for r in runtime.adapter.expected],
         }

@@ -1,5 +1,40 @@
 # Project log
 
+## 2026-10-07 - Public bounded ally Cure, policy refusal and lifecycle evidence
+
+A6.3 implements a separate `--bounded-ally-cure` public opt-in; schema2 and
+mutually exclusive recovery families are enforced before emulator launch.
+Two fresh public CLI reloads (`a63-public-cure-01/-02`) heal canonical
+Montblanc100 to157/153, spend exactly six of Marche's85 MP, preserve other
+party resources, complete guarded Wait and join Schneider as the next enemy.
+Each has70 raw writes and38 rejected receipt mutations. The schema2-adapted
+damage-focused preset declines the same engine-accepted Cure candidate;
+modal cancellation and fallback Wait preserve resources (85 writes). Fifteen
+decline mutations reject. This does not prove attacks or general recovery.
+
+Final STOP cases `a63-public-stop-cure-02` and `a63-public-stop-facing-01`
+stop before the respective final A at45/65 writes, permit verified owned-window
+manual Wait, and resume the same PIDs80676/72892 for one ordinary verified
+turn. Both reject eight lifecycle mutations. Trial cure-01's first manual
+attempt stopped at owned description-opening state101; the new party manual
+helper passively rejects that exact signature under a deadline. Fresh02
+exercises this rejection once and completes, without retrying a final key.
+Trial01's separately retained manual retry is not final acceptance evidence.
+
+The full validator now reports missing party continuation as a failed receipt
+instead of crashing, validates halt replies and requires trace restoration
+even on partial STOP journals. Shared raw-ledger20, policy119, adapter12,
+identity19, transport13 and self-executor23 host checks pass; AI10/10 and
+strategy9/9 pass. Two live unsupported-family controls reject with zero input.
+The final current-source six-case self-Cure matrix passes. Ordinary live
+`a63-ordinary-live-01` proves Marche Move(4,10)->(4,11), then Montblanc Wait.
+A6.3 now passes within its exact eight-unit living-ally fixture. Both final
+handoffs also reject seven partial-STOP cleanup/ledger mutations. A6.4 is the
+next research packet: prove engine KO lifecycle and accepted Life targeting
+before any guarded revival. Read-only table metadata finds Life ID5/cost10;
+that is not availability or revival proof.
+See `docs/a63-public-ally-recovery.md`.
+
 ## 2026-10-07 - Bounded ally target contract passes; preview cache identified
 
 A6.2 research now has two fresh cast/Wait/next-enemy reloads, live STOP and

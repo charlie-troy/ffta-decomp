@@ -1,0 +1,26 @@
+{
+  "status": "pass",
+  "scope": "Check a source-pinned public ally recovery STOP, manual Wait and same-PID resume.",
+  "run": "outputs/autobattle/a63-public-stop-cure-02",
+  "phase": "confirmation",
+  "pid": 80676,
+  "rejections": [
+    "different adopted PID",
+    "different manual window",
+    "unverified window focus",
+    "stub gameplay input",
+    "manual Wait did not continue",
+    "manual resource drift",
+    "source changed during first leg",
+    "resumed without verified action"
+  ],
+  "partial_stop_rejections": [
+    "partial missing restoration",
+    "partial wrong restoration count",
+    "partial invalid halt",
+    "partial missing explicit halt",
+    "partial missing ledger",
+    "partial raw journal missing",
+    "partial duplicate suspension"
+  ]
+}

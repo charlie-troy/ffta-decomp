@@ -1,0 +1,31 @@
+{
+  "status": "pass-bounded-regressions",
+  "scope": "Live unsupported-family controls followed by the accepted self-Cure matrix.",
+  "unsupported": [
+    {
+      "run": "a63-final-self-family",
+      "status": "pass",
+      "raw_writes": 0,
+      "turns": 0,
+      "reason": "bounded recovery rejected: party recovery caster/party outside bounded family",
+      "metadata_sha256": {
+        "run.json": "2aa0d0a4de61baa75d0b7ef5ab7f145dad004d669fd94f48a617c7c1be8efe1a",
+        "events.jsonl": "132a987b299e93fdeee7bac03333335c0739d5ac328534aad0ee63bd0e477bdf",
+        "input-log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "run": "a63-final-no-secondary",
+      "status": "pass",
+      "raw_writes": 0,
+      "turns": 0,
+      "reason": "bounded recovery rejected: unsupported ally caster",
+      "metadata_sha256": {
+        "run.json": "c82cabb176206e775f5ca5c25b3e60f73d2c64fca6a0f08a104500021b61e358",
+        "events.jsonl": "3935a55186a89282a5c3425a017e8d2973a10c7ba06cec845cf5adfa3d0f84b8",
+        "input-log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "self_matrix": "outputs\\autobattle\\a63-final-self-matrix.json"
+}

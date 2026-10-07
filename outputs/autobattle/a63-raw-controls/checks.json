@@ -1,0 +1,138 @@
+{
+  "status": "pass",
+  "scope": "host artifact validation only",
+  "checks": [
+    {
+      "case": "valid-raw",
+      "expected": "accepted",
+      "errors": []
+    },
+    {
+      "case": "raw-after-stop",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=9): ['key_write']"
+      ]
+    },
+    {
+      "case": "raw-after-terminal",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=9): ['key_write']"
+      ]
+    },
+    {
+      "case": "valid-terminal-without-stop-file",
+      "expected": "accepted",
+      "errors": []
+    },
+    {
+      "case": "raw-after-terminal-without-stop-file",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=10): ['key_write']"
+      ]
+    },
+    {
+      "case": "aborted-label-cannot-hide-raw-write",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=9): ['key_write']"
+      ]
+    },
+    {
+      "case": "false-completion-cannot-hide-raw-write",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=9): ['key_write']"
+      ]
+    },
+    {
+      "case": "raw-handoff-gap",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 automation press/drive between leg 1's paused stop and the resume marker (input during the handoff gap must be manual)"
+      ]
+    },
+    {
+      "case": "raw-valid-resumed-leg",
+      "expected": "accepted",
+      "errors": []
+    },
+    {
+      "case": "raw-resumed-stop",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=29): ['key_write']"
+      ]
+    },
+    {
+      "case": "raw-resumed-terminal",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=29): ['key_write']"
+      ]
+    },
+    {
+      "case": "raw-resumed-terminal-without-stop-file",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=30): ['key_write']"
+      ]
+    },
+    {
+      "case": "legacy-resumed-terminal",
+      "expected": "rejected",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=29): ['press']"
+      ]
+    },
+    {
+      "case": "manual-detached-input",
+      "expected": "accepted",
+      "errors": []
+    },
+    {
+      "case": "malformed-manual-True",
+      "expected": "rejected",
+      "errors": [
+        "input-log record 1: malformed automation key_write"
+      ]
+    },
+    {
+      "case": "malformed-t-None",
+      "expected": "rejected",
+      "errors": [
+        "input-log record 1: malformed automation key_write"
+      ]
+    },
+    {
+      "case": "malformed-t-late",
+      "expected": "rejected",
+      "errors": [
+        "input-log record 1: malformed automation key_write"
+      ]
+    },
+    {
+      "case": "malformed-t-nan",
+      "expected": "rejected",
+      "errors": [
+        "input-log record 1: malformed automation key_write"
+      ]
+    },
+    {
+      "case": "malformed-val-1024",
+      "expected": "rejected",
+      "errors": [
+        "input-log record 1: malformed automation key_write"
+      ]
+    },
+    {
+      "case": "malformed-hits-0",
+      "expected": "rejected",
+      "errors": [
+        "input-log record 1: malformed automation key_write"
+      ]
+    }
+  ]
+}

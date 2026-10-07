@@ -1,0 +1,64 @@
+{
+  "status": "read-only-metadata",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "abilities": [
+    {
+      "id": 1,
+      "name": "Cure",
+      "mp_cost": 6,
+      "range_h": 4,
+      "range_v": 0,
+      "targeting": 1,
+      "flags": 1073537,
+      "ai_condition": 0,
+      "ai_behaviour": 1
+    },
+    {
+      "id": 5,
+      "name": "Life",
+      "mp_cost": 10,
+      "range_h": 4,
+      "range_v": 0,
+      "targeting": 1,
+      "flags": 1073536,
+      "ai_condition": 0,
+      "ai_behaviour": 1
+    },
+    {
+      "id": 6,
+      "name": "Full-Life",
+      "mp_cost": 20,
+      "range_h": 4,
+      "range_v": 0,
+      "targeting": 1,
+      "flags": 1073536,
+      "ai_condition": 0,
+      "ai_behaviour": 1
+    },
+    {
+      "id": 19,
+      "name": "Raise",
+      "mp_cost": 22,
+      "range_h": 4,
+      "range_v": 0,
+      "targeting": 1,
+      "flags": 1073409,
+      "ai_condition": 0,
+      "ai_behaviour": 1
+    },
+    {
+      "id": 256,
+      "name": "Phoenix Down",
+      "mp_cost": 0,
+      "range_h": 1,
+      "range_v": 2,
+      "targeting": 1,
+      "flags": 1073665,
+      "ai_condition": 0,
+      "ai_behaviour": 0
+    }
+  ],
+  "limits": [
+    "Table metadata alone does not prove menu availability, KO semantics or legal targeting."
+  ]
+}
