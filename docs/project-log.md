@@ -1,5 +1,22 @@
 # Project log
 
+## 2026-10-07 - A6.2 read-only party joins and target-index ROM proof
+
+Two fresh eight-unit reloads independently join Marche id7 at(4,10) and
+Montblanc id5 at(5,10) to canonical records before targeting. No gameplay
+input, RAM edit or state export occurs; source hashes remain unchanged and
+owned cleanup passes. Each retained baseline rejects37 identity/resource
+mutations, including coherent side/KO/resource corruption and same-job aliases.
+The reader handles RAM-backed Marche and ROM-backed Montblanc names separately
+and chunks debugger memory replies. Retained earlier rejections are documented.
+
+Six actual ROM helper cases prove target-list next/previous/wrap/empty behavior;
+two caller fragments prove the selected wrapper is copied to processor+0x0C/
+0x10 from table+0x50 and index+0xA1. This is synthetic ROM semantics, not live
+ally targeting. See `docs/a62-ally-target-research.md` and `A6.2.json`.
+Live ally Cure legality, final target confirmation and effects remain UNKNOWN;
+the public self-only reader and fixture guards remain unchanged.
+
 ## 2026-10-07 - A6.1 bounded public self-Cure integration accepted
 
 The public CLI now supports explicit `--bounded-self-cure` with a schema-2

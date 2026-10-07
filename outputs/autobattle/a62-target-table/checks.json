@@ -1,0 +1,59 @@
+{
+  "status": "pass",
+  "scope": "Execute target-table ROM fragments on synthetic wrappers, without gameplay.\n\nThis proves index and pointer-copy semantics only. It does not prove which\nlive wrappers are legal Cure targets or the meaning of a menu peer pointer.\n",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "source_sha256": {
+    "tools/validate_recovery_target_table.py": "384032c16e34f362af79971054b2dc82be97cdebc034fa5773b44fde3c8c3bb4"
+  },
+  "selection_cases": [
+    {
+      "case": "no-input",
+      "result": 0,
+      "index": 0
+    },
+    {
+      "case": "next-from-first",
+      "result": 1,
+      "index": 1
+    },
+    {
+      "case": "next-wrap",
+      "result": 1,
+      "index": 0
+    },
+    {
+      "case": "previous-from-second",
+      "result": 1,
+      "index": 0
+    },
+    {
+      "case": "previous-wrap",
+      "result": 1,
+      "index": 1
+    },
+    {
+      "case": "empty-list",
+      "result": 0,
+      "index": 0
+    }
+  ],
+  "pointer_copy_cases": [
+    {
+      "index": 0,
+      "wrapper": 33759232,
+      "destination_offsets": [
+        12,
+        16
+      ]
+    },
+    {
+      "index": 1,
+      "wrapper": 33759488,
+      "destination_offsets": [
+        12,
+        16
+      ]
+    }
+  ],
+  "live_target_legality": "unknown"
+}

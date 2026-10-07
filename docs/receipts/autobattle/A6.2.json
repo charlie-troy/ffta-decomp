@@ -1,0 +1,89 @@
+{
+  "milestone": "A6.2",
+  "date": "2026-10-07",
+  "base_revision": "deff57e",
+  "status": "partial",
+  "scope": "Read-only pre-targeting party identity and synthetic target-table ROM semantics only",
+  "criteria": [
+    {
+      "id": "pre-targeting-party-identity",
+      "status": "pass",
+      "observed": "Two fresh owned reloads; two canonical/mirror joins each; no gameplay or fixture writes; 37 rejected mutations each"
+    },
+    {
+      "id": "target-index-rom-semantics",
+      "status": "pass",
+      "observed": "6 helper cases and 2 selected-wrapper copy fragments on synthetic RAM"
+    },
+    {
+      "id": "live-ally-target-legality",
+      "status": "unknown",
+      "observed": "No targeting entered; peer semantics and legal ally target unproven"
+    },
+    {
+      "id": "ally-cure-effects-and-continuation",
+      "status": "unknown",
+      "observed": "No cast, MP effect, Wait or later-actor acceptance"
+    },
+    {
+      "id": "public-party-recovery",
+      "status": "unknown",
+      "observed": "Existing self-only public bounds unchanged"
+    }
+  ],
+  "source_sha256": {
+    "tools/probe_recovery_party.py": "ff08f4a42968d45afd45d1dc7c77eec87e2434c4cb51a964739135409c2fc7a5",
+    "tools/recovery_party.py": "06d1df0dc323b71191ce2b36bba02c1be04bef26ccf6ed053c26171d3d828a95",
+    "tools/validate_recovery_party.py": "90c73945d826d0377b0e034fff26d5609fa858154f228a3c5cfe4b80f6e992f0",
+    "tools/validate_recovery_target_table.py": "384032c16e34f362af79971054b2dc82be97cdebc034fa5773b44fde3c8c3bb4",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
+    "outputs/autobattle/a62-party-baseline-04/checks.json": "8ea0c9bf81ae1f4ec2bb94a2df352d6a91c10087bf4f929ad17828f40c8ee35f",
+    "outputs/autobattle/a62-party-baseline-04/party-baseline.png": "5ba68ce39068509f471414f3f2ac7b2dadfab79b25eac7b11a6c0cc48d8c775a",
+    "outputs/autobattle/a62-party-baseline-04/name-085512c7.bin": "f98306027cd19d206408c565b4421247d7c7a2ab6efcfa5e7690a007f16fc9ce",
+    "outputs/autobattle/a62-party-baseline-04/name-02001f1c.bin": "3c22932bd39482c5137348e25c3bfb6471353f8570d1bb6ad64d06e4cc72e657",
+    "outputs/autobattle/a62-party-baseline-04/020159e8.bin": "9930faed7200896bbaed6b192df4183448c715775789d798136a304898cd678b",
+    "outputs/autobattle/a62-party-baseline-04/02000080.bin": "4b2729a0b3eb0710512de0a7f3f60c0d6cf5bafb17e291e5591aef50d981ee8a",
+    "outputs/autobattle/a62-party-baseline-04/0200f438.bin": "1043ec9f96256b24df0baad57a3f32096f22aca1e7ed88ccd9076de8b2162efb",
+    "outputs/autobattle/a62-party-baseline-04/0202d8a0.bin": "b6d3c53f9a2230a3664fc7feccf8102feed7b8911a05bb64724f215cc49f7ec8",
+    "outputs/autobattle/a62-party-baseline-04/0200f4e8.bin": "d944f6f1dbb49615f9217a2fe944d2e3c13e19722ba18031f9e6fc6771f8b232",
+    "outputs/autobattle/a62-party-baseline-04/0202267c.bin": "57cb8fc92c024467290ec93591f3d4a4677ca08709e00afed0dedeed55e5eada",
+    "outputs/autobattle/a62-party-baseline-05/baseline.json": "a49fd5c5ba2a896b00e8b5b79375bebdc4dce03663da6f21a7acdbd40a158f21",
+    "outputs/autobattle/a62-party-baseline-05/checks.json": "81964b98bf9604e0f884db7a537c9e1f2cf6be3700257502562fc5460d643f6b",
+    "outputs/autobattle/a62-party-baseline-05/party-baseline.png": "9980f43e967289536a1129b94efc17fb552adb587941d19779508da3b7621ad0",
+    "outputs/autobattle/a62-party-baseline-05/name-085512c7.bin": "f98306027cd19d206408c565b4421247d7c7a2ab6efcfa5e7690a007f16fc9ce",
+    "outputs/autobattle/a62-party-baseline-05/name-02001f1c.bin": "3c22932bd39482c5137348e25c3bfb6471353f8570d1bb6ad64d06e4cc72e657",
+    "outputs/autobattle/a62-party-baseline-05/020159e8.bin": "9930faed7200896bbaed6b192df4183448c715775789d798136a304898cd678b",
+    "outputs/autobattle/a62-party-baseline-05/02000080.bin": "4b2729a0b3eb0710512de0a7f3f60c0d6cf5bafb17e291e5591aef50d981ee8a",
+    "outputs/autobattle/a62-party-baseline-05/0200f438.bin": "1043ec9f96256b24df0baad57a3f32096f22aca1e7ed88ccd9076de8b2162efb",
+    "outputs/autobattle/a62-party-baseline-05/0202d8a0.bin": "b6d3c53f9a2230a3664fc7feccf8102feed7b8911a05bb64724f215cc49f7ec8",
+    "outputs/autobattle/a62-party-baseline-05/0200f4e8.bin": "d944f6f1dbb49615f9217a2fe944d2e3c13e19722ba18031f9e6fc6771f8b232",
+    "outputs/autobattle/a62-party-baseline-05/0202267c.bin": "57cb8fc92c024467290ec93591f3d4a4677ca08709e00afed0dedeed55e5eada",
+    "outputs/autobattle/a62-target-table/checks.json": "7a714991f700034e314b07bc1a97679a3cf157ad1835238cd6a61880fbc32278",
+    "outputs/autobattle/a62-final-ai.log": "17adad12b5ffb6fdb5a46585aad6d75e40076bc7dc16158f9ce73c0e268b7a73",
+    "outputs/autobattle/a62-final-strategy.log": "b93aa92e8fde2803e69d07fbeb83ecf1ae6ad2653cbe675352e3c48d4c5135ac"
+  },
+  "retained_failures": [
+    {
+      "run": "a62-party-baseline-01",
+      "error": "roster outside verified fixture bounds"
+    },
+    {
+      "run": "a62-party-baseline-02",
+      "error": "short modal memory read"
+    },
+    {
+      "run": "a62-party-baseline-03",
+      "error": "RAM pointer outside EWRAM"
+    }
+  ],
+  "next_packet": "Construct and independently reload a wounded-party scratch fixture; observe target-list wrapper/index/cursor and join the other ally before any final input",
+  "limitations": [
+    "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
+    "Two pre-targeting reloads are not two successful ally-target casts.",
+    "Synthetic wrappers prove ROM field semantics only, not live range, availability or Cure legality.",
+    "AI10/10 and strategy9/9 freshly pass; no ROM source changed."
+  ]
+}

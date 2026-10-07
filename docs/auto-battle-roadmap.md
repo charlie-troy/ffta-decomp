@@ -637,6 +637,12 @@ keep `RecoveryMenu`'s self-only peer/target rejection and public opt-in bounds
 until the new target contract is independently proven. Record exact sources,
 fixture changes and binary-capture hashes; raw RAM/states remain local.
 
+Prerequisite progress (2026-10-07): two fresh read-only party captures join
+both canonical allies, with37 rejection controls each. Six actual ROM helper
+cases and two caller fragments establish target-list index/wrapper semantics
+on synthetic tables. Live ally legality and context-peer meaning remain
+UNKNOWN. See `docs/a62-ally-target-research.md` and `A6.2.json` before proceeding.
+
 - Pin the caster and one living wounded ally by canonical name/id, job/race,
   side, maxima and tile. Verify both battle mirrors before entering targeting;
   never use the borrowed roster as an identity lookup during the modal interval.

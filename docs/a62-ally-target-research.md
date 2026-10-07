@@ -1,0 +1,64 @@
+# A6.2 living ally target research
+
+2026-10-07 baseline: `deff57e` plus the source hashes in the A6.2 receipt.
+The A6.1 opt-in remains self-only; no public target guard has changed.
+
+## Pre-targeting identity prerequisite: PASS within the A4 fixture
+
+`probe_recovery_party.py` boots an owned disposable copy of the eight-unit
+`a4-two-player.json` fixture. It waits passively for two matching fresh-owner
+observations, suspends tracing under an explicit halt and captures both battle
+mirrors and all canonical member records. Each complete block is read again
+while halted. Debugger packets are capped at0x200 bytes; large replies are
+dropped by this mGBA stub. No gameplay input, RAM edit or state export occurs.
+
+Fresh reloads `a62-party-baseline-04/-05` agree: Marche id7/job5/race1 is the
+owner at(4,10), canonical02000080, HP442/442 and MP85/85. Montblanc
+id5/job5/race1 is at(5,10), canonical02000188, HP177/241 and MP221/221.
+The initial guarded fixture had Montblanc at241HP; the observed value is177HP
+at the first Marche menu after the engine runs. Neither fresh run edits HP.
+This 73-percent ally would not match the healer preset's50-percent rule.
+
+Marche's name is RAM-backed02001F1C; Montblanc's is ROM-backed085512C7.
+Read ROM names from the verified source image and RAM names under the halt.
+Each mirror/canonical join agrees on identity, type/base/race/job/secondary/
+level, side, resources and tile. Canonical name/id aliases and duplicate party
+tiles reject. Each retained baseline passes37 rejection mutations, including
+coherently altered KO, cross-side, over-max resources and same-job identity
+aliasing. Menu root and main wrapper independently join the current caster.
+Inspected the first successful baseline screenshot: Marche command menu,
+HP442 and MP85. Both owned processes terminate after capture.
+
+Earlier attempts remain unknown:01 rejected a borrowed roster;02 rejected a
+large memory reply;03 rejected Montblanc's ROM name through an EWRAM-only read.
+Each failed before input and retained its error/source hashes. Passive retries
+do not weaken any accepted identity snapshot.
+
+## Target processor index prerequisite: bounded ROM proof
+
+Executed actual ROM helper080B50F0 on synthetic two-wrapper tables. Six cases
+cover no input, next/previous selection, both wrap directions and an empty
+list. With the caller's processor+0x4C argument, the table is processor+0x50,
+the index byte is+0xA1 and count byte is+0xA2. The helper's mask0x100/0x200
+branches cycle the target list. No inference about directional cursor movement
+or engine Cure legality follows from those synthetic cases.
+
+Executed caller fragment080B752C..080B7542 for both indices: it loads the
+selected wrapper from processor+0x50+4*index and copies it to+0x0C/+0x10.
+Static switch entry080B74E0 invokes the helper at080B751E. This identifies
+concrete fields to capture live; it does not prove they currently name an ally
+or establish the meaning of menu context+0x1C.
+
+## Next live gate: UNKNOWN
+
+Construct a new disposable party fixture with secondary White Mage on the
+verified caster and a living ally below50 percent, editing both canonical and
+battle copies with a write ledger. Export/reload independently; keep the
+original fixture untouched. Reuse guarded command/ability navigation only
+while the self-only reader accepts it. Capture the target processor, wrapper
+table/index/count and cursor before and after selecting the other ally.
+Join that wrapper to the pinned canonical Montblanc and tile, then inspect the
+engine's accepted confirmation. Do not press final A until the new target
+contract is proven and revalidated. Preserve the existing public self-only
+peer rejection. Healing, MP consumption, guarded Wait, independent later
+actors, STOP and policy comparison remain separate, unpassed gates.
