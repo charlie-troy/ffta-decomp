@@ -1,0 +1,98 @@
+{
+  "status": "pass",
+  "scope": "Replay bounded facing confirmation and independently join later actors.\n\nThis validates retained research captures; it does not launch fresh gameplay.\n",
+  "capture": "outputs\\autobattle\\a6-wait-facing-commit-02",
+  "probe_sha256": "49e570610fd74afaa12e7179f2ffb971b13fa43bf6a867b9c5be04fcf244f696",
+  "continuation": [
+    {
+      "tag": "12-A",
+      "raw_sha256": "f758ce7d2c6ddd776d6ac1dfe28720562b6af3dd071569442b6230a2ae381ec3",
+      "driver_state": 27,
+      "wrapper": 33695212,
+      "canonical": 33567716,
+      "actor": {
+        "slot": 3,
+        "addr": "02015d00",
+        "name": 139881681,
+        "side_raw": 32769,
+        "ct": 935,
+        "ea": 0,
+        "id": 3,
+        "type": 1,
+        "base_job": 36,
+        "race": 5,
+        "job": 36,
+        "level": 41,
+        "hp": 323,
+        "max_hp": 323,
+        "mp": 114,
+        "max_mp": 114,
+        "is_rom_name": true,
+        "is_ram_name": false,
+        "name_text": "Schneider",
+        "side_bit": true,
+        "unaffiliated": false,
+        "live": true,
+        "tile": [
+          9,
+          2
+        ]
+      },
+      "target_tile": [
+        9,
+        2
+      ]
+    },
+    {
+      "tag": "99-settled",
+      "raw_sha256": "e6244860ba877020704de61ae8682ebc923115d66bd73f3d4761c68f6f3872d9",
+      "driver_state": 27,
+      "wrapper": 33695068,
+      "canonical": 33567452,
+      "actor": {
+        "slot": 4,
+        "addr": "02015e08",
+        "name": 139881253,
+        "side_raw": 32769,
+        "ct": 692,
+        "ea": 0,
+        "id": 4,
+        "type": 1,
+        "base_job": 22,
+        "race": 3,
+        "job": 22,
+        "level": 40,
+        "hp": 231,
+        "max_hp": 231,
+        "mp": 179,
+        "max_mp": 179,
+        "is_rom_name": true,
+        "is_ram_name": false,
+        "name_text": "Carson",
+        "side_bit": true,
+        "unaffiliated": false,
+        "live": true,
+        "tile": [
+          7,
+          4
+        ]
+      },
+      "target_tile": [
+        7,
+        4
+      ]
+    }
+  ],
+  "rejections": [
+    "empty raw input",
+    "post-final input with matching guards",
+    "wrong facing actor",
+    "cached active callback",
+    "same continuing actor",
+    "continuation still owner",
+    "enemy cursor differs",
+    "Wait spent MP",
+    "canonical HP differs"
+  ],
+  "limits": "fixed research route, no policy fallback/public-runner acceptance"
+}

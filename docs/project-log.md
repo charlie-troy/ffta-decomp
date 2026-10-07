@@ -1,5 +1,38 @@
 # Project log
 
+## 2026-10-06 - A6 guarded facing and restored-roster continuation
+
+Decoded the Wait-facing input owner independently of its cached command menu:
+main player-driver state0x2F dispatches through `080955E0` to the facing handler
+`080A1BE8`. The reader pins its facing object, wrapper, direction, driver flags,
+and absence of active target/UI controllers. Command input also requires the
+command-driver state. Retained checks reject fourteen facing ownership/drift
+controls; the ROM input branch passes 1,024 direction/key cases. These fragment
+checks exclude rendering/audio helpers and do not prove turn completion.
+
+Live cancellation control `a6-wait-facing-cancel-01` returns from facing to
+Wait with HP100/MP6 unchanged. Confirmation run `a6-wait-facing-commit-02`
+sends no keys after its single final facing A, restores the roster, preserves
+Marche's HP/MP/tile, and joins two later active enemy wrappers to distinct
+restored battle records (IDs3 then4). Screenshots corroborate progression.
+The retained continuation validator rejects nine altered receipts.
+
+The first confirmation run had an incomplete post-final sweep and remains
+failed evidence. Disable unused router trace re-arming locally in this research
+probe; the successful discriminating rerun supports an asynchronous reply-race
+explanation, not a wire-level proof. A fresh Cure regression then stopped on
+description closing0x104; the ROM has an explicit close-window branch for it.
+It now classifies as read-only settling, with a fifteenth rejection proving
+that it cannot authorize input. That regression replay is explicitly derived
+from separate live/bulk observations. See the A6 research notes and receipt.
+The fresh rerun `a6-facing-cure-regression-02` settles successfully at
+HP160/MP79, consumes Action and sends no post-confirmation input; its retained
+receipt rejects twelve mutations. AI10/10 and strategy9/9 regressions pass.
+
+This remains fixed-route research; state-driven policy-decline Wait fallback,
+public-runner integration and ally/KO/wounded-party acceptance remain open.
+The pre-existing `docs/roadmap.md` change is preserved separately.
+
 ## 2026-10-06 - A6 pinned modal ownership and policy-driven self-Cure research
 
 Added a read-only modal reader that pins the verified owner, unique canonical

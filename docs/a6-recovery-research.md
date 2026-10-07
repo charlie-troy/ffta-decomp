@@ -216,6 +216,66 @@ Policy declines unwind known modal states and report fallback **unexecuted**.
 The normal battle-roster adapter can still reject the returned command storage.
 A safe Wait/facing executor and public runtime integration remain separate work.
 
+## Wait-facing ownership and bounded continuation
+
+`a6-wait-facing-01` reached the Wait-facing screen after canceling self-Cure.
+The reader rejected the cached command callback (LIST/mode4/state3) and
+preserved the unknown screenshot/RAM before cleanup. The active player driver
+at `0200F4E8` supplies an independent discriminator: `+0xDC` is the switch
+index, and table `080929D4[0x2F]` dispatches to `080955E0`. That arm calls
+`080A82C0` -> `080A1BE8`, the facing input handler. A confirms; B cancels;
+direction keys update the facing choice. The branch returns the current stored
+direction on A. `validate_recovery_facing.py` executes its actual input branch
+for four starting directions and all 256 low-byte key masks (1,024 cases),
+stopping before rendering/audio helpers. This is input-dispatch proof only.
+
+The fixture-bound reader requires driver state47/flags0x48, no target processor,
+no active UI callback, facing object `0200F8A8` owned by the pinned wrapper,
+enabled facing, and matching wrapper/object direction in 0..3. It rechecks these
+facts before input and after each observation. Command input independently
+requires driver state37 with no target processor. Fourteen facing mutation
+controls reject stale/wrong ownership, cached callbacks, invalid/changed
+direction, main-state drift, and changes during reads.
+
+`a6-wait-facing-cancel-01` sends guarded B from facing and returns to the
+command menu with Wait selected, HP100/MP6 unchanged; the battle roster remains
+borrowed. `a6-wait-facing-commit-02` instead sends one guarded facing A, latches
+the terminal input and then observes only. The restored roster identifies Marche
+at HP100/MP6 on tile4,10. Two later captures join the active wrapper's canonical
+enemy to a unique restored battle record (IDs3 then4), matching name/job/side/tile
+and cursor. Screenshots corroborate enemy progression. Old modal ownership
+correctly rejects the changed wrapper. CT changes alone are not the criterion.
+The retained continuation validator rejects nine altered receipts, including
+post-final input, empty raw input, wrong ownership, missing distinct enemies,
+cursor mismatch and resource changes.
+
+A fresh policy-Cure regression then exposed description closing state0x104
+after final confirmation (`a6-facing-cure-regression-01`). Static callback
+`08029188` explicitly dispatches 0x104 to `080291FA`, which closes the window
+and writes state3; it does not accept gameplay input. The reader now treats
+this description state as read-only settling. A fifteenth facing-suite
+rejection verifies that it cannot authorize a key. Its replay is explicitly
+derived from the later live rejection and earlier bulk capture, not an atomic
+captured state. The original failed run remains evidence, not an accepted cast.
+Fresh rerun `a6-facing-cure-regression-02` settles to command with HP100->160,
+MP85->79 and Action disabled; its receipt passes twelve rejection controls.
+
+The first confirmation run (`a6-wait-facing-commit-01`) delivered its final A
+but had an incomplete following sweep, so it proves no continuation. The
+research probe now disables unused router-trace re-arming after initial owner
+verification; those asynchronous stops could mispair a bulk-memory reply.
+No global transport or public-runner behavior was changed. Screenshots, bulk
+captures and live reads remain separate observations, not atomic pairs.
+
+```powershell
+python tools/validate_recovery_facing.py --out outputs/autobattle/a6-facing-reader/checks.json
+python tools/validate_recovery_facing_execution.py --out outputs/autobattle/a6-facing-continuation/checks.json
+```
+
+This is bounded fixed-route research. A state-driven policy-decline Wait
+fallback, public integration, ally/KO targeting and wounded-party comparison
+remain open. No input is inferred safe from a cached menu alone.
+
 
 ### Target processor and cancellation ownership
 

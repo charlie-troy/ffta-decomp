@@ -553,8 +553,11 @@ changes. MP-cost semantics match 2,429 executed retail-function cases. See
 [`a6-recovery-research.md`](a6-recovery-research.md). The pinned modal reader and state-driven research executor now join active
 target-processor ownership to canonical actor identity before policy-driven
 confirmation. MP6 is enabled by the engine but declined by the eight-MP
-reserve; guarded cancellation preserves resources. Next dependencies: safe
-Wait/facing fallback, public-runner integration, and ally/KO targeting. The
+reserve; guarded cancellation preserves resources. Guarded facing research now
+confirms Wait and joins two subsequent enemy actors after roster restoration;
+fourteen reader controls and nine receipt mutations reject wrong ownership.
+The ROM facing branch passes 1,024 input cases. Next dependencies: state-driven
+policy-decline Wait fallback, public-runner integration, and ally/KO targeting. The
 roster is scratch during targeting; do not bypass identity rejection or
 substitute a fixed research route for an adapter.
 

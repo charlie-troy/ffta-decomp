@@ -281,5 +281,65 @@
       "outputs/autobattle/a6-policy-reserve-03/99-settled.png": "bc2a365b536a2e59f351e3f6fca1a604f511774c561e8f266c7401d29d89f3e6",
       "outputs/autobattle/a6-policy-stop-01/08-A.png": "420c0edc9563fd60ec457e2f00fb2db6dcc1dd11fe8ea0a562d1e13d9e913b8e"
     }
+  },
+  "facing_research_slice": {
+    "base_revision": "10d5d6d",
+    "status": "bounded fixed-route confirmation and continuation; policy fallback remains unknown",
+    "delivered_source_sha256": {
+      "tools/recovery_menu.py": "06dbddd97a80ff0bd2ebc2ad7907babd51a0483cdb665ce2c479802cd3e33b47",
+      "tools/probe_a6_action_menu.py": "0ab597ef2f07a9351760b47bc506b86b6e837fd7f336a3fb23b8ea2740a0a781",
+      "tools/validate_recovery_facing.py": "4c412db94db02f7bfb831179480d8f6d695ab2dd891e37181af43259b1ffcd79",
+      "tools/validate_recovery_facing_execution.py": "ec3395458a4f9cfed67827419e7a2df1cd54366e8759dd99d6a334faf075bb8d"
+    },
+    "evidence_sha256": {
+      "outputs/autobattle/a6-wait-facing-01/probe.json": "0511b6703e82e1ca7c32d10f89a100dfee8d28e9417afd255dc8207f5c468496",
+      "outputs/autobattle/a6-wait-facing-cancel-01/probe.json": "e6999a92b55aff2f0d73ea3c3ef750475f9d0697452223b7123038972759e8f5",
+      "outputs/autobattle/a6-wait-facing-commit-01/probe.json": "1412566cb0bcaf83ab5fc9acc59e6d50593435d4f502565e59c3fa880dbe201f",
+      "outputs/autobattle/a6-wait-facing-commit-02/probe.json": "49e570610fd74afaa12e7179f2ffb971b13fa43bf6a867b9c5be04fcf244f696",
+      "outputs/autobattle/a6-facing-cure-regression-01/probe.json": "dc5f527f1a14666ccbbab8ba1ab2101f5a52fb083e4492af20af64e0051f8aa6",
+      "outputs/autobattle/a6-facing-cure-regression-02/probe.json": "e3288077ae1f04496b211df9af63425c75258e9abcfe53c340aa1aab401a6486",
+      "outputs/autobattle/a6-facing-reader/checks.json": "57d2514bbc3f8f0ff5d0591daf405ce2d4eb937de7143a765f374462d418ce38",
+      "outputs/autobattle/a6-facing-continuation/checks.json": "56ee9f70f7cb3869c8b4fc1f1b0c254f2acf2a2efc7cf4f18d2ce497ec747f85",
+      "outputs/autobattle/a6-facing-reader-regression/checks.json": "445c1fdad4032ac7764b50e01598767d8624ec40f7f653fceed38d1964cc7306",
+      "outputs/autobattle/a6-facing-executor-regression/checks.json": "e40cf3a6b98823a629d74ab49cf908cb31cefaac03b480a39db89e7ab28fcc47",
+      "outputs/autobattle/a6-facing-artifact-regression/checks.json": "0d51c307e14b9b5535498f41da43b2be5b39e5ee00486c101edf8030fff2c453",
+      "outputs/autobattle/a6-facing-cure-artifacts/checks.json": "d1b250b3841beaa7003500f8865bb5856c7e8fc1e65533a6da7d527dcb0dfe4c"
+    },
+    "checks": {
+      "facing_rom_input_branches": 1024,
+      "facing_rejections": 15,
+      "continuation_enemy_actors": 2,
+      "continuation_artifact_mutations": 9,
+      "modal_captured_states": 14,
+      "modal_derived_states": 1,
+      "modal_rejections": 46,
+      "executor_host_checks": 23,
+      "prior_policy_artifact_controls": 4,
+      "prior_policy_artifact_mutations": 14,
+      "fresh_policy_cure_artifact_mutations": 12,
+      "ai": 10,
+      "strategy": 9
+    },
+    "live": {
+      "cancel": "a6-wait-facing-cancel-01: HP100/MP6 unchanged, returned command",
+      "confirmation": "a6-wait-facing-commit-02: restored roster, enemies3 then4; HP100/MP6/tile4,10 unchanged",
+      "cure_regression": "a6-facing-cure-regression-02: HP100->160, MP85->79; Action consumed"
+    },
+    "retained_failures": [
+      "a6-wait-facing-01: unknown facing signature rejected before final input",
+      "a6-wait-facing-commit-01: incomplete post-final sweep; continuation unknown",
+      "a6-facing-cure-regression-01: read-only closing0x104 initially rejected"
+    ],
+    "limits": [
+      "Fixed research route is not state-driven policy-decline fallback or public integration",
+      "ROM fragment excludes helper calls and full main-controller completion",
+      "Closing0x104 replay is explicitly derived from separate live/bulk observations",
+      "No ally/KO/item/wounded-party acceptance or manual handoff claim"
+    ],
+    "local_screenshot_sha256": {
+      "outputs/autobattle/a6-wait-facing-commit-02/11-A.png": "f936a7d1c05b0d503d793bb574069bcf0db30f442812174c718117155e0f1c6b",
+      "outputs/autobattle/a6-wait-facing-commit-02/99-settled.png": "0f77394717bab627910d81cbdb5a82fe538cc38476f7fdef1d6000b386ac02ef",
+      "outputs/autobattle/a6-facing-cure-regression-02/99-settled.png": "c87a912a4f6ef4efc068a7e16fbc665e809e47d817166e9eb7e65dfd2dc04633"
+    }
   }
 }

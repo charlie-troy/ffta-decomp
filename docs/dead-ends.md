@@ -582,3 +582,20 @@ CLAUDE.md carries the slogan.
   selected ability or fixed roster. Read and validate the active target
   processor and actor wrapper separately. Post-confirmation execution still
   permits no more input, regardless of a reused signature.
+
+### DE-035 — Router trace can spoil post-facing bulk observations
+
+- **Tried (A6, 2026-10-06):** `a6-wait-facing-commit-01` delivered a guarded
+  final facing A, then its next EWRAM sweep was incomplete. Keep that failure;
+  a delivered key is not turn-completion proof.
+- **Observed:** the research probe reused a transport that re-armed router
+  trace breakpoints after each press. Following terminal facing input, the
+  engine advances into other actors, allowing unsolicited stop replies to
+  race bulk reads. The subsequent fresh run with unused trace re-arming
+  disabled (`-02`) captured a restored roster and two distinct enemy actors.
+- **Do not:** retry the final A, repair missing RAM with zero bytes, accept CT
+  change alone, or relax packet/identity validation. Disable unused tracing
+  locally for this probe; preserve the failed run and independently join the
+  canonical active actor to the restored battle roster. The suspected reply
+  race is an inference from the failure and successful discriminating rerun,
+  not a wire-level packet trace.

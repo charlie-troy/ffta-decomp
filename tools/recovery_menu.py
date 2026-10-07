@@ -21,6 +21,7 @@ LIST = 0x08028DE1
 DESCRIPTION = 0x08029189
 CONFIRM = 0x080293DD
 PLAYER_DRIVER = 0x0200F4E8
+FACING = 0x0200F8A8
 
 
 class RecoveryStateError(ValueError):
@@ -76,6 +77,8 @@ class MenuObservation:
     target_flags: int = 0
     actor_wrapper: int = 0
     ui_active: int = 0
+    driver_state: int = 0
+    facing_direction: int | None = None
 
     def receipt(self):
         return asdict(self)
@@ -138,6 +141,8 @@ class RecoveryMenu:
         require(integer(root, 0x28) == self.callback, "modal callback allocation changed")
         require(integer(root, 0x20) == self.manager, "modal manager changed")
         driver = exact(g, PLAYER_DRIVER, 0x64)
+        driver_control = exact(g, PLAYER_DRIVER + 0xD0, 0x10)
+        driver_state = integer(driver_control, 0xC, 2)
         require(integer(driver, 4) == integer(driver, 8) == self.wrapper
                 and integer(exact(g, self.wrapper, 4), 0) == self.member,
                 "player driver actor wrapper changed")
@@ -175,6 +180,8 @@ class RecoveryMenu:
         handler, state = integer(block, 0), integer(block, 0x14, 2)
         mode, selection, ability = root[4], integer(root, 0, 2), integer(root, 0x14)
         active = callback
+        facing_reads = []
+        facing_direction = None
         if handler == LIST and mode == 5 and state == 0x106:
             active = integer(block, 0x10)
             child = exact(g, active, 0x18)
@@ -184,9 +191,27 @@ class RecoveryMenu:
                     and integer(child, 0x14, 2) == 0x102, "Action child is not a stable owned list")
             kind = "action-group"
         elif handler == LIST and mode == 4 and state == 0x102:
+            require(driver_state == 0x25 and processor == 0,
+                    "command callback is not owned by the command driver")
             kind = "command"
         elif handler == LIST and mode == 4 and state == 0x101:
             raise RecoveryTransient("command controller is opening")
+        elif handler == LIST and mode == 4 and state == 3 and selection == 3:
+            # The completed command callback is cached. Main switch entry
+            # 0x2F (080955E0) owns input through 080A82C0 -> 080A1BE8.
+            require(driver_state == 0x2F and integer(driver_control, 0) == 0x48
+                    and processor == 0 and active_callback == 0,
+                    "facing controller is not the owned input state")
+            facing = exact(g, FACING, 0x14)
+            direction = exact(g, self.wrapper + 0x1F, 1)
+            require(integer(facing, 0) == self.wrapper and facing[0x10] == 1
+                    and facing[4] in range(4) and facing[5] in range(4)
+                    and direction[0] == facing[4], "facing actor or direction changed")
+            facing_direction = facing[4]
+            # Exclude animation counters +6..8; they are not decisions.
+            facing_reads = [(FACING, facing[:6]), (FACING + 0x10, facing[0x10:0x11]),
+                            (self.wrapper + 0x1F, direction)]
+            kind = "facing"
         elif handler == LIST and mode == 7 and state == 0x102:
             kind = "ability-list"
         elif handler == LIST and mode == 7 and state == 3 and selection > 0 and target_ready:
@@ -200,7 +225,8 @@ class RecoveryMenu:
             kind = "description"
         elif handler == CONFIRM and mode == 11 and state == 0x102 and selection == 0:
             kind = "confirmation"
-        elif ((handler == DESCRIPTION and mode == 12) or (handler == CONFIRM and mode == 11)) and state in (3, 0x103):
+        elif (((handler == DESCRIPTION and mode == 12) or (handler == CONFIRM and mode == 11))
+              and state in (3, 0x103)) or (handler == DESCRIPTION and mode == 12 and state == 0x104):
             kind = "settling"
         else:
             raise RecoveryStateError(f"unknown/transient modal signature: {handler:08x}/{mode}/{state:04x}")
@@ -246,7 +272,8 @@ class RecoveryMenu:
                                    rows, enabled, ids, integer(unit, 0x18, 2), integer(unit, 0x1A, 2),
                                    integer(unit, 0x1C, 2), integer(unit, 0x1E, 2),
                                    effective_mp_cost(self.rom, 1, unit), tile,
-                                   processor, target_state, target_flags, self.wrapper, active_callback)
+                                   processor, target_state, target_flags, self.wrapper, active_callback,
+                                   driver_state, facing_direction)
         # Confirm the root did not move during this multi-read observation.
         require(integer(exact(g, MENU_ROOT, 4), 0) == context
                 and exact(g, context, 0x30) == root, "modal root changed during snapshot")
@@ -262,6 +289,11 @@ class RecoveryMenu:
                 "player driver changed during snapshot")
         require(all(exact(g, address, len(data)) == data for address, data in processor_reads),
                 "target processor changed during snapshot")
+        require(exact(g, PLAYER_DRIVER + 0xD0, 4) == driver_control[:4]
+                and exact(g, PLAYER_DRIVER + 0xDC, 2) == driver_control[0xC:0xE],
+                "main player controller changed during snapshot")
+        require(all(exact(g, address, len(data)) == data for address, data in facing_reads),
+                "facing controller changed during snapshot")
         self.last = observed
         return observed
 

@@ -18,7 +18,7 @@ from autobattle_identity import ActorAdapter, IdentityError, key
 from c2_menu_probe import sweep
 from fixture_guard import FixtureSession, ROSTER, STRIDE, u8, u16, u32
 from probe_control_handoff import Probe
-from recovery_menu import RecoveryMenu
+from recovery_menu import RecoveryMenu, RecoveryStateError
 from recovery_executor import SelfCureExecutor, RecoveryStopped
 from tactics_policy import validate_policy
 
@@ -40,6 +40,8 @@ def main():
     parser.add_argument("--verify-menu", action="store_true",
                         help="require pinned canonical identity and known modal state before every research key")
     parser.add_argument("--route")
+    parser.add_argument("--confirm-facing", action="store_true",
+                        help="require the final route key to confirm verified facing, then observe only")
     parser.add_argument("--policy", help="state-driven bounded self-Cure research using this policy")
     parser.add_argument("--stop-file", help="observe STOP when this file exists; policy executor only")
     args = parser.parse_args()
@@ -47,6 +49,8 @@ def main():
         parser.error("policy execution and an explicit research route are mutually exclusive")
     if args.stop_file and not args.policy:
         parser.error("STOP file requires policy execution")
+    if args.confirm_facing and (args.policy or not args.verify_menu):
+        parser.error("facing research requires a guarded explicit route")
     route_text = args.route if args.route is not None else "DOWN,A,DOWN,DOWN,A,DOWN,UP,B,B"
     route = route_text.split(",") if route_text else []
     policy_bytes = Path(args.policy).read_bytes() if args.policy else None
@@ -54,6 +58,8 @@ def main():
     policy = validate_policy(policy_document) if policy_document is not None else None
     if any(k not in KEYS for k in route):
         parser.error("route contains an unsupported key")
+    if args.confirm_facing and (args.route is None or not route or route[-1] != "A"):
+        parser.error("facing research requires a final explicit A")
     root = Path(args.out)
     root.mkdir(parents=True, exist_ok=False)
     result = {"scope": "menu research only; fixture edits are not engine actions",
@@ -66,6 +72,7 @@ def main():
         result["policy_sha256"] = hashlib.sha256(policy_bytes).hexdigest()
     started = time.time()
     probe = None
+    facing_committed = False
     try:
         with FixtureSession(args.state, rom=args.rom, quiet=True) as session:
             if policy:
@@ -118,6 +125,12 @@ def main():
                                         "A6 disposable research fixture: actor MP")
             menu = RecoveryMenu(session.g, session.read_rom_bytes(), owner) if args.verify_menu or policy else None
             result["menu_guards"] = []
+            # This probe uses explicit modal reads, not the old router trace.
+            # Re-arming that trace after a terminal facing A can enqueue an
+            # unsolicited stop and mispair the next bulk memory reply.
+            probe.disarm()
+            probe.arm = lambda: None
+            result["router_trace"] = "disabled after independent initial owner verification"
 
             def stop_check():
                 stopped = bool(args.stop_file and Path(args.stop_file).exists())
@@ -163,6 +176,11 @@ def main():
                          "target_cursor": probe.read_target_cursor(),
                          "action_cursor": [u8(session.g, 0x0202DF5D),
                                            u8(session.g, 0x0202DF5E)]}
+                entry["player_driver"] = {
+                    "state": u16(session.g, 0x0200F4E8 + 0xDC),
+                    "flags": u32(session.g, 0x0200F4E8 + 0xD0),
+                    "actor_wrapper": f"{u32(session.g, 0x0200F4EC):08x}",
+                    "target_processor": f"{u32(session.g, 0x0200F548):08x}"}
                 # Research offsets from 08028970/080287C4/08028A70.
                 # Retain raw values even outside the ability list; these
                 # fields do not establish a public-adapter modal contract.
@@ -195,8 +213,15 @@ def main():
                                 "enabled": [read(enabled_ptr + i, 1) for i in range(count)]}
                 if transient is not None:
                     entry["roster_rejected"] = transient
+                guard_error = None
                 if menu is not None:
-                    entry["guarded_menu"] = menu.snapshot().receipt()
+                    try:
+                        entry["guarded_menu"] = menu.snapshot().receipt()
+                    except RecoveryStateError as exc:
+                        # Preserve the unknown state for diagnosis, then fail
+                        # before any additional input. Capture is read-only.
+                        entry["guarded_menu_error"] = repr(exc)
+                        guard_error = exc
                 if member is not None:
                     entry["member"] = {"addr": f"{member:08x}",
                                        "secondary_job": u8(session.g, member + 8),
@@ -210,6 +235,8 @@ def main():
                 result["phases"].append(entry)
                 (root / "probe.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
                 print(json.dumps(entry), flush=True)
+                if guard_error is not None and not facing_committed:
+                    raise guard_error
                 session.g.cont()
 
             phase("00-initial")
@@ -231,6 +258,14 @@ def main():
                     verified = menu.revalidate(token)
                     result["menu_guards"].append({"before_key": i, "key": name,
                                                   "facts": verified.receipt()})
+                    if args.confirm_facing and i == len(route):
+                        if verified.state != "facing":
+                            raise RecoveryStateError("final research A requires owned facing")
+                        # Ambiguous transport is terminal too. No retry or
+                        # further route input is permitted after this latch.
+                        facing_committed = True
+                        result["facing_confirmation"] = {"before_key": i,
+                                                         "facts": verified.receipt()}
                 hits = probe.press(KEYS[name], tag=f"a6-research:{name}", pause=1.2)
                 result["keys"].append({"key": name, "hits": hits})
                 if hits < 1:
