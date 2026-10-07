@@ -1,5 +1,15 @@
 # Project log
 
+## 2026-10-07 - Exact receipt packaging audit
+
+Added `audit_recovery_receipt_hashes.py` to compare local evidence and all
+available Git blobs with recorded SHA256 values. Current A6.1/A6.2 receipts
+pass93 committed-blob checks. Historical `ca1afe3` is a negative control: its
+line-ending-normalized JSON fails, while `deff57e` preserves captured bytes.
+Use `--git-ref index` before committing receipt evidence. Final runtime/party
+validators pass again; debugger port2345 is free. Only the user's pre-existing
+general-roadmap edit remains outside these packets.
+
 ## 2026-10-07 - A6.2 read-only party joins and target-index ROM proof
 
 Overlay research navigates engine-enabled Cure and moves the cursor once onto
