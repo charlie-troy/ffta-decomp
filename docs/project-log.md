@@ -1,5 +1,35 @@
 # Project log
 
+## 2026-10-07 - A6.1 modal transport prerequisite and opening-state decode
+
+Added scoped recovery debugger ownership: explicit halted reads, strict hook
+acknowledgments, original key-poll delivery without per-key router re-arming,
+raw-write export even on partial disconnect, and verified restoration before
+resuming. Default Probe behavior remains unchanged; no tracing method is
+replaced with a no-op on the scoped path. Real research reloads10/11 heal
+HP100->154/157, spend six MP, consume Action and finish through guarded Wait
+with two independently joined later enemies. Each has13 keys/65 raw writes,
+no post-facing input, launch-time source hashes and23 rejected mutations.
+Run10 then records21 decoded router events; run11 records one enemy seed.
+Those prove trace restoration, not additional action acceptance.
+
+Run04 failed safely on command initialization0x100 after healing. Three actual
+ROM dispatch cases establish initialization/opening/input separation; opening
+states now reject the observation and permit bounded passive retry only. Six
+derived controls preserve identity and input rejection. Run06's premature
+second launch was refused by the occupied-port guard, without touching the
+first owned emulator. Run08 had no trace traffic in its three-second sample;
+retain restoration as unknown. A twelve-second sample and seed-or-attributed
+router evidence now test restoration separately from raw action continuation.
+
+Fresh STOP at Cure confirmation and Wait facing preserves8/12 keys (40/60 raw
+writes), suppresses both respective final inputs and restores hooks. Each
+retained STOP receipt rejects seven mutations. Inspected heal, continuation,
+confirmation and facing screens. Transport13, Cure23, Wait16, reader46,
+facing1024/16, tactics12 and host resume pass; AI10/10 and strategy9/9 pass.
+See `A6.1.json` for source/evidence hashes and retained failures. Public recovery
+integration, live CLI handoff/resume and all broader A6 party gates remain open.
+
 ## 2026-10-07 - Raw-write receipt rejection and resumed terminal bounds
 
 While preparing A6.1 modal transport, reproduced an offline receipt defect:

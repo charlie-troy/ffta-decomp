@@ -578,6 +578,12 @@ Prerequisite: accepted current-source successful-Cure/Wait continuation reloads
 in `A6.json`, plus the policy-decline/STOP receipt. Keep their fixture limits.
 This is an integration packet, not closure of the wounded-party/ally/KO gates.
 
+Transport prerequisite now has bounded research evidence (2026-10-07): scoped
+explicit halts, strict hook acknowledgments, complete modal raw ledgers and
+restored real sequencer tracing after guarded Cure/Wait reloads. Command opening
+states reject input and permit bounded passive retry. See `A6.1.json` and A6
+research notes. Public runtime/CLI integration and handoff acceptance remain open.
+
 - Reuse `RecoveryMenu`, `SelfCureExecutor` and `WaitFacingExecutor` through
   `BattleRuntime._drive_player_boundary`; preserve the existing fresh-owner
   adapter. Never call its fixed-roster revalidation while targeting borrows

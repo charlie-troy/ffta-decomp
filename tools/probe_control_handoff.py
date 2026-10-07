@@ -269,19 +269,24 @@ class Probe:
     def set_bp(self, addr):
         return self.g.send(f"Z0,{addr:x},2")
 
-    def clear_bp(self, addr):
+    def clear_bp(self, addr, strict=False):
         try:
-            self.g.send(f"z0,{addr:x},2")
+            reply = self.g.send(f"z0,{addr:x},2")
+            if strict and reply != "OK":
+                raise OSError(f"breakpoint removal rejected at {addr:08x}: {reply!r}")
         except Exception:
-            pass
+            if strict:
+                raise
 
-    def arm(self):
+    def arm(self, strict=False):
         for bp in ALL_BPS:
-            self.set_bp(bp)
+            reply = self.set_bp(bp)
+            if strict and reply != "OK":
+                raise OSError(f"breakpoint insertion rejected at {bp:08x}: {reply!r}")
 
-    def disarm(self):
+    def disarm(self, strict=False):
         for bp in ALL_BPS:
-            self.clear_bp(bp)
+            self.clear_bp(bp, strict=strict)
 
     def handle_stop(self, during=""):
         g = self.g
@@ -475,7 +480,8 @@ class Probe:
         # (press() below re-arms the key-enable byte per press when
         # (run 13 disproved key-enable gating on this channel; kept as a
         # one-flag diagnostic)
-    def press(self, mask, frames=5, pause=1.2, tag="", stop_check=None):
+    def press(self, mask, frames=5, pause=1.2, tag="", stop_check=None,
+              rearm_trace=True):
         # Astra 2026-09-17 (round 3): a STOP observed before an input must
         # abort THAT input — a post-recovery check still lets one full input
         # sequence escape. Returns -1 when aborted (distinct from 0 hits) so
@@ -539,7 +545,11 @@ class Probe:
             except Exception:
                 pass
             try:
-                self.arm()
+                # A6 modal reads own an explicit halt interval. Their scoped
+                # transport restores tracing after the action, rather than
+                # enqueueing asynchronous router stops between modal reads.
+                if rearm_trace:
+                    self.arm()
             except Exception:
                 pass
             try:

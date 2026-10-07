@@ -1,0 +1,221 @@
+{
+  "packet": "A6.1",
+  "base_revision": "c927e40",
+  "status": "partial",
+  "scope": "Scoped debugger transport prerequisite verified; public-runner recovery remains unimplemented",
+  "criteria": [
+    {
+      "id": "modal-transport",
+      "status": "pass",
+      "expected": "Explicit halted modal reads, retained raw writes, restored real router tracing without extra input",
+      "observed": "Two source-pinned live reloads validate healing/cost/consumed Action, guarded Wait and two independent enemy joins; real tracing restored without another key. Cure/facing STOP controls suppress final input and restore tracing."
+    },
+    {
+      "id": "public-self-cure",
+      "status": "unknown",
+      "expected": "Two real public CLI reloads choose legal self-Cure and prove effect, six-MP cost, Action consumption and separate Wait continuation",
+      "observed": null
+    },
+    {
+      "id": "public-declines",
+      "status": "unknown",
+      "expected": "Reserve, engine-disabled Cure, no-match and disabled fallback through the public CLI",
+      "observed": null
+    },
+    {
+      "id": "public-stop",
+      "status": "unknown",
+      "expected": "STOP before Cure confirmation and before Wait-facing confirmation; zero later gameplay writes",
+      "observed": null
+    },
+    {
+      "id": "public-handoff-resume",
+      "status": "unknown",
+      "expected": "Paused CLI cleanup, visible manual command and same-PID resume",
+      "observed": null
+    },
+    {
+      "id": "receipt-rejection",
+      "status": "unknown",
+      "expected": "Exact chooser/modal/action/continuation evidence and raw-log/terminal mutations rejected",
+      "observed": null
+    },
+    {
+      "id": "move-wait-regressions",
+      "status": "unknown",
+      "expected": "Existing public Move/Wait and unsupported actor/job/target guards preserved",
+      "observed": null
+    }
+  ],
+  "live_runs": [
+    {
+      "run": "a61-scoped-cure-10",
+      "status": "pass-transport-prerequisite",
+      "command": "python tools/probe_a6_action_menu.py --out outputs/autobattle/a61-scoped-cure-10 --secondary-job 7 --hp 100 --mp 85 --edit-members --policy configs/tactics/healer.json --finish-recovery-turn --scoped-transport",
+      "hp": [
+        100,
+        154
+      ],
+      "mp": [
+        85,
+        79
+      ],
+      "keys": 13,
+      "raw_writes": 65,
+      "following_enemy_ids": [
+        3,
+        4
+      ],
+      "restored_trace": {
+        "router_hits": 21,
+        "seeds": 0
+      },
+      "trace_claim": "hook activity only; router preview is not an executed action",
+      "source_sha256": {
+        "tools/probe_a6_action_menu.py": "e05d9e02c7ee450ac2e2b6965fa2af4e5fc4f0f579b241296716fd607b180ada",
+        "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+        "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+        "tools/recovery_menu.py": "c724515a140702262d58110e0e1e0855f095b31601b315a44bbe9fcc523af5dc",
+        "tools/recovery_executor.py": "70af37812de149fb40a89237fe5c2f557203208d5f88ea92e819b8c30adcdde7",
+        "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+        "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+        "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+        "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e"
+      }
+    },
+    {
+      "run": "a61-scoped-cure-11",
+      "status": "pass-transport-prerequisite",
+      "command": "python tools/probe_a6_action_menu.py --out outputs/autobattle/a61-scoped-cure-11 --secondary-job 7 --hp 100 --mp 85 --edit-members --policy configs/tactics/healer.json --finish-recovery-turn --scoped-transport",
+      "hp": [
+        100,
+        157
+      ],
+      "mp": [
+        85,
+        79
+      ],
+      "keys": 13,
+      "raw_writes": 65,
+      "following_enemy_ids": [
+        3,
+        4
+      ],
+      "restored_trace": {
+        "router_hits": 0,
+        "seeds": 1
+      },
+      "trace_claim": "hook activity only; router preview is not an executed action",
+      "source_sha256": {
+        "tools/probe_a6_action_menu.py": "e05d9e02c7ee450ac2e2b6965fa2af4e5fc4f0f579b241296716fd607b180ada",
+        "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+        "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+        "tools/recovery_menu.py": "c724515a140702262d58110e0e1e0855f095b31601b315a44bbe9fcc523af5dc",
+        "tools/recovery_executor.py": "70af37812de149fb40a89237fe5c2f557203208d5f88ea92e819b8c30adcdde7",
+        "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+        "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+        "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+        "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e"
+      }
+    },
+    {
+      "run": "a61-scoped-stop-cure-01",
+      "status": "pass-research-stop",
+      "state": "confirmation",
+      "command": "python tools/probe_recovery_stop.py --out outputs/autobattle/a61-scoped-stop-cure-01 --phase 08-A --mp 85 --finish-recovery-turn --scoped-transport",
+      "keys": 8,
+      "raw_writes": 40,
+      "post_stop_writes": 0,
+      "limit": "Owned research session cleans up; no public CLI live handoff claim. Predates launch hashes/post-final evidence-wait additions, which do not alter these pre-final input or cleanup paths."
+    },
+    {
+      "run": "a61-scoped-stop-facing-01",
+      "status": "pass-research-stop",
+      "state": "facing",
+      "command": "python tools/probe_recovery_stop.py --out outputs/autobattle/a61-scoped-stop-facing-01 --phase 12-A --mp 85 --finish-recovery-turn --scoped-transport",
+      "keys": 12,
+      "raw_writes": 60,
+      "post_stop_writes": 0,
+      "limit": "Owned research session cleans up; no public CLI live handoff claim. Predates launch hashes/post-final evidence-wait additions, which do not alter these pre-final input or cleanup paths."
+    }
+  ],
+  "limitations": [
+    "Public runtime, event/source-hash integration, real CLI declines/STOP and manual continuation/same-PID resume remain unknown.",
+    "Source-bound reloads are constructed self-Cure research only; ally/KO/items/wounded-party acceptance remains open.",
+    "Raw RAM, ROM, states and screenshots stay local; metadata-only checks are selectively retained.",
+    "Router preview proves tracing restoration, never another action. Action/continuation remains independently joined from raw captures.",
+    "A seed-only restoration check was over-specific: final criterion accepts attributed router traffic or decoded seed traffic; no traffic remains unknown. Run08 is retained.",
+    "Screenshot subprocess timeout45s and debugger packet timeout1s bound pending-call latency. Post-final trace observation budget12s."
+  ],
+  "next_packet": "Integrate bounded executors and deliberate adapter capability through the real public runtime; require complete modal/raw/continuation evidence and execute public CLI/handoff gates.",
+  "date": "2026-10-07",
+  "tested_revision": "8fe1dbe plus source_sha256",
+  "retained_failures": [
+    {
+      "run": "a61-scoped-cure-04",
+      "observation": "Healed, then rejected command initialization 0x100 without further input; corrected by executed dispatch and passive-only retry."
+    },
+    {
+      "run": "a61-scoped-cure-06",
+      "observation": "Launch refused because run05 still owned the GDB listener; no foreign process reused or killed."
+    },
+    {
+      "run": "a61-scoped-cure-08",
+      "observation": "Action/continuation captures valid; three-second restored trace sample saw no events, so restoration evidence remains unknown."
+    }
+  ],
+  "evidence_sha256": {
+    "outputs/autobattle/a61-scoped-cure-10/probe.json": "3e553079b27433a8eac9189a6093fdb81c5db4b1a4d239a03f933a5f0b86bb9e",
+    "outputs/autobattle/a61-scoped-cure-10/10-DOWN.png": "16319c2e43faa7497f6fbfe8117efc9aea7cb56ceb75b8dfe5ad56b10503c069",
+    "outputs/autobattle/a61-scoped-cure-10/99-settled.png": "399223621e2a9c7d7c331d105986491f16d8f163d67b7a45543dd0ffee420cef",
+    "outputs/autobattle/a61-scoped-cure-11/probe.json": "6eef877074b6058b97aba63fe75d7ce219665cb4a0ef5e878d0464e15b8b9e9d",
+    "outputs/autobattle/a61-scoped-cure-11/10-DOWN.png": "d523c983c9803bdbce65d77d9f8f0689cc797a211367c64f417f683530064a3f",
+    "outputs/autobattle/a61-scoped-cure-11/99-settled.png": "8edc9e6f6921fdc3261ce2400809a281bef2758b9a512d1beb36b9b4c9be2e17",
+    "outputs/autobattle/a61-scoped-stop-cure-01/probe.json": "1d411f33d5a05dfbd6062bd6024d88ed33540f73da856a888d67e5a599bb07aa",
+    "outputs/autobattle/a61-scoped-stop-cure-01/08-A.png": "5eae63d2ae04cfcc4dcf008250157513e5503ed9f4a0d39def0437f70ce9a03a",
+    "outputs/autobattle/a61-scoped-stop-facing-01/probe.json": "f49fdc340efdc9ee47aff5e51fb0cf60b33bc25ec19848cc7e5aaedf703ac54a",
+    "outputs/autobattle/a61-scoped-stop-facing-01/12-A.png": "46ba85be44074ff2b82701fae2965b5c504b25fe5caf84ef88d1d049af1d4210",
+    "outputs/autobattle/a61-scoped-cure-04/probe.json": "6e74061f7819a1d2ee261e4a0322c18bea143cab52207b9f118089283a8edf2a",
+    "outputs/autobattle/a61-scoped-cure-06/probe.json": "55387756ad418032ad55272a88746624eb76ab920ea8e377c92a05fb89da5e6e",
+    "outputs/autobattle/a61-scoped-cure-08/probe.json": "337b485ac20eed443b045ce4717f2c4449c8e31230ce90fda39a3e1bbe2ac4fe",
+    "outputs/autobattle/a61-transport-regressions/turn10.json": "61cb2dc8a559515652dacecf8b0d0cb7d6cc5feece67c55a511f61cc2d13438c",
+    "outputs/autobattle/a61-transport-regressions/turn11.json": "d11b20d728de007f293bc0e1465434aa077a41716d4c23b46813d606a0ffea42",
+    "outputs/autobattle/a61-transport-regressions/stop-cure.json": "0a924ff73d04e16857a9a929a7bdf0cf429dc352c5232e61ae71bfebde9b617d",
+    "outputs/autobattle/a61-transport-regressions/stop-facing.json": "fdbd9a72b3701f82d32b67cc0ed9796e97029734502c47afe730a2b3183b7b26",
+    "outputs/autobattle/a61-transport-regressions/transport-final.json": "6eb88d3f5b2479f11c488d547c37042a38f66ffa632e93c1a54ae92d967142a1",
+    "outputs/autobattle/a61-transport-regressions/opening.json": "e31a362c2c0f7679337de1faf65064dd61bab7027d6aacd6955689bf471c7a2b",
+    "outputs/autobattle/a61-transport-regressions/menu.json": "b317407d1eee3c58a5a540b46c21d752a351856188223e16b0920e9683982017",
+    "outputs/autobattle/a61-transport-regressions/facing.json": "1c8ed468ee85ecb1bddf2d5d7f0bbde9f6bedc6477a06fb28e9463967be56bfe",
+    "outputs/autobattle/a61-transport-regressions/cure-final.json": "e40cf3a6b98823a629d74ab49cf908cb31cefaac03b480a39db89e7ab28fcc47",
+    "outputs/autobattle/a61-transport-regressions/wait-final.json": "7fc8c32d700531b4c82a0d6df4be136cc321b1e87506010855b6691b95df3e2b",
+    "outputs/autobattle/a61-transport-regressions/ai.log": "17adad12b5ffb6fdb5a46585aad6d75e40076bc7dc16158f9ce73c0e268b7a73",
+    "outputs/autobattle/a61-transport-regressions/resume.log": "cf7b362e01cf9bdee53a97396f8fcc33ec8c93f4889dcdb43cb2c19190ec7c18"
+  },
+  "source_sha256": {
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/probe_a6_action_menu.py": "e05d9e02c7ee450ac2e2b6965fa2af4e5fc4f0f579b241296716fd607b180ada",
+    "tools/probe_recovery_stop.py": "195811ed8728f28f7b67a541e872b2340693d2736149d29ac32c2121088cf9e6",
+    "tools/recovery_menu.py": "c724515a140702262d58110e0e1e0855f095b31601b315a44bbe9fcc523af5dc",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/recovery_executor.py": "70af37812de149fb40a89237fe5c2f557203208d5f88ea92e819b8c30adcdde7",
+    "tools/validate_recovery_transport.py": "986e98aec18b3d9f5ea6cdbac407e4bd4e31a515bf8a16ba8fbcaad1443e138f",
+    "tools/validate_recovery_transport_stop.py": "61ef07603ad69f99d5435665d1b612fcaf5325b16a73e636fe20627a67ef5c3a",
+    "tools/validate_recovery_opening.py": "d9b7d8bb6ddb83b3869f42743aa43494bc8c86963626c7c132a347f02af04564",
+    "tools/validate_recovery_turn_execution.py": "92cd4fdddf9ab2ddb0465a1b4aa439c55302c7a48cb7ea69bdb1cc26550b4b11"
+  },
+  "checks": {
+    "transport_host": 13,
+    "cure_host": 23,
+    "wait_host": 16,
+    "modal_rejections": 46,
+    "facing_rom_cases": 1024,
+    "facing_rejections": 16,
+    "opening_rom_cases": 3,
+    "opening_derived_rejections": 6,
+    "turn_mutations_each": 23,
+    "stop_mutations_each": 7,
+    "tactics_host": 12,
+    "ai": "10/10",
+    "strategy": "9/9"
+  }
+}

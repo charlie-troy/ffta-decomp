@@ -13,6 +13,7 @@ def main():
     parser.add_argument("--phase", required=True, help="screenshot tag, for example15-A")
     parser.add_argument("--mp", type=int, default=6)
     parser.add_argument("--finish-recovery-turn", action="store_true")
+    parser.add_argument("--scoped-transport", action="store_true")
     args = parser.parse_args()
     root = Path(args.out)
     stop = root.with_suffix(".stop")
@@ -27,6 +28,8 @@ def main():
                "--mp", str(args.mp), "--edit-members", "--policy", "configs/tactics/healer.json",
                "--stop-file", str(stop),
                "--finish-recovery-turn" if args.finish_recovery_turn else "--wait-fallback"]
+    if args.scoped_transport:
+        command.append("--scoped-transport")
     with log_path.open("w", encoding="utf-8") as log:
         process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT,
                                    creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)

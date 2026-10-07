@@ -194,7 +194,10 @@ class RecoveryMenu:
             require(driver_state == 0x25 and processor == 0,
                     "command callback is not owned by the command driver")
             kind = "command"
-        elif handler == LIST and mode == 4 and state == 0x101:
+        elif handler == LIST and mode == 4 and state in (0x100, 0x101):
+            # 08028DE0 dispatches 0x100 to initialization (08028E5E),
+            # 0x101 to window opening (08028ECC), and only 0x102 to input.
+            # Both reject the observation and allow passive bounded retry.
             raise RecoveryTransient("command controller is opening")
         elif handler == LIST and mode == 4 and state == 3 and selection == 3:
             # The completed command callback is cached. Main switch entry

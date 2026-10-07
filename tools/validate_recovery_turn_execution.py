@@ -14,6 +14,7 @@ def main():
     parser.add_argument("--rom", default="baserom.gba")
     parser.add_argument("--capture", default="outputs/autobattle/a6-cure-complete-turn-01")
     parser.add_argument("--out", required=True)
+    parser.add_argument("--require-scoped-transport", action="store_true")
     args = parser.parse_args()
     directory = Path(args.capture)
     run = json.loads((directory / "probe.json").read_text(encoding="utf-8"))
@@ -33,6 +34,43 @@ def main():
                 require([p["tag"] for p in captured] == receipt["continuation_tags"]
                         and all(p["roster"] == "verified" for p in captured), "poll/capture join differs")
         return validate(receipt, later, segment="finish", cure_outcome="accepted")
+
+    def check_transport(receipt):
+        events = receipt["modal_transport"]
+        require(events[0]["event"] == "halt" and events[1]["event"] == "trace_suspended"
+                and events[-1]["event"] == "trace_restored",
+                "modal trace suspension/restoration order differs")
+        require(sum(e["event"] == "trace_suspended" for e in events) == 1
+                and sum(e["event"] == "trace_restored" for e in events) == 1
+                and all(e["event"] in ("halt", "trace_suspended", "trace_restored") for e in events),
+                "duplicate/failed modal trace lifecycle")
+        halts = [e for e in events if e["event"] == "halt"]
+        require(len(halts) >= len(receipt["keys"]) and all(
+            isinstance(e["reply"], str) and len(e["reply"]) >= 3 and e["reply"][0] in "ST"
+            and all(c in "0123456789abcdefABCDEF" for c in e["reply"][1:3])
+            and e["reply"][:3] not in ("S04", "T04") for e in halts), "invalid modal halts")
+        writes = receipt["modal_raw_writes"]
+        require(writes and all(w["event"] == "key_write" for w in writes)
+                and [{k: v for k, v in w.items() if k != "event"} for w in writes] == receipt["key_writes"],
+                "modal ledger differs from raw transport writes")
+        require(events[-1]["write_count"] == len(writes), "input after modal tracing restoration")
+        trace = receipt["restored_trace"]
+        seed_traffic = (trace["after"]["seeds"] > trace["before"]["seeds"]
+                        and len(trace["seed_observations"]) == trace["after"]["seeds"]
+                        and any(s.get("ctx_units") for s in trace["seed_observations"]))
+        # Router preview traffic proves only hook restoration, never another
+        # action. The independent raw joins above still own continuation.
+        router_traffic = (trace["after"]["router_hits"] > trace["before"]["router_hits"]
+                          and len(trace["router_observations"]) == trace["after"]["router_hits"]
+                          and any(r.get("enemy") is True and r.get("during") == "a6-restored-trace"
+                                  and r.get("branch") == "ai_path_0x0809E3BA"
+                                  and any((r.get("id"), r.get("name"), r.get("slot")) ==
+                                          (c["actor"]["id"], c["actor"]["name_text"], c["actor"]["slot"])
+                                          for c in later) for r in trace["router_observations"]))
+        require(seed_traffic or router_traffic, "restored tracing lacks decoded seed/router evidence")
+
+    if args.require_scoped_transport:
+        check_transport(run)
 
     check(run)
     rejected = []
@@ -86,6 +124,29 @@ def main():
             rejected.append(name)
         else:
             raise AssertionError(name)
+    if args.require_scoped_transport:
+        for name, mutate in [
+            ("missing modal trace", lambda r: r.pop("modal_transport")),
+            ("missing modal halts", lambda r: r.update(modal_transport=[e for e in r["modal_transport"] if e["event"] != "halt"])),
+            ("fatal modal halt", lambda r: r["modal_transport"][0].update(reply="T04")),
+            ("duplicate trace restoration", lambda r: r["modal_transport"].append(copy.deepcopy(r["modal_transport"][-1]))),
+            ("missing modal ledger", lambda r: r.update(modal_raw_writes=[])),
+            ("altered modal write", lambda r: r["modal_raw_writes"][0].update(val=0)),
+            ("input after trace restoration", lambda r: r["modal_transport"][-1].update(write_count=0)),
+            ("no restored trace traffic", lambda r: r["restored_trace"]["after"].update(seeds=0, router_hits=0)),
+            ("missing restored trace observations", lambda r: r["restored_trace"].update(seed_observations=[], router_observations=[])),
+            ("unattributed restored router evidence", lambda r: (
+                r["restored_trace"].update(seed_observations=[]),
+                [entry.update(id=255, name="unknown") for entry in r["restored_trace"]["router_observations"]])),
+        ]:
+            changed = copy.deepcopy(run)
+            mutate(changed)
+            try:
+                check_transport(changed)
+            except (ValueError, KeyError, TypeError, IndexError):
+                rejected.append(name)
+            else:
+                raise AssertionError(f"transport mutation survived: {name}")
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"status": "pass", "scope": __doc__, "capture": str(directory),

@@ -1,0 +1,111 @@
+{
+  "status": "pass",
+  "scope": "Replay successful self-Cure, guarded turn finish and enemy continuation.",
+  "capture": "outputs\\autobattle\\a61-scoped-cure-11",
+  "continuation": [
+    {
+      "tag": "98-continuation",
+      "raw_sha256": "f4e3dfa1ed5a318d6373c04b56ff073a939f24af7a53b2ec0019b72425a9c7bf",
+      "driver_state": 27,
+      "wrapper": 33695212,
+      "canonical": 33567716,
+      "actor": {
+        "slot": 3,
+        "addr": "02015d00",
+        "name": 139881681,
+        "side_raw": 32769,
+        "ct": 935,
+        "ea": 0,
+        "id": 3,
+        "type": 1,
+        "base_job": 36,
+        "race": 5,
+        "job": 36,
+        "level": 41,
+        "hp": 323,
+        "max_hp": 323,
+        "mp": 114,
+        "max_mp": 114,
+        "is_rom_name": true,
+        "is_ram_name": false,
+        "name_text": "Schneider",
+        "side_bit": true,
+        "unaffiliated": false,
+        "live": true,
+        "tile": [
+          9,
+          2
+        ]
+      },
+      "target_tile": [
+        9,
+        2
+      ]
+    },
+    {
+      "tag": "99-settled",
+      "raw_sha256": "a936e4221263f593ea5e3e79cbd76c73b184fff15c02defaee010635b55c98cd",
+      "driver_state": 26,
+      "wrapper": 33695068,
+      "canonical": 33567452,
+      "actor": {
+        "slot": 4,
+        "addr": "02015e08",
+        "name": 139881253,
+        "side_raw": 32769,
+        "ct": 692,
+        "ea": 0,
+        "id": 4,
+        "type": 1,
+        "base_job": 22,
+        "race": 3,
+        "job": 22,
+        "level": 40,
+        "hp": 231,
+        "max_hp": 231,
+        "mp": 179,
+        "max_mp": 179,
+        "is_rom_name": true,
+        "is_ram_name": false,
+        "name_text": "Carson",
+        "side_bit": true,
+        "unaffiliated": false,
+        "live": true,
+        "tile": [
+          7,
+          4
+        ]
+      },
+      "target_tile": [
+        7,
+        4
+      ]
+    }
+  ],
+  "rejections": [
+    "Cure did not heal",
+    "Cure did not spend MP",
+    "Cure did not consume Action",
+    "finish belongs to different actor",
+    "finish before healing settled",
+    "missing final Wait policy",
+    "coherent duplicate final input",
+    "missing raw input",
+    "claimed completion inside executor",
+    "enemy-only healing",
+    "missing halted capture evidence",
+    "continuing enemy HP outside bounds",
+    "coherent invalid enemy coordinate",
+    "missing modal trace",
+    "missing modal halts",
+    "fatal modal halt",
+    "duplicate trace restoration",
+    "missing modal ledger",
+    "altered modal write",
+    "input after trace restoration",
+    "no restored trace traffic",
+    "missing restored trace observations",
+    "unattributed restored router evidence"
+  ],
+  "limits": "constructed self-Cure research only; no public runner/manual handoff"
+}

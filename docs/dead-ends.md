@@ -615,3 +615,16 @@ CLAUDE.md carries the slogan.
   distinct live enemy identity and current cursor/actor-tile coherence, then
   independently join canonical and battle records in the retained validator.
   Keep rejected polling states unknown and send no more terminal input.
+
+### DE-037 — A menu callback can be owned before it accepts input
+
+- **Tried (A6.1, 2026-10-07):** `a61-scoped-cure-04` healed successfully but
+  halted on command-list state0x100 while waiting for the command menu. The
+  existing reader rejected it and issued no post-cast input.
+- **Verified:** actual ROM dispatch at08028DE0 maps0x100 to initialization,
+  0x101 to opening, and0x102 to input. The reader treats both opening states as
+  rejected observations with bounded passive retry only; derived checks prove
+  they cannot authorize a new snapshot or revalidate an old command token.
+- **Do not:** label initialization as an engine-enabled command, retry a final
+  cast, or downgrade identity failures to transient opening. Preserve the
+  failed run and execute fresh reloads with the passive-only correction.

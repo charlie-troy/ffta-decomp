@@ -1,0 +1,27 @@
+{
+  "status": "pass",
+  "scope": "Execute ROM menu-state dispatch; derived opening snapshots authorize no input.",
+  "executed_dispatch": [
+    {
+      "state": 256,
+      "dispatch": 134385246
+    },
+    {
+      "state": 257,
+      "dispatch": 134385356
+    },
+    {
+      "state": 258,
+      "dispatch": 134385410
+    }
+  ],
+  "derived_rejections": [
+    "derived opening 0100 returns no snapshot",
+    "derived opening 0100 cannot authorize prior token",
+    "invalid identity remains hard rejection in 0100",
+    "derived opening 0101 returns no snapshot",
+    "derived opening 0101 cannot authorize prior token",
+    "invalid identity remains hard rejection in 0101"
+  ],
+  "limits": "Stops before external helpers; derived reader checks are not atomic live captures"
+}

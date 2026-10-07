@@ -9,6 +9,7 @@ adapter on the basis of a cursor or a learned-ability byte.
 from __future__ import annotations
 
 import argparse
+from contextlib import ExitStack
 import hashlib
 import json
 from pathlib import Path
@@ -20,6 +21,7 @@ from fixture_guard import FixtureSession, ROSTER, STRIDE, SIDE_BIT, u8, u16, u32
 from probe_control_handoff import Probe
 from recovery_menu import RecoveryMenu, RecoveryStateError
 from recovery_executor import SelfCureExecutor, WaitFacingExecutor, RecoveryStopped
+from recovery_transport import RecoveryTransport
 from tactics_policy import validate_policy
 
 KEYS = {"A": 1, "B": 2, "DOWN": 0x80, "UP": 0x40,
@@ -48,9 +50,13 @@ def main():
     parser.add_argument("--finish-recovery-turn", action="store_true",
                         help="also evaluate guarded Wait after a successful Cure; research only")
     parser.add_argument("--stop-file", help="observe STOP when this file exists; policy executor only")
+    parser.add_argument("--scoped-transport", action="store_true",
+                        help="exercise explicit modal halts and restore real Probe tracing after recovery")
     args = parser.parse_args()
     if args.policy and args.route is not None:
         parser.error("policy execution and an explicit research route are mutually exclusive")
+    if args.scoped_transport and not args.policy:
+        parser.error("scoped transport requires policy execution")
     if args.stop_file and not args.policy:
         parser.error("STOP file requires policy execution")
     if (args.wait_fallback or args.finish_recovery_turn) and not args.policy:
@@ -73,6 +79,14 @@ def main():
               "state_sha256": hashlib.sha256(Path(args.state).read_bytes()).hexdigest(),
               "phases": [], "writes": [], "keys": [], "status": "unknown"}
     result["engine_calls"] = []
+    # Pin the actual loaded implementation at launch, including research
+    # capture code, so later metadata changes cannot masquerade as live proof.
+    result["source_sha256"] = {
+        str(path).replace("\\", "/"): hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in (Path(__file__).parent / name for name in (
+            "probe_a6_action_menu.py", "probe_control_handoff.py", "recovery_transport.py",
+            "recovery_menu.py", "recovery_executor.py", "autobattle_identity.py",
+            "fixture_guard.py", "tactics_policy.py", "ability_resources.py"))}
     if policy:
         result["policy_document"] = policy_document
         result["policy_sha256"] = hashlib.sha256(policy_bytes).hexdigest()
@@ -80,7 +94,7 @@ def main():
     probe = None
     facing_committed = False
     try:
-        with FixtureSession(args.state, rom=args.rom, quiet=True) as session:
+        with FixtureSession(args.state, rom=args.rom, quiet=True) as session, ExitStack() as modal_stack:
             if policy:
                 session.g.sock.settimeout(1.0)
                 result["blocking_timeouts_seconds"] = {"debugger_packet": 1, "screenshot_process": 45}
@@ -129,14 +143,25 @@ def main():
                 for edit_base in edit_bases:
                     session.write_bytes(edit_base + 0x1C, args.mp.to_bytes(2, "little"),
                                         "A6 disposable research fixture: actor MP")
-            menu = RecoveryMenu(session.g, session.read_rom_bytes(), owner) if args.verify_menu or policy else None
+            transport = None
+            control = session.g
+            if args.scoped_transport:
+                transport = RecoveryTransport(probe, log_input=lambda rec:
+                    result.setdefault("modal_raw_writes", []).append(rec))
+                modal_stack.enter_context(transport)
+                control = transport.g
+                result["modal_transport"] = transport.events
+            menu = RecoveryMenu(control, session.read_rom_bytes(), owner) if args.verify_menu or policy else None
             result["menu_guards"] = []
             # This probe uses explicit modal reads, not the old router trace.
             # Re-arming that trace after a terminal facing A can enqueue an
             # unsolicited stop and mispair the next bulk memory reply.
-            probe.disarm()
-            probe.arm = lambda: None
-            result["router_trace"] = "disabled after independent initial owner verification"
+            if transport is None:
+                probe.disarm()
+                probe.arm = lambda: None
+                result["router_trace"] = "disabled after independent initial owner verification"
+            else:
+                result["router_trace"] = "scoped suspension; real tracing restored after modal interval"
 
             def stop_check():
                 stopped = bool(args.stop_file and Path(args.stop_file).exists())
@@ -161,11 +186,11 @@ def main():
                 # screenshot below are separate observations, not one atomic
                 # RAM/image pair; their facts must be checked independently.
                 if halted_reply is None:
-                    session.g.cont()
+                    control.cont()
                     time.sleep(0.5)
                 # Explicitly halt: individual memory requests alone can race
                 # an advancing main-controller state after terminal facing.
-                stop = halted_reply if halted_reply is not None else session.g.interrupt()
+                stop = halted_reply if halted_reply is not None else control.interrupt()
                 if not stop or stop[:1] not in ("S", "T") or stop == "S04":
                     raise RuntimeError(f"capture did not establish a debugger halt: {stop!r}")
                 result.setdefault("capture_halts", []).append({"tag": tag, "reply": stop})
@@ -243,14 +268,17 @@ def main():
                 shot = root / f"{tag}.png"
                 checkpoint()
                 session.screenshot(str(shot))
-                checkpoint()
                 entry["screenshot"] = str(shot)
                 result["phases"].append(entry)
                 (root / "probe.json").write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8", newline="\n")
                 print(json.dumps(entry), flush=True)
+                # Persist the read-only modal facts even when a watcher drops
+                # STOP as soon as the screenshot file appears. Cancellation
+                # still wins before resuming or requesting any further input.
+                checkpoint()
                 if guard_error is not None and not facing_committed:
                     raise guard_error
-                session.g.cont()
+                control.cont()
 
             def capture_continuation():
                 """Observe two independently readable later actors; never input."""
@@ -259,9 +287,9 @@ def main():
                 while len(tags) < 2 and time.monotonic() < deadline:
                     checkpoint()
                     probe.disarm()
-                    session.g.cont()
+                    control.cont()
                     time.sleep(0.25)
-                    stop = session.g.interrupt()
+                    stop = control.interrupt()
                     if not stop or stop[:1] not in ("S", "T") or stop == "S04":
                         raise RuntimeError("continuation poll did not establish halt")
                     poll = {"elapsed": round(time.time() - started, 3), "halt": stop,
@@ -307,7 +335,7 @@ def main():
                     result["keys"].append({"key": name, "hits": delivered["hits"]})
                     phase(f"{len(result['keys']):02d}-{name}")
 
-                executor = SelfCureExecutor(menu, probe, policy, after_key=after_key,
+                executor = SelfCureExecutor(menu, transport or probe, policy, after_key=after_key,
                     stop_check=stop_check)
                 result["executor_events"] = executor.events
                 result["policy"] = args.policy
@@ -321,7 +349,7 @@ def main():
                         result["facing_confirmation"] = {"before_key": len(result["keys"]) + 1,
                                                          "facts": obs.receipt()}
 
-                    executor = WaitFacingExecutor(menu, probe, policy, after_key=after_key,
+                    executor = WaitFacingExecutor(menu, transport or probe, policy, after_key=after_key,
                         before_final=latch_facing, stop_check=stop_check)
                     segment = "finish" if outcome == "accepted" else "fallback"
                     result[f"{segment}_events"] = executor.events
@@ -352,6 +380,16 @@ def main():
             if args.settle_end and not policy:
                 probe.pump(args.settle_end, "a6-settle", sample_every=10.0)
                 phase("99-settled")
+            if transport is not None:
+                transport.close()
+                before_trace = {"router_hits": probe.router_hits, "seeds": len(probe.seeds)}
+                probe.pump(12.0, "a6-restored-trace", sample_every=60.0,
+                           stop_when=lambda p: stop_check() or len(p.seeds) > before_trace["seeds"],
+                           tick=1.0)
+                checkpoint()
+                result["restored_trace"] = {"before": before_trace,
+                    "after": {"router_hits": probe.router_hits, "seeds": len(probe.seeds)},
+                    "seed_observations": list(probe.seeds), "router_observations": list(probe.turns)}
             probe.disarm()
             result["writes"] = session.writes
             result["key_writes"] = probe.key_write_log

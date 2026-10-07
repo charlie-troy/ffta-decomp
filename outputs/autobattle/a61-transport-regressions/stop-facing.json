@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "scope": "Retained scoped recovery STOP evidence; no public CLI handoff claim.",
+  "capture": "outputs/autobattle/a61-scoped-stop-facing-01",
+  "state": "facing",
+  "keys": 12,
+  "raw_writes": 60,
+  "rejected": [
+    "missing raw input",
+    "missing modal ledger",
+    "post-STOP raw input",
+    "missing tracing restoration",
+    "final confirmation escaped",
+    "wrong STOP modal",
+    "missing stop timestamp"
+  ]
+}

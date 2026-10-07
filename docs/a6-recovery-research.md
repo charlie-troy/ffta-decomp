@@ -423,3 +423,67 @@ owned emulator processes were cleaned up. Saved receipt validation passes four
 controls and rejects fourteen mutations, including coherent extra terminal
 input, internally consistent wrong chooser cost/target and post-STOP writes.
 The repeat-cast receipt independently passes twelve applicable mutations.
+
+### A6.1 scoped transport prerequisite (2026-10-07)
+
+`RecoveryTransport` now owns a bounded modal debugger interval. It explicitly
+halts before reads, keeps router hooks suspended during recovery input, exports
+every raw write including partial/disconnected delivery, and restores verified
+trace hooks while halted before resuming. `Probe.press(rearm_trace=False)` uses
+the original key-poll transport; its default behavior remains unchanged. Strict
+breakpoint acknowledgments are opt-in for the modal interval. No global method
+is replaced and cleanup never injects another gameplay key.
+
+The research CLI's `--scoped-transport` exercises this interval with the real
+executors. Reloads `a61-scoped-cure-05/-07` heal HP100->156, spend MP85->79,
+consume Action, confirm guarded Wait and independently join enemy IDs3/4. Each
+delivers13 keys/65 raw writes and no post-facing input. Tracing is then restored
+and observes a real enemy sequencer seed without further keys. Each retained
+receipt rejects22 mutations, including missing/modal ledger, bad halt, duplicate
+restoration and absent post-restoration seed evidence. Post-heal screenshots
+show HP156/MP79 and unavailable Action; the later frames show Carson's turn.
+
+Run04 remains failed: after healing, explicit halted reads caught command-list
+initialization state0x100. The ROM dispatch at08028DE0 sends0x100 to initialization
+at08028E5E,0x101 to opening at08028ECC, and0x102 to input at08028F02. Three executed
+dispatch cases verify that split. Both opening states now reject observations
+with `RecoveryTransient`, permitting only bounded passive retry. Six derived
+controls prove neither opening state authorizes a snapshot or an old command
+token, and invalid identity remains a hard rejection. No input guard was relaxed.
+Run06 attempted launch while05 still owned the GDB listener; the fixture guard
+refused it without reusing or killing that emulator. Keep both failed artifacts.
+
+Fresh STOP at Cure confirmation (`a61-scoped-stop-cure-01`) suppresses the final
+A, retains8 keys/40 writes, and restores tracing with zero post-STOP input.
+The screenshot watcher now persists the already-read modal evidence before
+propagating STOP after screenshot capture, avoiding an artifact-only race.
+Its screenshot subprocess still has the documented45-second timeout.
+
+The facing STOP control (`a61-scoped-stop-facing-01`) retains12 keys/60 writes,
+suppresses its final A and restores tracing. Both STOP receipts reject seven
+mutations, including a coherent additional transport write after STOP.
+
+Final source-pinned reloads10/11 heal HP100->154/157, spend MP85->79 and retain
+the same thirteen-key guarded turn proof; both reject23 receipt mutations.
+Run10 restores21 decoded router events with matching enemy identity/branch;
+run11 observes one enemy action seed. These establish hook activity separately
+from the two independent raw continuation joins. Router preview traffic is
+explicitly not another executed action. The earlier run08's three-second trace
+sample saw neither event and remains unknown for restoration, although its
+action/continuation captures are valid. The observation budget is now bounded
+at twelve seconds; seed or attributed router evidence can prove restoration,
+while no observed trace traffic still fails that criterion. This corrects an
+over-specific seed-only restoration check; it does not change the independent
+action acceptance or continuation gate. Source hashes are recorded at launch.
+
+Host transport13, Cure23, Wait16, modal-reader46 rejection controls and
+facing1024 ROM cases/16 rejections pass. Existing tactics-adapter12 and runtime
+resume host paths also pass; AI10/10 and strategy9/9 remain regression gates.
+Raw receipt auditing exposed and fixed a separate validator gap in8fe1dbe;
+see `C1-raw-input.json` for20 artifact cases and its pre-fix reproduction.
+
+This is a transport prerequisite, not public-runner recovery acceptance.
+`A6.1.json` retains all public integration/decline/STOP/manual-resume criteria
+as unknown. Next: connect the bounded executors to `BattleRuntime` and deliberate
+`TacticsAdapter` capability selection, extend event/source hashes and require
+complete recovery raw logs, then execute the public CLI acceptance suite.
