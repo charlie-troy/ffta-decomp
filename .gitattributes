@@ -4,3 +4,5 @@
 *.sh text eol=lf
 *.gba binary
 *.bin binary
+# Captured A6.1 JSON receipts carry SHA256 hashes of their exact original bytes.
+outputs/autobattle/a61-*/**/*.json -text whitespace=cr-at-eol
