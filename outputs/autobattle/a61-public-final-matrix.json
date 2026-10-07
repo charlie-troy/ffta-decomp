@@ -1,0 +1,277 @@
+{
+  "scope": "Sequential real CLI recovery acceptance cases; owned CLI cleanup per run.\n\nUses already verified disposable fixtures. Does not construct/edit RAM, send\nkeys, bypass guards or substitute a model for the public BattleRuntime.\nSTOP/manual/resume is a separate live gate. All binary fixtures remain local.\n",
+  "status": "pass-bounded-cli-matrix",
+  "cases": [
+    {
+      "run": "a61-public-final-cure1",
+      "command": [
+        "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+        "tools/run_autobattle.py",
+        "--state",
+        "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+        "--tactics-policy",
+        "configs/tactics/healer.json",
+        "--bounded-self-cure",
+        "--run-id",
+        "a61-public-final-cure1",
+        "--max-turns",
+        "1",
+        "--wall-timeout",
+        "150",
+        "--on-stop",
+        "kill",
+        "--yes"
+      ],
+      "status": "pass",
+      "outcome": "accepted",
+      "hp": [
+        100,
+        162
+      ],
+      "mp": [
+        85,
+        79
+      ],
+      "raw_writes": 65,
+      "turns": 1,
+      "later_enemy_ids": [
+        3,
+        4
+      ],
+      "metadata_sha256": {
+        "run.json": "6d7b91391dea700517db1a35af4cb09862ecc916e2f70a61cd63a76c2492c424",
+        "events.jsonl": "43bfd476f842aaf55336e4c1b6bebcbfa56ee28181e9865aa7345c9b76a4807b",
+        "input-log.jsonl": "4564ce48d0b16f7f66839c00b257adfdf6f511e497cc5c27b9c0338eb3e759bb"
+      },
+      "checks_sha256": "5b228dc15f28059d086cc89f51a7344d92138f0f600c08151bbb28a1e5000b22"
+    },
+    {
+      "run": "a61-public-final-cure2",
+      "command": [
+        "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+        "tools/run_autobattle.py",
+        "--state",
+        "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+        "--tactics-policy",
+        "configs/tactics/healer.json",
+        "--bounded-self-cure",
+        "--run-id",
+        "a61-public-final-cure2",
+        "--max-turns",
+        "1",
+        "--wall-timeout",
+        "150",
+        "--on-stop",
+        "kill",
+        "--yes"
+      ],
+      "status": "pass",
+      "outcome": "accepted",
+      "hp": [
+        100,
+        158
+      ],
+      "mp": [
+        85,
+        79
+      ],
+      "raw_writes": 65,
+      "turns": 1,
+      "later_enemy_ids": [
+        3,
+        4
+      ],
+      "metadata_sha256": {
+        "run.json": "b57d60309255007e03c1c37859e1b936b0e187f5c5a0e30baca9146f98a234a8",
+        "events.jsonl": "e93f15b1a810a9228b3ad5f1b7ad04a083076594fc6b7ac4f64c926f1f6ffb8d",
+        "input-log.jsonl": "0d57f2b499bc955f746223d0bc51d907b7f41547acbf6b528ae7bab25aed6beb"
+      },
+      "checks_sha256": "52ab15ecac57b09a0005e9b5917d15983a5bb6590c1a9a941b8d2fa1c482811a"
+    },
+    {
+      "run": "a61-public-final-reserve",
+      "command": [
+        "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+        "tools/run_autobattle.py",
+        "--state",
+        "outputs/autobattle/a61-public-fixture-mp6-01/recovery.ss0",
+        "--tactics-policy",
+        "configs/tactics/healer.json",
+        "--bounded-self-cure",
+        "--run-id",
+        "a61-public-final-reserve",
+        "--max-turns",
+        "1",
+        "--wall-timeout",
+        "150",
+        "--on-stop",
+        "kill",
+        "--yes"
+      ],
+      "status": "pass",
+      "outcome": "declined",
+      "hp": [
+        100,
+        100
+      ],
+      "mp": [
+        6,
+        6
+      ],
+      "raw_writes": 80,
+      "turns": 1,
+      "later_enemy_ids": [
+        3,
+        4
+      ],
+      "metadata_sha256": {
+        "run.json": "e51b6baad67c02af394f2b0530d86fd4b05d7f61839f9b60cc2a7d30464c5078",
+        "events.jsonl": "ebd28cdfbebb9d23406cc393f1131e7e8fd50fde8c13f2934f52ae0145b1f84d",
+        "input-log.jsonl": "1043e3f9d1e9a1207c573dea629ca1a169f7c3eaf81863d74d9c93b1f881b934"
+      }
+    },
+    {
+      "run": "a61-public-final-disabled",
+      "command": [
+        "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+        "tools/run_autobattle.py",
+        "--state",
+        "outputs/autobattle/a61-public-fixture-mp5-01/recovery.ss0",
+        "--tactics-policy",
+        "configs/tactics/healer.json",
+        "--bounded-self-cure",
+        "--run-id",
+        "a61-public-final-disabled",
+        "--max-turns",
+        "1",
+        "--wall-timeout",
+        "150",
+        "--on-stop",
+        "kill",
+        "--yes"
+      ],
+      "status": "pass",
+      "outcome": "declined",
+      "hp": [
+        100,
+        100
+      ],
+      "mp": [
+        5,
+        5
+      ],
+      "raw_writes": 50,
+      "turns": 1,
+      "later_enemy_ids": [
+        3,
+        4
+      ],
+      "metadata_sha256": {
+        "run.json": "dfa96b54ea23b503a7da466d9ff69966ff23a3d5a1b223b81426a1c6504940d6",
+        "events.jsonl": "32046ce14113320c4556f56772e59173c09a1922326de43042f557b91a61a959",
+        "input-log.jsonl": "246de4265ed36504f0c4f7ea3e2dc7be0f4ac126fef1bb2208d5c7afce131206"
+      }
+    },
+    {
+      "run": "a61-public-final-no-match-wait",
+      "command": [
+        "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+        "tools/run_autobattle.py",
+        "--state",
+        "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+        "--tactics-policy",
+        "outputs\\autobattle\\a61-public-final-no-match-wait-policy.json",
+        "--bounded-self-cure",
+        "--run-id",
+        "a61-public-final-no-match-wait",
+        "--max-turns",
+        "1",
+        "--wall-timeout",
+        "150",
+        "--on-stop",
+        "kill",
+        "--yes"
+      ],
+      "status": "pass",
+      "outcome": "declined",
+      "hp": [
+        100,
+        100
+      ],
+      "mp": [
+        85,
+        85
+      ],
+      "raw_writes": 80,
+      "turns": 1,
+      "later_enemy_ids": [
+        3,
+        4
+      ],
+      "metadata_sha256": {
+        "run.json": "b9418a53fd623c500ee9f88e4e7a95f478bf17bc2a3725e4871aca82672db81d",
+        "events.jsonl": "47d2f915fd2c4c26b6d0c8238e22370cfb6a9ae43fc01549274bb259fc39f58e",
+        "input-log.jsonl": "99a188a2d1188532d82381371bc6a9a6c01853167389e534b0f09e014081556c"
+      }
+    },
+    {
+      "run": "a61-public-final-no-match-none",
+      "command": [
+        "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+        "tools/run_autobattle.py",
+        "--state",
+        "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+        "--tactics-policy",
+        "outputs\\autobattle\\a61-public-final-no-match-none-policy.json",
+        "--bounded-self-cure",
+        "--run-id",
+        "a61-public-final-no-match-none",
+        "--max-turns",
+        "1",
+        "--wall-timeout",
+        "150",
+        "--on-stop",
+        "kill",
+        "--yes"
+      ],
+      "status": "pass",
+      "outcome": "declined",
+      "hp": [
+        100,
+        100
+      ],
+      "mp": [
+        85,
+        85
+      ],
+      "raw_writes": 65,
+      "turns": 0,
+      "later_enemy_ids": [],
+      "metadata_sha256": {
+        "run.json": "4e41f4b630a198acdf6340ecefa176612ee5bdfc6a4d042183db6b8848da8a1c",
+        "events.jsonl": "dd6b3c23f170b5e6e7d59d6cdf5e207e84684f40a081e7c6026f9fd5e216e7a1",
+        "input-log.jsonl": "fe527255b477fb900f661668c1e2d12152fa09b8e5e4f42f4cc0ef4e7eba555e"
+      }
+    }
+  ],
+  "limits": [
+    "Bounded single-player self-Cure fixture only",
+    "Does not close STOP/manual/resume or broader party A6 gates"
+  ],
+  "runtime_source_sha256": {
+    "tools/run_autobattle.py": "5d5b3c91b10743f2e947182cd7976775e6777ff5babcd9c8c4c600eaaf516c86",
+    "tools/autobattle_runtime.py": "a966c5663ada323eccb8989463f2fe7b0ef39ef3b65b0075ff6d7844adfc81eb",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/recovery_runtime.py": "53ed22a50d7bb451733ce818cd37534516f638485ea5e60da74c0675a930a640",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_continuation.py": "2063b48329e8953ec32d25f11dda48c79a0ed0d58e2c24af0c60d68fdfcb0216",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220"
+  }
+}

@@ -47,7 +47,7 @@ from __future__ import annotations
 import time
 
 from probe_control_handoff import MOVE_CMD, WAIT_CMD
-from tactics_policy import SNAPSHOT_SCHEMA, evaluate, validate_policy
+from tactics_policy import SNAPSHOT_SCHEMA, SNAPSHOT_SCHEMA2, evaluate, validate_policy
 
 MOVE_CANDIDATE = "move"
 WAIT_CANDIDATE = "wait"
@@ -144,3 +144,19 @@ class TacticsAdapter:
         self.last_snapshot = snap
         self.last_evaluation = evaluation
         return evaluation
+
+    def choose_recovery(self, snapshot):
+        """Evaluate a guarded modal snapshot, without inventing candidates.
+
+        The recovery reader/executor owns engine legality and freshness at
+        each confirmation. This seam records exactly that schema-2 input;
+        ordinary command observation continues to offer Move/Wait only.
+        """
+        if snapshot.get("schema") != SNAPSHOT_SCHEMA2:
+            raise AdapterError("recovery requires a schema-2 modal snapshot")
+        self.last_snapshot = snapshot
+        self.last_age = snapshot.get("age_seconds")
+        self.last_candidate_ids = [c.get("id") for c in snapshot.get("candidates", [])]
+        self.plans = {}
+        self.last_evaluation = evaluate(snapshot, self.policy)
+        return self.last_evaluation

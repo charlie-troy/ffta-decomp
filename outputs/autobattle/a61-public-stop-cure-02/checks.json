@@ -1,0 +1,17 @@
+{
+  "status": "pass",
+  "scope": "Check a source-pinned public recovery STOP, manual Wait and same-PID resume.",
+  "run": "outputs\\autobattle\\a61-public-stop-cure-02",
+  "phase": "confirmation",
+  "pid": 6504,
+  "rejections": [
+    "different adopted PID",
+    "different manual window",
+    "unverified window focus",
+    "stub gameplay input",
+    "manual Wait did not continue",
+    "manual resource drift",
+    "source changed during first leg",
+    "resumed without verified action"
+  ]
+}

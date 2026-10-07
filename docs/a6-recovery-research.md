@@ -1,9 +1,10 @@
 # A6 recovery menu and resource research
 
 2026-10-06, retail USA ROM, base `3b8bb4f`. This closes the first research
-dependency: an actual self-Cure and consumed MP are witnessed. A6 remains
-partial: the public runner still offers Move/Wait, and no wounded-party
-policy comparison, legal ally/KO target, revive, or item use is accepted.
+dependency: an actual self-Cure and consumed MP are witnessed. At this dated
+checkpoint the public runner still offered Move/Wait. The later opt-in A6.1
+integration is recorded below; A6 remains partial, with no accepted wounded-
+party policy comparison, legal ally/KO target, revive or item use.
 
 ## Owned fixture experiments
 
@@ -91,7 +92,7 @@ The menu state root is `*(0200F438)`, observed at `0202D8A0`. In these runs:
   its payload at `+0x18` is the list object, observed at `0202DD70`.
 - Object `+0x50/+0x52`: row count/scroll; `+0x69`: cursor;
   `+0x94/+0x98`: row array/enable-byte array. White Magic rows are race-table
-  indices **58ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“66**, not global ability IDs. For race 1, table entry 58's
+  indices **58-66**, not global ability IDs. For race 1, table entry 58's
   `+4` u16 resolves Cure **1** (`08028A70` accepted-selection branch).
 - `08028970` computes the selected row via `08017B68`, writes one-based
   selection to the context, and calls `080287C4`. That gate rejects a zero
@@ -482,8 +483,26 @@ resume host paths also pass; AI10/10 and strategy9/9 remain regression gates.
 Raw receipt auditing exposed and fixed a separate validator gap in8fe1dbe;
 see `C1-raw-input.json` for20 artifact cases and its pre-fix reproduction.
 
-This is a transport prerequisite, not public-runner recovery acceptance.
-`A6.1.json` retains all public integration/decline/STOP/manual-resume criteria
-as unknown. Next: connect the bounded executors to `BattleRuntime` and deliberate
-`TacticsAdapter` capability selection, extend event/source hashes and require
-complete recovery raw logs, then execute the public CLI acceptance suite.
+The preceding captures establish the transport prerequisite. Public-runner
+integration is now opt-in through `--bounded-self-cure`; its own acceptance is
+recorded separately in `A6.1.json`. It reuses the canonical modal pin without
+calling the fixed-roster actor adapter while targeting borrows that storage.
+The public source hashes are captured before execution and compared afterward;
+a resumed receipt preserves the previous leg rather than replacing its hashes.
+
+Live manual cancellation exposed another LIST opening state: mode7/state0x101.
+The same ROM dispatch separates initialization/opening/input independently of
+root mode. Command/ability list openings and an owned Action child's openings
+now reject observation and permit bounded passive retry only. Three executed
+dispatch cases plus eighteen derived rejection controls cover this; invalid
+canonical identity and unowned children still fail hard. A public observation
+allows at most twelve passive opening polls and issues no input while opening.
+
+A first public handoff trial manually cancelled Cure and completed Wait. Its
+same-PID resumed Cure healed100->158 and spent six MP, but only one later enemy
+was independently readable before the continuation bound: the borrowed roster
+was rejected seventy-two times. It correctly reported zero verified turns and
+remains unknown for action continuation. Do not count its healing alone as a
+completed turn. A separate Wait-facing handoff accepted manual Wait, then the
+same PID resumed through the established Move/Wait path and verified Marche's
+move(4,10)->(4,11). These are different acceptance observations.

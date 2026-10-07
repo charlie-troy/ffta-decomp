@@ -1,6 +1,6 @@
 # Customizable auto-battle roadmap
 
-Updated 2026-10-06. Reviewed checkout: `6b1faed` plus the A6 modal/executor research. Current acceptance status
+Updated 2026-10-07. Reviewed checkout: `9532cb4` plus the A6.1 public integration packet. Current acceptance status
 is maintained here; dated discoveries remain in `docs/project-log.md`.
 For every auto-battle implementation or completion claim, follow
 [Worker acceptance contract](autobattle-worker-contract.md). It defines the
@@ -9,7 +9,12 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**Start A6 below: resource and recovery tactics.**
+**Start A6.2's read-only ally-target research below. A6.1 is accepted within its seven-unit self-Cure fixture.**
+The opt-in public self-Cure matrix now has six passing current-source cases:
+two accepted casts, reserve decline, engine-disabled Cure and both no-match
+fallbacks. Both final STOP/manual/same-PID receipts pass, including eight
+rejected mutations each; the real two-ally fixture rejects with zero input.
+A6's wounded-party, ally/KO and item criteria remain open.
 A5 is closed for the narrow family (2026-10-06): the public runner follows
 per-character rules (two job-5 allies take different commands in one battle),
 and on equivalent starting states changing one condition value changes both the
@@ -578,11 +583,16 @@ Prerequisite: accepted current-source successful-Cure/Wait continuation reloads
 in `A6.json`, plus the policy-decline/STOP receipt. Keep their fixture limits.
 This is an integration packet, not closure of the wounded-party/ally/KO gates.
 
-Transport prerequisite now has bounded research evidence (2026-10-07): scoped
+Transport prerequisite has bounded research evidence (2026-10-07): scoped
 explicit halts, strict hook acknowledgments, complete modal raw ledgers and
 restored real sequencer tracing after guarded Cure/Wait reloads. Command opening
 states reject input and permit bounded passive retry. See `A6.1.json` and A6
-research notes. Public runtime/CLI integration and handoff acceptance remain open.
+research notes. Accepted 2026-10-07: the public opt-in integration passes its
+six-case matrix and both source-pinned STOP/manual/same-PID handoffs. Manual
+continuation proves Wait; resume proves the established Move/Wait path, not
+an additional resumed Cure. One earlier resumed Cure healed but could identify
+only one later enemy, so its continuation remains unknown with zero verified
+turns. See the retained failures and exact source hashes in `A6.1.json`.
 
 - Reuse `RecoveryMenu`, `SelfCureExecutor` and `WaitFacingExecutor` through
   `BattleRuntime._drive_player_boundary`; preserve the existing fresh-owner
@@ -613,6 +623,45 @@ research notes. Public runtime/CLI integration and handoff acceptance remain ope
 
 Then continue A6's wounded-party policy comparison and ally/KO/resource facts;
 keep item execution disabled until engine inventory/availability is proven.
+
+#### A6.2 — Identify one living ally target before public party recovery
+
+Prerequisite: A6.1's bounded public gates pass. Start with read-only target
+research on a disposable copy of `a4-multi-ally-battle-start.ss0`, using the
+`a4-two-player.json` eight-unit guard and the existing fresh-owner adapter.
+This is a new fixture/target scope; seven-unit self-Cure acceptance does not
+clear its actor, targeting or continuation gates.
+
+Ownership: add a separate research probe and read-only target decoder/tests;
+keep `RecoveryMenu`'s self-only peer/target rejection and public opt-in bounds
+until the new target contract is independently proven. Record exact sources,
+fixture changes and binary-capture hashes; raw RAM/states remain local.
+
+- Pin the caster and one living wounded ally by canonical name/id, job/race,
+  side, maxima and tile. Verify both battle mirrors before entering targeting;
+  never use the borrowed roster as an identity lookup during the modal interval.
+- Observe target cursor movement, target-processor/controller state, canonical
+  target references and accepted final confirmation. Derive the target from
+  the observed fields; do not assume the self-Cure `peer` field means the same
+  thing for another unit. Stop before final input while any join is unknown.
+- Prove that the engine accepts that other ally for Cure. Only then add a
+  bounded guarded research confirmation. Require the caster to spend exactly
+  the decoded MP cost, the intended ally to heal, and the caster and other
+  allies to retain their own HP. Guarded Wait and independently attributed
+  continuation remain separate proof obligations.
+- Require two fresh guarded reloads and negative controls for wrong identity,
+  stale target/tile, cross-side or KO target, disabled ability, changed MP and
+  missing final policy. Coherent aliasing of two same-job allies must reject.
+  No final-input retries after ambiguous delivery, STOP or terminal facing.
+- Host/retained decoder checks may clear a reader prerequisite, not live
+  targeting or public party recovery. Keep PASS/FAIL/UNKNOWN per obligation.
+  Only after the target contract passes should a later integration packet
+  expose that bounded ally candidate through the public policy adapter.
+
+Next integration comparison: replay the same wounded-party fixture with the
+healer policy versus the damage preset, reporting only candidates actually
+offered. A damage preset falling back to Wait is not a demonstrated attack.
+Revive/KO, item inventory and broader tactical quality remain later A6 gates.
 
 ### A7 — Movement tactics (P1, bounded research then implementation)
 

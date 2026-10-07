@@ -1,0 +1,39 @@
+{
+  "status": "pass",
+  "scope": "Execute ROM menu-state dispatch; derived opening snapshots authorize no input.",
+  "executed_dispatch": [
+    {
+      "state": 256,
+      "dispatch": 134385246
+    },
+    {
+      "state": 257,
+      "dispatch": 134385356
+    },
+    {
+      "state": 258,
+      "dispatch": 134385410
+    }
+  ],
+  "derived_rejections": [
+    "derived mode 4 opening 0100 returns no snapshot",
+    "derived mode 4 opening 0100 cannot authorize prior token",
+    "invalid identity remains hard rejection in mode 4 0100",
+    "derived mode 4 opening 0101 returns no snapshot",
+    "derived mode 4 opening 0101 cannot authorize prior token",
+    "invalid identity remains hard rejection in mode 4 0101",
+    "derived mode 7 opening 0100 returns no snapshot",
+    "derived mode 7 opening 0100 cannot authorize prior token",
+    "invalid identity remains hard rejection in mode 7 0100",
+    "derived mode 7 opening 0101 returns no snapshot",
+    "derived mode 7 opening 0101 cannot authorize prior token",
+    "invalid identity remains hard rejection in mode 7 0101",
+    "owned Action child 0100 rejects snapshot",
+    "owned Action child 0100 rejects old token",
+    "unowned opening Action child 0100 stays hard rejection",
+    "owned Action child 0101 rejects snapshot",
+    "owned Action child 0101 rejects old token",
+    "unowned opening Action child 0101 stays hard rejection"
+  ],
+  "limits": "Stops before external helpers; derived reader checks are not atomic live captures"
+}

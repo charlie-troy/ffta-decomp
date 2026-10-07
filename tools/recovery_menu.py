@@ -187,6 +187,10 @@ class RecoveryMenu:
             child = exact(g, active, 0x18)
             stable_reads.extend([(active, child[:4]), (active + 0xC, child[0xC:0x10]),
                                  (active + 0x14, child[0x14:0x16])])
+            require(integer(child, 0) == LIST and integer(child, 0xC) == callback,
+                    "Action child is not owned")
+            if integer(child, 0x14, 2) in (0x100, 0x101):
+                raise RecoveryTransient("owned Action child is opening")
             require(integer(child, 0) == LIST and integer(child, 0xC) == callback
                     and integer(child, 0x14, 2) == 0x102, "Action child is not a stable owned list")
             kind = "action-group"
@@ -194,11 +198,11 @@ class RecoveryMenu:
             require(driver_state == 0x25 and processor == 0,
                     "command callback is not owned by the command driver")
             kind = "command"
-        elif handler == LIST and mode == 4 and state in (0x100, 0x101):
+        elif handler == LIST and mode in (4, 7) and state in (0x100, 0x101):
             # 08028DE0 dispatches 0x100 to initialization (08028E5E),
             # 0x101 to window opening (08028ECC), and only 0x102 to input.
             # Both reject the observation and allow passive bounded retry.
-            raise RecoveryTransient("command controller is opening")
+            raise RecoveryTransient("owned list controller is opening")
         elif handler == LIST and mode == 4 and state == 3 and selection == 3:
             # The completed command callback is cached. Main switch entry
             # 0x2F (080955E0) owns input through 080A82C0 -> 080A1BE8.

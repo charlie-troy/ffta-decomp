@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "scope": "Host checks for the production modal-policy adapter seam; no gameplay proof.",
+  "checks": [
+    "MP 85: production adapter receives exactly 2 guarded snapshots",
+    "MP 6: production adapter receives exactly 1 guarded snapshots",
+    "MP 5: production adapter receives exactly 0 guarded snapshots",
+    "adapter decline at final policy check suppresses final input",
+    "ordinary command snapshot cannot enter modal policy seam",
+    "known opening permits bounded passive observation only",
+    "permanent opening reaches passive bound without input"
+  ]
+}

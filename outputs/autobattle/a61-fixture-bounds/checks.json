@@ -1,0 +1,12 @@
+{
+  "status": "pass",
+  "scope": "Unsupported public recovery owners must reject before ROM reads or input.",
+  "checks": [
+    "wrong actor id",
+    "unsupported job",
+    "unsupported race",
+    "different actor tile",
+    "multiple player actors",
+    "missing policy"
+  ]
+}

@@ -23,6 +23,26 @@ from autobattle_runtime import BattleRuntime  # noqa: E402
 from tactics_policy import PolicyError, load_policy_file  # noqa: E402
 
 
+def _input_hashes(args):
+    inputs = [args.rom, args.state, args.scenario,
+              "tools/run_autobattle.py", "tools/autobattle_runtime.py",
+              "tools/autobattle_identity.py", "tools/probe_control_handoff.py",
+              "tools/tactics_policy.py", "tools/tactics_adapter.py"]
+    if args.bounded_self_cure:
+        inputs.extend(["tools/recovery_runtime.py", "tools/recovery_transport.py",
+                       "tools/recovery_menu.py", "tools/recovery_executor.py",
+                       "tools/recovery_continuation.py", "tools/ability_resources.py",
+                       "tools/fixture_guard.py", "tools/trace_mgba.py"])
+    if args.tactics_policy:
+        inputs.append(args.tactics_policy)
+    result = {}
+    for path in inputs:
+        if os.path.isfile(path):
+            with open(path, "rb") as handle:
+                result[path] = hashlib.sha256(handle.read()).hexdigest()
+    return result
+
+
 def _tactics_decisions(events_path):
     """Turn events' tactics metadata, for the run receipt (A5.3 evidence)."""
     out = []
@@ -74,6 +94,8 @@ def main(argv=None):
                          "commands the engine currently offers, instead of the "
                          "scenario's fixed per-actor assignment. Validated "
                          "before the emulator is touched; a bad document exits 2.")
+    ap.add_argument("--bounded-self-cure", action="store_true",
+                    help="A6.1 opt-in seven-unit self-Cure fixture transaction; requires schema-2 tactics")
     ap.add_argument("--resume", metavar="RUN_ID", default=None,
                     help="continue the battle of a previously paused run: "
                          "adopt the ALREADY-RUNNING emulator (no reboot — "
@@ -98,6 +120,9 @@ def main(argv=None):
         print(f"tactics policy {args.tactics_policy} "
               f"({tactics_policy['schema']}) validated")
 
+    if args.bounded_self_cure and (tactics_policy or {}).get("schema") != "ffta-tactics-policy/2":
+        print("FAIL: --bounded-self-cure requires a schema-2 --tactics-policy")
+        return 2
     resumed_run = None
     if args.resume:
         # same run id, same artifacts: one battle, two runner legs
@@ -150,6 +175,7 @@ def main(argv=None):
     expect = dict(scenario.get("guard_expectations", {}))
     if isinstance(expect.get("slot0_name"), str):
         expect["slot0_name"] = int(expect["slot0_name"], 0)
+    launch_inputs = _input_hashes(args)
     session = FixtureSession(args.state, rom=args.rom, expect=expect)
     if args.resume:
         try:
@@ -179,7 +205,8 @@ def main(argv=None):
                                 resume=bool(args.resume),
                                 pause_at_boundary=args.pause_at_boundary,
                                 tactics_policy=tactics_policy,
-                                tactics_policy_source=args.tactics_policy)
+                                tactics_policy_source=args.tactics_policy,
+                                bounded_self_cure=args.bounded_self_cure)
         if not args.yes:
             ans = input("guards will run now; continue? [y/N] ").strip().lower()
             if ans != "y":
@@ -253,21 +280,15 @@ def main(argv=None):
             "emulator_handoff": ("left-running-for-player" if keep_process
                                  else "terminated"),
             "emulator_pid": session.pid,
+            "bounded_self_cure": args.bounded_self_cure,
             "player_identities": [list((r["name_text"], r["id"]))
                                   for r in runtime.adapter.expected],
         }
-        receipt["input_sha256"] = {}
-        inputs = [args.rom, args.state, args.scenario,
-                  "tools/run_autobattle.py", "tools/autobattle_runtime.py",
-                  "tools/autobattle_identity.py", "tools/probe_control_handoff.py",
-                  "tools/tactics_policy.py", "tools/tactics_adapter.py"]
-        if args.tactics_policy:
-            inputs.append(args.tactics_policy)
-        for path in inputs:
-            if os.path.isfile(path):
-                with open(path, "rb") as fh:
-                    receipt["input_sha256"][path] = hashlib.sha256(fh.read()).hexdigest()
+        receipt["input_sha256"] = launch_inputs
+        receipt["input_sha256_after"] = _input_hashes(args)
+        receipt["inputs_unchanged"] = receipt["input_sha256_after"] == launch_inputs
         if args.resume:
+            receipt["previous_leg"] = resumed_run
             # A5.1: an adopt may have to wait out the engine's turn-transition
             # window (the battle-struct region is reused for a few seconds
             # after a turn closes), so the receipt must carry HOW the adopt

@@ -1,0 +1,27 @@
+{
+  "checks": [
+    "cursor owner above old CT threshold; frozen ally is not owner",
+    "actor-linked move result",
+    "other ally movement rejects",
+    "CT-only move rejects",
+    "Wait with player movement rejects",
+    "unchanged Wait result",
+    "duplicate unit id",
+    "missing player name",
+    "job changed",
+    "enemy side changed",
+    "HP exceeds max",
+    "tile out of bounds",
+    "stale owner prevents first gameplay input",
+    "ambiguous same-tile owner rejects",
+    "dead known actor does not suppress distinct ally",
+    "absent assignment rejects before input",
+    "duplicate assignment rejects before input",
+    "malformed assignment rejects before input",
+    "unsupported assignment rejects before input",
+    "public CLI names actual renamed actor with verified result",
+    "corrupt actor receipt rejects"
+  ],
+  "passed": 21,
+  "scope": "synthetic control-flow evidence only"
+}

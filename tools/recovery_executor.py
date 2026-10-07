@@ -24,11 +24,14 @@ class RecoveryStopped(RuntimeError):
 class SelfCureExecutor:
     def __init__(self, menu, probe, policy, *, stop_check=lambda: False,
                  after_key=lambda name: None, before_final=lambda obs: None,
-                 clock=time.monotonic, sleep=time.sleep):
+                 clock=time.monotonic, sleep=time.sleep, choose=None,
+                 before_policy_final=lambda obs: None):
         self.menu, self.probe, self.policy = menu, probe, policy
         self.stop_check, self.after_key = stop_check, after_key
         self.clock, self.sleep = clock, sleep
         self.before_final = before_final
+        self.before_policy_final = before_policy_final
+        self.choose = choose if choose is not None else lambda snapshot: evaluate(snapshot, self.policy)
         self.events = []
         self.committed = False
 
@@ -39,8 +42,16 @@ class SelfCureExecutor:
         return False
 
     def observe(self, expected=None):
-        self.check_stop()
-        obs = self.menu.snapshot()
+        for _ in range(12):
+            self.check_stop()
+            try:
+                obs = self.menu.snapshot()
+                break
+            except RecoveryTransient as exc:
+                self.events.append({"event": "passive_transient", "detail": str(exc)})
+                self.passive_tick()
+        else:
+            raise TimeoutError("owned menu opening exceeded passive observation bound")
         if expected is not None:
             require(obs.state == expected, f"expected {expected}, observed {obs.state}")
         self.events.append({"event": "observation", "facts": obs.receipt()})
@@ -151,13 +162,15 @@ class SelfCureExecutor:
         self.press("A", self.observe("description"))
         obs = self.observe("confirmation")
         snapshot = self.snapshot_for_policy(obs)
-        decision = evaluate(snapshot, self.policy)
+        decision = self.choose(snapshot)
         self.events.append({"event": "policy", "snapshot": snapshot, "evaluation": decision})
         if (decision.get("decision") or {}).get("candidate_id") != CURE:
             return self.cancel(before)
+        self.before_policy_final(obs)
+        self.check_stop()
         current = self.menu.revalidate(obs)
         final_snapshot = self.snapshot_for_policy(current)
-        final_decision = evaluate(final_snapshot, self.policy)
+        final_decision = self.choose(final_snapshot)
         require((final_decision.get("decision") or {}).get("candidate_id") == CURE,
                 "policy changed before final confirmation")
         self.events.append({"event": "final_policy", "snapshot": final_snapshot,
@@ -217,16 +230,18 @@ after confirmation and independently observe the following actor lifecycle.
     def run(self):
         before = self.observe("command")
         snapshot = self.wait_snapshot(before, before)
-        decision = evaluate(snapshot, self.policy)
+        decision = self.choose(snapshot)
         self.events.append({"event": "policy", "snapshot": snapshot, "evaluation": decision})
         if (decision.get("decision") or {}).get("candidate_id") != WAIT:
             return {"outcome": "unexecuted", "reason": decision["reason"],
                     "before": before.receipt()}
         require(self.select("command", 10), "Wait became unavailable")
         facing = self.observe("facing")
+        self.before_policy_final(facing)
+        self.check_stop()
         current = self.menu.revalidate(facing)
         final_snapshot = self.wait_snapshot(current, before)
-        final_decision = evaluate(final_snapshot, self.policy)
+        final_decision = self.choose(final_snapshot)
         require((final_decision.get("decision") or {}).get("candidate_id") == WAIT,
                 "policy declined Wait before confirmation")
         self.events.append({"event": "final_policy", "snapshot": final_snapshot,

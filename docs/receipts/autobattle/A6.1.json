@@ -1,8 +1,8 @@
 {
   "packet": "A6.1",
-  "base_revision": "c927e40",
-  "status": "partial",
-  "scope": "Scoped debugger transport prerequisite verified; public-runner recovery remains unimplemented",
+  "base_revision": "9532cb4",
+  "status": "pass",
+  "scope": "Opt-in public CLI seven-unit self-Cure integration; A6 party/KO/items remain open",
   "criteria": [
     {
       "id": "modal-transport",
@@ -12,39 +12,39 @@
     },
     {
       "id": "public-self-cure",
-      "status": "unknown",
+      "status": "pass",
       "expected": "Two real public CLI reloads choose legal self-Cure and prove effect, six-MP cost, Action consumption and separate Wait continuation",
-      "observed": null
+      "observed": "Two current-source real CLI reloads heal100->162/158, spend85->79 MP, consume Action, confirm guarded Wait and independently identify two later enemies; 65 raw writes each."
     },
     {
       "id": "public-declines",
-      "status": "unknown",
+      "status": "pass",
       "expected": "Reserve, engine-disabled Cure, no-match and disabled fallback through the public CLI",
-      "observed": null
+      "observed": "Current-source CLI reserve MP6, disabled MP5, no-match/Wait and no-match/none all preserve resources. The none fallback records zero verified turns and no Wait input; navigation/cancellation raw writes remain audited."
     },
     {
       "id": "public-stop",
-      "status": "unknown",
+      "status": "pass",
       "expected": "STOP before Cure confirmation and before Wait-facing confirmation; zero later gameplay writes",
-      "observed": null
+      "observed": "Fresh confirmation/facing STOP retain40/60 raw writes, suppress the respective final request, restore hooks and leave each owned PID usable; no post-STOP automation writes."
     },
     {
       "id": "public-handoff-resume",
-      "status": "unknown",
+      "status": "pass",
       "expected": "Paused CLI cleanup, visible manual command and same-PID resume",
-      "observed": null
+      "observed": "Both source-pinned paused CLI handoffs accept manual window-channel Wait with two later enemies; the same PID resumes through established Move/Wait and verifies one actor-linked move to(4,11). Previous-leg hashes and manual timeline are preserved."
     },
     {
       "id": "receipt-rejection",
-      "status": "unknown",
+      "status": "pass",
       "expected": "Exact chooser/modal/action/continuation evidence and raw-log/terminal mutations rejected",
-      "observed": null
+      "observed": "Each final Cure receipt rejects26 mutations; each final handoff rejects8. Raw STOP/resumed-terminal suite20, modal-reader46, continuation-reader11 and strict raw-ledger/result/policy joins pass."
     },
     {
       "id": "move-wait-regressions",
-      "status": "unknown",
+      "status": "pass",
       "expected": "Existing public Move/Wait and unsupported actor/job/target guards preserved",
-      "observed": null
+      "observed": "Public same-PID Move/Wait resumes pass twice; actor21, adapter12, policy119 and recorded resume flow pass. Six unsupported-owner host controls and a real two-ally CLI boundary reject with zero input."
     }
   ],
   "live_runs": [
@@ -140,16 +140,18 @@
     }
   ],
   "limitations": [
-    "Public runtime, event/source-hash integration, real CLI declines/STOP and manual continuation/same-PID resume remain unknown.",
-    "Source-bound reloads are constructed self-Cure research only; ally/KO/items/wounded-party acceptance remains open.",
-    "Raw RAM, ROM, states and screenshots stay local; metadata-only checks are selectively retained.",
-    "Router preview proves tracing restoration, never another action. Action/continuation remains independently joined from raw captures.",
-    "A seed-only restoration check was over-specific: final criterion accepts attributed router traffic or decoded seed traffic; no traffic remains unknown. Run08 is retained.",
-    "Screenshot subprocess timeout45s and debugger packet timeout1s bound pending-call latency. Post-final trace observation budget12s."
+    "A6.1 is bounded integration only: seven-unit fixture, one player id6/job2/race1 at(4,10), secondary White Mage and effective Cure cost6; explicit opt-in. Other scopes fail closed.",
+    "No wounded-party policy comparison, ally/KO target, Life, item inventory/execution or complete-battle recovery-policy acceptance is claimed. A6 remains partial.",
+    "Manual continuation proves window-channel Wait; same-PID resume proves established Move/Wait. It does not accept an additional resumed Cure beyond the bounded initial action.",
+    "Navigation/cancellation inputs precede an unavailable or policy-declined Cure. A none fallback means no final Cure/Wait commit, not zero navigation writes.",
+    "Source fixture RAM construction is not gameplay. Status panels may cache old fixture HP; resources are verified on independent reload and actual post-cast modal/continuation reads.",
+    "Raw RAM, ROM, saves, states and screenshots remain local and untracked; compact metadata/checks and hashes are selectively committed.",
+    "Router preview proves hook activity only. Runtime action acceptance independently joins canonical actor, restored roster and later actors; borrowed storage rejects to a bounded unknown.",
+    "Screenshot helper has45-second timeout; final policy revalidation occurs after the observation callback. Pending OS/transport calls can delay STOP observation, but no subsequent gameplay input is authorized."
   ],
-  "next_packet": "Integrate bounded executors and deliberate adapter capability through the real public runtime; require complete modal/raw/continuation evidence and execute public CLI/handoff gates.",
+  "next_packet": "A6.2 read-only living-ally target research on the separately guarded eight-unit fixture",
   "date": "2026-10-07",
-  "tested_revision": "8fe1dbe plus source_sha256",
+  "tested_revision": "9532cb4 plus current source_sha256",
   "retained_failures": [
     {
       "run": "a61-scoped-cure-04",
@@ -162,6 +164,22 @@
     {
       "run": "a61-scoped-cure-08",
       "observation": "Action/continuation captures valid; three-second restored trace sample saw no events, so restoration evidence remains unknown."
+    },
+    {
+      "run": "a61-public-fixture-mp85",
+      "observation": "Export hotkey claimed delivery but created no state; owned process cleaned up. Verified foreground helper and fresh export/reload required."
+    },
+    {
+      "run": "a61-public-cure-01",
+      "observation": "Initial public adapter referenced a lazily created write list before input; owned process cleaned up. Initialization corrected and fresh final reloads pass."
+    },
+    {
+      "run": "a61-public-stop-cure-01/manual-recovery.json",
+      "observation": "Manual cancellation safely rejected owned ability-list opening0x101; ROM dispatch supports passive-only opening retry. Final source-pinned handoffs each pass in one attempt."
+    },
+    {
+      "run": "a61-public-stop-cure-01",
+      "observation": "Same-PID resumed Cure healed100->158 and spent six MP, but only one continuing enemy was readable; borrowed roster rejected72 times. Zero verified turns; continuation remains unknown. Final lifecycle acceptance uses established Move/Wait resume instead."
     }
   ],
   "evidence_sha256": {
@@ -189,9 +207,138 @@
     "outputs/autobattle/a61-transport-regressions/cure-final.json": "e40cf3a6b98823a629d74ab49cf908cb31cefaac03b480a39db89e7ab28fcc47",
     "outputs/autobattle/a61-transport-regressions/wait-final.json": "7fc8c32d700531b4c82a0d6df4be136cc321b1e87506010855b6691b95df3e2b",
     "outputs/autobattle/a61-transport-regressions/ai.log": "17adad12b5ffb6fdb5a46585aad6d75e40076bc7dc16158f9ce73c0e268b7a73",
-    "outputs/autobattle/a61-transport-regressions/resume.log": "cf7b362e01cf9bdee53a97396f8fcc33ec8c93f4889dcdb43cb2c19190ec7c18"
+    "outputs/autobattle/a61-transport-regressions/resume.log": "cf7b362e01cf9bdee53a97396f8fcc33ec8c93f4889dcdb43cb2c19190ec7c18",
+    "outputs/autobattle/a61-public-final-matrix.json": "8fab8591dd6e473541915fe012acb196ff784b8f0f2daee18f09b350d9b7aed5",
+    "outputs/autobattle/a61-public-stop-cure-02/run.json": "4019714730aa0af592b70ab9964a50b2a63df6523e76264fab8c4a9e786b390a",
+    "outputs/autobattle/a61-public-stop-cure-02/paused-run.json": "3106a7c0a1658d12685d03e3d2aa203ba896aa6b0e2ea79c06471704c9bc8ffe",
+    "outputs/autobattle/a61-public-stop-cure-02/events.jsonl": "d4ffa90ed751a71c55d96b23c76470521554e9cddacc77059ac90bce4c882cda",
+    "outputs/autobattle/a61-public-stop-cure-02/input-log.jsonl": "b5532a2a1f0db7b40c7d472e56c32cb961fa767da51cf5fb839841e6bd95162e",
+    "outputs/autobattle/a61-public-stop-cure-02/manual-recovery.json": "f3e25d89e1825442e09bd412647e37a12fb4599c1af68519ca1ee9879582a64e",
+    "outputs/autobattle/a61-public-stop-cure-02/checks.json": "cf0e320930018812bff2db4b95c496a5574c91dcc6ce7ae37f95fc051132de66",
+    "outputs/autobattle/a61-public-stop-cure-02/recovery-confirmation.png": "a56cd0c2d68ae02ed9d9f443c62a410669005257cafc96999e9efe670e61523c",
+    "outputs/autobattle/a61-public-stop-cure-02/manual-recovery-before.png": "4beef9fd893a4db0ceee3dee60d034725cbd169cc81c25a71c0881b76fcb68bc",
+    "outputs/autobattle/a61-public-stop-cure-02/manual-recovery-facing.png": "98c15b2ca6bf8bd1db21877397d741909159754e7f8a2f42752129bdd3af0e4e",
+    "outputs/autobattle/a61-public-stop-cure-02/manual-recovery-after.png": "608b583835c2fee786220ca0916dd3ba2ef3caf0f76945b6860cbcaa85bc8e98",
+    "outputs/autobattle/a61-public-stop-facing-02/run.json": "b4fc495d329e589450b51def601405d8fa372785baa07d3a1f619e003caae535",
+    "outputs/autobattle/a61-public-stop-facing-02/paused-run.json": "7e8369f88587d2cd97c664fd947a564c7fca5e2c4652b3b84a677f9b22332b99",
+    "outputs/autobattle/a61-public-stop-facing-02/events.jsonl": "4522801bacb0c9dd53a92906bec61e25ab9f99992458fbfcfdcaf13dd785fb8f",
+    "outputs/autobattle/a61-public-stop-facing-02/input-log.jsonl": "4c51d0d09c730a3219d0b9fa0649f64668047cd1ac1a3389256b45294affc3c3",
+    "outputs/autobattle/a61-public-stop-facing-02/manual-recovery.json": "2d5a9b0fe53489804631a6657410721f15d4d565f3c4f77f9b4c028fef74f88c",
+    "outputs/autobattle/a61-public-stop-facing-02/checks.json": "f41c21245257c60cc52af66ad5fd74a727a8e8e58b662f37fec95f7ee62b5706",
+    "outputs/autobattle/a61-public-stop-facing-02/recovery-facing.png": "49d63316360ed4966389313b8162ce3fe3be0f78e14d975392a1e142552f7f57",
+    "outputs/autobattle/a61-public-stop-facing-02/manual-recovery-before.png": "1fa07ae27f9eca71f12ac60a2269d1866c2133974277d28525cc230a29ae34e8",
+    "outputs/autobattle/a61-public-stop-facing-02/manual-recovery-facing.png": "1fa07ae27f9eca71f12ac60a2269d1866c2133974277d28525cc230a29ae34e8",
+    "outputs/autobattle/a61-public-stop-facing-02/manual-recovery-after.png": "91c4f0424e724f3842b6c5b2ebb12973db6ab55e8b3a61b007053a39fd412371",
+    "outputs/autobattle/a61-public-final-cure1/run.json": "6d7b91391dea700517db1a35af4cb09862ecc916e2f70a61cd63a76c2492c424",
+    "outputs/autobattle/a61-public-final-cure1/events.jsonl": "43bfd476f842aaf55336e4c1b6bebcbfa56ee28181e9865aa7345c9b76a4807b",
+    "outputs/autobattle/a61-public-final-cure1/input-log.jsonl": "4564ce48d0b16f7f66839c00b257adfdf6f511e497cc5c27b9c0338eb3e759bb",
+    "outputs/autobattle/a61-public-final-cure1/checks.json": "5b228dc15f28059d086cc89f51a7344d92138f0f600c08151bbb28a1e5000b22",
+    "outputs/autobattle/a61-public-final-cure1/recovery-facing.png": "0969f7d8af0cbc70c4c4ccb2815eb81c0b3449921abb96e1d85e2bf476b1da22",
+    "outputs/autobattle/a61-public-final-cure1/terminal-stalled.png": "f2ee2eff0309bf816363ec1d6771a300c631619979a5625443cfed3da3cdaad0",
+    "outputs/autobattle/a61-public-final-cure2/run.json": "b57d60309255007e03c1c37859e1b936b0e187f5c5a0e30baca9146f98a234a8",
+    "outputs/autobattle/a61-public-final-cure2/events.jsonl": "e93f15b1a810a9228b3ad5f1b7ad04a083076594fc6b7ac4f64c926f1f6ffb8d",
+    "outputs/autobattle/a61-public-final-cure2/input-log.jsonl": "0d57f2b499bc955f746223d0bc51d907b7f41547acbf6b528ae7bab25aed6beb",
+    "outputs/autobattle/a61-public-final-cure2/checks.json": "52ab15ecac57b09a0005e9b5917d15983a5bb6590c1a9a941b8d2fa1c482811a",
+    "outputs/autobattle/a61-public-final-cure2/recovery-facing.png": "626a1aa475c6584380c7ad56feb8b029ed73a2642fa09a4dc6e6a2d5a9e16c42",
+    "outputs/autobattle/a61-public-final-cure2/terminal-stalled.png": "275a0d6a728ba911ad86a6d5932ede4dae4005b98276322cc7dfc0e70ac4c57c",
+    "outputs/autobattle/a61-public-final-reserve/run.json": "e51b6baad67c02af394f2b0530d86fd4b05d7f61839f9b60cc2a7d30464c5078",
+    "outputs/autobattle/a61-public-final-reserve/events.jsonl": "ebd28cdfbebb9d23406cc393f1131e7e8fd50fde8c13f2934f52ae0145b1f84d",
+    "outputs/autobattle/a61-public-final-reserve/input-log.jsonl": "1043e3f9d1e9a1207c573dea629ca1a169f7c3eaf81863d74d9c93b1f881b934",
+    "outputs/autobattle/a61-public-final-disabled/run.json": "dfa96b54ea23b503a7da466d9ff69966ff23a3d5a1b223b81426a1c6504940d6",
+    "outputs/autobattle/a61-public-final-disabled/events.jsonl": "32046ce14113320c4556f56772e59173c09a1922326de43042f557b91a61a959",
+    "outputs/autobattle/a61-public-final-disabled/input-log.jsonl": "246de4265ed36504f0c4f7ea3e2dc7be0f4ac126fef1bb2208d5c7afce131206",
+    "outputs/autobattle/a61-public-final-no-match-wait/run.json": "b9418a53fd623c500ee9f88e4e7a95f478bf17bc2a3725e4871aca82672db81d",
+    "outputs/autobattle/a61-public-final-no-match-wait/events.jsonl": "47d2f915fd2c4c26b6d0c8238e22370cfb6a9ae43fc01549274bb259fc39f58e",
+    "outputs/autobattle/a61-public-final-no-match-wait/input-log.jsonl": "99a188a2d1188532d82381371bc6a9a6c01853167389e534b0f09e014081556c",
+    "outputs/autobattle/a61-public-final-no-match-none/run.json": "4e41f4b630a198acdf6340ecefa176612ee5bdfc6a4d042183db6b8848da8a1c",
+    "outputs/autobattle/a61-public-final-no-match-none/events.jsonl": "dd6b3c23f170b5e6e7d59d6cdf5e207e84684f40a081e7c6026f9fd5e216e7a1",
+    "outputs/autobattle/a61-public-final-no-match-none/input-log.jsonl": "fe527255b477fb900f661668c1e2d12152fa09b8e5e4f42f4cc0ef4e7eba555e",
+    "outputs/autobattle/a61-public-unsupported-two-ally-01/run.json": "d8413651f6bf7ff96cea5ae65f426499b2cf5805f6a9ff4c401f5f143b48d694",
+    "outputs/autobattle/a61-public-unsupported-two-ally-01/events.jsonl": "0f479e7378944ab96c13a287cdb3e732f6119faa93d8f8bceac33e072be08d80",
+    "outputs/autobattle/a61-public-unsupported-two-ally-01/input-log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/autobattle/a61-opening-public-final/checks.json": "1315a1b4556e9fbaf9d1806e1e77e1ebf103e9b2dbf3c471ca9e01e813b1fe9d",
+    "outputs/autobattle/a61-policy-seam-final/checks.json": "349521f4ef2f12e73d33680edc5ebcf6947a9494c2740baddcb1cc919d3b9ae5",
+    "outputs/autobattle/a61-resume-clock-final/checks.json": "9a1df67db4f3ebf462620b23303c6baf0bae9bc1457c0b3b3a23b5409d2d3604",
+    "outputs/autobattle/a61-fixture-bounds/checks.json": "21451f449674e767d5b04a2d018e4bd53898783851425eae8801fccaed2b1c5d",
+    "outputs/autobattle/a61-reader-public-final/checks.json": "53db21a1f7d0ca94d7736c847609a200e130bbfbb1b5272f1ac03ee69a59c899",
+    "outputs/autobattle/a61-continuation-reader-final/checks.json": "be800cfd5eefd1f0d45ddac4ce995b0e1f9b08b40aad34e2c34f9decde9221bd",
+    "outputs/autobattle/a61-transport-public-final/checks.json": "6eb88d3f5b2479f11c488d547c37042a38f66ffa632e93c1a54ae92d967142a1",
+    "outputs/autobattle/a61-facing-public-final/checks.json": "37e51e287be42c8153d213831bba3fdf1a5712c2af2d44e5749f09b132a8c9eb",
+    "outputs/autobattle/a61-executor-public-final/checks.json": "e40cf3a6b98823a629d74ab49cf908cb31cefaac03b480a39db89e7ab28fcc47",
+    "outputs/autobattle/a61-wait-public-final/checks.json": "7fc8c32d700531b4c82a0d6df4be136cc321b1e87506010855b6691b95df3e2b",
+    "outputs/autobattle/a61-raw-public-final/checks.json": "fbd542f54faf2995170652fe122085b4ba32d767a23a95a239604af104f8e971",
+    "outputs/autobattle/a61-policy-public-final/checks.json": "361a103121b5925b9b5cfafe95a599f9399a125546f91380d0f2f2cb40d46723",
+    "outputs/autobattle/a61-adapter-public-final/checks.json": "26a8c3c27b08e5ab40b6b7cf78c0a232bb24d37a28191c002ed9fd40e58f3303",
+    "outputs/autobattle/a61-identity-public/checks.json": "e6477dba807b9da4310d816dba57675136bd1d4f967f3c63a93b06b79ba7c1ea",
+    "outputs/autobattle/a61-public-final-ai.log": "17adad12b5ffb6fdb5a46585aad6d75e40076bc7dc16158f9ce73c0e268b7a73",
+    "outputs/autobattle/a61-transport-public-resume.log": "554e818341640fc2f7ec8aa664335b4839b13c059b197ab239a3cd7825a9067c",
+    "outputs/autobattle/a61-public-fixture-mp85-02/fixture.json": "3a050a96269b8d180ab75f97aaa8fd0a334fb3691a7eb89221449b4fb0ef52af",
+    "outputs/autobattle/a61-public-fixture-mp6-01/fixture.json": "c101b3e355e2ff6dd135a36c213fde801cc6c6527d33a338e0e5a5fcbe53b3e2",
+    "outputs/autobattle/a61-public-fixture-mp5-01/fixture.json": "e4ae6af2e51228f13b6bc35fbf75d94f425ecfde9ff7922e9578ce80d1517430"
   },
   "source_sha256": {
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/autobattle_runtime.py": "a966c5663ada323eccb8989463f2fe7b0ef39ef3b65b0075ff6d7844adfc81eb",
+    "tools/build_recovery_fixture.py": "3dd32d1e2379641b3f4c73f99e276edf30debd23b254e8be2b9c557c2017eb13",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/manual_recovery_handoff.py": "18e45db855c9d10e61e9c81e041f41a89d5f5b2fff88829a5a4c73699b7ce528",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/recovery_continuation.py": "2063b48329e8953ec32d25f11dda48c79a0ed0d58e2c24af0c60d68fdfcb0216",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_receipt.py": "eba0c0468c486c6a26ccc2de87cd95bee7fddfda0f280beba0882d3f4bfcaade",
+    "tools/recovery_runtime.py": "53ed22a50d7bb451733ce818cd37534516f638485ea5e60da74c0675a930a640",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/run_autobattle.py": "5d5b3c91b10743f2e947182cd7976775e6777ff5babcd9c8c4c600eaaf516c86",
+    "tools/run_recovery_cli_matrix.py": "3e9ce4176caab4eb2f11d79c90796ddefea0601900b21e77930d1e3e110e1692",
+    "tools/run_recovery_cli_stop.py": "594197de0af2faf06bc105df902624b68bb0e4a633e15c7817c9425210fa5223",
+    "tools/save_owned_mgba_state.ps1": "d36141e501ad7ea42d60acf215d386eef038a7bb3993d391e01675b8730c06a4",
+    "tools/send_owned_mgba_key.ps1": "d83da86767017fe147d48680c2f616ba9ec04ea687194924cbcb59d501c43761",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220",
+    "tools/validate_autobattle_runtime.py": "90d39b6ac656a1000b59f4887b1d3c87bd6ce0d7e87d222d1bad38507ccd9aa4",
+    "tools/validate_recovery_continuation.py": "2af962067008b8e0b996f0808f0b893ad3585d468ee0c4dad470924dc9bda2e4",
+    "tools/validate_recovery_executor.py": "031fa04cdf315a262b278cb56e0f9c3ad14585677a699206a2c6c8066e5ae989",
+    "tools/validate_recovery_facing.py": "4072e19c1e729fa908b9dc5b98fffbfc74112bc074ad3a2f6b68d723895096e5",
+    "tools/validate_recovery_fixture_bounds.py": "4f69ff5915c5775660b413a90ccb5ba4d065f13db9b5a7efe8c0958163e98116",
+    "tools/validate_recovery_handoff.py": "cf1ed384629ade38878aac7f9e89e8d047e39a07514e8ce0e23e0783ed01a3ef",
+    "tools/validate_recovery_menu.py": "349aec64f0c5171cfdb85271e3a8dc6fc7df5d695ab5bca62cde4131254a111b",
+    "tools/validate_recovery_opening.py": "33aeac6b0d577cc2842932b045087b4bd8d8a825bd5ce83ff27ced17ad06b6c7",
+    "tools/validate_recovery_policy_seam.py": "2cd787682500e8bd9b84a573ebae2e5c5b0de666f4feced8beb1297c47412d31",
+    "tools/validate_recovery_runtime.py": "c1be47ec7eb6a1ef2f430bccc9a6fd9bd3d936ca6f91dde3bb1181302cd752b2",
+    "tools/validate_recovery_transport.py": "986e98aec18b3d9f5ea6cdbac407e4bd4e31a515bf8a16ba8fbcaad1443e138f",
+    "tools/validate_recovery_wait_executor.py": "fcae984c5f6748c55bbbbd3179c7b6c003474dbbfc2ebf84430cc955845613c3",
+    "tools/validate_resume_clock.py": "a6c25c68ad4f26de1500e64e58f683230a45e76e00c8e5de8fe76ebd6545bb55"
+  },
+  "checks": {
+    "matrix_live_cases": 6,
+    "accepted_cure_reloads": 2,
+    "cure_mutations_each": 26,
+    "handoff_live_cases": 2,
+    "handoff_mutations_each": 8,
+    "raw_input_cases": 20,
+    "policy_host": 119,
+    "tactics_host": 12,
+    "actor_host": 21,
+    "modal_rejections": 46,
+    "continuation_raw_joins": 2,
+    "continuation_rejections": 11,
+    "opening_rom_cases": 3,
+    "opening_derived_rejections": 18,
+    "facing_rom_cases": 1024,
+    "facing_rejections": 16,
+    "transport_host": 13,
+    "cure_host": 23,
+    "wait_host": 16,
+    "modal_policy_seam_host": 7,
+    "unsupported_owner_host": 6,
+    "resume_clock_host": 3,
+    "ai": "10/10",
+    "strategy": "9/9"
+  },
+  "transport_source_sha256": {
     "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
     "tools/probe_a6_action_menu.py": "e05d9e02c7ee450ac2e2b6965fa2af4e5fc4f0f579b241296716fd607b180ada",
     "tools/probe_recovery_stop.py": "195811ed8728f28f7b67a541e872b2340693d2736149d29ac32c2121088cf9e6",
@@ -203,7 +350,7 @@
     "tools/validate_recovery_opening.py": "d9b7d8bb6ddb83b3869f42743aa43494bc8c86963626c7c132a347f02af04564",
     "tools/validate_recovery_turn_execution.py": "92cd4fdddf9ab2ddb0465a1b4aa439c55302c7a48cb7ea69bdb1cc26550b4b11"
   },
-  "checks": {
+  "transport_checks": {
     "transport_host": 13,
     "cure_host": 23,
     "wait_host": 16,
@@ -217,5 +364,384 @@
     "tactics_host": 12,
     "ai": "10/10",
     "strategy": "9/9"
+  },
+  "transport_baseline": {
+    "base_revision": "c927e40",
+    "tested_revision": "8fe1dbe plus source_sha256",
+    "commit": "9532cb4",
+    "scope": "Historical scoped transport research only"
+  },
+  "public_integration": {
+    "entrypoint": "tools/run_autobattle.py --bounded-self-cure --tactics-policy <schema-2-policy>",
+    "matrix": {
+      "scope": "Sequential real CLI recovery acceptance cases; owned CLI cleanup per run.\n\nUses already verified disposable fixtures. Does not construct/edit RAM, send\nkeys, bypass guards or substitute a model for the public BattleRuntime.\nSTOP/manual/resume is a separate live gate. All binary fixtures remain local.\n",
+      "status": "pass-bounded-cli-matrix",
+      "cases": [
+        {
+          "run": "a61-public-final-cure1",
+          "command": [
+            "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+            "tools/run_autobattle.py",
+            "--state",
+            "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+            "--tactics-policy",
+            "configs/tactics/healer.json",
+            "--bounded-self-cure",
+            "--run-id",
+            "a61-public-final-cure1",
+            "--max-turns",
+            "1",
+            "--wall-timeout",
+            "150",
+            "--on-stop",
+            "kill",
+            "--yes"
+          ],
+          "status": "pass",
+          "outcome": "accepted",
+          "hp": [
+            100,
+            162
+          ],
+          "mp": [
+            85,
+            79
+          ],
+          "raw_writes": 65,
+          "turns": 1,
+          "later_enemy_ids": [
+            3,
+            4
+          ],
+          "metadata_sha256": {
+            "run.json": "6d7b91391dea700517db1a35af4cb09862ecc916e2f70a61cd63a76c2492c424",
+            "events.jsonl": "43bfd476f842aaf55336e4c1b6bebcbfa56ee28181e9865aa7345c9b76a4807b",
+            "input-log.jsonl": "4564ce48d0b16f7f66839c00b257adfdf6f511e497cc5c27b9c0338eb3e759bb"
+          },
+          "checks_sha256": "5b228dc15f28059d086cc89f51a7344d92138f0f600c08151bbb28a1e5000b22"
+        },
+        {
+          "run": "a61-public-final-cure2",
+          "command": [
+            "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+            "tools/run_autobattle.py",
+            "--state",
+            "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+            "--tactics-policy",
+            "configs/tactics/healer.json",
+            "--bounded-self-cure",
+            "--run-id",
+            "a61-public-final-cure2",
+            "--max-turns",
+            "1",
+            "--wall-timeout",
+            "150",
+            "--on-stop",
+            "kill",
+            "--yes"
+          ],
+          "status": "pass",
+          "outcome": "accepted",
+          "hp": [
+            100,
+            158
+          ],
+          "mp": [
+            85,
+            79
+          ],
+          "raw_writes": 65,
+          "turns": 1,
+          "later_enemy_ids": [
+            3,
+            4
+          ],
+          "metadata_sha256": {
+            "run.json": "b57d60309255007e03c1c37859e1b936b0e187f5c5a0e30baca9146f98a234a8",
+            "events.jsonl": "e93f15b1a810a9228b3ad5f1b7ad04a083076594fc6b7ac4f64c926f1f6ffb8d",
+            "input-log.jsonl": "0d57f2b499bc955f746223d0bc51d907b7f41547acbf6b528ae7bab25aed6beb"
+          },
+          "checks_sha256": "52ab15ecac57b09a0005e9b5917d15983a5bb6590c1a9a941b8d2fa1c482811a"
+        },
+        {
+          "run": "a61-public-final-reserve",
+          "command": [
+            "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+            "tools/run_autobattle.py",
+            "--state",
+            "outputs/autobattle/a61-public-fixture-mp6-01/recovery.ss0",
+            "--tactics-policy",
+            "configs/tactics/healer.json",
+            "--bounded-self-cure",
+            "--run-id",
+            "a61-public-final-reserve",
+            "--max-turns",
+            "1",
+            "--wall-timeout",
+            "150",
+            "--on-stop",
+            "kill",
+            "--yes"
+          ],
+          "status": "pass",
+          "outcome": "declined",
+          "hp": [
+            100,
+            100
+          ],
+          "mp": [
+            6,
+            6
+          ],
+          "raw_writes": 80,
+          "turns": 1,
+          "later_enemy_ids": [
+            3,
+            4
+          ],
+          "metadata_sha256": {
+            "run.json": "e51b6baad67c02af394f2b0530d86fd4b05d7f61839f9b60cc2a7d30464c5078",
+            "events.jsonl": "ebd28cdfbebb9d23406cc393f1131e7e8fd50fde8c13f2934f52ae0145b1f84d",
+            "input-log.jsonl": "1043e3f9d1e9a1207c573dea629ca1a169f7c3eaf81863d74d9c93b1f881b934"
+          }
+        },
+        {
+          "run": "a61-public-final-disabled",
+          "command": [
+            "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+            "tools/run_autobattle.py",
+            "--state",
+            "outputs/autobattle/a61-public-fixture-mp5-01/recovery.ss0",
+            "--tactics-policy",
+            "configs/tactics/healer.json",
+            "--bounded-self-cure",
+            "--run-id",
+            "a61-public-final-disabled",
+            "--max-turns",
+            "1",
+            "--wall-timeout",
+            "150",
+            "--on-stop",
+            "kill",
+            "--yes"
+          ],
+          "status": "pass",
+          "outcome": "declined",
+          "hp": [
+            100,
+            100
+          ],
+          "mp": [
+            5,
+            5
+          ],
+          "raw_writes": 50,
+          "turns": 1,
+          "later_enemy_ids": [
+            3,
+            4
+          ],
+          "metadata_sha256": {
+            "run.json": "dfa96b54ea23b503a7da466d9ff69966ff23a3d5a1b223b81426a1c6504940d6",
+            "events.jsonl": "32046ce14113320c4556f56772e59173c09a1922326de43042f557b91a61a959",
+            "input-log.jsonl": "246de4265ed36504f0c4f7ea3e2dc7be0f4ac126fef1bb2208d5c7afce131206"
+          }
+        },
+        {
+          "run": "a61-public-final-no-match-wait",
+          "command": [
+            "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+            "tools/run_autobattle.py",
+            "--state",
+            "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+            "--tactics-policy",
+            "outputs\\autobattle\\a61-public-final-no-match-wait-policy.json",
+            "--bounded-self-cure",
+            "--run-id",
+            "a61-public-final-no-match-wait",
+            "--max-turns",
+            "1",
+            "--wall-timeout",
+            "150",
+            "--on-stop",
+            "kill",
+            "--yes"
+          ],
+          "status": "pass",
+          "outcome": "declined",
+          "hp": [
+            100,
+            100
+          ],
+          "mp": [
+            85,
+            85
+          ],
+          "raw_writes": 80,
+          "turns": 1,
+          "later_enemy_ids": [
+            3,
+            4
+          ],
+          "metadata_sha256": {
+            "run.json": "b9418a53fd623c500ee9f88e4e7a95f478bf17bc2a3725e4871aca82672db81d",
+            "events.jsonl": "47d2f915fd2c4c26b6d0c8238e22370cfb6a9ae43fc01549274bb259fc39f58e",
+            "input-log.jsonl": "99a188a2d1188532d82381371bc6a9a6c01853167389e534b0f09e014081556c"
+          }
+        },
+        {
+          "run": "a61-public-final-no-match-none",
+          "command": [
+            "C:\\Users\\charl\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\\python.exe",
+            "tools/run_autobattle.py",
+            "--state",
+            "outputs/autobattle/a61-public-fixture-mp85-02/recovery.ss0",
+            "--tactics-policy",
+            "outputs\\autobattle\\a61-public-final-no-match-none-policy.json",
+            "--bounded-self-cure",
+            "--run-id",
+            "a61-public-final-no-match-none",
+            "--max-turns",
+            "1",
+            "--wall-timeout",
+            "150",
+            "--on-stop",
+            "kill",
+            "--yes"
+          ],
+          "status": "pass",
+          "outcome": "declined",
+          "hp": [
+            100,
+            100
+          ],
+          "mp": [
+            85,
+            85
+          ],
+          "raw_writes": 65,
+          "turns": 0,
+          "later_enemy_ids": [],
+          "metadata_sha256": {
+            "run.json": "4e41f4b630a198acdf6340ecefa176612ee5bdfc6a4d042183db6b8848da8a1c",
+            "events.jsonl": "dd6b3c23f170b5e6e7d59d6cdf5e207e84684f40a081e7c6026f9fd5e216e7a1",
+            "input-log.jsonl": "fe527255b477fb900f661668c1e2d12152fa09b8e5e4f42f4cc0ef4e7eba555e"
+          }
+        }
+      ],
+      "limits": [
+        "Bounded single-player self-Cure fixture only",
+        "Does not close STOP/manual/resume or broader party A6 gates"
+      ],
+      "runtime_source_sha256": {
+        "tools/run_autobattle.py": "5d5b3c91b10743f2e947182cd7976775e6777ff5babcd9c8c4c600eaaf516c86",
+        "tools/autobattle_runtime.py": "a966c5663ada323eccb8989463f2fe7b0ef39ef3b65b0075ff6d7844adfc81eb",
+        "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+        "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+        "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+        "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+        "tools/recovery_runtime.py": "53ed22a50d7bb451733ce818cd37534516f638485ea5e60da74c0675a930a640",
+        "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+        "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+        "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+        "tools/recovery_continuation.py": "2063b48329e8953ec32d25f11dda48c79a0ed0d58e2c24af0c60d68fdfcb0216",
+        "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+        "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+        "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220"
+      }
+    },
+    "handoffs": [
+      {
+        "run": "a61-public-stop-cure-02",
+        "phase": "confirmation",
+        "status": "pass",
+        "pid": 6504,
+        "stop_raw_writes": 40,
+        "post_stop_automation_writes": 0,
+        "manual_keys": [
+          "B",
+          "B",
+          "B",
+          "B",
+          "B",
+          "DOWN",
+          "A",
+          "A"
+        ],
+        "manual_stub_gameplay_writes": 0,
+        "manual_later_enemy_ids": [
+          3,
+          4
+        ],
+        "resumed_action": {
+          "kind": "identified-move",
+          "command_id": 0,
+          "dest": [
+            4,
+            11
+          ],
+          "from": [
+            4,
+            10
+          ]
+        },
+        "resumed_turns": 1,
+        "resumed_position": [
+          {
+            "x": 4,
+            "y": 10
+          },
+          {
+            "x": 4,
+            "y": 11
+          }
+        ],
+        "mutations_rejected": 8,
+        "limit": "Manual Wait and established Move/Wait resume; no additional resumed Cure or complete-battle claim"
+      },
+      {
+        "run": "a61-public-stop-facing-02",
+        "phase": "facing",
+        "status": "pass",
+        "pid": 58552,
+        "stop_raw_writes": 60,
+        "post_stop_automation_writes": 0,
+        "manual_keys": [
+          "A"
+        ],
+        "manual_stub_gameplay_writes": 0,
+        "manual_later_enemy_ids": [
+          3,
+          4
+        ],
+        "resumed_action": {
+          "kind": "identified-move",
+          "command_id": 0,
+          "dest": [
+            4,
+            11
+          ],
+          "from": [
+            4,
+            10
+          ]
+        },
+        "resumed_turns": 1,
+        "resumed_position": [
+          {
+            "x": 4,
+            "y": 10
+          },
+          {
+            "x": 4,
+            "y": 11
+          }
+        ],
+        "mutations_rejected": 8,
+        "limit": "Manual Wait and established Move/Wait resume; no additional resumed Cure or complete-battle claim"
+      }
+    ],
+    "unsupported_run": "a61-public-unsupported-two-ally-01",
+    "source_hash_semantics": "Launch input hashes compared after each CLI leg; resumed receipts retain the previous leg; manual helper records its source hashes before input"
   }
 }

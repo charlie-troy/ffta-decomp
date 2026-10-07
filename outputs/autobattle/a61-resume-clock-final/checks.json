@@ -1,0 +1,21 @@
+{
+  "status": "pass",
+  "scope": "A resumed runner must start after manual-channel input as well as events.",
+  "checks": [
+    {
+      "event_t": 10,
+      "manual_t": 40,
+      "resume_t": 41.0
+    },
+    {
+      "event_t": 40,
+      "manual_t": 10,
+      "resume_t": 41.0
+    },
+    {
+      "event_t": 10,
+      "manual_t": 10,
+      "resume_t": 11.0
+    }
+  ]
+}

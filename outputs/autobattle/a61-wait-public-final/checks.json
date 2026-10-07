@@ -1,0 +1,22 @@
+{
+  "status": "pass",
+  "scope": "Exercise real Wait fallback flow with fake modal/transport dependencies.",
+  "checks": [
+    "Cure read-only transient retries passively, then joins post-heal resources to guarded Wait",
+    "Wait by row ID, reordered=False; one final and no completion inference",
+    "Wait by row ID, reordered=True; one final and no completion inference",
+    "fallback none suppresses all Wait input",
+    "disabled Wait",
+    "missing Wait",
+    "resources fails closed without retry",
+    "wrong-state fails closed without retry",
+    "ambiguous-final fails closed without retry",
+    "STOP after 0 keys",
+    "STOP after 1 keys",
+    "STOP after 2 keys",
+    "STOP arriving during pre-input revalidation",
+    "STOP during facing revalidation suppresses transport",
+    "STOP during latched final request suppresses transport",
+    "policy re-evaluated before final facing A"
+  ]
+}

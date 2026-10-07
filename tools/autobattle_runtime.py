@@ -25,6 +25,7 @@ No ROM code is patched: the Probe owns RAM breakpoints only, removed at exit.
 from __future__ import annotations
 
 import json
+import math
 import os
 import time
 
@@ -56,6 +57,7 @@ EVENT_SCHEMA = {
     # A5.3: the conditional-tactics receipt (policy, outcome, reason, matched
     # scope/rule, observation age, offered candidates). None without a policy.
     "tactics": None,
+    "recovery": None,
 }
 
 
@@ -69,7 +71,7 @@ class BattleRuntime:
                  mode="retail-ai", stall_seed_seconds=150.0,
                  wall_timeout=600.0, max_turns=None, verbose=True,
                  resume=False, pause_at_boundary=False,
-                 tactics_policy=None, tactics_policy_source=None):
+                 tactics_policy=None, tactics_policy_source=None, bounded_self_cure=False):
         self.s = session
         self.p = Probe(session, verbose=verbose)
         # A5.3: with a policy, the scenario's fixed per-actor assignment is
@@ -79,6 +81,7 @@ class BattleRuntime:
         self.tactics = (TacticsAdapter(self.p, tactics_policy)
                         if tactics_policy is not None else None)
         self._tactics_meta = None
+        self.bounded_self_cure = bool(bounded_self_cure)
         self._owner_observed_at = None
         self.scenario = scenario
         self.scenario_id = scenario.get("scenario_id", "unknown")
@@ -104,17 +107,18 @@ class BattleRuntime:
             # records. t is rounded to 0.1 s, so the +1.0 guard clears the
             # rounding slop with room to spare.
             max_t = 0.0
-            try:
-                with open(self.events_path, encoding="utf-8") as fh:
-                    for line in fh:
-                        line = line.strip()
-                        if line:
-                            rec = json.loads(line)
-                            t = rec.get("t")
-                            if isinstance(t, (int, float)):
-                                max_t = max(max_t, float(t))
-            except (OSError, ValueError):
-                max_t = 0.0
+            for clock_path in (self.events_path, os.path.join(out_dir, "input-log.jsonl")):
+                try:
+                    with open(clock_path, encoding="utf-8") as fh:
+                        for line in fh:
+                            line = line.strip()
+                            if line:
+                                rec = json.loads(line)
+                                t = rec.get("t")
+                                if type(t) in (int, float) and math.isfinite(t):
+                                    max_t = max(max_t, float(t))
+                except (OSError, ValueError):
+                    pass
             self.t0 = time.time() - (max_t + 1.0)
         else:
             self.t0 = time.time()
@@ -420,6 +424,8 @@ class BattleRuntime:
                         self._pause_at_player_boundary()
                         break
                     self._drive_player_boundary()
+                    if self._terminal_reason is not None:
+                        break
                 elif nxt == COMPLETED:
                     self._finish(COMPLETED, "battle end signature held")
                     break
@@ -525,6 +531,9 @@ class BattleRuntime:
         # re-opens the command menu, so the turn only closes after Wait).
         self.adapter.prior = None
         self._tactics_meta = None
+        if self.bounded_self_cure:
+            self._drive_recovery_boundary(before)
+            return
         # -- A5.3 conditional tactics --------------------------------------
         # With a policy configured, the adapter supplies only the commands
         # the engine currently offers (read from RAM) and the frozen chooser
@@ -715,6 +724,53 @@ class BattleRuntime:
                         "(no further input until a real menu echoes)"
                         + (f" [last leg: {_leglog[-1]}]" if _leglog else ""))
         self.state = prev
+
+    def _drive_recovery_boundary(self, before):
+        from recovery_runtime import drive_recovery
+        from recovery_executor import RecoveryStopped
+        journal = {}
+        def capture_confirmation(observation):
+            suffix = "" if self.turn == 0 else f"-turn{self.turn + 1}"
+            self.s.screenshot(os.path.join(os.path.dirname(self.events_path),
+                                           f"recovery-{observation.state}{suffix}.png"))
+        try:
+            confirmed = drive_recovery(self, journal, before_confirmation=capture_confirmation)
+        except RecoveryStopped as exc:
+            self.event("note", **self._actor_fields(), recovery=journal, note=str(exc))
+            self._finish(PAUSED, "STOP requested during bounded recovery: manual handoff")
+            return
+        except (ValueError, TimeoutError) as exc:
+            self.event("note", **self._actor_fields(), recovery=journal,
+                       note=f"bounded recovery rejected: {exc}; no retry")
+            self._finish(STALLED, "bounded recovery rejected: " + str(exc))
+            return
+        except (OSError, ConnectionError) as exc:
+            self.event("note", **self._actor_fields(), recovery=journal,
+                       note=f"bounded recovery transport lost: {exc}; no retry")
+            raise
+        # The scoped transport has restored tracing before any terminal or
+        # turn event. No fixed-roster adapter reads were used while targeting.
+        if self._stop_check():
+            self.event("note", **self._actor_fields(), recovery=journal, note="STOP after recovery cleanup")
+            self._finish(PAUSED, "STOP requested after bounded recovery: manual handoff")
+            return
+        if not confirmed:
+            self.event("note", **self._actor_fields(), recovery=journal, note="policy left Wait unexecuted")
+            self._finish(STALLED, "bounded recovery: policy selected no Wait; no retry")
+            return
+        after_row = journal["continuations"][0]["player_after"]
+        accepted = journal["recovery"]["outcome"] == "accepted"
+        self._engine_result = {"verified": True, "players_before": self._pre_players,
+                               "players_after": [after_row], "source": "recovery independent continuation"}
+        self.turn += 1
+        self.event("turn", turn=self.turn, **self._actor_fields(), control_mode="external",
+                   selected_action={"kind": "identified-self-cure" if accepted else "identified-wait",
+                                    "ability_id": 1 if accepted else None},
+                   selected_target={"kind": "unit", "id": self.owner["id"]} if accepted else None,
+                   position_before=before, position_after={"x": after_row["x"], "y": after_row["y"]},
+                   engine_result=self._engine_result, recovery=journal,
+                   note="bounded recovery: guarded Wait and two independently joined later enemies")
+        self.state = RUNNING
 
     def _record_identified_turn(self, plan_kind, plan, dest_used, drove,
                                 before, fail_log=None):

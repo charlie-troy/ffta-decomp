@@ -1,0 +1,20 @@
+{
+  "scope": "host transport/control flow only; not ROM or public-runtime acceptance",
+  "status": "pass",
+  "checks": [
+    "legacy Probe.press still restores all trace breakpoints",
+    "scoped press leaves router hooks suspended",
+    "memory reads explicitly halt after press/passive continue",
+    "same halt is reused until continue",
+    "exit restores real tracing then resumes",
+    "all modal raw writes reach ledger",
+    "idempotent cleanup never injects a key",
+    "closed/reused transport rejects input and reads",
+    "pre-input STOP yields zero writes and restores tracing",
+    "eight absent/malformed/non-stop/fatal halt replies fail closed with hooks removed",
+    "partial disconnected input is ledgered and never retried",
+    "caller cannot re-arm tracing during modal press",
+    "rejected insertion/removal cannot claim restoration/suspension respectively"
+  ],
+  "count": 13
+}

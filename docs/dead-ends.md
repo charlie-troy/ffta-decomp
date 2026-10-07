@@ -628,3 +628,10 @@ CLAUDE.md carries the slogan.
 - **Do not:** label initialization as an engine-enabled command, retry a final
   cast, or downgrade identity failures to transient opening. Preserve the
   failed run and execute fresh reloads with the passive-only correction.
+- **Public handoff extension:** manual cancellation in
+  `a61-public-stop-cure-01/manual-recovery.json` reached owned ability-list
+  mode7/state0x101 and correctly stopped before further input. The same LIST
+  dispatch permits passive opening retries for mode7 and for an owned Action
+  child in0x100/0x101. Eighteen derived rejection controls retain hard failures
+  for invalid identity or an unowned child. The failed first manual attempt
+  remains retained; a later source-pinned handoff must pass in one attempt.

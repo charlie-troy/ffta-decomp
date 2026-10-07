@@ -1,0 +1,147 @@
+{
+  "scope": "Build and reload a disposable self-Cure fixture for the real public CLI.\n\nEdits only copied-session RAM, exports a NEW local state with the existing\nowned-window save hotkey, and verifies a fresh reload. Never edits the source\nROM, save or state. Construction is not an engine action or legal Cure proof.\n",
+  "status": "verified-constructed-fixture",
+  "source_state": "outputs/lua-nav/battle-start.ss0",
+  "source_sha256": "4da58bfe0e162210383c28aa8f66659fca33c91c69da0e965b87b3b7a730abe5",
+  "constructed": {
+    "hp": 100,
+    "mp": 5,
+    "secondary_job": 7
+  },
+  "writes": [
+    {
+      "addr": "02016020",
+      "width": 1,
+      "old": "08",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "disposable recovery fixture: secondary White Mage"
+    },
+    {
+      "addr": "02016030",
+      "width": 2,
+      "old": "8401",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "disposable recovery fixture: HP"
+    },
+    {
+      "addr": "02016034",
+      "width": 2,
+      "old": "5500",
+      "new": "0500",
+      "requested": "0500",
+      "reply": "OK",
+      "note": "disposable recovery fixture: MP"
+    },
+    {
+      "addr": "02000088",
+      "width": 1,
+      "old": "08",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "disposable recovery fixture: secondary White Mage"
+    },
+    {
+      "addr": "02000098",
+      "width": 2,
+      "old": "8401",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "disposable recovery fixture: HP"
+    },
+    {
+      "addr": "0200009c",
+      "width": 2,
+      "old": "5500",
+      "new": "0500",
+      "requested": "0500",
+      "reply": "OK",
+      "note": "disposable recovery fixture: MP"
+    }
+  ],
+  "save_hotkey": {
+    "pid": 21184,
+    "output": "{\"foreground_verified\":true,\"hwnd\":2622498,\"pid\":21184,\"combo\":\"Shift+F2\"}",
+    "scope": "emulator state export only; no gameplay key injection"
+  },
+  "reload": {
+    "owner": {
+      "slot": 6,
+      "addr": "02016018",
+      "name": 33562396,
+      "side_raw": 129,
+      "ct": 0,
+      "ea": 0,
+      "id": 6,
+      "type": 2,
+      "base_job": 80,
+      "race": 1,
+      "job": 2,
+      "level": 50,
+      "hp": 100,
+      "max_hp": 442,
+      "mp": 5,
+      "max_mp": 85,
+      "is_rom_name": false,
+      "is_ram_name": true,
+      "name_text": "Marche",
+      "side_bit": false,
+      "unaffiliated": false,
+      "live": true,
+      "x": 4,
+      "y": 10
+    },
+    "canonical": 33554560,
+    "menu": {
+      "observed_at": 175322.1850217,
+      "context": 33740960,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 258,
+      "mode": 4,
+      "selection": 0,
+      "selected_ability": 0,
+      "member": 33554560,
+      "peer": 0,
+      "state": "command",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "max_hp": 442,
+      "mp": 5,
+      "max_mp": 85,
+      "cure_cost": 6,
+      "target_tile": [
+        4,
+        10
+      ],
+      "target_processor": 0,
+      "target_state": 0,
+      "target_flags": 0,
+      "actor_wrapper": 33695356,
+      "ui_active": 33742168,
+      "driver_state": 37,
+      "facing_direction": null
+    }
+  },
+  "fixture": "outputs\\autobattle\\a61-public-fixture-mp5-01\\recovery.ss0",
+  "fixture_sha256": "b0ff51f1eb69a42a16cc0ca515d6e527d1c17ae7222b2334817a4296c521d7aa"
+}

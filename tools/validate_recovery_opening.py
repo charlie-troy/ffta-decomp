@@ -37,21 +37,22 @@ def main():
     directory = Path(args.capture)
     run = json.loads((directory / "probe.json").read_text(encoding="utf-8"))
     rejected = []
-    for state in (0x100, 0x101):
+    for mode, state in [(mode, state) for mode in (4, 7) for state in (0x100, 0x101)]:
         memory = Memory((directory / "00-initial-ewram.bin").read_bytes())
         reader = RecoveryMenu(memory, gba.rom, run["owner"])
         original = reader.snapshot()
+        memory.put(reader.context + 4, mode, 1)
         memory.put(reader.callback + 0x14, state, 2)
         try:
             reader.snapshot()
         except RecoveryTransient:
-            rejected.append(f"derived opening {state:04x} returns no snapshot")
+            rejected.append(f"derived mode {mode} opening {state:04x} returns no snapshot")
         else:
             raise AssertionError("opening authorized a snapshot")
         try:
             reader.revalidate(original)
         except RecoveryTransient:
-            rejected.append(f"derived opening {state:04x} cannot authorize prior token")
+            rejected.append(f"derived mode {mode} opening {state:04x} cannot authorize prior token")
         else:
             raise AssertionError("opening authorized stale command token")
         memory.put(reader.member + 0x104, 0xFF, 1)
@@ -60,9 +61,32 @@ def main():
         except RecoveryTransient:
             raise AssertionError("invalid identity softened into passive opening")
         except RecoveryStateError:
-            rejected.append(f"invalid identity remains hard rejection in {state:04x}")
+            rejected.append(f"invalid identity remains hard rejection in mode {mode} {state:04x}")
         else:
             raise AssertionError("invalid opening owner accepted")
+    phase = next(p for p in run["phases"] if p.get("guarded_menu", {}).get("state") == "action-group")
+    for state in (0x100, 0x101):
+        memory = Memory((directory / f"{phase['tag']}-ewram.bin").read_bytes())
+        reader = RecoveryMenu(memory, gba.rom, run["owner"])
+        original = reader.snapshot()
+        child = int.from_bytes(memory.read_mem(reader.callback + 0x10, 4), "little")
+        memory.put(child + 0x14, state, 2)
+        for name, call in (("snapshot", reader.snapshot), ("old token", lambda: reader.revalidate(original))):
+            try:
+                call()
+            except RecoveryTransient:
+                rejected.append(f"owned Action child {state:04x} rejects {name}")
+            else:
+                raise AssertionError("opening Action child authorized input")
+        memory.put(child + 0xC, 0)
+        try:
+            reader.snapshot()
+        except RecoveryTransient:
+            raise AssertionError("unowned Action child softened into passive retry")
+        except RecoveryStateError:
+            rejected.append(f"unowned opening Action child {state:04x} stays hard rejection")
+        else:
+            raise AssertionError("unowned Action child accepted")
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"status": "pass", "scope": __doc__, "executed_dispatch": executed,

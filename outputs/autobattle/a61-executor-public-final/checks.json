@@ -1,0 +1,29 @@
+{
+  "scope": "host-only real executor with fake menu/transport; no ROM semantics claim",
+  "status": "pass",
+  "checks": [
+    "selected Cure",
+    "reordered rows still choose Cure",
+    "reserve decline cancels",
+    "healthy actor declines",
+    "disabled Cure never confirmed",
+    "enemy-only effect rejected",
+    "unspent MP rejected",
+    "STOP after 0 keys suppresses subsequent input",
+    "STOP after 1 keys suppresses subsequent input",
+    "STOP after 2 keys suppresses subsequent input",
+    "STOP after 3 keys suppresses subsequent input",
+    "STOP after 4 keys suppresses subsequent input",
+    "STOP after 5 keys suppresses subsequent input",
+    "STOP after 6 keys suppresses subsequent input",
+    "STOP after 7 keys suppresses subsequent input",
+    "STOP after 8 keys suppresses subsequent input",
+    "STOP after 9 keys suppresses subsequent input",
+    "STOP during cancellation at 9 keys",
+    "STOP during cancellation at 10 keys",
+    "STOP during cancellation at 11 keys",
+    "STOP during cancellation at 12 keys",
+    "STOP during cancellation at 13 keys",
+    "pre-input identity failure suppresses transport"
+  ]
+}

@@ -1,5 +1,45 @@
 # Project log
 
+## 2026-10-07 - A6.1 bounded public self-Cure integration accepted
+
+The public CLI now supports explicit `--bounded-self-cure` with a schema-2
+tactics policy on the seven-unit, one-player id6/job2/race1 fixture. Engine
+menu acceptance precedes the Cure candidate; fresh policy revalidation follows
+the confirmation screenshot. Scoped canonical identity replaces roster reads
+only while targeting borrows that storage. A separate guarded Wait executor
+and two independently joined later enemies establish the completed action.
+Partial input ledgers survive failures and STOP; no final input is retried.
+
+The final current-source six-case CLI matrix passes. Two fresh reloads heal
+HP100->162/158, spend MP85->79, consume Action and finish Wait with65 raw
+writes each. Reserve MP6, disabled MP5 and both no-match fallbacks preserve
+resources. The none fallback has zero verified turns and no Wait input.
+Each successful Cure receipt rejects26 mutations. Actual two-player A4 input
+rejects at the owner boundary with zero writes and zero verified turns.
+
+Fresh confirmation/facing STOP cases retain40/60 writes and suppress their
+respective final request. Each accepts manual window-channel Wait, independently
+joins two later enemies, resumes the same emulator PID through the public
+Move/Wait path and verifies one move to(4,11); adopted process cleanup passes.
+Each final handoff rejects eight mutations. Launch hashes remain unchanged,
+the resumed receipt preserves its previous leg, and the manual timeline is
+audited separately. Inspected post-heal, facing and manual continuation screens.
+
+Retained failures include an unverified export hotkey, an initial journal
+initialization error and an owned ability-list opening rejection. ROM dispatch
+now supports bounded passive opening retries without relaxing identity. An
+earlier resumed Cure healed100->158 but only one later enemy could be read;
+its continuation remains unknown and it claims zero verified turns. Final
+handoff acceptance uses established Move/Wait resume, not that failed gate.
+
+AI10/10 and strategy9/9 freshly pass. Policy119, adapter12, actor21, raw20,
+transport13, Cure23, Wait16, modal reader46, continuation11, opening18,
+facing16 and the recorded resume regression pass at the retained source hashes.
+See `docs/receipts/autobattle/A6.1.json` and the final matrix/check receipts.
+A6 remains partial: ally healing, wounded-party comparison, KO/revive, items
+and complete-battle recovery acceptance are open. Next: A6.2 read-only living
+ally target research on the separately guarded eight-unit fixture.
+
 ## 2026-10-07 - A6.1 modal transport prerequisite and opening-state decode
 
 Added scoped recovery debugger ownership: explicit halted reads, strict hook

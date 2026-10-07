@@ -26,7 +26,7 @@ KNOWN_FIELDS = {"t", "kind", "scenario", "turn", "actor", "actor_slot",
                 # A5.3: the conditional-tactics receipt (policy path, outcome,
                 # reason, matched scope/rule, observation age, offered
                 # candidates). Null on every scenario-driven run.
-                "tactics"}
+                "tactics", "recovery"}
 # kinds whose presence after the terminal stop means the run kept driving:
 # boundaries, turns, and notes about recovery cycles are all input activity
 INPUT_EVENT_KINDS = {"boundary", "turn", "note"}
@@ -91,6 +91,12 @@ def validate(out_dir):
     starts = [r for r in events if r.get("kind") == "start"]
     stops = [r for r in events if r.get("kind") == "stop"]
     resumed = bool(run.get("resumed"))
+    previous_leg = run.get("previous_leg") or {}
+    if previous_leg and (previous_leg.get("final_state") != "paused"
+                         or previous_leg.get("manual_handoff", {}).get("pid") != run.get("emulator_pid")):
+        fail("resume previous-leg receipt is not the same paused PID", errors)
+    if run.get("bounded_self_cure") and run.get("inputs_unchanged") is False:
+        fail("bounded recovery inputs changed during execution", errors)
     expected_starts = 2 if resumed else 1
     if n_starts != expected_starts:
         fail(f"expected exactly {expected_starts} start event(s)"
@@ -162,6 +168,10 @@ def validate(out_dir):
     for i, rec in enumerate(events):
         if rec.get("kind") != "turn":
             continue
+        current_leg = not resumed or i > max(j for j, event in enumerate(events) if event.get("kind") == "start")
+        bounded_leg = run.get("bounded_self_cure") if current_leg else previous_leg.get("bounded_self_cure")
+        if bounded_leg and rec.get("recovery") is None:
+            fail(f"turn event {i}: bounded recovery journal missing", errors)
         for field in ("actor", "control_mode"):
             if rec.get(field) is None:
                 fail(f"turn event {i}: {field} is null", errors)
@@ -216,8 +226,26 @@ def validate(out_dir):
                 elif action.get("kind") == "identified-wait":
                     if moved:
                         raise ValueError("Wait moved a player")
+                elif action.get("kind") == "identified-self-cure":
+                    recovery = rec.get("recovery") or {}
+                    if (moved or len(pre) != 1 or not recovery
+                            or action.get("ability_id") != 1
+                            or rec.get("selected_target") != {"kind": "unit", "id": identity["id"]}
+                            or post[actor]["hp"] <= row["hp"] or post[actor]["mp"] != row["mp"] - 6):
+                        raise ValueError("self-Cure actor/effect/target differs")
                 else:
                     raise ValueError("missing supported selected action")
+                if rec.get("recovery"):
+                    journal = rec["recovery"]
+                    owner = journal["owner"]
+                    if (owner["name_text"], owner["id"], owner["job"], owner["side_bit"]) != (
+                            identity["name_text"], identity["id"], identity["job"], identity["side_bit"]):
+                        raise ValueError("recovery owner disagrees with boundary")
+                    if (post[actor] != journal["continuations"][0]["player_after"]
+                            or journal["recovery"]["before"]["hp"] != row["hp"]
+                            or journal["recovery"]["before"]["mp"] != row["mp"]
+                            or (journal["recovery"]["outcome"] == "accepted") != (action.get("kind") == "identified-self-cure")):
+                        raise ValueError("recovery engine result differs")
             except (KeyError, TypeError, ValueError) as exc:
                 fail(f"turn event {i}: invalid actor-linked result ({exc})", errors)
             boundary = None
@@ -248,7 +276,7 @@ def validate(out_dir):
         # committed input; a boundary is only a detection (zero-input runs
         # carry boundaries too), so it does not count. The bare guard-
         # failure stream (no input possible) legitimately has an empty log.
-        claims_input = any(e.get("kind") == "turn" for e in events)
+        claims_input = any(e.get("kind") == "turn" or (e.get("recovery") or {}).get("raw_writes") for e in events)
         if events and run and claims_input:
             fail(f"missing {ilog_path} — a run that committed turns must "
                  "carry its raw write log", errors)
@@ -265,6 +293,13 @@ def validate(out_dir):
                 fail(f"input-log line {ln}: not JSON ({exc})", errors)
     # Actual transport writes cannot inherit the aborted/completed labels of
     # a surrounding request. A delivered write remains input in every case.
+    from recovery_receipt import validate_recovery
+    for index, rec in enumerate(events):
+        if rec.get("recovery") is not None:
+            try:
+                validate_recovery(rec["recovery"], ilog, confirmed=rec.get("kind") == "turn")
+            except (KeyError, TypeError, ValueError, IndexError) as exc:
+                fail(f"event {index}: invalid recovery journal ({exc})", errors)
     valid_raw = []
     for index, record in enumerate(ilog):
         if record.get("event") != "key_write":
@@ -297,7 +332,7 @@ def validate(out_dir):
     # committed turns must carry at least the input records that auditing
     # those commits requires (boundary-only streams may be empty — zero
     # input is legitimate evidence FOR zero input)
-    claims_input = any(e.get("kind") == "turn" for e in events)
+    claims_input = any(e.get("kind") == "turn" or (e.get("recovery") or {}).get("raw_writes") for e in events)
     if claims_input and not ilog:
         fail("input-log.jsonl is empty but the run records committed turns "
              "— the raw write log cannot be missing for an input-owning run",

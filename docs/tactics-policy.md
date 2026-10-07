@@ -330,7 +330,7 @@ does not establish live recovery support. A7 will extend the contract explicitly
 | `contrast-two-ally.json` | per-character divergence on the proven Move/Wait candidates (`Marche#7` takes a Move, `Montblanc#5` holds with Wait) — a contract demonstration, not tactics quality |
 | `hp-split.json` | one party rule set conditioned on the actor's own engine-read HP percent (`<= 80%` holds, otherwise advance); calibrated to the A4 two-ally fixture so one live run exercises both rules |
 | `hold-below-30.json` | the A5.4 condition-change twin of `hp-split.json`: identical rules, one value different (threshold 30 instead of 80) |
-| `healer.json` | v2 host preset: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve; items disabled. Live adapter currently cannot offer these abilities. |
+| `healer.json` | v2 preset: Life on KO ally, Cure on living wounded ally/self, eight-MP reserve; items disabled. Opt-in bounded self-Cure is the only live recovery candidate; ally/KO remain unsupported. |
 
 All are validated by the host suite on every run. Resource preservation and
 live healer execution remain A6 work.
@@ -446,10 +446,35 @@ capability.
 A6 live research is recorded in [a6-recovery-research.md](a6-recovery-research.md):
 two constructed-fixture self-Cure casts consume six MP and increase HP;
 five-MP Cure is disabled and rejected. The decoded effective-MP reader matches
-2,429 executions of the retail cost function. These are research results;
-the public adapter still offers only Move/Wait. Recovery-policy and
-wounded-party acceptance remain open until modal actor/target identity and
-confirmation guards are integrated and validated.
+2,429 executions of the retail cost function. Ordinary command observation
+still offers only Move/Wait. The explicit `--bounded-self-cure` CLI path now
+uses pinned modal identity, an engine-enabled Cure row, accepted self targeting
+and final confirmation before offering a schema-2 Cure candidate. It requires
+the seven-unit constructed fixture, actor id6/job2/race1 at(4,10), secondary
+White Mage and six-MP effective cost; other shapes reject before confirmation.
+This is not party healing, learned-ability enumeration or item execution.
+
+The public runtime records the complete recovery journal in the explicit
+`recovery` event field: chooser snapshots and policy document, canonical pin,
+input requests/deliveries, raw writes, separate Wait and independent later
+actors. A declined Cure returns to the command menu before Wait is separately
+evaluated; `fallback: none` leaves it unexecuted. Screenshot observation occurs
+before the final policy revalidation. STOP restores tracing and enters the
+existing paused lifecycle without retrying an ambiguous final input.
+
+For the bounded local fixture:
+
+```powershell
+python tools/build_recovery_fixture.py --out outputs/autobattle/my-new-cure-fixture --mp 85
+python tools/run_autobattle.py --state outputs/autobattle/my-new-cure-fixture/recovery.ss0 --tactics-policy configs/tactics/healer.json --bounded-self-cure --max-turns 1 --wall-timeout 150 --on-stop kill --yes
+```
+
+Fixture construction edits only copied-session RAM, exports a new local state
+and verifies an independent reload. Its cached status screenshot can show the
+old HP; the reload RAM observations, not that panel, verify fixture resources.
+States, ROMs, saves and raw captures stay untracked. The opt-in transaction is
+bounded; a turn-budget stop is not a completed battle. See `A6.1.json` for
+accepted public cases and remaining gates; broader wounded-party A6 stays open.
 
 `python tools/validate_tactics_policy.py` -> **94/94 PASS**, writing
 `outputs/autobattle/a52-tactics-policy/checks.json`. Coverage: every
