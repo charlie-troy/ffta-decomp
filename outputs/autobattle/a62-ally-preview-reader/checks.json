@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "scope": "Replay the retained ally preview reader; no live final-prompt proof.",
+  "rejected": [
+    "caster-wrapper",
+    "caster-copy",
+    "target-copy",
+    "target-table",
+    "target-count",
+    "target-index",
+    "committed-coordinates",
+    "display-coordinates",
+    "acceptance-coordinates",
+    "target-canonical",
+    "target-hp",
+    "caster-mp"
+  ],
+  "final_prompt": "unknown"
+}

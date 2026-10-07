@@ -1,0 +1,16 @@
+{
+  "status": "pass",
+  "scope": "Retained final-prompt joins; this is not a cast or policy-candidate receipt.",
+  "mutations_rejected": [
+    "false-cast",
+    "wrong-prompt-mode",
+    "wrong-target-state",
+    "wrong-target-flags",
+    "wrong-cursor",
+    "extra-final-input",
+    "missing-advance",
+    "missing-final-prompt"
+  ],
+  "final_cursor": "not retained in callback header; revalidate live before candidate",
+  "cast": "unknown"
+}

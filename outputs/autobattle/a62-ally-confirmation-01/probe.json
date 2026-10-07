@@ -1,0 +1,1410 @@
+{
+  "status": "captured-final-prompt-only",
+  "scope": "Observe guarded ally selection through the final prompt; NEVER cast.\n\nResearch navigation only. Public self-only guards are preserved. After the\nsingle RIGHT, target-selection A and description A, then stop at the final prompt.\n",
+  "source_sha256": {
+    "outputs/autobattle/a62-party-fixture-01/party-recovery.ss0": "17d477e182453eadc497da7096de640ba8fc464085db587b994c2c7cae140929",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/probe_recovery_ally_confirmation.py": "0dc85ecc1fc1f0d489816c6faee74aa1f4d04eecf5ee5b2cec4f4d935165c6d6",
+    "tools/recovery_ally_preview.py": "f1d77ae16b908306bec1d74596f8cca679c434bdbcb31ae858f61a6b6270a95f",
+    "tools/recovery_ally_target.py": "3221800edce967464be71815facb3085233dd6a7a541da7b22cb859c06696a2e",
+    "tools/recovery_party.py": "06d1df0dc323b71191ce2b36bba02c1be04bef26ccf6ed053c26171d3d828a95",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/build_recovery_fixture.py": "3dd32d1e2379641b3f4c73f99e276edf30debd23b254e8be2b9c557c2017eb13",
+    "tools/probe_recovery_party.py": "ff08f4a42968d45afd45d1dc7c77eec87e2434c4cb51a964739135409c2fc7a5"
+  },
+  "raw_writes": [
+    {
+      "event": "key_write",
+      "t": 12.077,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.131,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.183,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.236,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.289,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.796,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.848,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.901,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.952,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 14.005,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.517,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.57,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.622,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.675,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.728,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.238,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.291,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.343,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.395,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 17.447,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 18.967,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.021,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.074,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.126,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.178,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.688,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.739,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.791,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.843,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.895,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.406,
+      "val": 16,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.459,
+      "val": 16,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.51,
+      "val": 16,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.563,
+      "val": 16,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.616,
+      "val": 16,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.147,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.2,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.252,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.305,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.357,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 26.636,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 26.689,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 26.743,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 26.796,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 26.848,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    }
+  ],
+  "final_confirmation": false,
+  "phases": [
+    {
+      "tag": "before",
+      "cursor": [
+        4,
+        10
+      ],
+      "acceptance_coordinates": [
+        4,
+        10
+      ],
+      "root_peer": 33554560,
+      "root_member": 33554560,
+      "root_mode": 7,
+      "handler": 134385121,
+      "controller_state": 3,
+      "target_state": 10,
+      "target_flags": 0,
+      "index": 0,
+      "count": 2,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "name": 33562396,
+          "id": 7,
+          "hp": 442,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        {
+          "wrapper": 33695500,
+          "canonical": 33554824,
+          "name": 139793095,
+          "id": 5,
+          "hp": 100,
+          "tile": [
+            5,
+            10
+          ]
+        }
+      ],
+      "processor_sha256": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d"
+    },
+    {
+      "tag": "after",
+      "cursor": [
+        5,
+        10
+      ],
+      "acceptance_coordinates": [
+        5,
+        10
+      ],
+      "root_peer": 33554560,
+      "root_member": 33554560,
+      "root_mode": 7,
+      "handler": 134385121,
+      "controller_state": 3,
+      "target_state": 10,
+      "target_flags": 0,
+      "index": 0,
+      "count": 2,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "name": 33562396,
+          "id": 7,
+          "hp": 442,
+          "tile": [
+            4,
+            10
+          ]
+        },
+        {
+          "wrapper": 33695500,
+          "canonical": 33554824,
+          "name": 139793095,
+          "id": 5,
+          "hp": 100,
+          "tile": [
+            5,
+            10
+          ]
+        }
+      ],
+      "processor_sha256": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d"
+    },
+    {
+      "tag": "selected",
+      "cursor": [
+        5,
+        10
+      ],
+      "acceptance_coordinates": [
+        5,
+        10
+      ],
+      "root_peer": 33554560,
+      "root_member": 33554560,
+      "root_mode": 12,
+      "handler": 134386057,
+      "controller_state": 258,
+      "target_state": 10,
+      "target_flags": 108,
+      "index": 0,
+      "count": 2,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695500,
+          "canonical": 33554824,
+          "name": 139793095,
+          "id": 5,
+          "hp": 100,
+          "tile": [
+            5,
+            10
+          ]
+        },
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "name": 33562396,
+          "id": 7,
+          "hp": 442,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ],
+      "processor_sha256": "599b06aef154eaab8f2b226d5d4b6798c974f2a69c8c0093d78eba9320fa523f"
+    },
+    {
+      "tag": "confirmation",
+      "cursor": [
+        5,
+        10
+      ],
+      "acceptance_coordinates": [
+        5,
+        10
+      ],
+      "root_peer": 33554560,
+      "root_member": 33554560,
+      "root_mode": 11,
+      "handler": 134386653,
+      "controller_state": 258,
+      "target_state": 2,
+      "target_flags": 32,
+      "index": 0,
+      "count": 2,
+      "selected_copies": [
+        33695356,
+        0
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695500,
+          "canonical": 33554824,
+          "name": 139793095,
+          "id": 5,
+          "hp": 100,
+          "tile": [
+            5,
+            10
+          ]
+        },
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "name": 33562396,
+          "id": 7,
+          "hp": 442,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ],
+      "processor_sha256": "34a3900c7475b219e3ae5d1e12800167810e1926544172fd63b52c6ce2a96f14"
+    }
+  ],
+  "pid": 48976,
+  "owner": {
+    "slot": 7,
+    "addr": "02016120",
+    "name": 33562396,
+    "side_raw": 129,
+    "ct": 306,
+    "ea": 0,
+    "id": 7,
+    "type": 2,
+    "base_job": 5,
+    "race": 1,
+    "job": 5,
+    "level": 50,
+    "hp": 442,
+    "max_hp": 442,
+    "mp": 85,
+    "max_mp": 85,
+    "is_rom_name": false,
+    "is_ram_name": true,
+    "name_text": "Marche",
+    "side_bit": false,
+    "unaffiliated": false,
+    "live": true,
+    "x": 4,
+    "y": 10
+  },
+  "party_pins": [
+    {
+      "canonical": 33554824,
+      "name": 139793095,
+      "name_text": "Montblanc",
+      "id": 5,
+      "slot": 5,
+      "job": 5,
+      "race": 1,
+      "secondary_job": 0,
+      "hp": 100,
+      "max_hp": 241,
+      "mp": 221,
+      "max_mp": 221,
+      "tile": [
+        5,
+        10
+      ],
+      "name_sha256": "f98306027cd19d206408c565b4421247d7c7a2ab6efcfa5e7690a007f16fc9ce"
+    },
+    {
+      "canonical": 33554560,
+      "name": 33562396,
+      "name_text": "Marche",
+      "id": 7,
+      "slot": 7,
+      "job": 5,
+      "race": 1,
+      "secondary_job": 7,
+      "hp": 442,
+      "max_hp": 442,
+      "mp": 85,
+      "max_mp": 85,
+      "tile": [
+        4,
+        10
+      ],
+      "name_sha256": "3c22932bd39482c5137348e25c3bfb6471353f8570d1bb6ad64d06e4cc72e657"
+    }
+  ],
+  "navigation": [
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 201133.8222815,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 201133.8239228,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 201135.5401161,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 201135.5420264,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 4,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 201137.2611149,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 201137.2630221,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 201138.983729,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "DOWN",
+      "final": false,
+      "facts": {
+        "observed_at": 201138.9859973,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "DOWN",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 201140.7118992,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 201140.713553,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 262,
+        "mode": 5,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 0,
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          2,
+          10,
+          80,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 37,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 201142.4345947,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 75,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_requested",
+      "key": "A",
+      "final": false,
+      "facts": {
+        "observed_at": 201142.4364394,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 258,
+        "mode": 7,
+        "selection": 0,
+        "selected_ability": 0,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 0,
+        "target_state": 0,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 33742168,
+        "driver_state": 75,
+        "facing_direction": null
+      }
+    },
+    {
+      "event": "input_delivered",
+      "key": "A",
+      "hits": 5
+    },
+    {
+      "event": "observation",
+      "facts": {
+        "observed_at": 201144.1470584,
+        "context": 33740960,
+        "callback": 33742168,
+        "handler": 134385121,
+        "controller_state": 3,
+        "mode": 7,
+        "selection": 1,
+        "selected_ability": 1,
+        "member": 33554560,
+        "peer": 33554560,
+        "state": "target-overlay",
+        "cursor": null,
+        "scroll": null,
+        "rows": [],
+        "enabled": [],
+        "ability_ids": [],
+        "hp": 442,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "cure_cost": 6,
+        "target_tile": [
+          4,
+          10
+        ],
+        "target_processor": 33642980,
+        "target_state": 10,
+        "target_flags": 0,
+        "actor_wrapper": 33695356,
+        "ui_active": 0,
+        "driver_state": 49,
+        "facing_direction": null
+      }
+    }
+  ],
+  "ally_overlay_token": {
+    "caster": 33554560,
+    "target": 33554824,
+    "target_id": 5,
+    "target_wrapper": 33695500,
+    "tile": [
+      5,
+      10
+    ],
+    "index": 0,
+    "table": [
+      33695356,
+      33695500
+    ],
+    "resource_digest": "eb498ee76e6f3dac5c334e013f466ed55c62e70dd7eefc1c5152d7c72f3a4962"
+  },
+  "target_selection_requested": true,
+  "target_selection_delivered": true,
+  "ally_preview_token": {
+    "caster": 33554560,
+    "target": 33554824,
+    "target_wrapper": 33695500,
+    "tile": [
+      5,
+      10
+    ],
+    "resource_digest": "eb498ee76e6f3dac5c334e013f466ed55c62e70dd7eefc1c5152d7c72f3a4962"
+  },
+  "description_advance_requested": true,
+  "description_advance_delivered": true,
+  "transport": [
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "trace_suspended"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "halt",
+      "reply": "S02"
+    },
+    {
+      "event": "trace_restored",
+      "write_count": 45
+    }
+  ],
+  "inputs_unchanged": true,
+  "capture_sha256": {
+    "after-callback.bin": "1ada3f27f70a03b44207fb1d2ea6f08b8b1b6c069a5c74e9469df0a6a274ec5e",
+    "after-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "after-root.bin": "6568ba64cd342034cd94311318fb6b923aeb722524361e9408a1cdc621e9e2c5",
+    "after-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "after-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "after-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "after-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
+    "before-callback.bin": "1ada3f27f70a03b44207fb1d2ea6f08b8b1b6c069a5c74e9469df0a6a274ec5e",
+    "before-processor.bin": "a3039cd790f67fae55dc620701dcfc6ec1f4c28a16be74a6e71f4a9f77d85a4d",
+    "before-root.bin": "6568ba64cd342034cd94311318fb6b923aeb722524361e9408a1cdc621e9e2c5",
+    "before-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "before-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "before-wrapper-0202267c.bin": "b85c22f8d0722af0e122014c254be31d61b5996a31344fe9851ab90d1ea67023",
+    "before-wrapper-0202270c.bin": "3e12a8f3460e5063704e8044f338d532e7f9d0f12fd0c178b2507a5440f2b48b",
+    "confirmation-callback.bin": "0f862f75ff02f2dc65901ce7f07e075636053d11d41f84225a6adbedd6ac8116",
+    "confirmation-processor.bin": "34a3900c7475b219e3ae5d1e12800167810e1926544172fd63b52c6ce2a96f14",
+    "confirmation-root.bin": "90f6d4085277ac40cc2937f8358b853bbcb53ca0fc74e661af9e191b5d977662",
+    "confirmation-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "confirmation-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "confirmation-wrapper-0202267c.bin": "aa6321a96a655d04a97d079bad8d8e984519e105b4ffb70df22dad5d588afe73",
+    "confirmation-wrapper-0202270c.bin": "52b9527f0713f51d89eaa6b7e1652429e8654d50d369ee66600d0abac63b1e3b",
+    "selected-callback.bin": "281c976bff80c6df6843ee3deb02b839d447f8696df607c2064649e20c0316c0",
+    "selected-processor.bin": "599b06aef154eaab8f2b226d5d4b6798c974f2a69c8c0093d78eba9320fa523f",
+    "selected-root.bin": "22d8f947269d17fde8ace749294471fc384e78e473b8a554f8c3244208bdc080",
+    "selected-unit-02000080.bin": "7f70f9958c138c13b32cde5b66cb9308f8aa710e9ab198cf56dc391b6a07beb8",
+    "selected-unit-02000188.bin": "eb3f7ca203b30edbd22193b03b2d7946bcb9b2428f711ee0efdf455d5a698ef0",
+    "selected-wrapper-0202267c.bin": "aa6321a96a655d04a97d079bad8d8e984519e105b4ffb70df22dad5d588afe73",
+    "selected-wrapper-0202270c.bin": "52b9527f0713f51d89eaa6b7e1652429e8654d50d369ee66600d0abac63b1e3b"
+  }
+}

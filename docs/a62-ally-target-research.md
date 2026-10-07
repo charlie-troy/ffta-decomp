@@ -59,6 +59,19 @@ target tile. These fragment tests do not execute surrounding acceptance checks.
 
 ## Next live gate: UNKNOWN
 
+Final-prompt experiment `a62-ally-confirmation-01` now reaches Do-it/Cancel
+through a revalidated `AllyPreviewReader` token, then stops. Twelve preview
+reader controls reject changed resources, target wrappers/table and coordinates.
+The live final prompt is CONFIRM/mode11/state0x102, processor state2/flags0x20.
+Processor+8 retains ally wrapper0202270C/canonical02000188; +0/+4/+0x0C name
+caster0202267C, +0x10 is0, and context peer still names canonical caster.
+45 raw writes, no final cast and no HP/MP changes. Eight retained prompt mutants
+reject. Inspected Do-it/Cancel screenshot. Callback-header captures do not
+include its cursor payload; the next live final-candidate reader must verify
+cursor0 and all target joins afresh, then repeat policy/identity checks after
+any screenshot before one final input. This is a target-prompt prerequisite,
+not two successful ally-Cure/Wait continuation reloads.
+
 Selection experiment `a62-ally-acceptance-01` independently pins both party
 records, then uses a separate read-only `AllyOverlayReader` token for the one
 target-selection A. Both coordinate structures agree on(5,10). Fourteen

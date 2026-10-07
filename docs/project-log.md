@@ -1,5 +1,16 @@
 # Project log
 
+## 2026-10-07 - Guarded ally preview reaches final prompt without casting
+
+The preview reader rejects12 identity/resource/table/coordinate controls.
+Fresh guarded navigation then reaches the Do-it/Cancel prompt: target state2,
+flags0x20, target wrapper at processor+8 still canonical Montblanc. The extra
+pointer at+0x0C names the caster, as does cached context peer.45 raw writes,
+no final cast and no resource effect. Eight retained final-prompt mutants reject;
+the screenshot was inspected. Next live candidate must verify cursor0 from its
+payload, preserve the target join and re-evaluate policy after observations.
+Two successful ally-Cure/Wait continuation reloads remain unproven.
+
 ## 2026-10-07 - Guarded ally selection into Cure preview
 
 Fresh scratch reload independently pins both canonical allies; a separate
