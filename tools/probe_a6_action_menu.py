@@ -19,7 +19,7 @@ from c2_menu_probe import sweep
 from fixture_guard import FixtureSession, ROSTER, STRIDE, u8, u16, u32
 from probe_control_handoff import Probe
 from recovery_menu import RecoveryMenu, RecoveryStateError
-from recovery_executor import SelfCureExecutor, RecoveryStopped
+from recovery_executor import SelfCureExecutor, WaitFacingExecutor, RecoveryStopped
 from tactics_policy import validate_policy
 
 KEYS = {"A": 1, "B": 2, "DOWN": 0x80, "UP": 0x40,
@@ -43,12 +43,16 @@ def main():
     parser.add_argument("--confirm-facing", action="store_true",
                         help="require the final route key to confirm verified facing, then observe only")
     parser.add_argument("--policy", help="state-driven bounded self-Cure research using this policy")
+    parser.add_argument("--wait-fallback", action="store_true",
+                        help="after policy Cure decline, evaluate/confirm engine-enabled Wait then observe only")
     parser.add_argument("--stop-file", help="observe STOP when this file exists; policy executor only")
     args = parser.parse_args()
     if args.policy and args.route is not None:
         parser.error("policy execution and an explicit research route are mutually exclusive")
     if args.stop_file and not args.policy:
         parser.error("STOP file requires policy execution")
+    if args.wait_fallback and not args.policy:
+        parser.error("Wait fallback requires policy execution")
     if args.confirm_facing and (args.policy or not args.verify_menu):
         parser.error("facing research requires a guarded explicit route")
     route_text = args.route if args.route is not None else "DOWN,A,DOWN,DOWN,A,DOWN,UP,B,B"
@@ -251,6 +255,21 @@ def main():
                 result["executor_events"] = executor.events
                 result["policy"] = args.policy
                 result["recovery"] = executor.run()
+                if args.wait_fallback and result["recovery"]["outcome"] == "declined":
+                    def latch_facing(obs):
+                        nonlocal facing_committed
+                        facing_committed = True
+                        result["facing_confirmation"] = {"before_key": len(result["keys"]) + 1,
+                                                         "facts": obs.receipt()}
+
+                    executor = WaitFacingExecutor(menu, probe, policy, after_key=after_key,
+                        before_final=latch_facing, stop_check=stop_check)
+                    result["fallback_events"] = executor.events
+                    result["fallback"] = executor.run()
+                    if facing_committed:
+                        probe.disarm()
+                        session.g.cont()
+                        time.sleep(5)
                 phase("99-settled")
             for i, name in enumerate([] if policy else route, 1):
                 if menu is not None:

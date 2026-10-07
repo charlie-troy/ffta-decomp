@@ -1,5 +1,28 @@
 # Project log
 
+## 2026-10-06 - A6 state-driven policy-decline Wait fallback research
+
+Added `WaitFacingExecutor`: unique engine-enabled Wait row, chooser evaluation,
+identity-based navigation, policy recheck at owned facing, single terminal A,
+and no input after the pre-transport latch. It reports confirmation separately
+from independent continuation proof. The research CLI's `--wait-fallback` runs
+this only after Cure has declined and canceled back to command; no public
+runner capability or successful-Cure turn completion is implied.
+
+Reserve-MP6 (`a6-policy-wait-reserve-01`) and disabled-Cure-MP5 (`a6-policy-wait-low-mp-02`)
+reloads restore the roster and join two distinct later enemy actors while
+preserving Marche HP100/MP/tile. The first low-MP capture mismatched bulk/live
+main-state observations and remains unaccepted. A fresh strict rerun passes.
+Live STOP at facing delivers15 keys/75 raw writes and zero writes after STOP,
+without a final facing A. Host flow checks15/15; each retained policy receipt
+rejects13 mutations, including wrong/absent Cure rejection, altered Wait
+candidate, post-final/post-STOP input and false completion. Existing Cure23,
+reader46 and AI10 regressions pass. Research screenshots retain the documented
+45-second blocking timeout. See A6 research notes and receipt for exact limits.
+Fresh positive regression `a6-wait-cure-regression-01` heals HP100->165,
+MP85->79 with Action consumed, sends no Wait fallback after success, and
+rejects12 retained-receipt mutations. Strategy9/9 passes too.
+
 ## 2026-10-06 - A6 guarded facing and restored-roster continuation
 
 Decoded the Wait-facing input owner independently of its cached command menu:

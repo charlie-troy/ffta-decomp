@@ -556,8 +556,11 @@ confirmation. MP6 is enabled by the engine but declined by the eight-MP
 reserve; guarded cancellation preserves resources. Guarded facing research now
 confirms Wait and joins two subsequent enemy actors after roster restoration;
 fourteen reader controls and nine receipt mutations reject wrong ownership.
-The ROM facing branch passes 1,024 input cases. Next dependencies: state-driven
-policy-decline Wait fallback, public-runner integration, and ally/KO targeting. The
+The ROM facing branch passes 1,024 input cases. State-driven policy-decline
+Wait research now passes reserve/insufficient-MP reloads, a live facing STOP
+control and fifteen host flow checks; retained receipts reject thirteen mutations
+each. Next dependencies: finish successful Cure's turn, public-runner integration,
+and ally/KO targeting. The
 roster is scratch during targeting; do not bypass identity rejection or
 substitute a fixed research route for an adapter.
 

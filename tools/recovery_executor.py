@@ -1,8 +1,9 @@
-"""State-driven, bounded self-Cure research; not a public runner capability.
+"""State-driven self-Cure and explicit policy Wait research; not a public capability.
 
 The engine must expose enabled Cure and accept the pinned self target through
 its final confirmation before the policy receives a legal candidate. Only a
-matching policy decision authorizes the final A. No fallback Wait is inferred.
+matching policy decision authorizes the final A. A declined recovery can be
+followed by a separately evaluated, engine-enabled Wait through owned facing.
 """
 from __future__ import annotations
 
@@ -13,6 +14,7 @@ from tactics_policy import SNAPSHOT_SCHEMA2, evaluate
 
 KEYS = {"A": 1, "B": 2, "DOWN": 0x80, "UP": 0x40}
 CURE = "cure-self"
+WAIT = "recovery-wait"
 
 
 class RecoveryStopped(RuntimeError):
@@ -21,10 +23,12 @@ class RecoveryStopped(RuntimeError):
 
 class SelfCureExecutor:
     def __init__(self, menu, probe, policy, *, stop_check=lambda: False,
-                 after_key=lambda name: None, clock=time.monotonic, sleep=time.sleep):
+                 after_key=lambda name: None, before_final=lambda obs: None,
+                 clock=time.monotonic, sleep=time.sleep):
         self.menu, self.probe, self.policy = menu, probe, policy
         self.stop_check, self.after_key = stop_check, after_key
         self.clock, self.sleep = clock, sleep
+        self.before_final = before_final
         self.events = []
         self.committed = False
 
@@ -48,17 +52,22 @@ class SelfCureExecutor:
         verified = self.menu.revalidate(token)
         self.check_stop()
         if final:
-            require(name == "A" and verified.state == "confirmation" and verified.cursor == 0,
-                    "final confirmation is not Do it")
+            self.validate_final(name, verified)
             # Latch before transport: never retry an ambiguous delivered A.
             self.committed = True
         self.events.append({"event": "input_requested", "key": name,
                             "final": final, "facts": verified.receipt()})
+        if final:
+            self.before_final(verified)
         hits = self.probe.press(KEYS[name], tag=f"a6-state:{name}",
                                 stop_check=self.check_stop)
         require(hits > 0, "input transport did not establish delivery")
         self.events.append({"event": "input_delivered", "key": name, "hits": hits})
         self.after_key(name)
+
+    def validate_final(self, name, verified):
+        require(name == "A" and verified.state == "confirmation" and verified.cursor == 0,
+                "final confirmation is not Do it")
 
     def select(self, state, row_id, *, ability=False):
         for _ in range(34):
@@ -172,3 +181,56 @@ class SelfCureExecutor:
             require(obs.state in ("description", "confirmation", "settling"),
                     "unexpected post-confirmation state")
         raise TimeoutError("Cure confirmation did not settle to command menu")
+
+
+class WaitFacingExecutor(SelfCureExecutor):
+    """Confirm one engine-enabled Wait; continuation requires independent proof.
+
+Used only after a bounded recovery decline. The caller must stop issuing input
+after confirmation and independently observe the following actor lifecycle.
+"""
+
+    def validate_final(self, name, verified):
+        require(name == "A" and verified.state == "facing"
+                and verified.driver_state == 47 and verified.facing_direction in range(4),
+                "final confirmation is not owned Wait facing")
+
+    def wait_snapshot(self, obs, before):
+        require((obs.hp, obs.mp, obs.member, obs.target_tile) ==
+                (before.hp, before.mp, before.member, before.target_tile),
+                "actor/resources changed before Wait confirmation")
+        require(obs.state in ("command", "facing"), "Wait candidate outside owned modal boundary")
+        if obs.state == "command":
+            require(obs.rows.count(10) == 1 and obs.enabled[obs.rows.index(10)],
+                    "Wait is unavailable")
+        owner = self.menu.owner
+        return {"schema": SNAPSHOT_SCHEMA2, "identity": "verified",
+                "age_seconds": max(0, self.clock() - obs.observed_at),
+                "actor": {"name": owner["name_text"], "id": owner["id"],
+                          "job_id": owner["job"], "side": "player",
+                          "hp": obs.hp, "max_hp": obs.max_hp,
+                          "mp": obs.mp, "max_mp": obs.max_mp,
+                          "tile": [owner["x"], owner["y"]]},
+                "candidates": [{"id": WAIT, "kind": "wait", "action_id": 10,
+                                "legal": True, "cost": 0}]}
+
+    def run(self):
+        before = self.observe("command")
+        snapshot = self.wait_snapshot(before, before)
+        decision = evaluate(snapshot, self.policy)
+        self.events.append({"event": "policy", "snapshot": snapshot, "evaluation": decision})
+        if (decision.get("decision") or {}).get("candidate_id") != WAIT:
+            return {"outcome": "unexecuted", "reason": decision["reason"],
+                    "before": before.receipt()}
+        require(self.select("command", 10), "Wait became unavailable")
+        facing = self.observe("facing")
+        current = self.menu.revalidate(facing)
+        final_snapshot = self.wait_snapshot(current, before)
+        final_decision = evaluate(final_snapshot, self.policy)
+        require((final_decision.get("decision") or {}).get("candidate_id") == WAIT,
+                "policy declined Wait before confirmation")
+        self.events.append({"event": "final_policy", "snapshot": final_snapshot,
+                            "evaluation": final_decision})
+        self.press("A", current, final=True)
+        return {"outcome": "confirmed", "continuation": "unverified",
+                "before": before.receipt(), "facing": current.receipt(), "decision": decision}

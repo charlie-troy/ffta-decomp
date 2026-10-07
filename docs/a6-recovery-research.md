@@ -276,6 +276,55 @@ This is bounded fixed-route research. A state-driven policy-decline Wait
 fallback, public integration, ally/KO targeting and wounded-party comparison
 remain open. No input is inferred safe from a cached menu alone.
 
+## Explicit policy Wait after a declined recovery
+
+`WaitFacingExecutor` uses the same guarded reader and navigation code as Cure.
+It requires a unique enabled command row10, supplies that legal Wait candidate
+to schema-v2 policy, selects the row by identity and re-evaluates policy at
+verified facing before the final A. It latches before transport and reports
+only `confirmed` / continuation `unverified`. The caller observes independently;
+neither a sent route nor the executor's result is upgraded to turn completion.
+The research CLI enables this only with `--policy ... --wait-fallback`, after a
+completed Cure decline. A successful Cure does not trigger this fallback.
+
+Fresh constructed-fixture runs:
+
+- `a6-policy-wait-reserve-01`: Cure enabled at MP6, but the eight-MP reserve
+  declines it. Guarded cancellation returns command, then policy chooses Wait.
+  Sixteen keys are delivered; there are none after facing confirmation.
+- `a6-policy-wait-low-mp-02`: Cure disabled at MP5 and never selected. Ten keys
+  cancel the list and confirm policy Wait. The first low-MP run (`-01`) has a
+  bulk/live controller-state mismatch in its last observation and is retained
+  without a continuation acceptance claim; the strict fresh rerun passes.
+- Both accepted continuation receipts join two later enemy actors to restored
+  roster records, with Marche's HP100, MP6/5 and tile4,10 unchanged.
+- `a6-policy-wait-stop-01`: STOP arrives at the facing screenshot before final
+  confirmation. Fifteen keys /75 raw writes are delivered; zero writes occur
+  after observed STOP and no final facing A is requested. Cleanup owns its PID.
+
+The real Wait executor passes fifteen host checks with fake menu/transport,
+including reordered rows, disabled/missing Wait, fallback none, changed resources,
+wrong modal state, ambiguous delivery, policy recheck, STOP during revalidation
+and after the final latch, and forbidden post-final input. Retained policy-Wait
+receipts reject thirteen mutations each, including consistent wrong candidate
+facts, missing Cure rejection, post-final/post-STOP input and false completion.
+The existing Cure flow still passes23 host checks and the reader46 controls.
+Fresh positive regression `a6-wait-cure-regression-01` heals HP100->165,
+spends85->79 MP, disables Action and does not invoke Wait fallback. Its retained
+receipt rejects twelve mutations; AI10/10 and strategy9/9 pass.
+
+```powershell
+python tools/validate_recovery_wait_executor.py --out outputs/autobattle/a6-wait-executor-host/checks.json
+python tools/validate_recovery_wait_execution.py --stopped outputs/autobattle/a6-policy-wait-stop-01/probe.json --out outputs/autobattle/a6-wait-policy-artifacts/checks.json
+python tools/validate_recovery_wait_execution.py --capture outputs/autobattle/a6-policy-wait-low-mp-02 --stopped outputs/autobattle/a6-policy-wait-stop-01/probe.json --out outputs/autobattle/a6-wait-low-mp-artifacts/checks.json
+```
+
+This proves bounded policy-decline fallback on the constructed self-Cure fixture.
+It does not close A6: successful Cure's remaining turn, public integration,
+ally/KO/item handling, wounded-party comparison and manual continuation remain
+separate. The research screenshot subprocess can still delay STOP observation
+up to its45-second timeout; this slice does not claim a general latency bound.
+
 
 ### Target processor and cancellation ownership
 

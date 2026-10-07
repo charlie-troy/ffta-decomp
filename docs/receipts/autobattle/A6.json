@@ -341,5 +341,60 @@
       "outputs/autobattle/a6-wait-facing-commit-02/99-settled.png": "0f77394717bab627910d81cbdb5a82fe538cc38476f7fdef1d6000b386ac02ef",
       "outputs/autobattle/a6-facing-cure-regression-02/99-settled.png": "c87a912a4f6ef4efc068a7e16fbc665e809e47d817166e9eb7e65dfd2dc04633"
     }
+  },
+  "policy_decline_wait_slice": {
+    "base_revision": "5ae1e8d",
+    "status": "bounded state-driven decline/Wait/continuation proven; public recovery unknown",
+    "delivered_source_sha256": {
+      "tools/recovery_executor.py": "70af37812de149fb40a89237fe5c2f557203208d5f88ea92e819b8c30adcdde7",
+      "tools/probe_a6_action_menu.py": "d26151f0f2b0eca39e6cbb91cc4f638539c5f2d6c0d2c2b1f7b4aa09b8a9b2bf",
+      "tools/validate_recovery_wait_executor.py": "6b1b67cc585c59b05124872f7b7a590b7c39993536a8e04d62688f055ad6c004",
+      "tools/validate_recovery_wait_execution.py": "a528c282ee4a6798a42bc827347c007a8141b0b88a7596d507e4060f1b349391"
+    },
+    "evidence_sha256": {
+      "outputs/autobattle/a6-policy-wait-reserve-01/probe.json": "a2ab3831851a95270ecc979bea054612933fcebb420e3154fcb9900dc8d7ade1",
+      "outputs/autobattle/a6-policy-wait-low-mp-01/probe.json": "0290826703291918df6d0cd45fc4186758e02ae7afd7a1e95d1df5e4eb35b27e",
+      "outputs/autobattle/a6-policy-wait-low-mp-02/probe.json": "ac84a090141a61b868c49b38d36d44b5a87e27ca7ee55662e87478dbb205279c",
+      "outputs/autobattle/a6-policy-wait-stop-01/probe.json": "7cf7140e6118b473b2baff0e1b8c6107aab344345218bafc7958c4d62dfa3f37",
+      "outputs/autobattle/a6-wait-cure-regression-01/probe.json": "123252fc644e5b187f4d8cc62fc528e8fdc10fd4250bbb0be87248ffd42196f2",
+      "outputs/autobattle/a6-wait-executor-host/checks.json": "5306bbd6373a16691f547f69e750544dc8c6f28c048359237914a510139f13c1",
+      "outputs/autobattle/a6-wait-executor-regression/checks.json": "e40cf3a6b98823a629d74ab49cf908cb31cefaac03b480a39db89e7ab28fcc47",
+      "outputs/autobattle/a6-wait-modal-regression/checks.json": "f9092b4de85f17f562dec3aa626ac5d082c6c51217fc73be81d8a92c638565eb",
+      "outputs/autobattle/a6-wait-policy-artifacts/checks.json": "5e8dfa37d2a2cdfe69c344b14796388540026cb1d2f9fafcde08e5e798f2a269",
+      "outputs/autobattle/a6-wait-low-mp-artifacts/checks.json": "a0e9a74a512f58563f6ba73717516f3dca1e8ed78d2faf99b19f93ea53c65462",
+      "outputs/autobattle/a6-wait-cure-artifacts/checks.json": "d1b250b3841beaa7003500f8865bb5856c7e8fc1e65533a6da7d527dcb0dfe4c"
+    },
+    "checks": {
+      "wait_executor_host": 15,
+      "cure_executor_host": 23,
+      "modal_captured_states": 14,
+      "modal_derived_states": 1,
+      "modal_rejections": 46,
+      "reserve_artifact_mutations": 13,
+      "low_mp_artifact_mutations": 13,
+      "cure_artifact_mutations": 12,
+      "ai": 10,
+      "strategy": 9
+    },
+    "live": {
+      "reserve": "a6-policy-wait-reserve-01: Cure declined at MP6, policy Wait confirmed, two enemy actors joined",
+      "unavailable": "a6-policy-wait-low-mp-02: disabled Cure never selected at MP5, policy Wait and two enemies joined",
+      "stop": "a6-policy-wait-stop-01: 15 keys/75 raw writes, no final facing A, zero post-STOP writes",
+      "cure_regression": "a6-wait-cure-regression-01: HP100->165, MP85->79, Action disabled; no Wait after success"
+    },
+    "retained_failure": "a6-policy-wait-low-mp-01: bulk/live main-state mismatch; strict continuation validator rejects",
+    "limits": [
+      "Constructed self-Cure fixture only; not public runner or ally/KO/item/wounded-party acceptance",
+      "Wait executor reports confirmed/continuation unverified; retained independent joins prove bounded continuation",
+      "Successful Cure still leaves the rest of its turn uncompleted by this path",
+      "Research cleanup kills only its owned PID; no manual handoff/resume claim",
+      "Screenshot subprocess may block STOP observation up to45 seconds"
+    ],
+    "local_screenshot_sha256": {
+      "outputs/autobattle/a6-policy-wait-reserve-01/99-settled.png": "7afd2af94188aca05cfaf1a85fd1f416046239d240ce1d23425057748f980bba",
+      "outputs/autobattle/a6-policy-wait-low-mp-02/99-settled.png": "ce60e36b591fad8088db13190b366990a70131725c4672c108627117b9800a43",
+      "outputs/autobattle/a6-policy-wait-stop-01/15-A.png": "ebf41a01c6dbbaddbf11fbab2f2d2a23304f522c663ef176dbdad7b67071d694",
+      "outputs/autobattle/a6-wait-cure-regression-01/99-settled.png": "e7b2c3c545f294f4b82cd0eb9227cb1d5030c5e4f3a96f0090ab58e5388bae59"
+    }
   }
 }
