@@ -1,0 +1,100 @@
+{
+  "status": "pass-construction-and-independent-reload",
+  "scope": "Construct a NEW local A6.2 party fixture; construction is not gameplay.\n\nNever modifies the original ROM/save/state. Both canonical and battle copies\nare ledgered; owned-window export is independently reloaded by the party probe.\nNo Cure or gameplay key is executed by this builder.\n",
+  "source_sha256": {
+    "outputs/lua-nav/a4-multi-ally-battle-start.ss0": "7cbe2f661279d148dd659e023d2cbd89bd6044e9eeca21a171420ffff222491b",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "tools/build_party_recovery_fixture.py": "e26725d707ecda395ae5d87ea8205ffc43017d46c1d4106b82dc40f8aba0de2a",
+    "tools/probe_recovery_party.py": "ff08f4a42968d45afd45d1dc7c77eec87e2434c4cb51a964739135409c2fc7a5",
+    "tools/recovery_party.py": "06d1df0dc323b71191ce2b36bba02c1be04bef26ccf6ed053c26171d3d828a95",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/save_owned_mgba_state.ps1": "d36141e501ad7ea42d60acf215d386eef038a7bb3993d391e01675b8730c06a4",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80"
+  },
+  "pid": 74948,
+  "before": [
+    {
+      "canonical": 33554824,
+      "name": 139793095,
+      "name_text": "Montblanc",
+      "id": 5,
+      "slot": 5,
+      "job": 5,
+      "race": 1,
+      "secondary_job": 0,
+      "hp": 177,
+      "max_hp": 241,
+      "mp": 221,
+      "max_mp": 221,
+      "tile": [
+        5,
+        10
+      ],
+      "name_sha256": "f98306027cd19d206408c565b4421247d7c7a2ab6efcfa5e7690a007f16fc9ce"
+    },
+    {
+      "canonical": 33554560,
+      "name": 33562396,
+      "name_text": "Marche",
+      "id": 7,
+      "slot": 7,
+      "job": 5,
+      "race": 1,
+      "secondary_job": 0,
+      "hp": 442,
+      "max_hp": 442,
+      "mp": 85,
+      "max_mp": 85,
+      "tile": [
+        4,
+        10
+      ],
+      "name_sha256": "3c22932bd39482c5137348e25c3bfb6471353f8570d1bb6ad64d06e4cc72e657"
+    }
+  ],
+  "writes": [
+    {
+      "addr": "02000088",
+      "width": 1,
+      "old": "00",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "A6.2 scratch caster secondary White Mage"
+    },
+    {
+      "addr": "02016128",
+      "width": 1,
+      "old": "00",
+      "new": "07",
+      "requested": "07",
+      "reply": "OK",
+      "note": "A6.2 scratch caster secondary White Mage"
+    },
+    {
+      "addr": "020001a0",
+      "width": 2,
+      "old": "b100",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "A6.2 scratch living ally HP"
+    },
+    {
+      "addr": "02015f28",
+      "width": 2,
+      "old": "b100",
+      "new": "6400",
+      "requested": "6400",
+      "reply": "OK",
+      "note": "A6.2 scratch living ally HP"
+    }
+  ],
+  "save_hotkey": "{\"foreground_verified\":true,\"hwnd\":70715954,\"pid\":74948,\"combo\":\"Shift+F2\"}",
+  "state_sha256": "17d477e182453eadc497da7096de640ba8fc464085db587b994c2c7cae140929",
+  "inputs_unchanged": true
+}

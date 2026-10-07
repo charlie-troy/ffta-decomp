@@ -2,6 +2,12 @@
 
 ## 2026-10-07 - A6.2 read-only party joins and target-index ROM proof
 
+Follow-on scratch construction passes: four ledgered writes, owned export and
+independent read-only reload establish caster secondary White Mage/MP85 and
+living Montblanc HP100/241. No gameplay keys; another37 reader rejection cases
+pass. Original ROM/save/fixture remain untouched. Cure availability and live
+target legality are still unknown; proceed from this exported scratch state.
+
 Two fresh eight-unit reloads independently join Marche id7 at(4,10) and
 Montblanc id5 at(5,10) to canonical records before targeting. No gameplay
 input, RAM edit or state export occurs; source hashes remain unchanged and

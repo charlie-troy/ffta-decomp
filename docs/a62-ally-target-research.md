@@ -51,10 +51,16 @@ or establish the meaning of menu context+0x1C.
 
 ## Next live gate: UNKNOWN
 
-Construct a new disposable party fixture with secondary White Mage on the
-verified caster and a living ally below50 percent, editing both canonical and
-battle copies with a write ledger. Export/reload independently; keep the
-original fixture untouched. Reuse guarded command/ability navigation only
+Scratch construction `a62-party-fixture-01` now passes: four ledgered RAM
+writes set Marche's secondary job7 and Montblanc's living HP100 in both copies.
+Owned export and a fresh read-only reload agree on HP100/241, caster MP85 and
+secondary White Mage. The reloaded baseline rejects37 mutants and records zero
+gameplay/fixture writes. The builder records zero gameplay keys. Construction
+does not establish learned/available Cure or another ally's legal target.
+
+Use the independently reloaded `a62-party-fixture-01/party-recovery.ss0`, with
+secondary White Mage on the verified caster and a living ally below50 percent.
+Keep the original fixture untouched. Reuse guarded command/ability navigation only
 while the self-only reader accepts it. Capture the target processor, wrapper
 table/index/count and cursor before and after selecting the other ally.
 Join that wrapper to the pinned canonical Montblanc and tile, then inspect the

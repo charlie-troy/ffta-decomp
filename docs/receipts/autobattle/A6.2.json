@@ -11,6 +11,11 @@
       "observed": "Two fresh owned reloads; two canonical/mirror joins each; no gameplay or fixture writes; 37 rejected mutations each"
     },
     {
+      "id": "wounded-party-fixture",
+      "status": "pass",
+      "observed": "Four ledgered scratch RAM writes; owned export; independent read-only reload joins Marche secondaryjob7 MP85 and Montblanc HP100/241; zero gameplay keys"
+    },
+    {
       "id": "target-index-rom-semantics",
       "status": "pass",
       "observed": "6 helper cases and 2 selected-wrapper copy fragments on synthetic RAM"
@@ -36,7 +41,8 @@
     "tools/recovery_party.py": "06d1df0dc323b71191ce2b36bba02c1be04bef26ccf6ed053c26171d3d828a95",
     "tools/validate_recovery_party.py": "90c73945d826d0377b0e034fff26d5609fa858154f228a3c5cfe4b80f6e992f0",
     "tools/validate_recovery_target_table.py": "384032c16e34f362af79971054b2dc82be97cdebc034fa5773b44fde3c8c3bb4",
-    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899"
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "tools/build_party_recovery_fixture.py": "e26725d707ecda395ae5d87ea8205ffc43017d46c1d4106b82dc40f8aba0de2a"
   },
   "evidence_sha256": {
     "outputs/autobattle/a62-party-baseline-04/baseline.json": "4a797a8e85b6cd6b247b619a68583de10c07eff83beeff76764e5a642770f90e",
@@ -63,7 +69,19 @@
     "outputs/autobattle/a62-party-baseline-05/0202267c.bin": "57cb8fc92c024467290ec93591f3d4a4677ca08709e00afed0dedeed55e5eada",
     "outputs/autobattle/a62-target-table/checks.json": "7a714991f700034e314b07bc1a97679a3cf157ad1835238cd6a61880fbc32278",
     "outputs/autobattle/a62-final-ai.log": "17adad12b5ffb6fdb5a46585aad6d75e40076bc7dc16158f9ce73c0e268b7a73",
-    "outputs/autobattle/a62-final-strategy.log": "b93aa92e8fde2803e69d07fbeb83ecf1ae6ad2653cbe675352e3c48d4c5135ac"
+    "outputs/autobattle/a62-final-strategy.log": "b93aa92e8fde2803e69d07fbeb83ecf1ae6ad2653cbe675352e3c48d4c5135ac",
+    "outputs/autobattle/a62-party-fixture-01/fixture.json": "5240ef67df8cbdbd328c235394cd7ee53db22e2e878c72b1f7d73b04bb1f8639",
+    "outputs/autobattle/a62-party-fixture-01/reload/baseline.json": "2501b8b7858866d2ab0a4efe7dabde56957cb517914ac1fc107caf7ca340e7ea",
+    "outputs/autobattle/a62-party-fixture-01/reload/checks.json": "d8876b486bcc4355bd9ad2481817c97e729f7b2ce466351c797ae65b589b6218",
+    "outputs/autobattle/a62-party-fixture-01/reload/party-baseline.png": "d7daf5243c7e03fe9cf8345be9f015b7b6b5656d7659af944e18fb12ef7ed7e2",
+    "outputs/autobattle/a62-party-fixture-01/reload/name-085512c7.bin": "f98306027cd19d206408c565b4421247d7c7a2ab6efcfa5e7690a007f16fc9ce",
+    "outputs/autobattle/a62-party-fixture-01/reload/name-02001f1c.bin": "3c22932bd39482c5137348e25c3bfb6471353f8570d1bb6ad64d06e4cc72e657",
+    "outputs/autobattle/a62-party-fixture-01/reload/020159e8.bin": "cfbf50fe70c16061138cce17449742011cf604142dcfe3508c184bf5f7249784",
+    "outputs/autobattle/a62-party-fixture-01/reload/02000080.bin": "ac7cb6fe647699edc520bcad41f61351b5e958dfd5d0bf02b1dea4c1dbd5d90e",
+    "outputs/autobattle/a62-party-fixture-01/reload/0200f438.bin": "1043ec9f96256b24df0baad57a3f32096f22aca1e7ed88ccd9076de8b2162efb",
+    "outputs/autobattle/a62-party-fixture-01/reload/0202d8a0.bin": "b6d3c53f9a2230a3664fc7feccf8102feed7b8911a05bb64724f215cc49f7ec8",
+    "outputs/autobattle/a62-party-fixture-01/reload/0200f4e8.bin": "d944f6f1dbb49615f9217a2fe944d2e3c13e19722ba18031f9e6fc6771f8b232",
+    "outputs/autobattle/a62-party-fixture-01/reload/0202267c.bin": "57cb8fc92c024467290ec93591f3d4a4677ca08709e00afed0dedeed55e5eada"
   },
   "retained_failures": [
     {
@@ -79,11 +97,16 @@
       "error": "RAM pointer outside EWRAM"
     }
   ],
-  "next_packet": "Construct and independently reload a wounded-party scratch fixture; observe target-list wrapper/index/cursor and join the other ally before any final input",
+  "next_packet": "Navigate engine-enabled Cure to the range overlay; capture target table/index/wrappers and cursor before/after one guarded cursor input. No final commit until ally target joined.",
   "limitations": [
     "Retained decoder replay requires local untracked binary captures; no game bytes are committed.",
     "Two pre-targeting reloads are not two successful ally-target casts.",
     "Synthetic wrappers prove ROM field semantics only, not live range, availability or Cure legality.",
     "AI10/10 and strategy9/9 freshly pass; no ROM source changed."
-  ]
+  ],
+  "party_fixture": {
+    "state": "outputs/autobattle/a62-party-fixture-01/party-recovery.ss0",
+    "state_sha256": "17d477e182453eadc497da7096de640ba8fc464085db587b994c2c7cae140929",
+    "scope": "Construction only; no cast or target legality"
+  }
 }
