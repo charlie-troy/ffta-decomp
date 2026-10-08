@@ -1,0 +1,6 @@
+{"event": "key_write", "t": 13.815, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 13.866, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 13.918, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 13.971, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 14.024, "val": 128, "hits": 5, "manual": false}
+{"event": "stop_requested", "t": 15.246, "detection_latency_s": 0.008, "note": "STOP file observed; no further gameplay key injections permitted"}

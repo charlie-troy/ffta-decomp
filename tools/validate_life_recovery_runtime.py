@@ -58,6 +58,9 @@ def main():
         ('wrong trace count',lambda r,e,l:journal(e)['transport'][-1].__setitem__('write_count',0)),
         ('wrong halt',lambda r,e,l:journal(e)['transport'][0].__setitem__('reply','S04')),
         ('source changed',lambda r,e,l:r.__setitem__('inputs_unchanged',False)),
+        ('missing source proof',lambda r,e,l:r.pop('inputs_unchanged')),
+        ('empty source closure',lambda r,e,l:r.__setitem__('input_sha256',{})),
+        ('changed source after',lambda r,e,l:r.__setitem__('input_sha256_after',{})),
     ]
     rejected=[]
     with tempfile.TemporaryDirectory(prefix='ffta-public-Life-mutations-') as directory:

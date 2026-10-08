@@ -17,7 +17,8 @@
     },
     {
       "id": "two-fresh-public-Life-Wait-continuations",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Source-stable public02/public03 owned reloads, one Life5->Marche7, native HP/MP/level-up, one Wait and independent next Carson4. Both public receipt validators pass; 38 full mutations reject."
     },
     {
       "id": "live-reserve-refusal-and-default-refusal",
@@ -43,10 +44,10 @@
   "source_sha256": {
     "tools/run_autobattle.py": "0e9e85d6b081e387669934b2e9a929aa7352756545be97b8ebcfb5185c03cb1c",
     "tools/autobattle_runtime.py": "e849de62fe308f73883a550ce4148c8c42e0e5bc5c31b685743b90add846a904",
-    "tools/validate_autobattle_runtime.py": "eb26489de4ef4bdf756d6f56bd7b9b094831eb3400ff431a8ec3afcf4e76acc5",
+    "tools/validate_autobattle_runtime.py": "b97733bcbfc3d3f0bb34aeb37fc166ebc8e001d0747c71fdedb2de5e25380585",
     "tools/life_recovery_runtime.py": "c500c9a5d6e65b8c9b2b3b25319047280d7ca6d25079dcdc27580a04e4d49f8a",
     "tools/life_recovery_transaction.py": "e41c994fc226fb6de13cca140ed529b051ab3d1d5b667254c2f84c51ef87ae2b",
-    "tools/life_recovery_receipt.py": "e28d454990616614be5a10ee6aacc59e09509badadaa9ba6790f8fc05a58d5cc",
+    "tools/life_recovery_receipt.py": "d488b6af26bd21994423d247b648e12d76ade5bba234082e6e822df2d8ae9693",
     "tools/recovery_life_target.py": "60c8bd54e6a64095393786638edacdd396ee4928cf6f4fa774145c52d9aa3766",
     "tools/recovery_life_final.py": "4ad604a0363308eee0f5defd113d7f1cc25e247cbb09cd55d9eca88fd76337af",
     "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
@@ -54,8 +55,11 @@
     "tools/recovery_life_effect.py": "8dcb15bde6f7feddbe2bae9f7c62644eb58fff0c8b3f0f090b4c9935dfccfddb",
     "tools/recovery_source_versions.py": "3fef21940a6debb21a037514efb037fbe166ef3a9940a0f9db8f44542f39e783",
     "tools/validate_life_recovery_interface.py": "57dd01a02fa3a3f5dca5b4ac19d51f1f96f3d991dfb60f332d00acf2a5117c0c",
-    "tools/validate_life_recovery_runtime.py": "6923b76e532052618061bc35ee3e0e3ba15a03655402a2bad62e64a47d322111",
-    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
+    "tools/validate_life_recovery_runtime.py": "524499c4d6a110582600c0dcf53c33b5072cc581f7196b0c954cac40df377681",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
+    "tools/run_life_cli_stop.py": "2e1d0f78ca787438979ade86ab7fcdf030338c9b3191754a391f7ace61ba5657",
+    "tools/manual_life_wait_handoff.py": "da9743cc327b6b7b21fc5dc54725bcd74c9c9f804b7b218fdfb083a6dd21c97d",
+    "tools/validate_life_recovery_decline.py": "9219dc3982b903f23be67a82227042efb0589075cadb5a3b1cf60318ff6f2958"
   },
   "evidence_sha256": {
     "outputs/autobattle/a65-public-interface-01.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
@@ -70,7 +74,25 @@
     "outputs/autobattle/a65-public-Life-02/run.json": "e8841bed38be0dd1a3fc8f8b5dcca446015080e9771b724e0f99571f4d3fbf7c",
     "outputs/autobattle/a65-public-Life-02/events.jsonl": "9964a62327beff77e2349dfb9d3b3c88282ceea132044acc7f714e70151a5be9",
     "outputs/autobattle/a65-public-Life-02/input-log.jsonl": "8ce7ad8e4846312f4204079c8a0ac3c15bbe22ed0a15ca984fcdba196008efb2",
-    "outputs/autobattle/a65-public-Life-02/Life-transaction-1/Life-engine.jsonl": "22489541f370f804a8d542bda872d9042635027dda171ac2af4f4702eecc59c9"
+    "outputs/autobattle/a65-public-Life-02/Life-transaction-1/Life-engine.jsonl": "22489541f370f804a8d542bda872d9042635027dda171ac2af4f4702eecc59c9",
+    "outputs/autobattle/a65-public-Life-02-mutations.json": "fa1b288b9c244c7eb8e789a0d6485cb924aef68c70217664b66adf7fcd21a766",
+    "outputs/autobattle/a65-public-Life-03-mutations-02.json": "846a1ee2e4655da120cb79d789c65b4e0793099162e952da322bcfc8dcfc335c",
+    "outputs/autobattle/a65-public-STOP-navigation-01-checks.json": "c3ade46a6f21d60194eabf787102001fb3ccc8fbad14f46db9aa8d74fe7aeefb",
+    "outputs/autobattle/a65-public-STOP-final-01-checks.json": "a8dcf7f7e784c6188f169901a8e040f8146a1534ff1c7283ce8e183fcff774b0",
+    "outputs/autobattle/a65-public-Life-03/run.json": "f81a7e65db97d53ed55476e45fed2c6b456b2671eb3fdb760a07b788ef8130dc",
+    "outputs/autobattle/a65-public-Life-03/events.jsonl": "0c88588e44681eca9c8bac9b670504e7826815305ee2bbde81537dbd321dda28",
+    "outputs/autobattle/a65-public-Life-03/input-log.jsonl": "4d1799928870e4d5280e83c23d84ca80517df60ce575e9a123adb550214ce5d5",
+    "outputs/autobattle/a65-public-STOP-navigation-01/run.json": "4e5583884a757c40b04034361cacdadb33b5221a268f0aaadbbf8ba02df2bd97",
+    "outputs/autobattle/a65-public-STOP-navigation-01/events.jsonl": "56123fc9d09d4497be563afd0af6c1e00e08264468835bf3387388948653c859",
+    "outputs/autobattle/a65-public-STOP-navigation-01/input-log.jsonl": "d868dd26d0d3bfea4ec2e37e3862a5b319eb547d19c83aa37694f1f4f2f1ed1e",
+    "outputs/autobattle/a65-public-STOP-final-01/run.json": "a4bd9bd56c9f0fe1a713dbd3c61c50d2ae935be6be3506a0488430d3846280cc",
+    "outputs/autobattle/a65-public-STOP-final-01/events.jsonl": "953b3f9ac6d2fa53e6b3669660199aac72d1c0192ce7ce5e8850c0999f81de40",
+    "outputs/autobattle/a65-public-STOP-final-01/input-log.jsonl": "65171224a80a5ba5bae6c821d54e03dc4f854d068208dad27b2a7e5908eb02c4",
+    "outputs/autobattle/a65-public-STOP-navigation-01/paused-run.json": "1b3f550a88d9ce19e6dd91fe64411be246115a0e193e5a1a2b8e3b7d7eb6c3c3",
+    "outputs/autobattle/a65-public-STOP-navigation-01/STOP-trigger.json": "7e86d2daedf2a6c0d1122689f63446290aed9fa07b1ff9f1abbbe9d170e4e4d2",
+    "outputs/autobattle/a65-public-STOP-final-01/paused-run.json": "0a5b809aee6828d94fe4dbb654c1c1d5db19f690302e8df51c9cf6adc3165d71",
+    "outputs/autobattle/a65-public-STOP-final-01/STOP-trigger.json": "ebb844878f5cd2a17075f277bf3dc054a62077347f51d83166f8bd5d87918f70",
+    "outputs/autobattle/a65-public-Life-03/Life-transaction-1/Life-engine.jsonl": "f9b58136d031bcc20ace8ba92f052a28873e25e71d6204a75f6f708ba793c486"
   },
   "limitations": [
     "No public revival acceptance yet.",
@@ -79,6 +101,7 @@
   ],
   "observations": [
     "Public01/02 each record identified-ally-life5 target7, native HP0->221, MP221->211, level40->41, guarded Wait and Carson4 next actor. Both source/input unchanged and public validators pass; max-turns1 stops stalled intentionally, no battle-completion claim. Public01 pilot source versions partly superseded; public02 exact implementation checkpoint is retained. Repeat current public implementation after remaining gate work.",
-    "35 public receipt mutations reject on public01. STOP/reserve/default refusal and same-PID lifecycle are pending."
+    "35 public receipt mutations reject on public01. STOP/reserve/default refusal and same-PID lifecycle are pending.",
+    "Current public02/public03 source-stable revivals and public38 mutation audits pass. Actual CLI STOP navigation and Life-final pause before Life final input, with owned kill cleanup; partial journals reject8/11 mutations. Partial policy snapshots, attempt latches and native effects are now validated even on a STOP/refusal journal. Reserve/default refusal and post-Life same-PID lifecycle remain pending."
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "phase": "navigation",
+  "trigger": {
+    "raw_writes_seen": 5,
+    "last_input": {
+      "event": "key_write",
+      "t": 14.024,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    }
+  },
+  "pid": 82572,
+  "cli_exit": 0,
+  "source_stable": true
+}

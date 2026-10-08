@@ -1,0 +1,9 @@
+{
+  "phase": "Life-final",
+  "trigger": {
+    "screenshot": "recovery-Life-final.png"
+  },
+  "pid": 82324,
+  "cli_exit": 0,
+  "source_stable": true
+}

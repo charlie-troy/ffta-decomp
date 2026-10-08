@@ -31,6 +31,49 @@ def validate_life_recovery(journal,ledger,*,confirmed=False):
         events=journal.get(group_name,[])
         require(sum(e['event']=='final_input_requested' for e in events)<=1
                 and sum(e['event']=='final_input_delivered' for e in events)<=1,'duplicate public Life/Wait final')
+    policy=validate_policy(journal['policy_document'])
+    partial_policies=[e for name in ('final_gate_events','Wait_events') for e in journal.get(name,[])
+                      if e['event'] in ('policy','final_policy','revalidated_final_policy')]
+    require(len(partial_policies)==len(journal['policy_observations']),
+            'partial public Life policy observations missing/repeated')
+    for event,observation in zip(partial_policies,journal['policy_observations']):
+        snapshot=event['snapshot'];decision=evaluate(snapshot,policy)
+        require(event['policy']==policy and event['evaluation']==decision
+                and observation=={'snapshot':snapshot,'evaluation':decision},
+                'partial public Life policy/adapter differs')
+        actor=snapshot['actor'];candidate=snapshot['candidates']
+        require(actor['id']==5 and actor['hp']==241 and actor['tile']==[5,10] and len(candidate)==1,
+                'partial public Life policy actor/candidates differ')
+        if candidate[0]['kind']=='ability':
+            hp_max,mp_max,mp=241,221,221
+        else:
+            unit=bytes.fromhex(journal['effect_units_after']['33554824'])
+            hp_max,mp_max,mp=integer(unit,0x1A,2),integer(unit,0x1E,2),211
+        require(actor=={'name':journal['owner']['name_text'],'id':5,'job_id':5,'side':'player',
+            'hp':241,'max_hp':hp_max,'mp':mp,'max_mp':mp_max,'tile':[5,10]},
+            'partial public Life actor identity/resources differ')
+        if candidate[0]['kind']=='ability':
+            require(candidate[0]=={'id':'life-ally','kind':'ability','action_id':5,'legal':True,'cost':10,
+                'ability_name':'Life','relation':'ally','target':{'kind':'unit','id':7},'target_hp':0,
+                'target_max_hp':442,'target_mp':85} and actor['mp']==221,
+                'partial public Life legal candidate differs')
+        else:
+            require(candidate==[{'id':'wait','kind':'wait','action_id':10,'legal':True,'cost':0}]
+                    and actor['mp']==211,'partial public Life Wait candidate differs')
+    for name,flag in [('final_gate_events','final_confirmation'),('Wait_events','Wait_final_attempted')]:
+        events=journal.get(name,[]);requested=any(e['event']=='final_input_requested' for e in events)
+        require(bool(journal.get(flag,False))==requested,'partial public final-attempt latch differs')
+        if requested:
+            policies=[e for e in events if 'snapshot' in e]
+            expected='life-ally' if name=='final_gate_events' else 'wait'
+            require(policies and (policies[-1]['evaluation'].get('decision') or {}).get('candidate_id')==expected,
+                    'partial public final input lacks policy authorization')
+    if journal.get('effect_attribution'):
+        before_units={int(a):bytes.fromhex(u) for a,u in journal['effect_units_before'].items()}
+        after_units={int(a):bytes.fromhex(u) for a,u in journal['effect_units_after'].items()}
+        pins={p['id']:p for p in journal['party']}
+        require(verify_life_effect(before_units,after_units,journal['life_engine_hits'],pins[5],pins[7])
+                ==journal['effect_attribution'],'partial public native Life effect differs')
     if not confirmed and journal.get('status')!='confirmed':return
     require(journal['status']=='confirmed' and writes,'public Life completion/inputs missing')
     owner=journal['owner'];party=journal['party'];roles={p['id']:p for p in party}

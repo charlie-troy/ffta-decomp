@@ -97,6 +97,15 @@ def validate(out_dir):
         fail("resume previous-leg receipt is not the same paused PID", errors)
     if (run.get("bounded_self_cure") or run.get('bounded_ally_cure') or run.get('bounded_ally_life')) and run.get("inputs_unchanged") is False:
         fail("bounded recovery inputs changed during execution", errors)
+    if run.get('bounded_ally_life'):
+        pins=run.get('input_sha256') or {}
+        required={'tools/run_autobattle.py','tools/autobattle_runtime.py','tools/life_recovery_runtime.py',
+                  'tools/life_recovery_transaction.py','tools/recovery_life_target.py',
+                  'tools/recovery_life_final.py','tools/recovery_life_wait.py','tools/recovery_life_effect.py',
+                  'tools/recovery_life_trace.py','tools/tactics_policy.py'}
+        if (run.get('inputs_unchanged') is not True or not required<=set(pins)
+                or run.get('input_sha256_after')!=pins):
+            fail('public Life source closure/unchanged proof missing',errors)
     expected_starts = 2 if resumed else 1
     if n_starts != expected_starts:
         fail(f"expected exactly {expected_starts} start event(s)"
