@@ -1,0 +1,59 @@
+{
+  "status": "pass-retained-Life-list-guards",
+  "scope": "Replay the retained Life list and reject stale/foreign input tokens.",
+  "rejected": [
+    "KO-caster",
+    "MP-change",
+    "race",
+    "job",
+    "secondary",
+    "id",
+    "name",
+    "tile",
+    "enemy",
+    "unaffiliated",
+    "foreign-menu-member",
+    "manager",
+    "callback",
+    "driver-owner",
+    "driver-peer",
+    "target-processor",
+    "cached-callback",
+    "handler",
+    "initializing-list",
+    "opening-list",
+    "final-prompt-mode",
+    "cursor",
+    "count-zero",
+    "scroll",
+    "row-pointer",
+    "enable-pointer",
+    "disabled-Life",
+    "invalid-enable",
+    "foreign-ability-row",
+    "canonical-name-alias",
+    "canonical-id-alias"
+  ],
+  "life": {
+    "id": 5,
+    "index": 4,
+    "enabled": true,
+    "effective_cost": 10,
+    "actual_ROM_cost": 10,
+    "cost_accessor": "0812ed98",
+    "caster_mp": 221
+  },
+  "source_sha256": {
+    "tools/validate_recovery_life_menu.py": "eda08b81d67628bb1d08c0a801a383eb229219876ba86c17de08d58b1a4276e0",
+    "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-life-menu-04\\Life-menu.json": "c94671b5e5cff9552117fe8d9fb8d2e3f07e0a3d9dd7de4e2eeda64c40815c4e",
+    "outputs\\autobattle\\a64-life-menu-04\\ewram.bin": "69503910efc44d6cb78cbfa42c2d7013124a36aebce8d971805e69552c90cf36"
+  },
+  "limitations": [
+    "Retained list guards only; no Life target or final-input authority."
+  ]
+}

@@ -141,3 +141,28 @@ The same retained caster has primary ability-set `+0x35=10`, while native
 that disagreement too. Reconstruct both ability-state fields from native
 properties in the next disposable fixture experiment; changing secondary
 state alone cannot resolve the primary-list/visual mismatch.
+
+## Corrected fixture and enabled Life (2026-10-08)
+
+The native-property correction is now exercised live. Build/reload command:
+`python tools/build_life_recovery_fixture.py --engine-run outputs/autobattle/a64-engine-ko-04 --rebuild-ability-state --out outputs/autobattle/a64-life-fixture-02`.
+Six verified scratch writes reconstruct living Montblanc primary/secondary
+ability-state24/9, secondary job7 and positive HP241 in both copies. Genuine KO
+Marche is untouched. The exported state independently reloads with those bytes.
+
+`python tools/probe_recovery_life_menu.py --state outputs/autobattle/a64-life-fixture-02/life-recovery.ss0 --group-row 9 --out outputs/autobattle/a64-life-menu-04`
+observes enabled Life5 at list index4, MP221, cost10. Retail0812ED98 agrees.
+The separate Action-group capture now renders Steal/White Magic as expected;
+the list screenshot explicitly shows Life10. The old rendered HP100 persists
+in the list but redraws to canonical241 when the target overlay opens. Neither
+cached pixels nor raw job IDs substitute for resource/identity joins.
+
+`python tools/validate_recovery_life_menu.py --capture outputs/autobattle/a64-life-menu-04 --out outputs/autobattle/a64-life-list-guards-04.json`
+rejects31 mutations. `a64-life-overlay-01` opens Life without target acceptance,
+retains two unchanged canonical party joins and shows a single KO wrapper
+(Marche7, HP0 at4,10), unlike Cure's two living entries. Cursor/acceptance
+coordinates remain at caster5,10; the KO table alone is not selected targeting.
+`validate_recovery_life_overlay.py --capture outputs/autobattle/a64-life-overlay-01 --out outputs/autobattle/a64-life-overlay-guards-01.json`
+rejects57 mutations/controls. Its coherent KO cursor control is synthetic.
+Next: guarded adjacent LEFT, selected-target preview, final prompt, then only
+after their independent guards pass a bounded research revival.

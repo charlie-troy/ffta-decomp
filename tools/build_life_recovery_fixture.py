@@ -14,6 +14,8 @@ import sys
 from autobattle_identity import ActorAdapter
 from audit_recovery_ko_observations import audit
 from build_recovery_fixture import verified_owner
+from emulate import Gba, STOP
+from unicorn.arm_const import UC_ARM_REG_PC
 from fixture_guard import FixtureSession, ROSTER, STRIDE
 from probe_control_handoff import Probe
 from probe_recovery_ko_lifecycle import joined_party, export_owned_state, source_dependencies
@@ -29,6 +31,8 @@ def main():
     ap.add_argument('--rom', default='baserom.gba')
     ap.add_argument('--scenario', default='configs/battle-scenarios/a4-two-player.json')
     ap.add_argument('--out', required=True)
+    ap.add_argument('--rebuild-ability-state', action='store_true',
+                    help='Rebuild primary/secondary ability-set bytes through the native job accessor')
     args = ap.parse_args()
     engine = json.loads((Path(args.engine_run)/'research.json').read_text())
     proof = audit(args.engine_run)
@@ -59,8 +63,24 @@ def main():
                 require(ResearchMenuList(transport.g, session.read_rom_bytes(), owner, caster['canonical']).snapshot().state == 'command',
                         'construction lacks an owned command menu')
                 target_before = exact(transport.g, target['canonical'], STRIDE)
+                caster_before = exact(transport.g, caster['canonical'], STRIDE)
+                ability_state = None
+                if args.rebuild_ability_state:
+                    gba = Gba(args.rom)
+                    primary = gba.call(0x080C8570, [caster_before[5], caster_before[7], 0x0C])
+                    require(gba.uc.reg_read(UC_ARM_REG_PC) == STOP, 'primary accessor did not return')
+                    secondary = gba.call(0x080C8570, [7, 7, 0x0C])
+                    require(gba.uc.reg_read(UC_ARM_REG_PC) == STOP and 0 < primary < 256
+                            and secondary == 9, 'native ability-set property differs')
+                    ability_state = bytes((primary, secondary))
+                    result['ability_state_rebuild'] = {
+                        'accessor': '080c8570', 'property': 12,
+                        'before': list(caster_before[0x35:0x37]), 'after': list(ability_state)}
                 for address in (caster['canonical'], ROSTER+caster['slot']*STRIDE):
                     session.write_u8(address+8, 7, 'A6.4 living caster secondary White Mage; KO target untouched')
+                    if ability_state is not None:
+                        session.write_bytes(address+0x35, ability_state,
+                                            'A6.4 native primary/secondary ability-set reconstruction')
                     session.write_bytes(address+0x18, caster['max_hp'].to_bytes(2, 'little'),
                                         'A6.4 living caster positive HP restore; KO target untouched')
                 require(exact(transport.g, target['canonical'], STRIDE) == target_before,
@@ -79,6 +99,11 @@ def main():
         target = next(p for p in reload['party'] if p['id'] == engine['ko_target_id'])
         caster = next(p for p in reload['party'] if p['id'] != engine['ko_target_id'])
         require(target['hp'] == 0 and caster['hp'] == caster['max_hp'], 'Life fixture reload resources differ')
+        if ability_state is not None:
+            capture = (out/'reload'/f'{MEMBERS:08x}.bin').read_bytes()
+            offset = caster['canonical']-MEMBERS
+            require(capture[offset+0x35:offset+0x37] == ability_state,
+                    'independent reload lost the reconstructed ability-state')
         result['status'] = 'pass-Life-fixture-construction-and-reload'
     except BaseException as exc:
         result['error'] = repr(exc)

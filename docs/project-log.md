@@ -1,5 +1,22 @@
 # Project log
 
+## 2026-10-08 - Reconstructed ability sets expose enabled Life
+
+A6.4 enabled-Life/effective-cost criterion now passes for the corrected disposable
+fixture only. Native job properties reconstruct primary/secondary ability-state
+24/9 in canonical and mirror living Montblanc, with six verified setup writes.
+`a64-life-fixture-02` exports and independently reloads with genuine KO Marche
+unchanged. `a64-life-groups-02` exposes Fight/Steal/White Magic/Combo; fresh
+`a64-life-menu-04` observes enabled Life5 at index4 and MP cost10, independently
+matching retail0812ED98. Thirty-one retained list mutations are rejected.
+
+`a64-life-overlay-01` selects Life but never accepts a target: two joins show
+ability5, KO-only one-entry target table and the cursor still on the caster.
+Fifty-seven retained overlay controls reject stale/foreign/invalid facts.
+Target acceptance, preview/final prompt, revival and policy/lifecycle gates
+remain UNKNOWN. Production Cure and living-only readers are unchanged. Commands
+and exact evidence hashes are in the A6.4 receipt and KO/Life research document.
+
 ## 2026-10-08 - Native secondary ability-set dependency
 
 Three isolated actual-ROM helper cases identify the next A6.4 fixture correction:

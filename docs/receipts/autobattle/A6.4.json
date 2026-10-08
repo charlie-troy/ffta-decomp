@@ -16,7 +16,8 @@
     },
     {
       "id": "enabled-Life-and-effective-cost",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Corrected a64-life-fixture-02 only; a64-life-menu-04 enabled Life5/cost10 independently matched retail0812ED98; 31 retained list guards."
     },
     {
       "id": "accepted-canonical-KO-target",
@@ -43,11 +44,14 @@
     "tools/audit_recovery_ko_observations.py": "d5c5584a506e421384d824a4766040a9e4751e6f21b9bf10427f5976632a27d2",
     "tools/validate_recovery_ko_join.py": "0570c6b35e405a0b015c13401298b4450d2b2260b39e7f3cf8625ae00c631262",
     "tools/validate_recovery_ko_tail.py": "9fc04342d94bee21f96823667dd4f634f1860f9a63adbc7dfe7ace015593c6b6",
-    "tools/build_life_recovery_fixture.py": "389a4f295a45044ccb708ab6ad3dc35b4eb9e325d0521853d84a27026fbb855a",
+    "tools/build_life_recovery_fixture.py": "2a44aa8893848bff65a00a14d2d40e321b8d5dc175cc7fe3168e46f05fa126e6",
     "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f",
     "tools/probe_recovery_life_menu.py": "8e2ec841413e90a50bbd28f8fb93b87f1acad2f7fe5d33ac7f65dad093b31f7b",
     "tools/validate_recovery_life_menu.py": "eda08b81d67628bb1d08c0a801a383eb229219876ba86c17de08d58b1a4276e0",
-    "tools/validate_recovery_action_set.py": "19f09bd1e9b926a2766f2e6c9f3eae13a9c9acb826cf92b4946485586056fbd9"
+    "tools/validate_recovery_action_set.py": "19f09bd1e9b926a2766f2e6c9f3eae13a9c9acb826cf92b4946485586056fbd9",
+    "tools/recovery_life_target.py": "01f02d74e12cf11e88fb4fee275e46f4f6c5baaa295dc12f629bfd2a23b609a9",
+    "tools/probe_recovery_life_overlay.py": "534926212c21798b319967bea596c8fd921db0a74bfbc1f2516d80285f0a2502",
+    "tools/validate_recovery_life_overlay.py": "877fa1a56835c4c099afa5466710b00553a7c9ec5b6245780b287588b1f3fb59"
   },
   "evidence_sha256": {
     "outputs/autobattle/a64-ability-metadata.json": "e69a6d90fb4c680d71af08396121748d39b13461347a2359bcac16386038aab6",
@@ -70,7 +74,18 @@
     "outputs/autobattle/a64-life-menu-02/Life-menu.json": "270563fcfabba54306115660d5c14b68ef3283a6998ef15da9b7f4079ba58393",
     "outputs/autobattle/a64-life-menu-03/Life-menu.json": "aad39f6c4bc5dbf68134ad3841a32428995030399538ef25a692fca2333ddacb",
     "outputs/autobattle/a64-life-groups-01/Life-menu.json": "401dac6cf3300b6141b07f08cd2857ae2e68381f0df1c1548b23d20425045f40",
-    "outputs/autobattle/a64-action-set-dependency.json": "ded3e5626473dfeee5b79fd265da39ef710af3dbb3b7b73173ce19c97aa6957e"
+    "outputs/autobattle/a64-action-set-dependency.json": "ded3e5626473dfeee5b79fd265da39ef710af3dbb3b7b73173ce19c97aa6957e",
+    "outputs/autobattle/a64-life-fixture-02/fixture.json": "cf326f44204167a49624d80b55002a3a02de27759b89bf74e7d08022fbfb1404",
+    "outputs/autobattle/a64-life-fixture-02/reload/reload.json": "95a2ac5a4b6242d79bdf94ebe112660bd89924cf9ca557c2fde5a47389190211",
+    "outputs/autobattle/a64-life-groups-02/Life-menu.json": "1400992a55f00cea621d74aa49866fc476a8fe42f65365ee6f9c3d770668d2ed",
+    "outputs/autobattle/a64-life-menu-04/Life-menu.json": "c94671b5e5cff9552117fe8d9fb8d2e3f07e0a3d9dd7de4e2eeda64c40815c4e",
+    "outputs/autobattle/a64-life-list-guards-04.json": "762ffa4e719f784b38f6dab3194d1d65687c119ca46b2ee9f2d185e6603378b3",
+    "outputs/autobattle/a64-life-overlay-01/Life-overlay.json": "809fd6b38c109ba62e1083063ef2d2b98363cfac080dca2158e44b1c0e9d7dca",
+    "outputs/autobattle/a64-life-overlay-guards-01.json": "51306a733bbdc6f798224bbf603e017b09fd60101e5bf705b2db220f7f98626b",
+    "outputs/autobattle/a64-life-list-guards-05.json": "762ffa4e719f784b38f6dab3194d1d65687c119ca46b2ee9f2d185e6603378b3",
+    "outputs/autobattle/a64-life-overlay-guards-04.json": "c4c0a7911a9c1d2afa0044194f7c2b9630ec3a77952ec8f95f591fe7dc4e0004",
+    "outputs/autobattle/a64-life-preview-guards-02.json": "c66e602d54a445050d1a1937de15df006843066143601f32776c1a974e483618",
+    "outputs/autobattle/a64-life-acceptance-01/Life-overlay.json": "e5421cf3b75169e0259be603ac8e55dafb40efeae566640858029a5d0b2027f2"
   },
   "observations": [
     "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20.",
@@ -82,7 +97,8 @@
     "37 KO join mutations reject; 11 actual-ROM tail/status controls pass. Existing living-party37, public-interface7 and public-Cure38 guard controls pass.",
     "Enabled Life, accepted target, revival and public integration remain unknown. Caster changed from earlier Cure fixtures; Action-group row IDs require fresh identification.",
     "Prepared caster Action groups show Fight/Black Magic/Item/Combo, not an enabled White Magic assumption. Group10 opens native Steal IDs163..171; group12 enters a target processor. Availability remains UNKNOWN; next question is action-set mapping/menu reconstruction, not more guessed group IDs.",
-    "Three isolated native 080CCE60 executions prove secondary ability-set +0x36 fallback dependency; job7 property0c=9 returns White Magic table bounds58,68. Corrected live fixture remains UNKNOWN; see a64-action-set-dependency.json."
+    "Three isolated native 080CCE60 executions prove secondary ability-set +0x36 fallback dependency; job7 property0c=9 returns White Magic table bounds58,68. Corrected live fixture remains UNKNOWN; see a64-action-set-dependency.json.",
+    "Corrected fixture exposes enabled Life5 at cost10. Two pre-acceptance Life joins show one KO-only table entry but cursor remains caster. 31 list and 57 overlay controls pass; target acceptance and revival remain UNKNOWN."
   ],
   "limitations": [
     "Table metadata is not engine availability, KO semantics, target acceptance or revival proof.",

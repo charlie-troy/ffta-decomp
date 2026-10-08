@@ -9,9 +9,9 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**A6.4 engine KO lifecycle and independent scratch reload now have bounded PASS
-evidence. Continue native action-set/menu reconstruction to expose enabled Life;
-target acceptance and revival remain UNKNOWN.**
+**A6.4 engine KO, independent corrected fixture reload and enabled Life/cost
+now have bounded PASS evidence. Continue KO target acceptance, preview and final
+prompt reconstruction; revival and policy/lifecycle gates remain UNKNOWN.**
 Two public ally casts, damage-policy refusal/Wait, both STOP/manual/same-PID
 handoffs, two unsupported-family zero-input controls, the six-case self-Cure
 matrix and ordinary live Move/Wait pass on current production sources.
