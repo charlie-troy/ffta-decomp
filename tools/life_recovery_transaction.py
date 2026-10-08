@@ -17,7 +17,7 @@ from recovery_menu import MEMBERS, MEMBER_COUNT, MENU_ROOT, PLAYER_DRIVER, exact
 from recovery_menu_list import ResearchMenuList
 from recovery_life_target import LifeOverlayReader
 from recovery_life_final import LifeFinalGate
-from recovery_life_effect import verify_life_effect
+from recovery_life_effect import verify_life_effect, validate_life_fixture
 from recovery_life_wait import LifeWaitBoundary
 from recovery_party_continuation import observe_party_continuation
 from tactics_policy import evaluate
@@ -37,6 +37,7 @@ def drive_life_transaction(session,probe,owner,transport,policy,args,out,result,
             and caster['hp'] > 0 and not any(target['statuses'].values()), 'Life fixture differs')
     units = {p['canonical']: exact(g, p['canonical'], STRIDE) for p in party}
     result['party'] = party
+    result['pre_action_fixture']=validate_life_fixture(party,units)
     menu = ResearchMenuList(g, rom, owner, caster['canonical'])
     overlay_reader = LifeOverlayReader(g, menu, party, units)
     def drop_stop(stage):

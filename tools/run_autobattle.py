@@ -28,6 +28,8 @@ def _input_hashes(args):
               "tools/run_autobattle.py", "tools/autobattle_runtime.py",
               "tools/autobattle_identity.py", "tools/probe_control_handoff.py",
               "tools/tactics_policy.py", "tools/tactics_adapter.py"]
+    if args.resume:
+        inputs.append('tools/recovery_boundary_diagnostic.py')
     if args.bounded_self_cure:
         inputs.extend(["tools/recovery_runtime.py", "tools/recovery_transport.py",
                        "tools/recovery_menu.py", "tools/recovery_executor.py",

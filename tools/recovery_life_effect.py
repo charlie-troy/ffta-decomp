@@ -5,6 +5,31 @@ from fixture_guard import STRIDE
 from recovery_menu import integer, require
 
 
+def validate_life_fixture(party,units):
+    """Reject a different research family before opening Action or sending input."""
+    require(len(party)==2 and {p['id'] for p in party}=={5,7},'Life fixture party differs')
+    roles={p['id']:p for p in party}
+    require(roles[5]['canonical']==0x02000188 and roles[7]['canonical']==0x02000080
+            and roles[5]['tile']==[5,10] and roles[7]['tile']==[4,10], 'Life fixture identity/tile differs')
+    require(set(units)=={0x02000188,0x02000080} and all(len(u)==STRIDE for u in units.values()),
+            'Life fixture unit captures differ')
+    c,t=units[0x02000188],units[0x02000080]
+    for pin in party:
+        u=units[pin['canonical']]
+        require(integer(u,0)==pin['name'] and u[0x104]==pin['id'] and u[5:8]==bytes((5,1,5))
+                and integer(u,0x28,2)&0x9000==0 and list(u[0xF6:0xF8])==pin['tile']
+                and not any(pin['statuses'].values()), 'Life fixture raw identity/status differs')
+    require(c[4]==8 and c[8:11]==bytes((7,40,99)) and c[0x35:0x37]==bytes((24,9))
+            and c[0x3B]==30 and c[0xF2]==0
+            and [integer(c,o,2) for o in (0x18,0x1A,0x1C,0x1E)]==[241,241,221,221],
+            'Life fixture caster resources/level/ability-state differ')
+    require(t[4]==2 and t[9]==50 and t[0xF2]==2
+            and [integer(t,o,2) for o in (0x18,0x1A,0x1C,0x1E)]==[0,442,85,85],
+            'Life fixture genuine KO counter/resources/level differ')
+    return {'status':'accepted-exact-Life-fixture','caster':5,'target':7,'cost':10,
+            'level':40,'exp':99,'ability_sets':[24,9]}
+
+
 def verify_life_effect(before, after, hits, caster, target):
     """Accept this EXP-99 fixture only with a paired native level-up witness."""
     require(set(before) == set(after), 'Life canonical capture set differs')

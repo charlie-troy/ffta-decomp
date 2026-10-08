@@ -1,0 +1,23 @@
+{
+  "status": "pass-public-Life-default",
+  "scope": "Audit the real no-opt-in control on the exact Life fixture.",
+  "rejected": [
+    "opt-in changed",
+    "source changed",
+    "ability offered",
+    "revival invented",
+    "MP spent"
+  ],
+  "source_sha256": {
+    "tools/validate_life_recovery_default.py": "b3a1bd979244d821563e4bfb7ce904aa4c61ba190c9551834388539dd5bdde64",
+    "tools/validate_autobattle_runtime.py": "22d5c3d93a7d327d8525f99010835ee5792cf367adc39b9aa17268f3e6de0f24"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a65-public-default-01\\run.json": "c65bea73004a0a76d9c4c5573a2ebb6842b60be012f0ce6a154de7d9239fdc4a",
+    "outputs\\autobattle\\a65-public-default-01\\events.jsonl": "4d6fbee0f4c2930c67bdabfc340e2c6768e5033515492270fa31a070c06e60de",
+    "outputs\\autobattle\\a65-public-default-01\\input-log.jsonl": "c2f720348d667d861b78dea44f5c0306eb287c2aa379dad01b2cdd0d375b2f85"
+  },
+  "limitations": [
+    "One retained no-opt-in fixture control; no arbitrary-party claim."
+  ]
+}

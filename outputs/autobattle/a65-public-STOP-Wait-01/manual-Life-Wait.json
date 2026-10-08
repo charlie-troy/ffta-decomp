@@ -1,0 +1,113 @@
+{
+  "schema": "ffta-Life-manual-Wait/1",
+  "status": "verified-manual-Life-Wait",
+  "pid": 79496,
+  "input_channel": "verified owned window; GDB reads/control only",
+  "stub_gameplay_writes": 0,
+  "keys": [
+    {
+      "key": "A",
+      "before": {
+        "observed_at": 285159.2119347,
+        "member": 33554824,
+        "actor_wrapper": 33695500,
+        "direction": 1,
+        "context": 33740960,
+        "callback": 33742168,
+        "hp": 241,
+        "mp": 211
+      },
+      "window": {
+        "foreground_verified": true,
+        "hwnd": 2690588,
+        "pid": 79496,
+        "duration_ms": 100,
+        "key": "A"
+      }
+    }
+  ],
+  "continuations": [
+    {
+      "source": "canonical driver / restored eight-unit roster / own cursor",
+      "wrapper": 33695068,
+      "canonical": 33567452,
+      "actor": {
+        "slot": 4,
+        "addr": "02015e08",
+        "name": 139881253,
+        "side_raw": 32769,
+        "ct": 710,
+        "ea": 0,
+        "id": 4,
+        "type": 1,
+        "base_job": 22,
+        "race": 3,
+        "job": 22,
+        "level": 40,
+        "hp": 231,
+        "max_hp": 231,
+        "mp": 179,
+        "max_mp": 179,
+        "is_rom_name": true,
+        "is_ram_name": false,
+        "name_text": "Carson",
+        "side_bit": true,
+        "unaffiliated": false,
+        "live": true,
+        "tile": [
+          7,
+          7
+        ]
+      },
+      "relation": "enemy",
+      "party_after": [
+        {
+          "id": 5,
+          "canonical": 33554824,
+          "hp": 241,
+          "mp": 211,
+          "tile": [
+            5,
+            10
+          ]
+        },
+        {
+          "id": 7,
+          "canonical": 33554560,
+          "hp": 221,
+          "mp": 85,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/manual_life_wait_handoff.py": "da9743cc327b6b7b21fc5dc54725bcd74c9c9f804b7b218fdfb083a6dd21c97d",
+    "tools/send_owned_mgba_key.ps1": "d83da86767017fe147d48680c2f616ba9ec04ea687194924cbcb59d501c43761",
+    "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
+    "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f",
+    "tools/recovery_party_continuation.py": "e3ba10612af1207b9873af8d45c826085ccf98acc736c9f00643bd9e5f9ab4f9",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220"
+  },
+  "facing": {
+    "observed_at": 285159.2119347,
+    "member": 33554824,
+    "actor_wrapper": 33695500,
+    "direction": 1,
+    "context": 33740960,
+    "callback": 33742168,
+    "hp": 241,
+    "mp": 211
+  },
+  "rejections": [
+    "next actor cursor mismatch",
+    "next actor cursor mismatch",
+    "next actor cursor mismatch",
+    "next actor cursor mismatch",
+    "next actor cursor mismatch"
+  ],
+  "inputs_unchanged": true
+}

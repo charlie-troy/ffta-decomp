@@ -1,0 +1,112 @@
+{
+  "schema": "a3-run/2",
+  "run_id": "a65-public-default-01",
+  "scenario": "a4-two-player",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 1,
+  "seeds": 1,
+  "router_hits": 24,
+  "terminal_reason": "turn budget reached",
+  "events": "outputs/autobattle\\a65-public-default-01\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "emulator_pid": 85620,
+  "bounded_self_cure": false,
+  "bounded_ally_cure": false,
+  "bounded_ally_life": false,
+  "player_identities": [
+    [
+      "Montblanc",
+      5
+    ],
+    [
+      "Marche",
+      7
+    ]
+  ],
+  "input_sha256": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/autobattle/a64-life-fixture-02/life-recovery.ss0": "925017c918bb1eadf3bace27024c7d5e5bfaf985738080c0f1c7bc5d6e637063",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "0e9e85d6b081e387669934b2e9a929aa7352756545be97b8ebcfb5185c03cb1c",
+    "tools/autobattle_runtime.py": "e849de62fe308f73883a550ce4148c8c42e0e5bc5c31b685743b90add846a904",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
+  },
+  "input_sha256_after": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/autobattle/a64-life-fixture-02/life-recovery.ss0": "925017c918bb1eadf3bace27024c7d5e5bfaf985738080c0f1c7bc5d6e637063",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "0e9e85d6b081e387669934b2e9a929aa7352756545be97b8ebcfb5185c03cb1c",
+    "tools/autobattle_runtime.py": "e849de62fe308f73883a550ce4148c8c42e0e5bc5c31b685743b90add846a904",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
+  },
+  "inputs_unchanged": true,
+  "tactics_policy": {
+    "path": "configs/tactics/healer.json",
+    "schema": "ffta-tactics-policy/2",
+    "fallback": "wait",
+    "scopes": [
+      "party"
+    ],
+    "decisions": [
+      {
+        "policy": "configs/tactics/healer.json",
+        "outcome": "fallback",
+        "reason": "fallback:wait",
+        "scope": "party",
+        "rule_id": "fallback",
+        "detail": null,
+        "age_seconds": 1.5758044719696045,
+        "candidates": [
+          "move",
+          "wait"
+        ],
+        "snapshot": {
+          "schema": "ffta-tactics-snapshot/1",
+          "identity": "verified",
+          "actor": {
+            "name": "Montblanc",
+            "id": 5,
+            "job_id": 5,
+            "side": "player",
+            "hp": 241,
+            "max_hp": 241,
+            "mp": 221,
+            "max_mp": 221,
+            "ct": 0,
+            "tile": [
+              5,
+              10
+            ]
+          },
+          "candidates": [
+            {
+              "id": "move",
+              "kind": "move",
+              "action_id": 0,
+              "legal": true,
+              "cost": 0
+            },
+            {
+              "id": "wait",
+              "kind": "wait",
+              "action_id": 2,
+              "legal": true,
+              "cost": 0
+            }
+          ],
+          "age_seconds": 1.5758044719696045
+        }
+      }
+    ],
+    "note": "choices made by the frozen chooser among the commands the engine offered; the scenario's fixed actor_actions are not used in this run"
+  }
+}

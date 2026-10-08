@@ -22,44 +22,55 @@
     },
     {
       "id": "live-reserve-refusal-and-default-refusal",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Fresh public reserve212 rejects remaining211 (11 receipt mutants); no opt-in independently commits identified Wait without Life candidate, MP spend or revival (5 mutants)."
     },
     {
       "id": "STOP-navigation-final-Wait-and-zero-later-input",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Actual public navigation/final/Wait STOP; navigation8/final11/Wait11 partial-receipt mutants. Wait first-leg pause preserves attributed Life without final Wait; full resumed ledger has zero automation in manual gap."
     },
     {
       "id": "same-PID-manual-handoff-resume",
-      "status": "unknown"
+      "status": "unknown",
+      "scope": "Wait01 PID79496 and Wait02 PID76672 verified manual window Wait and exact PID adoption. Both resumed with zero identified player turns at150/300 second bounds; do not accept adoption as control. Sleep screenshot hypothesis requires native RAM diagnostic."
     },
     {
       "id": "raw-policy-source-identity-effect-receipt-mutations",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Public full38, partial STOP8/11/11, reserve11/default5 and failed-resume5 mutants reject. Previous-leg source stability and exact adoption flags independently checked; no successful resume claimed."
     },
     {
       "id": "existing-Cure-and-runner-regressions",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Fresh current public ally-Cure and self-Cure each cast/Wait/continue; full existing receipt mutation suites pass, independent default Move/Wait turn passes."
     }
   ],
   "source_sha256": {
-    "tools/run_autobattle.py": "0e9e85d6b081e387669934b2e9a929aa7352756545be97b8ebcfb5185c03cb1c",
-    "tools/autobattle_runtime.py": "e849de62fe308f73883a550ce4148c8c42e0e5bc5c31b685743b90add846a904",
-    "tools/validate_autobattle_runtime.py": "b97733bcbfc3d3f0bb34aeb37fc166ebc8e001d0747c71fdedb2de5e25380585",
-    "tools/life_recovery_runtime.py": "c500c9a5d6e65b8c9b2b3b25319047280d7ca6d25079dcdc27580a04e4d49f8a",
-    "tools/life_recovery_transaction.py": "e41c994fc226fb6de13cca140ed529b051ab3d1d5b667254c2f84c51ef87ae2b",
+    "tools/run_autobattle.py": "ff8fa77e72e66410dd0e6796dc976bd9f422ab2a5d749ed8f1422bbca8be8d66",
+    "tools/autobattle_runtime.py": "cc477d14d16bb155c91c489a0304af1071a116904cda355ac4e2a4eaede670c0",
+    "tools/validate_autobattle_runtime.py": "98e802fc581bfc44b5f6d4204aa5cf149eddff198a4eadeebf16ba53faf9ae33",
+    "tools/life_recovery_runtime.py": "0b03dde158f2bfc1edc25c659eccfd211e597556ee510e9c8b712892ef65e2be",
+    "tools/life_recovery_transaction.py": "1f758c25a8ac0586257d23acbe75c5e808c2bbfa2ab238b294974c85173c1687",
     "tools/life_recovery_receipt.py": "d488b6af26bd21994423d247b648e12d76ade5bba234082e6e822df2d8ae9693",
     "tools/recovery_life_target.py": "60c8bd54e6a64095393786638edacdd396ee4928cf6f4fa774145c52d9aa3766",
     "tools/recovery_life_final.py": "4ad604a0363308eee0f5defd113d7f1cc25e247cbb09cd55d9eca88fd76337af",
     "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
     "tools/recovery_life_trace.py": "61f0b6ecbf3603d7dd28b3e4aba0905dfe03b6ba4e66cc75b9230807a4073ab6",
-    "tools/recovery_life_effect.py": "8dcb15bde6f7feddbe2bae9f7c62644eb58fff0c8b3f0f090b4c9935dfccfddb",
+    "tools/recovery_life_effect.py": "65d7a22c6d368835c098cb32af517694576a3d2d375b9bb85270dc3610800a4c",
     "tools/recovery_source_versions.py": "3fef21940a6debb21a037514efb037fbe166ef3a9940a0f9db8f44542f39e783",
-    "tools/validate_life_recovery_interface.py": "57dd01a02fa3a3f5dca5b4ac19d51f1f96f3d991dfb60f332d00acf2a5117c0c",
+    "tools/validate_life_recovery_interface.py": "305ced4bd57c5f59fa4e7acdacc5d096da384f594b7c3a78d953e68f9c0bace1",
     "tools/validate_life_recovery_runtime.py": "524499c4d6a110582600c0dcf53c33b5072cc581f7196b0c954cac40df377681",
     "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
     "tools/run_life_cli_stop.py": "2e1d0f78ca787438979ade86ab7fcdf030338c9b3191754a391f7ace61ba5657",
-    "tools/manual_life_wait_handoff.py": "da9743cc327b6b7b21fc5dc54725bcd74c9c9f804b7b218fdfb083a6dd21c97d",
-    "tools/validate_life_recovery_decline.py": "9219dc3982b903f23be67a82227042efb0589075cadb5a3b1cf60318ff6f2958"
+    "tools/manual_life_wait_handoff.py": "370a30df2e7e0d13535ad42e8e3d7059e098ff8450ae52120b04d292b605d365",
+    "tools/validate_life_recovery_decline.py": "9219dc3982b903f23be67a82227042efb0589075cadb5a3b1cf60318ff6f2958",
+    "tools/recovery_boundary_diagnostic.py": "6aaf71c26c1fd9a2b5f15766aca162ef6bc4c42d07ad62db5191168b22f3c48d",
+    "tools/run_life_recovery_handoff.py": "11c11e0bb0fe4d6deaf021a61dd39c9476610cf46ace5a1cf95f76bbace5a40e",
+    "tools/validate_life_recovery_handoff.py": "fd76dde7d3c580225a845ad18b53242ca12d4618a5d8eeb94ff2599c48e1f3b1",
+    "tools/validate_life_recovery_default.py": "b3a1bd979244d821563e4bfb7ce904aa4c61ba190c9551834388539dd5bdde64",
+    "tools/validate_life_recovery_fixture.py": "ca07065dae40d634b332bb369732b149c6b8e7c243fabe641efc7f6468482f10",
+    "tools/validate_life_recovery_resume_bound.py": "154d15b1d6b99063ff1ba6565fd815c2b21d374be018c125a65116fd0022dca2"
   },
   "evidence_sha256": {
     "outputs/autobattle/a65-public-interface-01.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
@@ -92,7 +103,45 @@
     "outputs/autobattle/a65-public-STOP-navigation-01/STOP-trigger.json": "7e86d2daedf2a6c0d1122689f63446290aed9fa07b1ff9f1abbbe9d170e4e4d2",
     "outputs/autobattle/a65-public-STOP-final-01/paused-run.json": "0a5b809aee6828d94fe4dbb654c1c1d5db19f690302e8df51c9cf6adc3165d71",
     "outputs/autobattle/a65-public-STOP-final-01/STOP-trigger.json": "ebb844878f5cd2a17075f277bf3dc054a62077347f51d83166f8bd5d87918f70",
-    "outputs/autobattle/a65-public-Life-03/Life-transaction-1/Life-engine.jsonl": "f9b58136d031bcc20ace8ba92f052a28873e25e71d6204a75f6f708ba793c486"
+    "outputs/autobattle/a65-public-Life-03/Life-transaction-1/Life-engine.jsonl": "f9b58136d031bcc20ace8ba92f052a28873e25e71d6204a75f6f708ba793c486",
+    "outputs/autobattle/a65-public-STOP-Wait-01/events.jsonl": "d29ceb57f6aab9ad8e74c89989cff9060d3af72990d92d75963a8acfb96bb126",
+    "outputs/autobattle/a65-public-STOP-Wait-01/input-log.jsonl": "7a27ab46c4f7d94efd27c67e60b1654babc231d4ba43b61611c84a63b402ed0a",
+    "outputs/autobattle/a65-public-STOP-Wait-01/manual-Life-Wait.json": "7d21fde4856e4a5b7cf8b0bdddaa3a7a470569d8f5a82fadadb348339d4b3429",
+    "outputs/autobattle/a65-public-STOP-Wait-01/paused-run.json": "4e066b20821692969db409f12bb8fa6b6e5ba068a727029828ed620cef27e5f4",
+    "outputs/autobattle/a65-public-STOP-Wait-01/run.json": "35be54d16fe1a59c14120dd2affc0cd977f0379e558619636d15fda4f99467d3",
+    "outputs/autobattle/a65-public-STOP-Wait-01/STOP-trigger.json": "11b20a547ae1ad00b375ebc9e9146b9660cb22f7a37d7e466bebf38790329b94",
+    "outputs/autobattle/a65-public-STOP-Wait-01/Life-transaction-1/Life-engine.jsonl": "8e282988de80c86b54dd5bdf4100133b9ebe68341a43c66f664c3575875e541b",
+    "outputs/autobattle/a65-public-STOP-Wait-01-checks.json": "54160cd73b6d142194294b21002614332448abf3e2f0a998a42b300adcdf749e",
+    "outputs/autobattle/a65-public-STOP-Wait-02/events.jsonl": "0169de60005c63e963bd7206b5f7691c0e5e3c83b76d79d2f45cb17ef9563224",
+    "outputs/autobattle/a65-public-STOP-Wait-02/input-log.jsonl": "ae04a792d771451c18cfe414ee35ae5df404ed8e58898f1fa63aaec1416273c2",
+    "outputs/autobattle/a65-public-STOP-Wait-02/manual-Life-Wait.json": "250c6be1657875c6a396157ce5c55b9a21079cf8ce625c1e8d90c0275d6b7128",
+    "outputs/autobattle/a65-public-STOP-Wait-02/paused-run.json": "34aaff0a404ae7db353aaf580ddf570d4540609345da52067e622eb81335e5bd",
+    "outputs/autobattle/a65-public-STOP-Wait-02/run.json": "8ebcfbe9ed36b4cf87666651444a586b45e75b55e917a6fb4073885163e9444f",
+    "outputs/autobattle/a65-public-STOP-Wait-02/STOP-trigger.json": "28c02ddb0695e33c05c3ae60ed619580630b271c307cebca872e8bb47b87ecb2",
+    "outputs/autobattle/a65-public-STOP-Wait-02/Life-transaction-1/Life-engine.jsonl": "15b5457c783841f215409e16b6c62efe608a172d789be2bfcb2c82a16d0e063b",
+    "outputs/autobattle/a65-public-reserve-01/events.jsonl": "5046e10b5157077e4365e6476a6f192d0288d41dd323c4438ebb0cfedae95428",
+    "outputs/autobattle/a65-public-reserve-01/input-log.jsonl": "717902819c1381bac1dfe3259301795db5e36fe37d2458a63937324a7b68ea19",
+    "outputs/autobattle/a65-public-reserve-01/run.json": "5b9867359e2060c734b3483536f074cb693d838943d74c1d74e1994e165a13f4",
+    "outputs/autobattle/a65-public-reserve-01-checks.json": "7c5935d9ecff6191b8278ab64ae8ef03418e6b76109c740a6efc3b66701db3ee",
+    "outputs/autobattle/a65-public-default-01/events.jsonl": "4d6fbee0f4c2930c67bdabfc340e2c6768e5033515492270fa31a070c06e60de",
+    "outputs/autobattle/a65-public-default-01/input-log.jsonl": "c2f720348d667d861b78dea44f5c0306eb287c2aa379dad01b2cdd0d375b2f85",
+    "outputs/autobattle/a65-public-default-01/run.json": "c65bea73004a0a76d9c4c5573a2ebb6842b60be012f0ce6a154de7d9239fdc4a",
+    "outputs/autobattle/a65-public-default-01-checks.json": "93ae8fa00923b4015b6bfb63abb7e8becc5f7dde8531904d62ab37c3056b72e7",
+    "outputs/autobattle/a65-regression-ally-Cure-01/events.jsonl": "e78023656ca6bc8519add373c2c21f15b4bf6b9f077429c694ed05f0378707fd",
+    "outputs/autobattle/a65-regression-ally-Cure-01/input-log.jsonl": "1bdc43b19b16c615e184bf7a516dcf0d732602acbd9ed16eeacc14cc2a52452f",
+    "outputs/autobattle/a65-regression-ally-Cure-01/run.json": "d8dcf715d4a58f04234eefb15f640989e5e2bae9fa1662d662243697dc33c1c7",
+    "outputs/autobattle/a65-regression-ally-Cure-01-checks.json": "db7f1890a7e0e3b03ae0b939bbebc694528a6acfd44f936a82e4632c2f2cd284",
+    "outputs/autobattle/a65-regression-self-Cure-01/events.jsonl": "62e416b84cf789351ddeccaadcbbfdc7cba189942a6a51a9a58b7979e823b51a",
+    "outputs/autobattle/a65-regression-self-Cure-01/input-log.jsonl": "d86a72863c3c2211970368469dc53e2da1b01ca110d5ee1266c3b0424b6399ef",
+    "outputs/autobattle/a65-regression-self-Cure-01/run.json": "633d25a552fe14a2239d071721a7cb5e9426670b89f93ea76d0dbf2f14a7e6c7",
+    "outputs/autobattle/a65-regression-self-Cure-01-checks.json": "197712d6ded2cb5ab550fa1d35943771f8cf02f3f8b2c60c0db6dec593491407",
+    "outputs/autobattle/a65-public-interface-02.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
+    "outputs/autobattle/a65-pre-navigation-fixture-02.json": "be454773367faef77d6f34c9bf39108b20e220a6048a80e4f0a2f83b7ddc8982",
+    "outputs/autobattle/a65-public-unsupported-01/events.jsonl": "d20ea805e097472d8df96bc3c798f37908fb1370474a67efed1bbe29eb9473ca",
+    "outputs/autobattle/a65-public-unsupported-01/input-log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/autobattle/a65-public-unsupported-01/run.json": "a9e0844f05e146405911a0989cf2b11e4e0d1e4e803d8bcaa0f6e3695e632cec",
+    "outputs/autobattle/a65-public-unsupported-01-checks.json": "4e3e3747f32d38f949c85dc5459ef91dbea445ae4499e0439397c1fb395cb07f",
+    "outputs/autobattle/a65-public-STOP-Wait-02-bound-checks.json": "8ce54d4ec1da838a157f076de73ec8e413fd74c49fa7596aeb19b3ef232a37c8"
   },
   "limitations": [
     "No public revival acceptance yet.",

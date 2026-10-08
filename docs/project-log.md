@@ -1,5 +1,13 @@
 # Project log
 
+## 2026-10-08 - A6.5 public refusal, regression and bounded resume checkpoint
+
+- Live reserve212 rejects remaining211; default no-opt-in offers only Move/Wait and commits Wait with no Life MP spend/revival. Receipt mutants11/5 reject.
+- Current public ally-Cure and self-Cure independently cast, Wait and continue; existing38/26 mutation suites pass. Unsupported seven-unit Life refuses before gameplay input; empty rejection journal validates.
+- Exact pre-navigation Life fixture guard rejects31 changed identities/resources/ability-state/EXP cases. Previous-leg source proofs and actual same-PID adoption flags are checked even when resumed without Life opt-in.
+- Post-Life STOP, window-only manual Wait and exact PID adoption pass on two fresh runs;150/300-second resumes each yield zero identified player turns. A6.5 stays UNKNOWN. Sleep is only a screenshot hypothesis pending native terminal diagnostics; no identity rule is relaxed.
+- Added reusable lifecycle driver, failed-resume audit (five mutants), and read-only canonical/mirror terminal diagnostics. See `docs/a65-public-life.md` and `docs/receipts/autobattle/A6.5.json`. Preserve A6.4 bounded research PASS and separate ROM-native milestones.
+
 ## 2026-10-08 - A6.5 public Life implementation checkpoint
 
 Added mutually exclusive schema2 --bounded-ally-life and shared state-driven

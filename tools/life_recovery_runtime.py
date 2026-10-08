@@ -16,6 +16,12 @@ def drive_life_recovery(runtime,journal,*,before_confirmation=lambda observation
     owner,probe=runtime.owner,runtime.p
     require(runtime.tactics is not None and runtime.tactics.policy['schema']=='ffta-tactics-policy/2',
             'public Life requires schema2 tactics')
+    early_t=round(time.time()-runtime.t0,3)
+    journal.update(schema='ffta-life-recovery-turn/1',owner=dict(owner),status='unknown',
+        write_start=len(getattr(probe,'key_write_log',[])),started_t=early_t,ended_t=early_t,
+        raw_writes=[],gameplay_writes=[],fixture_writes=[],life_engine_errors=[],transport=[],
+        policy_document=deepcopy(runtime.tactics.policy),policy_observations=[],navigation=[],
+        final_confirmation=False)
     require((owner['id'],owner['job'],owner['race'],owner['x'],owner['y'])==(5,5,1,5,10)
             and len(runtime._pre_players)==2,'public Life caster/party outside bounded family')
     root=Path(runtime.events_path).parent

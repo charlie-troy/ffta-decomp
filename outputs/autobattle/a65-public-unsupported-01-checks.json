@@ -1,0 +1,11 @@
+{
+  "status": "pass-live-unsupported-Life-family",
+  "scope": "Actual seven-unit public guard refusal before input; portable empty journal validates.",
+  "turns": 0,
+  "gameplay_writes": 0,
+  "evidence_sha256": {
+    "outputs\\autobattle\\a65-public-unsupported-01\\run.json": "a9e0844f05e146405911a0989cf2b11e4e0d1e4e803d8bcaa0f6e3695e632cec",
+    "outputs\\autobattle\\a65-public-unsupported-01\\events.jsonl": "d20ea805e097472d8df96bc3c798f37908fb1370474a67efed1bbe29eb9473ca",
+    "outputs\\autobattle\\a65-public-unsupported-01\\input-log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

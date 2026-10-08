@@ -932,6 +932,16 @@ class BattleRuntime:
     def _finish(self, state, reason):
         self.state = state
         self._terminal_reason = reason
+        if self.resume and state == STALLED:
+            # The classification pass already halted the CPU. Preserve the
+            # missing-menu evidence without changing input authority.
+            try:
+                from recovery_boundary_diagnostic import capture_boundary_diagnostic
+                diagnostic = capture_boundary_diagnostic(self.g, self.p)
+                self.event('note', boundary_diagnostic=diagnostic,
+                           note='read-only resumed terminal boundary evidence')
+            except (ValueError, OSError, ConnectionError) as exc:
+                self.event('note', note=f'terminal boundary diagnostic unavailable: {exc}')
         # a3-natural4 lesson: every bounded stop needs a terminal frame,
         # otherwise the post-silence engine state is unknowable and the
         # bound's honesty cannot be audited

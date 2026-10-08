@@ -9,7 +9,7 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**A6.4 is bounded research PASS: two source-stable Life/Wait/independent-next-actor runs, native HP/MP/level-up attribution and live STOP/reserve controls. Proceed to A6.5 public revival integration with separate public lifecycle/receipt/regression gates. Public revival remains UNKNOWN until those gates pass.**
+**A6.4 remains bounded research PASS. A6.5 has two public Life/Wait continuations, live reserve/default and STOP controls, and fresh Cure regressions; same-PID resumed player control remains UNKNOWN after150/300-second bounds. Continue A6.5 with native terminal status/menu evidence; do not count adoption as control.**
 Two public ally casts, damage-policy refusal/Wait, both STOP/manual/same-PID
 handoffs, two unsupported-family zero-input controls, the six-case self-Cure
 matrix and ordinary live Move/Wait pass on current production sources.
@@ -710,6 +710,18 @@ input; require two attributed revivals, separate Wait/continuation, STOP,
 reserve and adversarial controls. Public revive integration is a later packet.
 Read-only table Life ID5/base cost10 is metadata, not target/availability proof.
 
+
+### A6.5 - Public bounded Life integration (ACTIVE)
+
+See [public Life contract](a65-public-life.md) and `docs/receipts/autobattle/A6.5.json`.
+The explicit schema2 opt-in shares the A6.4 transaction and verifies native
+Life HP/MP and EXP99 level-up before rebinding identity. Two independent public
+turns, STOP stages, reserve/default refusals and fresh Cure regressions pass.
+Overall acceptance stays UNKNOWN until a window-only manual handoff resumes
+on the same PID and produces a later identified public player turn.150/300
+second bounds adopted correctly but produced no such turn. Capture native
+status/menu evidence; do not weaken ownership or infer control from adoption.
+Full-Life, items, arbitrary KO parties and whole-battle claims remain gated.
 
 ### A7 — Movement tactics (P1, bounded research then implementation)
 

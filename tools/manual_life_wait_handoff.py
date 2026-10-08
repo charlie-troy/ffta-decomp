@@ -40,9 +40,9 @@ def main():
             'input_channel':'verified owned window; GDB reads/control only','stub_gameplay_writes':0,
             'keys':[],'continuations':[]}
     sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
-    record['source_sha256']={p:sha(p) for p in ['tools/manual_life_wait_handoff.py',
-        'tools/send_owned_mgba_key.ps1','tools/recovery_life_wait.py','tools/recovery_menu_list.py',
-        'tools/recovery_party_continuation.py','tools/trace_mgba.py']}
+    from probe_recovery_ko_lifecycle import source_dependencies
+    record['source_sha256']={p:sha(p) for p in
+        source_dependencies('manual_life_wait_handoff') + ['tools/send_owned_mgba_key.ps1']}
     base=max(e.get('t',0) for e in events)+1;started=time.time()
     try:
         reply=g.interrupt();require(reply and reply[:1] in ('S','T') and reply[:3]!='S04','manual halt failed')

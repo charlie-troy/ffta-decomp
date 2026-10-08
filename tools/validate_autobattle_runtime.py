@@ -26,7 +26,7 @@ KNOWN_FIELDS = {"t", "kind", "scenario", "turn", "actor", "actor_slot",
                 # A5.3: the conditional-tactics receipt (policy path, outcome,
                 # reason, matched scope/rule, observation age, offered
                 # candidates). Null on every scenario-driven run.
-                "tactics", "recovery"}
+                "tactics", "recovery", "boundary_diagnostic"}
 # kinds whose presence after the terminal stop means the run kept driving:
 # boundaries, turns, and notes about recovery cycles are all input activity
 INPUT_EVENT_KINDS = {"boundary", "turn", "note"}
@@ -95,16 +95,23 @@ def validate(out_dir):
     if previous_leg and (previous_leg.get("final_state") != "paused"
                          or previous_leg.get("manual_handoff", {}).get("pid") != run.get("emulator_pid")):
         fail("resume previous-leg receipt is not the same paused PID", errors)
+    if resumed and previous_leg.get('bounded_ally_life'):
+        adopt = run.get('adopt') or {}
+        if (adopt.get('pid') != run.get('emulator_pid')
+                or adopt.get('match_receipt_handoff_pid') is not True
+                or adopt.get('roster_guard_ok') is not True):
+            fail('Life resume lacks verified same-PID adoption', errors)
     if (run.get("bounded_self_cure") or run.get('bounded_ally_cure') or run.get('bounded_ally_life')) and run.get("inputs_unchanged") is False:
         fail("bounded recovery inputs changed during execution", errors)
-    if run.get('bounded_ally_life'):
-        pins=run.get('input_sha256') or {}
+    for life_leg in (run,run.get('previous_leg') or {}):
+        if not life_leg.get('bounded_ally_life'):continue
+        pins=life_leg.get('input_sha256') or {}
         required={'tools/run_autobattle.py','tools/autobattle_runtime.py','tools/life_recovery_runtime.py',
                   'tools/life_recovery_transaction.py','tools/recovery_life_target.py',
                   'tools/recovery_life_final.py','tools/recovery_life_wait.py','tools/recovery_life_effect.py',
                   'tools/recovery_life_trace.py','tools/tactics_policy.py'}
-        if (run.get('inputs_unchanged') is not True or not required<=set(pins)
-                or run.get('input_sha256_after')!=pins):
+        if (life_leg.get('inputs_unchanged') is not True or not required<=set(pins)
+                or life_leg.get('input_sha256_after')!=pins):
             fail('public Life source closure/unchanged proof missing',errors)
     expected_starts = 2 if resumed else 1
     if n_starts != expected_starts:

@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 import tempfile
+import time
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -32,10 +33,11 @@ def main():
                               ('caster-x','x',4),('caster-y','y',11),('party-count',None,None)]:
         owner=good|({field:value} if field else {})
         runtime=SimpleNamespace(owner=owner,p=SimpleNamespace(key_write_log=[]),
-            tactics=SimpleNamespace(policy=policy),_pre_players=[{}]*(1 if not field else 2))
+            tactics=SimpleNamespace(policy=policy),_pre_players=[{}]*(1 if not field else 2),t0=time.time())
         journal={}
         try:drive_life_recovery(runtime,journal)
-        except ValueError:require(not runtime.p.key_write_log and not journal,'family rejection touched input')
+        except ValueError:require(not runtime.p.key_write_log and not journal['raw_writes']
+                                  and not journal['transport'],'family rejection touched input')
         else:raise AssertionError('accepted wrong Life family')
         controls.append(label)
     output={'status':'pass-Life-public-interface','scope':__doc__,'controls':controls,

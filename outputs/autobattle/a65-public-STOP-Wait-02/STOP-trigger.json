@@ -1,0 +1,9 @@
+{
+  "phase": "Life-Wait-final",
+  "trigger": {
+    "screenshot": "recovery-Life-Wait-final.png"
+  },
+  "pid": 76672,
+  "cli_exit": 0,
+  "source_stable": true
+}

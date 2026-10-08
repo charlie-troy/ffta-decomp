@@ -1,0 +1,59 @@
+{
+  "status": "pass-Life-pre-navigation-fixture",
+  "scope": "Reject unaccepted Life fixture variants before transaction navigation.",
+  "valid": {
+    "status": "accepted-exact-Life-fixture",
+    "caster": 5,
+    "target": 7,
+    "cost": 10,
+    "level": 40,
+    "exp": 99,
+    "ability_sets": [
+      24,
+      9
+    ]
+  },
+  "rejected": [
+    "caster-0x0",
+    "caster-0x4",
+    "caster-0x5",
+    "caster-0x6",
+    "caster-0x7",
+    "caster-0x9",
+    "caster-0x18",
+    "caster-0x1a",
+    "caster-0x1c",
+    "caster-0x1e",
+    "caster-0xf2",
+    "caster-0xf6",
+    "caster-0x104",
+    "target-0x0",
+    "target-0x4",
+    "target-0x5",
+    "target-0x6",
+    "target-0x7",
+    "target-0x9",
+    "target-0x18",
+    "target-0x1a",
+    "target-0x1c",
+    "target-0x1e",
+    "target-0xf2",
+    "target-0xf6",
+    "target-0x104",
+    "caster-0x8",
+    "caster-0xa",
+    "caster-0x35",
+    "caster-0x36",
+    "caster-0x3b"
+  ],
+  "source_sha256": {
+    "tools/recovery_life_effect.py": "65d7a22c6d368835c098cb32af517694576a3d2d375b9bb85270dc3610800a4c",
+    "tools/validate_life_recovery_fixture.py": "ca07065dae40d634b332bb369732b149c6b8e7c243fabe641efc7f6468482f10"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-life-wait-03\\final-prompt-second-ewram.bin": "a9b84d252d172a7824e72e76810940ea869d8115e4b2a4d99143031753571f74"
+  },
+  "limitations": [
+    "Retained pre-navigation gate; no new live execution."
+  ]
+}
