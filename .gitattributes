@@ -10,3 +10,6 @@ outputs/autobattle/a61-*/**/*.json -text whitespace=cr-at-eol
 outputs/autobattle/a63-*.json -text whitespace=cr-at-eol
 outputs/autobattle/a63-*/**/*.json -text whitespace=cr-at-eol
 outputs/autobattle/a63-*/**/*.jsonl -text whitespace=cr-at-eol
+# KO research receipts also preserve exact captured input-ledger bytes.
+outputs/autobattle/a64-*/**/*.json -text whitespace=cr-at-eol
+outputs/autobattle/a64-*/**/*.jsonl -text whitespace=cr-at-eol

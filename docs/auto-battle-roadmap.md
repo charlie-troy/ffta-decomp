@@ -9,9 +9,9 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**A6.3 passes for its bounded public eight-unit living-ally Cure fixture.
-Continue A6.4 KO/Life target research below. A6.1 self-Cure and A6.2 research
-retain their independent limits; broad recovery and item support remain open.**
+**A6.4 engine KO lifecycle and independent scratch reload now have bounded PASS
+evidence. Continue native action-set/menu reconstruction to expose enabled Life;
+target acceptance and revival remain UNKNOWN.**
 Two public ally casts, damage-policy refusal/Wait, both STOP/manual/same-PID
 handoffs, two unsupported-family zero-input controls, the six-case self-Cure
 matrix and ordinary live Move/Wait pass on current production sources.

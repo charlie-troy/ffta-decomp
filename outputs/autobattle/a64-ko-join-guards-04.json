@@ -1,0 +1,61 @@
+{
+  "status": "pass-retained-KO-join-guards",
+  "scope": "Retained KO research joins and mutation guards; no live lifecycle claim.",
+  "rejected": [
+    "short-roster",
+    "short-members",
+    "missing-party-row",
+    "expected-id-alias",
+    "expected-name-alias",
+    "5-canonical-name",
+    "5-canonical-id",
+    "5-canonical-job",
+    "5-canonical-race",
+    "5-canonical-tile",
+    "5-canonical-HP",
+    "5-canonical-MP",
+    "5-canonical-Petrify",
+    "5-canonical-KO-counter",
+    "5-coherent-enemy",
+    "5-coherent-unaffiliated",
+    "5-coherent-job",
+    "5-coherent-race",
+    "5-coherent-tile",
+    "5-name-alias",
+    "5-id-alias",
+    "7-canonical-name",
+    "7-canonical-id",
+    "7-canonical-job",
+    "7-canonical-race",
+    "7-canonical-tile",
+    "7-canonical-HP",
+    "7-canonical-MP",
+    "7-canonical-Petrify",
+    "7-canonical-KO-counter",
+    "7-coherent-enemy",
+    "7-coherent-unaffiliated",
+    "7-coherent-job",
+    "7-coherent-race",
+    "7-coherent-tile",
+    "7-name-alias",
+    "7-id-alias"
+  ],
+  "synthetic_zero_hp_join_controls": [
+    5,
+    7
+  ],
+  "source_sha256": {
+    "tools/validate_recovery_ko_join.py": "0570c6b35e405a0b015c13401298b4450d2b2260b39e7f3cf8625ae00c631262",
+    "tools/probe_recovery_ko_lifecycle.py": "fc5b0acd88859144804c699b6d29518e54b2182ef2a1563be6804a0f3ed8d0f2",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12"
+  },
+  "capture_sha256": {
+    "outputs\\autobattle\\a64-engine-ko-04\\0000-roster.bin": "1fe64fb24441684837e8af6e7c1e8393b6fbe5cd58f78725552f246d9f05b387",
+    "outputs\\autobattle\\a64-engine-ko-04\\0000-members.bin": "61c569375486ed693954a158b5209f05451308e5c76061c132de07f5fe92c58c"
+  },
+  "limitations": [
+    "Synthetic zero-HP mutations test identity joins only; they do not create genuine KO evidence.",
+    "No public living-only guard was relaxed; no targeting or revival input."
+  ]
+}

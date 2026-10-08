@@ -67,3 +67,52 @@ Petrify snapshots change living classification but HP0 still returns1.
 This fragment distinguishes zero HP from living critical HP; it does not
 execute the surrounding KO lifecycle, scheduler, target eligibility or revival.
 All required A6.4 criteria remain UNKNOWN. Capture: `a64-ko-classifier.json`.
+
+## 2026-10-08 execution checkpoint
+
+The dated initial UNKNOWN verdict above is superseded for the first two
+criteria only. `a64-engine-ko-04` sets living Marche to HP1 in both copied
+records, then issues ordinary identified Wait commands. Native instructions
+`080A2298/080A229A` change canonical `02000080` from HP1 to0 at t180.4.
+His KO-suffered counter increases1 to2; MP85 is preserved. Montblanc remains
+HP100/MP221. Both canonical/mirror identities, resources and status fields
+are rejoined; Petrify, battle/persistent Zombie and Auto-Life are clear.
+
+The interactive caller `0809F870` reaches zero-HP skip `0809E246` at t209.5.
+`08093018` then returns living battle actors. Prediction-helper skips from
+`0809F7B4` are recorded separately. Fresh `a64-ko-reload-04` independently
+opens living Montblanc's command menu with Marche still KO and no inputs or
+unit writes. This is bounded engine-KO lifecycle evidence, not Life legality.
+
+`a64-life-fixture-01` starts only after that audit. It changes living
+Montblanc's secondary job to7 and HP to241 in both copies, with four verified
+ledger entries. The genuine KO target is unchanged byte-for-byte before
+export; a separate fresh reload verifies the prepared resources. Original
+ROM/save/state files remain untouched, and all binary captures/states stay
+local. Exact source and metadata hashes are in `A6.4.json`.
+
+Current fixture: living Montblanc ID5, canonical02000188, HP241/241,
+MP221/221, raw race1/job5/secondary7; genuine KO Marche ID7,
+canonical02000080, HP0/442, MP85/85. This changes caster identity from the
+accepted Cure fixtures. The separate research list reader handles ROM names;
+production living-only/Cure readers are unchanged.
+
+Thirty-seven KO join mutations and eleven actual-ROM status/pending-tail
+controls pass. Existing living-party37, public-interface7 and public-Cure38
+guards still pass; AI10/10 and strategy9/9 pass on the unchanged original ROM.
+The initial broad helper hypothesis and failed export are retained local
+research, not acceptance evidence; see DE-038. Earlier observational runs
+01/02 mislabelled +D2 Speed as CT; accepted run04 reads CT at+D0 explicitly.
+
+Next gate: identify this caster's White Magic group and an enabled Life row,
+then independently decode its KO overlay, preview and final prompt. Group10
+opened native Steal (mode6); group12 entered a target processor rather than
+the desired ability list. Neither executed a spell. Do not transfer the
+earlier caster's group-row assumption or promote an unexecuted Life probe.
+
+The native Action-group capture (`a64-life-groups-01`) shows Fight, Black
+Magic, Item and Combo. Its rendered HP100 also differs from canonical HP241.
+The action-set mapping or cached-menu reconstruction is unresolved; raw
+secondary7 alone cannot certify White Magic. `a64-Life-frontier.json` records
+the mismatch. Stop guessing group IDs: identify the native action-set source
+and menu reconstruction before another availability claim.

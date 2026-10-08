@@ -1,5 +1,27 @@
 # Project log
 
+## 2026-10-08 - Genuine engine KO and disposable Life fixture checkpoint
+
+A6.4 now has bounded PASS evidence for its engine-KO lifecycle and independent
+scratch-fixture reload criteria. In `a64-engine-ko-04`, ordinary verified Wait
+turns permit retail enemy damage to change Marche HP 1 to 0 at 080A2298/9A;
+the KO counter increments, the interactive loop skips that unit, and the
+battle driver selects living units. No synthetic zero-HP/status writes occur.
+The exported state independently reloads at Montblanc's command boundary.
+`a64-life-fixture-01` preserves that KO and reloads independently after four
+positive living-caster setup writes. Overall A6.4 remains UNKNOWN.
+
+The native menu does not yet expose White Magic: rows 12/10/1/15 visually show
+Fight/Black Magic/Item/Combo, while the selected group 10 produced a Steal list.
+Raw secondary-job 7 alone therefore does not establish enabled Life. Next:
+resolve native action-set construction before attempting Life targeting.
+Research tooling never grants public revive authority; living Cure guards are
+unchanged. Retained audits pass 37 KO-join mutations, 11 synthetic KO-tail
+controls plus two captured units, 37 living guards, seven interface controls,
+and 38 public Cure receipt mutations. ROM regressions pass 10/10 and 9/9.
+See `docs/a64-ko-target-research.md` and `docs/receipts/autobattle/A6.4.json` for
+commands, source/evidence hashes, failed probes and the remaining UNKNOWN gates.
+
 ## 2026-10-07 - Initial KO classifier fragment research
 
 A6.4 remains UNKNOWN. Eight actual-ROM fragment cases at080A2218..080A225E

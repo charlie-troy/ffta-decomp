@@ -1,0 +1,884 @@
+{
+  "status": "pass-retained-KO-observation-audit",
+  "scope": "Audit local natural-KO research captures; no fresh-runtime acceptance claim.",
+  "run": "outputs\\autobattle\\a64-engine-ko-04",
+  "observations": 29,
+  "positive_hp_setup": 1,
+  "ko_target_id": 7,
+  "verified_wait_turns": 2,
+  "input_writes": 0,
+  "resource_changes": [
+    {
+      "observation": 0,
+      "t": 18.086,
+      "resources": [
+        [
+          5,
+          100,
+          221,
+          0
+        ],
+        [
+          7,
+          1,
+          85,
+          1
+        ]
+      ]
+    },
+    {
+      "observation": 19,
+      "t": 189.588,
+      "resources": [
+        [
+          5,
+          100,
+          221,
+          0
+        ],
+        [
+          7,
+          0,
+          85,
+          2
+        ]
+      ]
+    }
+  ],
+  "KO_candidates": [
+    {
+      "index": 19,
+      "t": 189.588,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 589,
+          "mirror_ct": 449,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "d3f3efb24155d7b35ebc95f7df91389d7b6196ceafb0bdedaded64f9a9cc9a71",
+          "mirror_sha256": "90ff4c49ef8d2287a71fb0c02fd6201d337879d2f4e072ad5374260c516bee86"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 966,
+          "mirror_ct": 649,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "196fd43cc2f071c29f3b0a688120ec0cb550ce4a3f4614cf747d4cfa96747d0d",
+          "mirror_sha256": "71cda31f7ed53c0b2d77910f1d88837240addb005df7debf2ad92cf3d67958b4"
+        }
+      ],
+      "captures": {
+        "0019-roster.bin": "2605695bbd9c7e6b30368b349a4b22b1b48eec7acdc4352e4299c9b4ef692aa6",
+        "0019-members.bin": "0379eff4037e856ac3bc0e192a251368a88ba209219757eea74fdfae6ca3427f"
+      }
+    },
+    {
+      "index": 20,
+      "t": 192.645,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 589,
+          "mirror_ct": 791,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "d3f3efb24155d7b35ebc95f7df91389d7b6196ceafb0bdedaded64f9a9cc9a71",
+          "mirror_sha256": "4819a85f098a38413968230d81ae52bfde357d8baed2c129555c4bdcce355946"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 966,
+          "mirror_ct": 1000,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "196fd43cc2f071c29f3b0a688120ec0cb550ce4a3f4614cf747d4cfa96747d0d",
+          "mirror_sha256": "7708c11813feb5220b8ea5c86cf6c87fc1f0613474234a6e47c362b7b6eb0ae5"
+        }
+      ],
+      "captures": {
+        "0020-roster.bin": "1f5422a21917199111fd3cab1bd6de7cb523c563ea372ef235aff0717b1fa27e",
+        "0020-members.bin": "0379eff4037e856ac3bc0e192a251368a88ba209219757eea74fdfae6ca3427f"
+      }
+    },
+    {
+      "index": 21,
+      "t": 195.687,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 563,
+          "mirror_ct": 690,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "b3f647a20a0b21c531594ff7fe6cb084f6d491f39f885acf535ffb3489daac7d",
+          "mirror_sha256": "e9b7c5ac26aa10eb0b3677a0adb3d33dd5b5537055b9e0f601da8c88c58072d5"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 949,
+          "mirror_ct": 1085,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "143d7c875e9815b2589a0785cc06ff79711a5e3cb0c1c030ee4f313bb1f3baed",
+          "mirror_sha256": "10534d81fb85060d3777a3cbd11dd62aaef3e01975eb5da6d66acb51859cfe57"
+        }
+      ],
+      "captures": {
+        "0021-roster.bin": "2fd7361332e9b028470910000ebca925eb847f9feeebe4b4239da5bedafd2474",
+        "0021-members.bin": "3fefdb875e1ab553ae3385b30f06b379ae7dba44086e132bf92a752e4853b3b4"
+      }
+    },
+    {
+      "index": 22,
+      "t": 198.737,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 563,
+          "mirror_ct": 0,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "b3f647a20a0b21c531594ff7fe6cb084f6d491f39f885acf535ffb3489daac7d",
+          "mirror_sha256": "aeb66103f0851dbc345c096a80f4912fc1421a825be2a7be07b3d01a9ba9fa16"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 949,
+          "mirror_ct": 110,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "143d7c875e9815b2589a0785cc06ff79711a5e3cb0c1c030ee4f313bb1f3baed",
+          "mirror_sha256": "14798fccc69087114ae3891199853b68ba3688334fbb31ff7f02da2146f13b19"
+        }
+      ],
+      "captures": {
+        "0022-roster.bin": "2de127a896983eb74e7885640c7a0bf4b4a17236b4b93dfb71dd94090143cd44",
+        "0022-members.bin": "3fefdb875e1ab553ae3385b30f06b379ae7dba44086e132bf92a752e4853b3b4"
+      }
+    },
+    {
+      "index": 23,
+      "t": 201.792,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 563,
+          "mirror_ct": 303,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "b3f647a20a0b21c531594ff7fe6cb084f6d491f39f885acf535ffb3489daac7d",
+          "mirror_sha256": "6f7a3a2d5fb5fc0e9783d8f0352f8db381a80143e2aa93e071b2041d0f00768a"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 949,
+          "mirror_ct": 494,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "143d7c875e9815b2589a0785cc06ff79711a5e3cb0c1c030ee4f313bb1f3baed",
+          "mirror_sha256": "7a492a24ebad4c3524d39f5f469ab2138e44d8dddc5bdd16c65a40648e6266d8"
+        }
+      ],
+      "captures": {
+        "0023-roster.bin": "c662eadab7b4a186fe2167926497529962e05a761f3672056ed798aadbeaada9",
+        "0023-members.bin": "3fefdb875e1ab553ae3385b30f06b379ae7dba44086e132bf92a752e4853b3b4"
+      }
+    },
+    {
+      "index": 24,
+      "t": 209.141,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 563,
+          "mirror_ct": 690,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "b3f647a20a0b21c531594ff7fe6cb084f6d491f39f885acf535ffb3489daac7d",
+          "mirror_sha256": "e9b7c5ac26aa10eb0b3677a0adb3d33dd5b5537055b9e0f601da8c88c58072d5"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 949,
+          "mirror_ct": 1085,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "143d7c875e9815b2589a0785cc06ff79711a5e3cb0c1c030ee4f313bb1f3baed",
+          "mirror_sha256": "10534d81fb85060d3777a3cbd11dd62aaef3e01975eb5da6d66acb51859cfe57"
+        }
+      ],
+      "captures": {
+        "0024-roster.bin": "9f856786f65a3ac068aa67db997a7e70852f43daa0e232b45e9685f7b8918513",
+        "0024-members.bin": "3fefdb875e1ab553ae3385b30f06b379ae7dba44086e132bf92a752e4853b3b4"
+      }
+    },
+    {
+      "index": 25,
+      "t": 212.194,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 1000,
+          "mirror_ct": 782,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "20cf8105f0a4e00b3edcd34dbf773a6833dcbdc8fd7580eddd47d103f08e9e47",
+          "mirror_sha256": "1f3e855cad3785458725b85b6724897144cb11ea508fcd432575f5133969e7b2"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 0,
+          "mirror_ct": 1000,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "ee216391a919d00db97774d259e97c30bc0551c8ca68f7a02d09e6a3dd9869b0",
+          "mirror_sha256": "93d3a92a4bb631b8513b34e995a6b617cb818514c45b0bf260204f09b9647db0"
+        }
+      ],
+      "captures": {
+        "0025-roster.bin": "179a5622d9ea51f3a9d54795342cd2055228d9f84e6b482af11220c2f7bef0ed",
+        "0025-members.bin": "9ec1ff6cef96f08d36615b69e4a219f9ed214ff86b33874e6159d01b228e9475"
+      }
+    },
+    {
+      "index": 26,
+      "t": 215.251,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 1000,
+          "mirror_ct": 170,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "20cf8105f0a4e00b3edcd34dbf773a6833dcbdc8fd7580eddd47d103f08e9e47",
+          "mirror_sha256": "e7b31c8b7e630e8ba94ff64f80dfde282bac75cf4ff9c09891003cb39f665bba"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 0,
+          "mirror_ct": 343,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "ee216391a919d00db97774d259e97c30bc0551c8ca68f7a02d09e6a3dd9869b0",
+          "mirror_sha256": "942e87a7930ef5e08ccd1805e4bf65ab4c9f4faaed87934113381d19881a18bc"
+        }
+      ],
+      "captures": {
+        "0026-roster.bin": "9b6f812129145dac134aab58147f0f0554016dbbb9ffa298b89139f59b2e03f3",
+        "0026-members.bin": "9ec1ff6cef96f08d36615b69e4a219f9ed214ff86b33874e6159d01b228e9475"
+      }
+    },
+    {
+      "index": 27,
+      "t": 223.002,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 1000,
+          "mirror_ct": 0,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "20cf8105f0a4e00b3edcd34dbf773a6833dcbdc8fd7580eddd47d103f08e9e47",
+          "mirror_sha256": "58d70c3306a03ce49db4810d146cf77b8857bdab4a3cd8a958a3bc20a6bb599e"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 0,
+          "mirror_ct": 142,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "ee216391a919d00db97774d259e97c30bc0551c8ca68f7a02d09e6a3dd9869b0",
+          "mirror_sha256": "80d79bdeb12fb692c8a446f04ab062b2db9950c8e9baff6cfbc1e5f066f8e58d"
+        }
+      ],
+      "captures": {
+        "0027-roster.bin": "b9eeb9432ac5cbbe6f26503bbabdf4965e1c3733f7dcc4bcae028fd8f2aef5f2",
+        "0027-members.bin": "9ec1ff6cef96f08d36615b69e4a219f9ed214ff86b33874e6159d01b228e9475"
+      }
+    },
+    {
+      "index": 28,
+      "t": 229.029,
+      "party": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "name_text": "Montblanc",
+          "slot": 5,
+          "hp": 100,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 32,
+          "ko_suffered": 0,
+          "canonical_ct": 1000,
+          "mirror_ct": 0,
+          "canonical_speed": 146,
+          "mirror_speed": 146,
+          "canonical_sha256": "20cf8105f0a4e00b3edcd34dbf773a6833dcbdc8fd7580eddd47d103f08e9e47",
+          "mirror_sha256": "58d70c3306a03ce49db4810d146cf77b8857bdab4a3cd8a958a3bc20a6bb599e"
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "name_text": "Marche",
+          "slot": 7,
+          "hp": 0,
+          "max_hp": 442,
+          "mp": 85,
+          "max_mp": 85,
+          "tile": [
+            4,
+            10
+          ],
+          "statuses": {
+            "auto_life": false,
+            "petrify": false,
+            "zombie": false,
+            "persistent_zombie": false
+          },
+          "side_flags": 129,
+          "ko_inflicted": 154,
+          "ko_suffered": 2,
+          "canonical_ct": 0,
+          "mirror_ct": 142,
+          "canonical_speed": 155,
+          "mirror_speed": 155,
+          "canonical_sha256": "ee216391a919d00db97774d259e97c30bc0551c8ca68f7a02d09e6a3dd9869b0",
+          "mirror_sha256": "80d79bdeb12fb692c8a446f04ab062b2db9950c8e9baff6cfbc1e5f066f8e58d"
+        }
+      ],
+      "captures": {}
+    }
+  ],
+  "attributed_engine_KO_damage": [],
+  "live_driver_picks_after_KO": [
+    {
+      "t": 195.0,
+      "pc": "08093018",
+      "phase": "battle-driver-picked",
+      "during": "runtime",
+      "unit": "02002fc4",
+      "name": 139882543,
+      "id": 1,
+      "hp": 300,
+      "mp": 60,
+      "ko_suffered": 0,
+      "wrapper": "020223ac",
+      "driver": "0200f4e8",
+      "caller": "08093014 -> 0809f850 -> 08093018"
+    },
+    {
+      "t": 209.8,
+      "pc": "08093018",
+      "phase": "battle-driver-picked",
+      "during": "runtime",
+      "unit": "02000188",
+      "name": 139793095,
+      "id": 5,
+      "hp": 100,
+      "mp": 221,
+      "ko_suffered": 0,
+      "wrapper": "0202270c",
+      "driver": "0200f4e8",
+      "caller": "08093014 -> 0809f850 -> 08093018"
+    }
+  ],
+  "native_HP_zero_stores": [
+    {
+      "before": {
+        "t": 180.4,
+        "pc": "080a2298",
+        "phase": "HP-adjust-before",
+        "during": "runtime",
+        "unit": "02000080",
+        "name": 33562396,
+        "id": 7,
+        "hp": 1,
+        "mp": 85,
+        "ko_suffered": 1,
+        "store_value": 0,
+        "old_class": 2,
+        "registers": [
+          "000001ba",
+          "080a2289",
+          "02000080",
+          "0000001e",
+          "00000000",
+          "00000000",
+          "02000080",
+          "00000002",
+          "0000004c",
+          "020159e4",
+          "020159e4",
+          "00000000",
+          "00000001",
+          "03007934",
+          "080a2289",
+          "080a2298",
+          "8000003f"
+        ]
+      },
+      "after": {
+        "t": 180.4,
+        "pc": "080a229a",
+        "phase": "HP-adjust-after",
+        "during": "runtime",
+        "unit": "02000080",
+        "name": 33562396,
+        "id": 7,
+        "hp": 0,
+        "mp": 85,
+        "ko_suffered": 1,
+        "store_value": 0,
+        "old_class": 2,
+        "registers": [
+          "000001ba",
+          "080a2289",
+          "02000080",
+          "0000001e",
+          "00000000",
+          "00000000",
+          "02000080",
+          "00000002",
+          "0000004c",
+          "020159e4",
+          "020159e4",
+          "00000000",
+          "00000001",
+          "03007934",
+          "080a2289",
+          "080a229a",
+          "8000003f"
+        ]
+      }
+    }
+  ],
+  "interactive_KO_loop_skips": [
+    {
+      "t": 209.5,
+      "pc": "0809e246",
+      "phase": "tail-loop-skip",
+      "during": "runtime",
+      "unit": "02016120",
+      "name": 33562396,
+      "id": 7,
+      "hp": 0,
+      "mp": 85,
+      "ko_suffered": 2,
+      "slot_register": 7,
+      "root": "020159e4",
+      "flags": 0,
+      "caller_lr": "0809f870"
+    }
+  ],
+  "limitations": [
+    "Retained raw captures and Wait ledgers; no fresh replay performed by this audit.",
+    "A candidate does not certify full scheduling, targeting, reload or revival."
+  ],
+  "source_sha256": {
+    "tools/audit_recovery_ko_observations.py": "d5c5584a506e421384d824a4766040a9e4751e6f21b9bf10427f5976632a27d2",
+    "tools/probe_recovery_ko_lifecycle.py": "fc5b0acd88859144804c699b6d29518e54b2182ef2a1563be6804a0f3ed8d0f2",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-engine-ko-04\\research.json": "44ced12ee7ea362039989a6b7d3faa9c24e07882cb0ecc96466964f26a171c0d",
+    "outputs\\autobattle\\a64-engine-ko-04\\ko-observations.jsonl": "546d8634ba347853b095b0bcfbd7a0feee86d6c0761c0bee4ca01c5443083319",
+    "outputs\\autobattle\\a64-engine-ko-04\\events.jsonl": "8c98ea969ce5b3d87e5d55c72003972da36a611a74b806c077e5ab66df3822fa",
+    "outputs\\autobattle\\a64-engine-ko-04\\input-log.jsonl": "d3d811379edbb5aa59fe50c0d8b432285647aa79c891ae655c8eb851d8745e1e"
+  }
+}

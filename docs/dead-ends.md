@@ -635,3 +635,18 @@ CLAUDE.md carries the slogan.
   child in0x100/0x101. Eighteen derived rejection controls retain hard failures
   for invalid identity or an unowned child. The failed first manual attempt
   remains retained; a later source-pinned handoff must pass in one attempt.
+
+### DE-038 — One unhit HP-result helper does not refute an engine KO
+
+- **Tried (A6.4, 2026-10-08):** attributed KO solely through the call to
+  `080A22F0` at `080A487A/080A487E`. In `a64-engine-ko-02`, Marche changed
+  from positive HP to zero and his KO-suffered counter increased while the
+  battle driver continued selecting living actors, but neither hook fired.
+- **Refuted:** that helper is not the observed fixture's sole HP mutation
+  path. The separate HP adjustment function starts at `080A2210`; its store
+  is `080A2298`, followed by `080A229A`. Observe actual canonical writes and
+  restored mirror/counter joins before assigning a cause.
+- **Do not:** interpret a missing hook as absence of KO, or interpret the
+  shared `0809F7B4` prediction helper as interactive actor selection. Record
+  the caller and distinguish `08093018` battle-driver returns. Failed export
+  must retain partial trace data; research now journals each hook separately.

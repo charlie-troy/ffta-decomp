@@ -1,0 +1,8 @@
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 40.81, "duration": 1.414, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:wait-nav-down", "t": 43.449, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 46.1, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 48.741, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 138.441, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "press", "mask": 128, "tag": "c3:wait-nav-down", "t": 141.062, "duration": 1.414, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 143.693, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 146.321, "duration": 1.411, "hits": 5, "aborted": false}

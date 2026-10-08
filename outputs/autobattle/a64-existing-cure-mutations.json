@@ -1,0 +1,237 @@
+{
+  "status": "pass",
+  "run": "outputs/autobattle/a63-public-cure-01",
+  "scope": "Mutate real public ally-Cure artifacts through the full runtime validator.",
+  "rejections": [
+    {
+      "case": "missing public adapter observations",
+      "errors": [
+        "event 3: invalid recovery journal (public ally adapter observations missing)"
+      ]
+    },
+    {
+      "case": "adapter ignores target",
+      "errors": [
+        "event 3: invalid recovery journal (public ally candidate/policy differs)"
+      ]
+    },
+    {
+      "case": "caster heals instead of ally",
+      "errors": [
+        "event 3: invalid recovery journal (party caster boundary differs)"
+      ]
+    },
+    {
+      "case": "target spends MP",
+      "errors": [
+        "event 3: invalid recovery journal (party effect missing)"
+      ]
+    },
+    {
+      "case": "wrong accepted target token",
+      "errors": [
+        "event 3: invalid recovery journal (accepted party target token differs)"
+      ]
+    },
+    {
+      "case": "stale accepted tile",
+      "errors": [
+        "event 3: invalid recovery journal (accepted party target token differs)"
+      ]
+    },
+    {
+      "case": "wrong accepted cost",
+      "errors": [
+        "event 3: invalid recovery journal (accepted party target token differs)"
+      ]
+    },
+    {
+      "case": "stale final policy",
+      "errors": [
+        "event 3: invalid recovery journal (party policy replay differs)"
+      ]
+    },
+    {
+      "case": "changed final caster MP",
+      "errors": [
+        "event 3: invalid recovery journal (party policy actor resources differ)"
+      ]
+    },
+    {
+      "case": "stale Wait resources",
+      "errors": [
+        "event 3: invalid recovery journal (party policy actor resources differ)"
+      ]
+    },
+    {
+      "case": "aliased canonical party",
+      "errors": [
+        "event 3: invalid recovery journal (party fixture pin differs)"
+      ]
+    },
+    {
+      "case": "next actor is allied",
+      "errors": [
+        "event 3: invalid recovery journal (party independent next enemy differs)"
+      ]
+    },
+    {
+      "case": "stale next actor wrapper",
+      "errors": [
+        "event 3: invalid recovery journal (party independent next enemy differs)"
+      ]
+    },
+    {
+      "case": "missing journal",
+      "errors": [
+        "turn event 3: bounded recovery journal missing",
+        "turn event 3: invalid actor-linked result (ally-Cure actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "empty raw journal",
+      "errors": [
+        "event 3: invalid recovery journal (party raw ledger missing or changed)"
+      ]
+    },
+    {
+      "case": "empty raw ledger",
+      "errors": [
+        "event 3: invalid recovery journal (party raw ledger missing or changed)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run"
+      ]
+    },
+    {
+      "case": "truncated raw ledger",
+      "errors": [
+        "event 3: invalid recovery journal (party raw ledger missing or changed)"
+      ]
+    },
+    {
+      "case": "wrong ally target",
+      "errors": [
+        "turn event 3: invalid actor-linked result (ally-Cure actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "wrong ability",
+      "errors": [
+        "turn event 3: invalid actor-linked result (ally-Cure actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "missing ally healing",
+      "errors": [
+        "event 3: invalid recovery journal (party effect missing)"
+      ]
+    },
+    {
+      "case": "no MP spent",
+      "errors": [
+        "event 3: invalid recovery journal (party Wait resources differ)"
+      ]
+    },
+    {
+      "case": "Action remains enabled",
+      "errors": [
+        "event 3: invalid recovery journal (party effect missing)"
+      ]
+    },
+    {
+      "case": "Wait outside facing",
+      "errors": [
+        "event 3: invalid recovery journal (party facing differs)"
+      ]
+    },
+    {
+      "case": "missing Wait final policy",
+      "errors": [
+        "event 3: invalid recovery journal (party final policy missing)"
+      ]
+    },
+    {
+      "case": "coherent duplicate final input",
+      "errors": [
+        "event 3: invalid recovery journal (party final input differs)"
+      ]
+    },
+    {
+      "case": "missing next enemy",
+      "errors": [
+        "turn event 3: invalid actor-linked result (list index out of range)",
+        "event 3: invalid recovery journal (party next actor missing)"
+      ]
+    },
+    {
+      "case": "wrong later side",
+      "errors": [
+        "event 3: invalid recovery journal (party independent next enemy differs)"
+      ]
+    },
+    {
+      "case": "invalid later tile",
+      "errors": [
+        "event 3: invalid recovery journal (party independent next enemy differs)"
+      ]
+    },
+    {
+      "case": "dead continuing actor",
+      "errors": [
+        "event 3: invalid recovery journal (party independent next enemy differs)"
+      ]
+    },
+    {
+      "case": "completed player resources change",
+      "errors": [
+        "turn event 3: invalid actor-linked result (party recovery engine result differs)",
+        "event 3: invalid recovery journal (party effect differs at next enemy)"
+      ]
+    },
+    {
+      "case": "missing restoration",
+      "errors": [
+        "event 3: invalid recovery journal (party trace lifecycle differs)"
+      ]
+    },
+    {
+      "case": "invalid explicit halt",
+      "errors": [
+        "event 3: invalid recovery journal (party halt reply invalid)"
+      ]
+    },
+    {
+      "case": "write after restoration",
+      "errors": [
+        "event 3: invalid recovery journal (party trace lifecycle differs)"
+      ]
+    },
+    {
+      "case": "borrowed owner",
+      "errors": [
+        "turn event 3: invalid actor-linked result (recovery owner disagrees with boundary)",
+        "event 3: invalid recovery journal (party fixture pin differs)"
+      ]
+    },
+    {
+      "case": "wrong chooser target",
+      "errors": [
+        "event 3: invalid recovery journal (party policy replay differs)"
+      ]
+    },
+    {
+      "case": "input owner drift",
+      "errors": [
+        "event 3: invalid recovery journal (party input owner/resources drifted)"
+      ]
+    },
+    {
+      "case": "modal timing excludes writes",
+      "errors": [
+        "event 3: invalid recovery journal (party raw ledger missing or changed)"
+      ]
+    },
+    {
+      "case": "missing raw ledger"
+    }
+  ]
+}

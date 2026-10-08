@@ -1,16 +1,18 @@
 {
   "milestone": "A6.4",
-  "date": "2026-10-07",
+  "date": "2026-10-08",
   "status": "unknown",
   "scope": "Research-only KO/Life target contract; entry depends on A6.3 public acceptance",
   "criteria": [
     {
       "id": "engine-KO-lifecycle",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "a64-engine-ko-04 only: positive HP setup, native store, KO counter, interactive skip and living driver picks"
     },
     {
       "id": "independent-scratch-fixture-reload",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "a64-ko-reload-04 plus a64-life-fixture-01 construction and independent reload; KO target preserved"
     },
     {
       "id": "enabled-Life-and-effective-cost",
@@ -34,16 +36,50 @@
     "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
     "tools/validate_recovery_ko_classifier.py": "a645ee4b82b439e018751c2b4032e2de35539acc965cb17048ffb4c417718d36",
     "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
-    "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812"
+    "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812",
+    "tools/probe_recovery_ko_lifecycle.py": "fc5b0acd88859144804c699b6d29518e54b2182ef2a1563be6804a0f3ed8d0f2",
+    "tools/recovery_ko_trace.py": "280482e50e58dc26f882914b188d3ffd1dd72c3bbbc16564d7988ca6db01979b",
+    "tools/probe_recovery_ko_reload.py": "f3eab2fb48ea32bf30a0fa6083d85d63a0a79f340d49b1c6f7968d051630def5",
+    "tools/audit_recovery_ko_observations.py": "d5c5584a506e421384d824a4766040a9e4751e6f21b9bf10427f5976632a27d2",
+    "tools/validate_recovery_ko_join.py": "0570c6b35e405a0b015c13401298b4450d2b2260b39e7f3cf8625ae00c631262",
+    "tools/validate_recovery_ko_tail.py": "9fc04342d94bee21f96823667dd4f634f1860f9a63adbc7dfe7ace015593c6b6",
+    "tools/build_life_recovery_fixture.py": "389a4f295a45044ccb708ab6ad3dc35b4eb9e325d0521853d84a27026fbb855a",
+    "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f",
+    "tools/probe_recovery_life_menu.py": "8e2ec841413e90a50bbd28f8fb93b87f1acad2f7fe5d33ac7f65dad093b31f7b",
+    "tools/validate_recovery_life_menu.py": "eda08b81d67628bb1d08c0a801a383eb229219876ba86c17de08d58b1a4276e0"
   },
   "evidence_sha256": {
     "outputs/autobattle/a64-ability-metadata.json": "e69a6d90fb4c680d71af08396121748d39b13461347a2359bcac16386038aab6",
-    "outputs/autobattle/a64-ko-classifier.json": "ba393556ff4dfe3a810ec8062d754ba17f7ad2aab48e8074f47f61c91c69058d"
+    "outputs/autobattle/a64-ko-classifier.json": "ba393556ff4dfe3a810ec8062d754ba17f7ad2aab48e8074f47f61c91c69058d",
+    "outputs/autobattle/a64-engine-ko-04/research.json": "44ced12ee7ea362039989a6b7d3faa9c24e07882cb0ecc96466964f26a171c0d",
+    "outputs/autobattle/a64-engine-ko-04/engine-lifecycle.jsonl": "aa9cc2760b61030b3be7249922bcea8bfde2ebe4713ac3c77062926419500045",
+    "outputs/autobattle/a64-engine-ko-04/ko-observations.jsonl": "546d8634ba347853b095b0bcfbd7a0feee86d6c0761c0bee4ca01c5443083319",
+    "outputs/autobattle/a64-engine-ko-04/events.jsonl": "8c98ea969ce5b3d87e5d55c72003972da36a611a74b806c077e5ab66df3822fa",
+    "outputs/autobattle/a64-engine-ko-04/input-log.jsonl": "d3d811379edbb5aa59fe50c0d8b432285647aa79c891ae655c8eb851d8745e1e",
+    "outputs/autobattle/a64-engine-ko-04-audit.json": "dad3688948446bdc8262b01d99c2cf53191da104e47633f33f6410fbbfd11f17",
+    "outputs/autobattle/a64-ko-reload-04/reload.json": "ff68ad42e7037be0d8fe6aa83e59904acb9210e908afc3562665208615c9f2bd",
+    "outputs/autobattle/a64-life-fixture-01/fixture.json": "0e3d4cf5b172d4f3ac5925558b5960b5b96627dc48e91bfed2274cfdd565bcb9",
+    "outputs/autobattle/a64-life-fixture-01/reload/reload.json": "ebfe65d439dedc2873cc2d84b1c131a4ea62ecab4a74257a1c502119bc8b5ed4",
+    "outputs/autobattle/a64-ko-join-guards-04.json": "c33cd4aa7d314798b55a8f4871b3c844f44559c0fd366e5569b8b5f4c0c7c7d1",
+    "outputs/autobattle/a64-ko-tail-reloaded.json": "3ae68655ed052894b139cf744e60cc021da70a1e01fdbab70ad5512ce980982d",
+    "outputs/autobattle/a64-existing-interface-guards.json": "5db4fcf2742bcf2e0f2b0709d06159266ba554a06a40a3c0fd2df4280e0855c6",
+    "outputs/autobattle/a64-existing-living-guards.json": "d8876b486bcc4355bd9ad2481817c97e729f7b2ce466351c797ae65b589b6218",
+    "outputs/autobattle/a64-existing-cure-mutations.json": "50588e2b57b1808b4aedddd84d8c23fe38c98408c308552ecef4e37992dee92d",
+    "outputs/autobattle/a64-Life-frontier.json": "71182a1a77f6d040eb86a21255b630e73ec98db431ebc965acf8c1feb772d54a",
+    "outputs/autobattle/a64-life-menu-02/Life-menu.json": "270563fcfabba54306115660d5c14b68ef3283a6998ef15da9b7f4079ba58393",
+    "outputs/autobattle/a64-life-menu-03/Life-menu.json": "aad39f6c4bc5dbf68134ad3841a32428995030399538ef25a692fca2333ddacb",
+    "outputs/autobattle/a64-life-groups-01/Life-menu.json": "401dac6cf3300b6141b07f08cd2857ae2e68381f0df1c1548b23d20425045f40"
   },
   "observations": [
     "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20.",
     "Actual ROM fragment080A2218..080A225E: eight synthetic cases distinguish HP0 class1, living critical class2 and healthy class3; Petrify critical snapshot changes living classification. Surrounding KO lifecycle remains unknown.",
-    "Read-only effect dispatch uses handler-table stride12: Life raw15/case68; Full-Life raw14/case39. No handler execution or live revival claim."
+    "Read-only effect dispatch uses handler-table stride12: Life raw15/case68; Full-Life raw14/case39. No handler execution or live revival claim.",
+    "Owned run a64-engine-ko-04 writes only positive HP1 to both Marche copies during setup. Native 080A2298/229A changes canonical Marche HP1 to0 at t180.4; his KO-suffered counter increases1 to2. Montblanc remains100HP/221MP.",
+    "Interactive caller0809F870 reaches zero-HP skip0809E246 at t209.5; actual battle-driver08093018 returns living actors after KO. Separate prediction caller0809F7B4 is not counted as interactive proof.",
+    "Fresh KO command reload passes without gameplay/unit writes. Prepared Life fixture ledgers living Montblanc secondary7 and positive HP241 in both copies; genuine KO Marche is preserved byte-for-byte before export. Independent prepared reload passes.",
+    "37 KO join mutations reject; 11 actual-ROM tail/status controls pass. Existing living-party37, public-interface7 and public-Cure38 guard controls pass.",
+    "Enabled Life, accepted target, revival and public integration remain unknown. Caster changed from earlier Cure fixtures; Action-group row IDs require fresh identification.",
+    "Prepared caster Action groups show Fight/Black Magic/Item/Combo, not an enabled White Magic assumption. Group10 opens native Steal IDs163..171; group12 enters a target processor. Availability remains UNKNOWN; next question is action-set mapping/menu reconstruction, not more guessed group IDs."
   ],
   "limitations": [
     "Table metadata is not engine availability, KO semantics, target acceptance or revival proof.",

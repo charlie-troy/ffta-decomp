@@ -1,0 +1,22 @@
+{
+  "status": "unknown-Life-availability",
+  "scope": "Bounded current-caster Action groups; no Life execution or accepted KO target.",
+  "observed_groups": {
+    "12": "Fight",
+    "10": "Black Magic label; native opened-list IDs163..171 are Steal",
+    "1": "Item",
+    "15": "Combo"
+  },
+  "mismatch": "Native group labels/list semantics do not match an enabled White Magic assumption from raw secondary byte7. UI HP100 differs from canonical prepared HP241; cached UI or action-set mapping remains unresolved.",
+  "next_question": "Identify the native action-set mapping and how the engine reconstructs this caster menu; do not guess more group IDs.",
+  "source_sha256": {
+    "tools/probe_recovery_life_menu.py": "8e2ec841413e90a50bbd28f8fb93b87f1acad2f7fe5d33ac7f65dad093b31f7b",
+    "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a64-life-menu-02/Life-menu.json": "270563fcfabba54306115660d5c14b68ef3283a6998ef15da9b7f4079ba58393",
+    "outputs/autobattle/a64-life-menu-03/Life-menu.json": "aad39f6c4bc5dbf68134ad3841a32428995030399538ef25a692fca2333ddacb",
+    "outputs/autobattle/a64-life-groups-01/Life-menu.json": "401dac6cf3300b6141b07f08cd2857ae2e68381f0df1c1548b23d20425045f40",
+    "outputs/autobattle/a64-life-groups-01/action-groups.png": "1892d7cbc30f71a77918507981e76a1153a5216ba71d062e55c4a6c0a19ad50a"
+  }
+}

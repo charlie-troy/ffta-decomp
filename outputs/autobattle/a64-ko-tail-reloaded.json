@@ -1,0 +1,168 @@
+{
+  "status": "pass-bounded-ROM-tail",
+  "scope": "Execute retail zero-HP accessors and turn-tail branches; bounded ROM proof.\n\nSynthetic controls distinguish status bits from HP and pending tail flags.\nOptional captured canonical unit bytes are read without editing the capture.\nThis does not certify live scheduling, Life targeting or a reusable KO fixture.\n",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "source_sha256": {
+    "tools/validate_recovery_ko_tail.py": "9fc04342d94bee21f96823667dd4f634f1860f9a63adbc7dfe7ace015593c6b6",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812"
+  },
+  "cases": [
+    {
+      "name": "living",
+      "hp": 100,
+      "zero_hp": 0,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e1f8",
+      "branch": "living-loop"
+    },
+    {
+      "name": "KO",
+      "hp": 0,
+      "zero_hp": 1,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e246",
+      "branch": "zero-HP-skip"
+    },
+    {
+      "name": "living-Petrify",
+      "hp": 100,
+      "zero_hp": 0,
+      "battle_zombie": 0,
+      "petrify": 1,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e1f8",
+      "branch": "living-loop"
+    },
+    {
+      "name": "KO-Petrify",
+      "hp": 0,
+      "zero_hp": 1,
+      "battle_zombie": 0,
+      "petrify": 1,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e246",
+      "branch": "zero-HP-skip"
+    },
+    {
+      "name": "living-Auto-Life",
+      "hp": 100,
+      "zero_hp": 0,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 1,
+      "pending_flags": 0,
+      "destination": "0809e1f8",
+      "branch": "living-loop"
+    },
+    {
+      "name": "KO-Auto-Life",
+      "hp": 0,
+      "zero_hp": 1,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 1,
+      "pending_flags": 0,
+      "destination": "0809e246",
+      "branch": "zero-HP-skip"
+    },
+    {
+      "name": "living-Zombie",
+      "hp": 100,
+      "zero_hp": 0,
+      "battle_zombie": 1,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e1f8",
+      "branch": "living-loop"
+    },
+    {
+      "name": "KO-Zombie",
+      "hp": 0,
+      "zero_hp": 1,
+      "battle_zombie": 1,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e246",
+      "branch": "zero-HP-skip"
+    },
+    {
+      "name": "KO-persistent-Zombie",
+      "hp": 0,
+      "zero_hp": 1,
+      "battle_zombie": 1,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e246",
+      "branch": "zero-HP-skip"
+    },
+    {
+      "name": "KO-pending-tail",
+      "hp": 0,
+      "zero_hp": 1,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 8192,
+      "destination": "0809e81e",
+      "branch": "pending-tail-return"
+    },
+    {
+      "name": "living-pending-tail",
+      "hp": 100,
+      "zero_hp": 0,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 8192,
+      "destination": "0809e1f8",
+      "branch": "living-loop"
+    }
+  ],
+  "capture": "outputs/autobattle/a64-ko-reload-04/02000080.bin",
+  "capture_sha256": "9ec1ff6cef96f08d36615b69e4a219f9ed214ff86b33874e6159d01b228e9475",
+  "captured_units": [
+    {
+      "canonical": "02000080",
+      "id": 7,
+      "hp": 0,
+      "unit_sha256": "ee216391a919d00db97774d259e97c30bc0551c8ca68f7a02d09e6a3dd9869b0",
+      "zero_hp": 1,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e246",
+      "branch": "zero-HP-skip"
+    },
+    {
+      "canonical": "02000188",
+      "id": 5,
+      "hp": 100,
+      "unit_sha256": "20cf8105f0a4e00b3edcd34dbf773a6833dcbdc8fd7580eddd47d103f08e9e47",
+      "zero_hp": 0,
+      "battle_zombie": 0,
+      "petrify": 0,
+      "auto_life": 0,
+      "pending_flags": 0,
+      "destination": "0809e1f8",
+      "branch": "living-loop"
+    }
+  ],
+  "limitations": [
+    "This fragment begins after Zombie countdown and pending-flag construction.",
+    "Pending 0x2000 is a conditional tail branch, not a complete revival claim.",
+    "No fresh live scheduling, accepted Life target or reusable fixture proof."
+  ]
+}
