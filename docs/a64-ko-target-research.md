@@ -135,3 +135,9 @@ and independently reloading before observing the enabled list. These are
 synthetic helper executions, not a live corrected fixture. The prior Steal
 list/visual Black Magic discrepancy and rendered HP mismatch remain unresolved.
 No Life availability, targeting or revival criterion is promoted.
+
+The same retained caster has primary ability-set `+0x35=10`, while native
+`080C8570(base5,active5,0x0C)` returns24. The replay now asserts and records
+that disagreement too. Reconstruct both ability-state fields from native
+properties in the next disposable fixture experiment; changing secondary
+state alone cannot resolve the primary-list/visual mismatch.

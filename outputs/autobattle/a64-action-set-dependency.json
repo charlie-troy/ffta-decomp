@@ -102,6 +102,10 @@
       ]
     }
   ],
+  "primary_ability_state": {
+    "captured_plus35": 10,
+    "native_job_property0c": 24
+  },
   "Life_entry": {
     "index": 62,
     "global_id": 5
@@ -113,7 +117,7 @@
     "No enabled Life, target acceptance or revival claim."
   ],
   "source_sha256": {
-    "tools/validate_recovery_action_set.py": "0c6495040fa4f4607c00ddd7b62c7f04d533b4aaaade1e5e729a4329fee79655",
+    "tools/validate_recovery_action_set.py": "19f09bd1e9b926a2766f2e6c9f3eae13a9c9acb826cf92b4946485586056fbd9",
     "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
     "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19"
   },

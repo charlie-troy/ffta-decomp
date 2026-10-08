@@ -47,7 +47,7 @@
     "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f",
     "tools/probe_recovery_life_menu.py": "8e2ec841413e90a50bbd28f8fb93b87f1acad2f7fe5d33ac7f65dad093b31f7b",
     "tools/validate_recovery_life_menu.py": "eda08b81d67628bb1d08c0a801a383eb229219876ba86c17de08d58b1a4276e0",
-    "tools/validate_recovery_action_set.py": "0c6495040fa4f4607c00ddd7b62c7f04d533b4aaaade1e5e729a4329fee79655"
+    "tools/validate_recovery_action_set.py": "19f09bd1e9b926a2766f2e6c9f3eae13a9c9acb826cf92b4946485586056fbd9"
   },
   "evidence_sha256": {
     "outputs/autobattle/a64-ability-metadata.json": "e69a6d90fb4c680d71af08396121748d39b13461347a2359bcac16386038aab6",
@@ -70,7 +70,7 @@
     "outputs/autobattle/a64-life-menu-02/Life-menu.json": "270563fcfabba54306115660d5c14b68ef3283a6998ef15da9b7f4079ba58393",
     "outputs/autobattle/a64-life-menu-03/Life-menu.json": "aad39f6c4bc5dbf68134ad3841a32428995030399538ef25a692fca2333ddacb",
     "outputs/autobattle/a64-life-groups-01/Life-menu.json": "401dac6cf3300b6141b07f08cd2857ae2e68381f0df1c1548b23d20425045f40",
-    "outputs/autobattle/a64-action-set-dependency.json": "5999fac540421543d4e71e610dadf10da561382b33a7d059a279b96e1f786b74"
+    "outputs/autobattle/a64-action-set-dependency.json": "ded3e5626473dfeee5b79fd265da39ef710af3dbb3b7b73173ce19c97aa6957e"
   },
   "observations": [
     "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20.",

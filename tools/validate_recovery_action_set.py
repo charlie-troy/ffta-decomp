@@ -33,6 +33,9 @@ def main():
     assert original[0x104] == doc['owner']['id'] == 5
     assert original[6:9] == bytes((1, 5, 7)) and original[0x36] == 1
     gba = Gba(args.rom)
+    primary_property = gba.call(0x080C8570, [original[5], original[7], 0x0C])
+    assert gba.uc.reg_read(UC_ARM_REG_PC) == STOP and primary_property == 24
+    assert original[0x35] == 10
     property_value = gba.call(0x080C8570, [7, 7, 0x0C])
     assert gba.uc.reg_read(UC_ARM_REG_PC) == STOP and property_value == 9
     observations = []
@@ -68,6 +71,8 @@ def main():
     result = {'status': 'pass-synthetic-secondary-action-set-dependency',
         'scope': __doc__, 'helper': '080cce60', 'property_accessor': '080c8570',
         'secondary_job_property_0c': property_value, 'observations': observations,
+        'primary_ability_state': {'captured_plus35': original[0x35],
+                                 'native_job_property0c': primary_property},
         'Life_entry': {'index': 62, 'global_id': 5},
         'next': 'Prepare disposable canonical and mirror +0x36 using the native property; independently reload and observe the live menu before claiming availability.',
         'limitations': ['Synthetic unit mutation under Unicorn only; no new live inputs.',
