@@ -1,0 +1,33 @@
+{
+  "status": "pass-live-refusal",
+  "stage": "Life-final",
+  "input_presses": 13,
+  "final_Life_attempted": false,
+  "final_Wait_attempted": false,
+  "post_STOP_writes": 0,
+  "scope": "Audit live research STOP/reserve refusals and reject post-terminal input.",
+  "rejected": [
+    "status",
+    "inputs_unchanged",
+    "fixture_writes",
+    "raw_writes",
+    "gameplay_writes",
+    "Wait_final_attempted",
+    "error",
+    "post-terminal-input",
+    "source-hash",
+    "missing-source-closure",
+    "coherent-extra-final-pulse",
+    "missing-STOP",
+    "wrong-terminal-count"
+  ],
+  "source_sha256": {
+    "tools/audit_recovery_life_refusal.py": "63d6bc7e56f30e0afaeb1ada7b1dcd0b0421409948a4e7f365fd571d3ecb7087"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-life-STOP-final-01\\Life-overlay.json": "5d7e9b1a9b3b1efa500a5905b3e9a7f6c444a9d9a26bbb97efcb0f61ce9b1135"
+  },
+  "limitations": [
+    "Audits captured live refusal; not a new run."
+  ]
+}

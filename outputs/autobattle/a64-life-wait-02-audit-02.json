@@ -1,0 +1,52 @@
+{
+  "status": "pass-retained-Life-Wait-continuation",
+  "pid": 82784,
+  "target_hp": [
+    0,
+    221
+  ],
+  "caster_mp": [
+    221,
+    211
+  ],
+  "next_actor": 4,
+  "input_presses": 18,
+  "source_versions": [
+    "HEAD",
+    "6ab4e70"
+  ],
+  "scope": "Audit retained bounded Life/Wait runs against raw RAM, inputs and policy.\n\nRetained replay is not a new emulator run. Historical source versions must be\navailable locally or in an explicitly supplied Git ref with identical bytes.\n",
+  "rejected": [
+    "status",
+    "inputs_unchanged",
+    "fixture_writes",
+    "raw_writes",
+    "final_confirmation",
+    "Wait_final_attempted",
+    "life_engine_hits",
+    "life_engine_errors",
+    "empty-policy",
+    "missing-final-policy",
+    "duplicate-final",
+    "missing-Wait-policy",
+    "extra-input",
+    "altered-input",
+    "lost-input",
+    "effect-HP",
+    "unjoined-next-actor",
+    "source-hash",
+    "missing-source-closure",
+    "capture-hash",
+    "duplicate-navigation",
+    "wrong-navigation-action"
+  ],
+  "source_sha256": {
+    "tools/audit_recovery_life_run.py": "85c595809c2d655375f1ea65fb0ce8eb4622fb9e9dfa7c4b7fd73d8557cde99c"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-life-wait-02\\Life-overlay.json": "71a191b71a2a9aea03eb009699b5fdd9e1fa12425b3902e63fb79126144adc58"
+  },
+  "limitations": [
+    "Retained audit, not a new live run."
+  ]
+}

@@ -45,8 +45,12 @@ def main():
     ap.add_argument('--policy', default='configs/tactics/healer.json')
     ap.add_argument('--inspect-Wait', action='store_true',help='After Life, select enabled Wait; stop at facing')
     ap.add_argument('--execute-Wait', action='store_true',help='After Life, confirm one owned Wait and observe next actor')
+    ap.add_argument('--stop-at-stage',choices=('navigation','Life-final','Wait-final'),
+                    help='Drop the real STOP file at a named research boundary')
+    ap.add_argument('--expect-reserve-refusal',action='store_true',help='Capture a policy refusal as the intended result')
     args = ap.parse_args()
     require(not (args.inspect_Wait or args.execute_Wait) or args.execute_Life,'Wait requires the single Life cast')
+    require(args.stop_at_stage!='Wait-final' or args.execute_Wait,'Wait STOP requires explicit Wait execution')
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=False)
     sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -79,7 +83,15 @@ def main():
                 result['party'] = party
                 menu = ResearchMenuList(g, rom, owner, caster['canonical'])
                 overlay_reader = LifeOverlayReader(g, menu, party, units)
+                def drop_stop(stage):
+                    if args.stop_at_stage==stage:
+                        (out/'STOP').write_text(stage+'\n',encoding='utf-8')
+                        result['STOP_injected']={'stage':stage,'t':probe.now(),
+                            'input_write_count':len(probe.key_write_log)}
                 def stopped():
+                    if (out/'STOP').exists():
+                        result.setdefault('STOP_observed',{'t':probe.now(),
+                            'input_write_count':len(probe.key_write_log)})
                     require(not (out/'STOP').exists(), 'STOP observed; Life research input forbidden')
                     return False
                 def observe(kind):
@@ -100,6 +112,7 @@ def main():
                     hits = transport.press(mask, tag='a64-Life-overlay-list', stop_check=stopped)
                     require(hits == 5, 'Life list input incomplete')
                     result['navigation'].append({'mask': mask, 'hits': hits, 'before': token.receipt()})
+                    if len(result['navigation'])==1:drop_stop('navigation')
                 def select(kind, value, ability=False):
                     for _ in range(34):
                         token = observe(kind)
@@ -225,7 +238,8 @@ def main():
                             result['policy_snapshot'] = overlay_reader.policy_snapshot(token)
                             result['policy_evaluation'] = evaluate(result['policy_snapshot'],policy)
                             if args.execute_Life:
-                                gate = LifeFinalGate(overlay_reader,transport,policy,stop_check=stopped)
+                                gate = LifeFinalGate(overlay_reader,transport,policy,stop_check=stopped,
+                                    before_final=lambda:drop_stop('Life-final'))
                                 result['final_gate_events'] = gate.events
                                 try:
                                     result['final_delivery'] = gate.commit(token)
@@ -327,6 +341,7 @@ def main():
                                                   else exact(g,address,32))
                                             pins.append(p|{'name_sha256':hashlib.sha256(name).hexdigest()})
                                         result['Wait_events']=boundary.events
+                                        drop_stop('Wait-final')
                                         try:
                                             result['Wait_delivery']=boundary.commit(facing,transport,policy,stopped)
                                         finally:result['Wait_final_attempted']=boundary.final_attempted
@@ -357,7 +372,14 @@ def main():
                             'captured-Life-KO-cursor-only' if args.move_to_KO else 'captured-Life-overlay-only')
     except BaseException as exc:
         result['error'] = repr(exc)
-        raise
+        if result.get('STOP_observed') and 'STOP observed;' in str(exc):
+            require(len(probe.key_write_log)==result['STOP_observed']['input_write_count'],
+                    'input was written after STOP')
+            result['status']='observed-STOP-refusal'
+        elif (args.expect_reserve_refusal and str(exc)=='policy declined Life; no final input'
+              and not result['final_confirmation']):
+            result['status']='observed-policy-reserve-refusal'
+        else:raise
     finally:
         if probe is not None:
             result.update(gameplay_writes=getattr(probe, 'key_write_log', []), fixture_writes=probe.s.writes,

@@ -191,3 +191,23 @@ controls. Facing01 is host-reader evidence only: effect source was edited while
 it ran, so inputs_unchanged=false explicitly excludes fresh acceptance. Next:
 two source-stable Life/Wait/independent next-actor runs, live STOP and reserve
 refusals, and a receipt validator. Production Cure/living-only readers unchanged.
+
+## Bounded research acceptance (2026-10-08)
+
+A6.4 is PASS for its exact corrected eight-unit fixture. Fresh wait02/wait03
+use different owned PIDs82784/81720, preserve source files and original inputs,
+revive Marche0->221 with MontblancMP221->211/native growth, then one guarded
+Wait and next Carson4 canonical/wrapper/restored-roster/own-cursor join.
+Native Life ORs0x20 into result flags; the verifier checks preservation of
+other bits, including observed0x80->0xA0. Full retained auditors reject22
+mutations per run, including missing source closure, duplicate navigation,
+policy/input/effect/next-actor tampering. Historical wait02 sources resolve
+exactly at6ab4e70; these audits replay retained evidence rather than fresh play.
+
+STOP navigation01, final01 and Wait01 each halt the actual research transport
+with zero post-STOP writes; reserve01 rejects configured212 against actual
+remaining211 before final Life. Their auditors reject13/13/13/12 mutations,
+including a coherent added post-terminal pulse. Existing living37/interface7/
+public-Cure38 guard suites pass again. Binary captures remain local; compact
+source/input/engine metadata is committed. Public revival is a separate A6.5
+packet requiring public runner integration and fresh lifecycle acceptance.

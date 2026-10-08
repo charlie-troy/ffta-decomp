@@ -1,5 +1,18 @@
 # Project log
 
+## 2026-10-08 - A6.4 bounded Life research passes
+
+All six A6.4 research criteria now pass in the corrected eight-unit fixture.
+Independent wait02/wait03 owned reloads each deliver one policy-gated Life,
+attribute MarcheHP0->221 and MontblancMP221->211 plus native level40->41,
+then guard one Wait and independently join next enemyCarson4. Full retained
+run auditors reject22 mutations each. Live STOP navigation/Life-final/Wait-final
+refusals and reserve212 versus remaining211 pass; refusal auditors reject
+13/13/13/12 mutations. Existing living37/interface7/public-Cure38 pass again.
+Research PASS does not integrate public revival. Next A6.5 must reuse accepted
+readers and public schema2 policy, lifecycle/STOP/resume, raw receipt validation
+and regression gates. Public revive, Full-Life and items remain UNKNOWN.
+
 ## 2026-10-08 - Life target acceptance and attributed revival research
 
 A6.4 canonical KO target criterion passes in the selected preview/Do it fixture.

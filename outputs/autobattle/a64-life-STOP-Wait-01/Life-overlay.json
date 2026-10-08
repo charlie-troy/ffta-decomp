@@ -1,0 +1,3568 @@
+{
+  "status": "observed-STOP-refusal",
+  "scope": "Guarded Life research stages, with an explicit single-cast opt-in.\n\nIndependent research path. No final-confirmation, targeting-legality or revival\nauthority follows from capturing bytes alone. Final cast input requires the\nseparate single-attempt target/policy gate; existing Cure readers are unchanged.\n",
+  "source_sha256": {
+    "outputs/autobattle/a64-life-fixture-02/life-recovery.ss0": "925017c918bb1eadf3bace27024c7d5e5bfaf985738080c0f1c7bc5d6e637063",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/ability_table.py": "9ec959131119d9d4cdd491e3cbbdfdecf7778f0f6634572df02458f079e01f41",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/autobattle_runtime.py": "14bc87935095c2a60bc2c396127a19fa45157a0df567b20983056923297bff67",
+    "tools/build_recovery_fixture.py": "3dd32d1e2379641b3f4c73f99e276edf30debd23b254e8be2b9c557c2017eb13",
+    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
+    "tools/ffta_text.py": "3f03a83eb15407816a0bdb7bda4a09cfa86517f6fb46a879e6f5696a30f32f27",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/party_recovery_runtime.py": "b4496209770115ea5628cd68ef3d0eee1c5ffccea2d50969b6808013b30b27c3",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/probe_recovery_ko_lifecycle.py": "fc5b0acd88859144804c699b6d29518e54b2182ef2a1563be6804a0f3ed8d0f2",
+    "tools/probe_recovery_life_overlay.py": "0e4d363202a3ff824d6f66cdf1ce42c35d5ede8ad5ddfa17bd115f839726bc37",
+    "tools/probe_recovery_party.py": "ff08f4a42968d45afd45d1dc7c77eec87e2434c4cb51a964739135409c2fc7a5",
+    "tools/recovery_ally_confirmation.py": "fe670132d75754a892c2ad926ed39137f0bb061cf0af27250e18c41329c6bf7f",
+    "tools/recovery_ally_executor.py": "8b0e1aac7eb7505cc475c871244e6179b0c0a5f69800a72e293bf35789e313c4",
+    "tools/recovery_ally_preview.py": "f1d77ae16b908306bec1d74596f8cca679c434bdbcb31ae858f61a6b6270a95f",
+    "tools/recovery_ally_target.py": "3221800edce967464be71815facb3085233dd6a7a541da7b22cb859c06696a2e",
+    "tools/recovery_continuation.py": "2063b48329e8953ec32d25f11dda48c79a0ed0d58e2c24af0c60d68fdfcb0216",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_ko_trace.py": "280482e50e58dc26f882914b188d3ffd1dd72c3bbbc16564d7988ca6db01979b",
+    "tools/recovery_life_effect.py": "8dcb15bde6f7feddbe2bae9f7c62644eb58fff0c8b3f0f090b4c9935dfccfddb",
+    "tools/recovery_life_final.py": "af92b61866df173e127d25428e751da0ec4b67651d8eb5f5e19af1a7b74336a1",
+    "tools/recovery_life_target.py": "60c8bd54e6a64095393786638edacdd396ee4928cf6f4fa774145c52d9aa3766",
+    "tools/recovery_life_trace.py": "61f0b6ecbf3603d7dd28b3e4aba0905dfe03b6ba4e66cc75b9230807a4073ab6",
+    "tools/recovery_life_wait.py": "588f9367f658b759b12e606d80b53d9f3c51c2a2816725de0c9fdcc912334214",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f",
+    "tools/recovery_party.py": "06d1df0dc323b71191ce2b36bba02c1be04bef26ccf6ed053c26171d3d828a95",
+    "tools/recovery_party_continuation.py": "e3ba10612af1207b9873af8d45c826085ccf98acc736c9f00643bd9e5f9ab4f9",
+    "tools/recovery_runtime.py": "53ed22a50d7bb451733ce818cd37534516f638485ea5e60da74c0675a930a640",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220"
+  },
+  "raw_writes": [
+    {
+      "event": "key_write",
+      "t": 12.104,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.157,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.21,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.263,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 12.315,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.573,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.626,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.678,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.73,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 13.782,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.059,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.111,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.165,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.217,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 15.269,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 16.559,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 16.611,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 16.663,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 16.715,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 16.767,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 18.028,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 18.082,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 18.135,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 18.187,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 18.239,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.496,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.549,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.601,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.655,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 19.707,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 20.977,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 21.03,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 21.081,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 21.133,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 21.186,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.456,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.509,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.562,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.614,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 22.667,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 23.926,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 23.978,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.031,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.084,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 24.136,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 25.397,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 25.45,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 25.503,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 25.555,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 25.607,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 28.958,
+      "val": 32,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 29.009,
+      "val": 32,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 29.062,
+      "val": 32,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 29.116,
+      "val": 32,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 29.169,
+      "val": 32,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 32.023,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 32.076,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 32.128,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 32.18,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 32.234,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 35.59,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 35.641,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 35.694,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 35.746,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 35.798,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 39.141,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 39.193,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 39.245,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 39.297,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 39.35,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 53.45,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 53.503,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 53.554,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 53.607,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 53.659,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 54.918,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 54.971,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 55.023,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 55.076,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 55.129,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 56.388,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 56.44,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 56.492,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 56.544,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "event": "key_write",
+      "t": 56.597,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    }
+  ],
+  "navigation": [
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 4,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "29f3623d293dbe122341c8a0fa892e2056542b48e026550a14a9a2d3c8fe3167"
+      }
+    },
+    {
+      "mask": 1,
+      "hits": 5,
+      "before": {
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 4,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "4b5449a15c8105b387a73faf48d34e5904c4807c5223dd1eab5587946c6c9389"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          24,
+          9,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 5,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742556,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "0178a90562276807c4a9752f6beefb5b24fa206a42291c90aed69f32f829fd08"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          24,
+          9,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 5,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742556,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "ed1bf540c636416f4fa11736b0486fc446fc786decf699d94d3459e5c93dd192"
+      }
+    },
+    {
+      "mask": 1,
+      "hits": 5,
+      "before": {
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          24,
+          9,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 5,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742556,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "ebe8413e58d74f49ce55eb4c579a5e5e74b226e97eb927f29974e13d9edacbdf"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "ability-list",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 7,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "847e47ecf6d22a91170a1b64c1bc1795f2e9930b0b05c939a1a1342e494c41cb"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "ability-list",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 7,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "eab0bd486ad8f18d118c86de90299b21d56ca5afab08fba511025f8af1d7c4e7"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "ability-list",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 7,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "c01e0245eadc31b5bf5d89ab5fb41ca6c9acb59444741f07e45b6f7a32ab7679"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "ability-list",
+        "cursor": 3,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 7,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "ad7f5faa9385ffe7240ea8d1aaeae70bb6fd137e441258dc04fe6cd224e139c7"
+      }
+    },
+    {
+      "mask": 1,
+      "hits": 5,
+      "before": {
+        "state": "ability-list",
+        "cursor": 4,
+        "scroll": 0,
+        "rows": [
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "hp": 241,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 7,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "decision_sha256": "903dcb511a44921b1cd910417db6f4ac5c2da1436cb74869302bfa56636222b3"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 211,
+        "member": 33554824,
+        "mode": 4,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "0a4c0236734923a13397ea6176867b78fd08d9ea83851f50e357dede1f5e15b2",
+        "decision_sha256": "6f8274019c5b8ca01c141c03fbc2e0443db21227d87e1ce79be5ae9df53f41f7"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 211,
+        "member": 33554824,
+        "mode": 4,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "0a4c0236734923a13397ea6176867b78fd08d9ea83851f50e357dede1f5e15b2",
+        "decision_sha256": "05f396f27bcbee69a501e60ab1bab71c9f98a3af8d88f69cbfe79cf91c838361"
+      }
+    },
+    {
+      "mask": 1,
+      "hits": 5,
+      "before": {
+        "state": "command",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          0,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 241,
+        "mp": 211,
+        "member": 33554824,
+        "mode": 4,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "0a4c0236734923a13397ea6176867b78fd08d9ea83851f50e357dede1f5e15b2",
+        "decision_sha256": "3ae554e68ed8ce9071d2cdc4a58f59d41caceb4fd2c2d26f4f1749e58c84abf5"
+      }
+    }
+  ],
+  "phases": [
+    {
+      "tag": "overlay-first",
+      "context": 33740960,
+      "mode": 7,
+      "selection": 5,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 3,
+      "active_callback": 0,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 10,
+      "target_flags": 0,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "cursor": [
+        5,
+        10
+      ],
+      "acceptance_xy": [
+        5,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "overlay-second",
+      "context": 33740960,
+      "mode": 7,
+      "selection": 5,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 3,
+      "active_callback": 0,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 10,
+      "target_flags": 0,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "cursor": [
+        5,
+        10
+      ],
+      "acceptance_xy": [
+        5,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "KO-cursor-first",
+      "context": 33740960,
+      "mode": 7,
+      "selection": 5,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 3,
+      "active_callback": 0,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 10,
+      "target_flags": 0,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "cursor": [
+        4,
+        10
+      ],
+      "acceptance_xy": [
+        4,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "KO-cursor-second",
+      "context": 33740960,
+      "mode": 7,
+      "selection": 5,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134385121,
+      "controller_state": 3,
+      "active_callback": 0,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 10,
+      "target_flags": 0,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "cursor": [
+        4,
+        10
+      ],
+      "acceptance_xy": [
+        4,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "selected-first",
+      "context": 33740960,
+      "mode": 12,
+      "selection": 0,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134386057,
+      "controller_state": 258,
+      "active_callback": 33742168,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 10,
+      "target_flags": 108,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "cursor": [
+        4,
+        10
+      ],
+      "acceptance_xy": [
+        4,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "selected-second",
+      "context": 33740960,
+      "mode": 12,
+      "selection": 0,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134386057,
+      "controller_state": 258,
+      "active_callback": 33742168,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 10,
+      "target_flags": 108,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        0,
+        0
+      ],
+      "cursor": [
+        4,
+        10
+      ],
+      "acceptance_xy": [
+        4,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "final-prompt-first",
+      "context": 33740960,
+      "mode": 11,
+      "selection": 0,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134386653,
+      "controller_state": 258,
+      "active_callback": 33742168,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 2,
+      "target_flags": 32,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        33695500,
+        0
+      ],
+      "cursor": [
+        4,
+        10
+      ],
+      "acceptance_xy": [
+        4,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    },
+    {
+      "tag": "final-prompt-second",
+      "context": 33740960,
+      "mode": 11,
+      "selection": 0,
+      "selected_ability": 5,
+      "member": 33554824,
+      "peer": 33554824,
+      "callback": 33742168,
+      "handler": 134386653,
+      "controller_state": 258,
+      "active_callback": 33742168,
+      "driver_state": 49,
+      "processor": 33642980,
+      "processor_actor": 33695500,
+      "processor_ability": 5,
+      "target_state": 2,
+      "target_flags": 32,
+      "index": 0,
+      "count": 1,
+      "selected_copies": [
+        33695500,
+        0
+      ],
+      "cursor": [
+        4,
+        10
+      ],
+      "acceptance_xy": [
+        4,
+        10
+      ],
+      "wrappers": [
+        {
+          "wrapper": 33695356,
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 0,
+          "mp": 85,
+          "side_flags": 129,
+          "tile": [
+            4,
+            10
+          ]
+        }
+      ]
+    }
+  ],
+  "target_acceptance": true,
+  "final_confirmation": true,
+  "policy_document": {
+    "schema": "ffta-tactics-policy/2",
+    "fallback": "wait",
+    "observation": {
+      "max_age_seconds": 3.0
+    },
+    "assignments": {
+      "party": {
+        "player": {
+          "rules": [
+            {
+              "id": "revive-before-attack",
+              "when": {
+                "kind": "ability",
+                "ability_name": "Life",
+                "relation": "ally",
+                "target_hp": {
+                  "eq": 0
+                },
+                "remaining_mp_after_cost": {
+                  "gte": 8
+                }
+              },
+              "select": "first",
+              "note": "a KO'd ally is exactly HP 0; the absolute predicate is used because a percent floors a 1-HP high-max ally to 0 too"
+            },
+            {
+              "id": "heal-wounded-ally",
+              "when": {
+                "kind": "ability",
+                "ability_name": "Cure",
+                "relation": "ally",
+                "target_hp": {
+                  "gt": 0
+                },
+                "target_hp_pct": {
+                  "lte": 50
+                },
+                "remaining_mp_after_cost": {
+                  "gte": 8
+                }
+              },
+              "select": "lowest-target-hp",
+              "note": "heal the weakest wounded ally; the MP predicate is the reserve that keeps at least 8 MP after the cast"
+            },
+            {
+              "id": "heal-self",
+              "when": {
+                "kind": "ability",
+                "ability_name": "Cure",
+                "relation": "self",
+                "target_hp": {
+                  "gt": 0
+                },
+                "actor_hp_pct": {
+                  "lte": 40
+                },
+                "remaining_mp_after_cost": {
+                  "gte": 8
+                }
+              },
+              "select": "first",
+              "note": "self-heal below 40% while still holding the MP reserve"
+            },
+            {
+              "id": "pressure-enemy",
+              "when": {
+                "relation": "enemy"
+              },
+              "select": "lowest-target-hp",
+              "note": "otherwise take the engine-offered action on the weakest enemy"
+            },
+            {
+              "id": "use-potion-last-resort",
+              "enabled": false,
+              "when": {
+                "kind": "item",
+                "item_name": "Potion",
+                "item_count": {
+                  "gte": 1
+                }
+              },
+              "select": "first",
+              "note": "never-use-item by default: consumables are disabled, so this rule stays disabled and the party consumes nothing"
+            }
+          ],
+          "note": "Healer preset for every player-side actor without its own character assignment. Ordered revive -> heal ally -> heal self -> attack; every choice still comes only from the engine-legal candidates the adapter supplies."
+        }
+      }
+    },
+    "note": "A6 resource/recovery preset. Consumables stay disabled (no `consumables` flag), so the item rule cannot fire; the MP reserve is the remaining_mp_after_cost predicate. A learned heal is never a candidate by itself -- the engine must offer it."
+  },
+  "pid": 84452,
+  "owner": {
+    "slot": 5,
+    "addr": "02015f10",
+    "name": 139793095,
+    "side_raw": 129,
+    "ct": 0,
+    "ea": 0,
+    "id": 5,
+    "type": 8,
+    "base_job": 5,
+    "race": 1,
+    "job": 5,
+    "level": 40,
+    "hp": 241,
+    "max_hp": 241,
+    "mp": 221,
+    "max_mp": 221,
+    "is_rom_name": true,
+    "is_ram_name": false,
+    "name_text": "Montblanc",
+    "side_bit": false,
+    "unaffiliated": false,
+    "live": true,
+    "x": 5,
+    "y": 10
+  },
+  "party": [
+    {
+      "canonical": 33554824,
+      "id": 5,
+      "name": 139793095,
+      "name_text": "Montblanc",
+      "slot": 5,
+      "hp": 241,
+      "max_hp": 241,
+      "mp": 221,
+      "max_mp": 221,
+      "tile": [
+        5,
+        10
+      ],
+      "statuses": {
+        "auto_life": false,
+        "petrify": false,
+        "zombie": false,
+        "persistent_zombie": false
+      },
+      "side_flags": 129,
+      "ko_inflicted": 32,
+      "ko_suffered": 0,
+      "canonical_ct": 1000,
+      "mirror_ct": 0,
+      "canonical_speed": 146,
+      "mirror_speed": 146,
+      "canonical_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+      "mirror_sha256": "1200427ee63cecea784e8339554a9325cbf6a7cd55800b2cdee890066f1a925a"
+    },
+    {
+      "canonical": 33554560,
+      "id": 7,
+      "name": 33562396,
+      "name_text": "Marche",
+      "slot": 7,
+      "hp": 0,
+      "max_hp": 442,
+      "mp": 85,
+      "max_mp": 85,
+      "tile": [
+        4,
+        10
+      ],
+      "statuses": {
+        "auto_life": false,
+        "petrify": false,
+        "zombie": false,
+        "persistent_zombie": false
+      },
+      "side_flags": 129,
+      "ko_inflicted": 154,
+      "ko_suffered": 2,
+      "canonical_ct": 0,
+      "mirror_ct": 142,
+      "canonical_speed": 155,
+      "mirror_speed": 155,
+      "canonical_sha256": "ee216391a919d00db97774d259e97c30bc0551c8ca68f7a02d09e6a3dd9869b0",
+      "mirror_sha256": "80d79bdeb12fb692c8a446f04ab062b2db9950c8e9baff6cfbc1e5f066f8e58d"
+    }
+  ],
+  "capture_sha256": {
+    "overlay-first-ewram.bin": "a205335a7d2402637ba773749329fa33bffdd99ae2578b837c107595034e7400",
+    "overlay-second-ewram.bin": "f66b1cde4e542b67b7f2a9e08a37e7fd7b444fdb81ed2b07b850f9665ae291c0",
+    "KO-cursor-first-ewram.bin": "ddaf40174775aff93c8cb1c5b44139e666a7230838576895fd3b7c84ba22bfb7",
+    "KO-cursor-second-ewram.bin": "3dd0489c087f56f0ab58fd197d71ee3bc1a67319610bef36c330cc2581b87cf7",
+    "selected-first-ewram.bin": "7e58950e9b4f14b6464340bf7b0ee7a9a70c5219c3abc3beff9a200c39618f5d",
+    "selected-second-ewram.bin": "be809600790b975172e49652796aeacc7a08dbd8232f345ee0670c981e4fd50e",
+    "final-prompt-first-ewram.bin": "a6c908a2b53104a25c0eba2ee004afc0d742f3007fe7cc57216ade7ecf027933",
+    "final-prompt-second-ewram.bin": "9960634277225bca00940e641b25b59a4efafa67c9f701a982a3b14a59c49def",
+    "post-effect-rejection-0-ewram.bin": "e6ced1b5a8796ac33edb1563c1891782f550d90c166d835132f73da23541ec47",
+    "post-effect-rejection-1-ewram.bin": "078f0d1bd625782d1a700053788932b29af2d33389b1bee19cbb0eee2181efc8",
+    "after-Life-ewram.bin": "83cd3736be10cbee53615266a73c32534e402b6afcc4b71d7ea5be09cb086d4f",
+    "Wait-facing-ewram.bin": "b86940fd8a449d96ad8d6ecd2da3bf7874aa1a15fdf1657b5264511362ab5559"
+  },
+  "KO_cursor_tokens": [
+    {
+      "observed_at": 284003.1735993,
+      "caster": 33554824,
+      "target": 33554560,
+      "target_wrapper": 33695356,
+      "cursor": [
+        4,
+        10
+      ],
+      "target_tile": [
+        4,
+        10
+      ],
+      "decision_sha256": "2c9abd8f8c8c208c61867ed1e9334fd70ca83b164c887ad55cbaa3359ad4e66d",
+      "stage": "overlay"
+    },
+    {
+      "observed_at": 284003.7134917,
+      "caster": 33554824,
+      "target": 33554560,
+      "target_wrapper": 33695356,
+      "cursor": [
+        4,
+        10
+      ],
+      "target_tile": [
+        4,
+        10
+      ],
+      "decision_sha256": "2c9abd8f8c8c208c61867ed1e9334fd70ca83b164c887ad55cbaa3359ad4e66d",
+      "stage": "overlay"
+    }
+  ],
+  "target_selection_delivered": true,
+  "Life_preview_token": {
+    "observed_at": 284007.2791587,
+    "caster": 33554824,
+    "target": 33554560,
+    "target_wrapper": 33695356,
+    "cursor": [
+      4,
+      10
+    ],
+    "target_tile": [
+      4,
+      10
+    ],
+    "decision_sha256": "ed84bddf72b2d6e4d090ff126d2e6177ba09efedf974fbfe6879124d972f60c6",
+    "stage": "preview"
+  },
+  "description_advance_requested": true,
+  "description_advance_delivered": true,
+  "Life_final_token": {
+    "observed_at": 284010.8221202,
+    "caster": 33554824,
+    "target": 33554560,
+    "target_wrapper": 33695356,
+    "cursor": [
+      4,
+      10
+    ],
+    "target_tile": [
+      4,
+      10
+    ],
+    "decision_sha256": "cccd65686829a0f7b2548172077fc0dc45624879b4e410aab4aa2e054de1a3c6",
+    "stage": "confirmation"
+  },
+  "policy_snapshot": {
+    "schema": "ffta-tactics-snapshot/2",
+    "identity": "verified",
+    "age_seconds": 1.4699995517730713e-05,
+    "actor": {
+      "name": "Montblanc",
+      "id": 5,
+      "job_id": 5,
+      "side": "player",
+      "hp": 241,
+      "max_hp": 241,
+      "mp": 221,
+      "max_mp": 221,
+      "tile": [
+        5,
+        10
+      ]
+    },
+    "candidates": [
+      {
+        "id": "life-ally",
+        "kind": "ability",
+        "action_id": 5,
+        "legal": true,
+        "cost": 10,
+        "ability_name": "Life",
+        "relation": "ally",
+        "target": {
+          "kind": "unit",
+          "id": 7
+        },
+        "target_hp": 0,
+        "target_max_hp": 442,
+        "target_mp": 85
+      }
+    ]
+  },
+  "policy_evaluation": {
+    "outcome": "selected",
+    "reason": "rule:matched",
+    "scope": "party",
+    "rule_id": "revive-before-attack",
+    "decision": {
+      "candidate_id": "life-ally",
+      "kind": "ability",
+      "action_id": 5,
+      "target": {
+        "kind": "unit",
+        "id": 7
+      },
+      "target_id": 7,
+      "scope": "party",
+      "rule_id": "revive-before-attack",
+      "fallback": false,
+      "reason": "rule:matched"
+    },
+    "detail": null
+  },
+  "final_gate_events": [
+    {
+      "event": "policy",
+      "policy": {
+        "schema": "ffta-tactics-policy/2",
+        "fallback": "wait",
+        "observation": {
+          "max_age_seconds": 3.0
+        },
+        "assignments": {
+          "party": {
+            "player": {
+              "rules": [
+                {
+                  "id": "revive-before-attack",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Life",
+                    "relation": "ally",
+                    "target_hp": {
+                      "eq": 0
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "a KO'd ally is exactly HP 0; the absolute predicate is used because a percent floors a 1-HP high-max ally to 0 too"
+                },
+                {
+                  "id": "heal-wounded-ally",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "ally",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "target_hp_pct": {
+                      "lte": 50
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "heal the weakest wounded ally; the MP predicate is the reserve that keeps at least 8 MP after the cast"
+                },
+                {
+                  "id": "heal-self",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "self",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "actor_hp_pct": {
+                      "lte": 40
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "self-heal below 40% while still holding the MP reserve"
+                },
+                {
+                  "id": "pressure-enemy",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "relation": "enemy"
+                  },
+                  "note": "otherwise take the engine-offered action on the weakest enemy"
+                },
+                {
+                  "id": "use-potion-last-resort",
+                  "enabled": false,
+                  "select": "first",
+                  "when": {
+                    "kind": "item",
+                    "item_name": "Potion",
+                    "item_count": {
+                      "gte": 1
+                    }
+                  },
+                  "note": "never-use-item by default: consumables are disabled, so this rule stays disabled and the party consumes nothing"
+                }
+              ],
+              "note": "Healer preset for every player-side actor without its own character assignment. Ordered revive -> heal ally -> heal self -> attack; every choice still comes only from the engine-legal candidates the adapter supplies."
+            }
+          }
+        },
+        "consumables": false,
+        "note": "A6 resource/recovery preset. Consumables stay disabled (no `consumables` flag), so the item rule cannot fire; the MP reserve is the remaining_mp_after_cost predicate. A learned heal is never a candidate by itself -- the engine must offer it."
+      },
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 1.6900012269616127e-05,
+        "actor": {
+          "name": "Montblanc",
+          "id": 5,
+          "job_id": 5,
+          "side": "player",
+          "hp": 241,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "life-ally",
+            "kind": "ability",
+            "action_id": 5,
+            "legal": true,
+            "cost": 10,
+            "ability_name": "Life",
+            "relation": "ally",
+            "target": {
+              "kind": "unit",
+              "id": 7
+            },
+            "target_hp": 0,
+            "target_max_hp": 442,
+            "target_mp": 85
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "selected",
+        "reason": "rule:matched",
+        "scope": "party",
+        "rule_id": "revive-before-attack",
+        "decision": {
+          "candidate_id": "life-ally",
+          "kind": "ability",
+          "action_id": 5,
+          "target": {
+            "kind": "unit",
+            "id": 7
+          },
+          "target_id": 7,
+          "scope": "party",
+          "rule_id": "revive-before-attack",
+          "fallback": false,
+          "reason": "rule:matched"
+        },
+        "detail": null
+      },
+      "token": {
+        "observed_at": 284010.8221202,
+        "caster": 33554824,
+        "target": 33554560,
+        "target_wrapper": 33695356,
+        "cursor": [
+          4,
+          10
+        ],
+        "target_tile": [
+          4,
+          10
+        ],
+        "decision_sha256": "cccd65686829a0f7b2548172077fc0dc45624879b4e410aab4aa2e054de1a3c6",
+        "stage": "confirmation"
+      }
+    },
+    {
+      "event": "final_policy",
+      "policy": {
+        "schema": "ffta-tactics-policy/2",
+        "fallback": "wait",
+        "observation": {
+          "max_age_seconds": 3.0
+        },
+        "assignments": {
+          "party": {
+            "player": {
+              "rules": [
+                {
+                  "id": "revive-before-attack",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Life",
+                    "relation": "ally",
+                    "target_hp": {
+                      "eq": 0
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "a KO'd ally is exactly HP 0; the absolute predicate is used because a percent floors a 1-HP high-max ally to 0 too"
+                },
+                {
+                  "id": "heal-wounded-ally",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "ally",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "target_hp_pct": {
+                      "lte": 50
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "heal the weakest wounded ally; the MP predicate is the reserve that keeps at least 8 MP after the cast"
+                },
+                {
+                  "id": "heal-self",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "self",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "actor_hp_pct": {
+                      "lte": 40
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "self-heal below 40% while still holding the MP reserve"
+                },
+                {
+                  "id": "pressure-enemy",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "relation": "enemy"
+                  },
+                  "note": "otherwise take the engine-offered action on the weakest enemy"
+                },
+                {
+                  "id": "use-potion-last-resort",
+                  "enabled": false,
+                  "select": "first",
+                  "when": {
+                    "kind": "item",
+                    "item_name": "Potion",
+                    "item_count": {
+                      "gte": 1
+                    }
+                  },
+                  "note": "never-use-item by default: consumables are disabled, so this rule stays disabled and the party consumes nothing"
+                }
+              ],
+              "note": "Healer preset for every player-side actor without its own character assignment. Ordered revive -> heal ally -> heal self -> attack; every choice still comes only from the engine-legal candidates the adapter supplies."
+            }
+          }
+        },
+        "consumables": false,
+        "note": "A6 resource/recovery preset. Consumables stay disabled (no `consumables` flag), so the item rule cannot fire; the MP reserve is the remaining_mp_after_cost predicate. A learned heal is never a candidate by itself -- the engine must offer it."
+      },
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 1.1500029359012842e-05,
+        "actor": {
+          "name": "Montblanc",
+          "id": 5,
+          "job_id": 5,
+          "side": "player",
+          "hp": 241,
+          "max_hp": 241,
+          "mp": 221,
+          "max_mp": 221,
+          "tile": [
+            5,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "life-ally",
+            "kind": "ability",
+            "action_id": 5,
+            "legal": true,
+            "cost": 10,
+            "ability_name": "Life",
+            "relation": "ally",
+            "target": {
+              "kind": "unit",
+              "id": 7
+            },
+            "target_hp": 0,
+            "target_max_hp": 442,
+            "target_mp": 85
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "selected",
+        "reason": "rule:matched",
+        "scope": "party",
+        "rule_id": "revive-before-attack",
+        "decision": {
+          "candidate_id": "life-ally",
+          "kind": "ability",
+          "action_id": 5,
+          "target": {
+            "kind": "unit",
+            "id": 7
+          },
+          "target_id": 7,
+          "scope": "party",
+          "rule_id": "revive-before-attack",
+          "fallback": false,
+          "reason": "rule:matched"
+        },
+        "detail": null
+      },
+      "token": {
+        "observed_at": 284010.8311792,
+        "caster": 33554824,
+        "target": 33554560,
+        "target_wrapper": 33695356,
+        "cursor": [
+          4,
+          10
+        ],
+        "target_tile": [
+          4,
+          10
+        ],
+        "decision_sha256": "cccd65686829a0f7b2548172077fc0dc45624879b4e410aab4aa2e054de1a3c6",
+        "stage": "confirmation"
+      }
+    },
+    {
+      "event": "final_input_requested",
+      "mask": 1
+    },
+    {
+      "event": "final_input_delivered",
+      "hits": 5
+    }
+  ],
+  "final_delivery": {
+    "outcome": "final-input-delivered-only",
+    "final_attempted": true,
+    "effect": "unknown",
+    "wait": "unexecuted",
+    "continuation": "unknown"
+  },
+  "effect_attribution": {
+    "status": "bounded-Life-effect-and-native-level-up",
+    "target_hp": [
+      0,
+      221
+    ],
+    "caster_mp": [
+      221,
+      211
+    ],
+    "level": [
+      40,
+      41
+    ],
+    "awarded_exp": 30,
+    "native_growth_offsets": [
+      9,
+      26,
+      30,
+      32,
+      34,
+      36,
+      38,
+      210
+    ],
+    "caster_after_sha256": "0a4c0236734923a13397ea6176867b78fd08d9ea83851f50e357dede1f5e15b2",
+    "target_after_sha256": "5ca05dba3fc911f4b047789b9dcdd143205727cd5045373e0acea9e00462d561"
+  },
+  "post_effect_rejections": [
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "research list driver/callback differs",
+    "owned research list is opening"
+  ],
+  "post_effect_caster_differences": [
+    {
+      "reason": "research list driver/callback differs",
+      "differences": [
+        {
+          "offset": 9,
+          "before": 40,
+          "after": 41
+        },
+        {
+          "offset": 10,
+          "before": 99,
+          "after": 0
+        },
+        {
+          "offset": 26,
+          "before": 241,
+          "after": 248
+        },
+        {
+          "offset": 28,
+          "before": 221,
+          "after": 211
+        },
+        {
+          "offset": 30,
+          "before": 221,
+          "after": 222
+        },
+        {
+          "offset": 32,
+          "before": 26,
+          "after": 34
+        },
+        {
+          "offset": 34,
+          "before": 125,
+          "after": 132
+        },
+        {
+          "offset": 36,
+          "before": 158,
+          "after": 165
+        },
+        {
+          "offset": 38,
+          "before": 219,
+          "after": 225
+        },
+        {
+          "offset": 210,
+          "before": 146,
+          "after": 148
+        },
+        {
+          "offset": 248,
+          "before": 2,
+          "after": 1
+        }
+      ]
+    },
+    {
+      "reason": "owned research list is opening",
+      "differences": [
+        {
+          "offset": 9,
+          "before": 40,
+          "after": 41
+        },
+        {
+          "offset": 10,
+          "before": 99,
+          "after": 0
+        },
+        {
+          "offset": 26,
+          "before": 241,
+          "after": 248
+        },
+        {
+          "offset": 28,
+          "before": 221,
+          "after": 211
+        },
+        {
+          "offset": 30,
+          "before": 221,
+          "after": 222
+        },
+        {
+          "offset": 32,
+          "before": 26,
+          "after": 34
+        },
+        {
+          "offset": 34,
+          "before": 125,
+          "after": 132
+        },
+        {
+          "offset": 36,
+          "before": 158,
+          "after": 165
+        },
+        {
+          "offset": 38,
+          "before": 219,
+          "after": 225
+        },
+        {
+          "offset": 210,
+          "before": 146,
+          "after": 148
+        },
+        {
+          "offset": 248,
+          "before": 2,
+          "after": 1
+        }
+      ]
+    }
+  ],
+  "Life_effect": {
+    "before": [
+      {
+        "canonical": 33554824,
+        "id": 5,
+        "name": 139793095,
+        "name_text": "Montblanc",
+        "slot": 5,
+        "hp": 241,
+        "max_hp": 241,
+        "mp": 221,
+        "max_mp": 221,
+        "tile": [
+          5,
+          10
+        ],
+        "statuses": {
+          "auto_life": false,
+          "petrify": false,
+          "zombie": false,
+          "persistent_zombie": false
+        },
+        "side_flags": 129,
+        "ko_inflicted": 32,
+        "ko_suffered": 0,
+        "canonical_ct": 1000,
+        "mirror_ct": 0,
+        "canonical_speed": 146,
+        "mirror_speed": 146,
+        "canonical_sha256": "831d22c2ff3623a44cc23e1d9050141df1cfedc3c198d1b39a2cbe1b86f2df0d",
+        "mirror_sha256": "1200427ee63cecea784e8339554a9325cbf6a7cd55800b2cdee890066f1a925a"
+      },
+      {
+        "canonical": 33554560,
+        "id": 7,
+        "name": 33562396,
+        "name_text": "Marche",
+        "slot": 7,
+        "hp": 0,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "tile": [
+          4,
+          10
+        ],
+        "statuses": {
+          "auto_life": false,
+          "petrify": false,
+          "zombie": false,
+          "persistent_zombie": false
+        },
+        "side_flags": 129,
+        "ko_inflicted": 154,
+        "ko_suffered": 2,
+        "canonical_ct": 0,
+        "mirror_ct": 142,
+        "canonical_speed": 155,
+        "mirror_speed": 155,
+        "canonical_sha256": "ee216391a919d00db97774d259e97c30bc0551c8ca68f7a02d09e6a3dd9869b0",
+        "mirror_sha256": "80d79bdeb12fb692c8a446f04ab062b2db9950c8e9baff6cfbc1e5f066f8e58d"
+      }
+    ],
+    "after": [
+      {
+        "canonical": 33554824,
+        "id": 5,
+        "name": 139793095,
+        "name_text": "Montblanc",
+        "slot": 5,
+        "hp": 241,
+        "max_hp": 248,
+        "mp": 211,
+        "max_mp": 222,
+        "tile": [
+          5,
+          10
+        ],
+        "statuses": {
+          "auto_life": false,
+          "petrify": false,
+          "zombie": false,
+          "persistent_zombie": false
+        },
+        "side_flags": 129,
+        "ko_inflicted": 32,
+        "ko_suffered": 0,
+        "canonical_ct": 1000,
+        "mirror_ct": 311,
+        "canonical_speed": 148,
+        "mirror_speed": 148,
+        "canonical_sha256": "0a4c0236734923a13397ea6176867b78fd08d9ea83851f50e357dede1f5e15b2",
+        "mirror_sha256": "48d94a68f58067365bb2e2f23e93b661f40eeed3b1225b940b168aabd2b8ca70"
+      },
+      {
+        "canonical": 33554560,
+        "id": 7,
+        "name": 33562396,
+        "name_text": "Marche",
+        "slot": 7,
+        "hp": 221,
+        "max_hp": 442,
+        "mp": 85,
+        "max_mp": 85,
+        "tile": [
+          4,
+          10
+        ],
+        "statuses": {
+          "auto_life": false,
+          "petrify": false,
+          "zombie": false,
+          "persistent_zombie": false
+        },
+        "side_flags": 129,
+        "ko_inflicted": 154,
+        "ko_suffered": 2,
+        "canonical_ct": 0,
+        "mirror_ct": 494,
+        "canonical_speed": 155,
+        "mirror_speed": 155,
+        "canonical_sha256": "5ca05dba3fc911f4b047789b9dcdd143205727cd5045373e0acea9e00462d561",
+        "mirror_sha256": "bf608323a3aceb43e24a790de823d885aaa2a0897d5ba3486b013d7eca593dc3"
+      }
+    ],
+    "command": {
+      "state": "command",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "enabled": [
+        1,
+        0,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 241,
+      "mp": 211,
+      "member": 33554824,
+      "mode": 4,
+      "context": 33740960,
+      "callback": 33742168,
+      "active": 33742168,
+      "unit_sha256": "0a4c0236734923a13397ea6176867b78fd08d9ea83851f50e357dede1f5e15b2",
+      "decision_sha256": "6f8274019c5b8ca01c141c03fbc2e0443db21227d87e1ce79be5ae9df53f41f7"
+    },
+    "wait": "unexecuted",
+    "continuation": "unknown"
+  },
+  "life_engine_hits": [
+    {
+      "t": 41.8,
+      "pc": "080a2298",
+      "phase": "HP-store-before",
+      "registers": [
+        "000001ba",
+        "080a2289",
+        "02000080",
+        "0000001e",
+        "000000dd",
+        "000000dd",
+        "02000080",
+        "00000001",
+        "0000004c",
+        "020159e4",
+        "020159e4",
+        "00000000",
+        "00000001",
+        "03007934",
+        "080a2289",
+        "080a2298",
+        "8000003f"
+      ],
+      "during": "a64-Life-post-final-native",
+      "unit": {
+        "canonical": 33554560,
+        "id": 7,
+        "name": 33562396,
+        "hp": 0,
+        "mp": 85,
+        "ko_suffered": 2
+      },
+      "stored_hp": 221
+    },
+    {
+      "t": 41.8,
+      "pc": "080a229a",
+      "phase": "HP-store-after",
+      "registers": [
+        "000001ba",
+        "080a2289",
+        "02000080",
+        "0000001e",
+        "000000dd",
+        "000000dd",
+        "02000080",
+        "00000001",
+        "0000004c",
+        "020159e4",
+        "020159e4",
+        "00000000",
+        "00000001",
+        "03007934",
+        "080a2289",
+        "080a229a",
+        "8000003f"
+      ],
+      "during": "a64-Life-post-final-native",
+      "unit": {
+        "canonical": 33554560,
+        "id": 7,
+        "name": 33562396,
+        "hp": 221,
+        "mp": 85,
+        "ko_suffered": 2
+      },
+      "stored_hp": 221
+    },
+    {
+      "t": 41.9,
+      "pc": "08133388",
+      "phase": "Life-effect-entry",
+      "registers": [
+        "0200f3f0",
+        "08133389",
+        "02000080",
+        "00000004",
+        "0200f3f0",
+        "083a87b0",
+        "02015a04",
+        "0200f400",
+        "00000004",
+        "020159e4",
+        "00000000",
+        "00000000",
+        "00000001",
+        "0300793c",
+        "081338bf",
+        "08133388",
+        "0000003f"
+      ],
+      "during": "a64-Life-post-final-native",
+      "context": 33616880,
+      "context_words": [
+        33554824,
+        33554560,
+        33554560
+      ],
+      "flags": 128,
+      "canonical_joins": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "hp": 241,
+          "mp": 211,
+          "ko_suffered": 0
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 221,
+          "mp": 85,
+          "ko_suffered": 2
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 221,
+          "mp": 85,
+          "ko_suffered": 2
+        }
+      ]
+    },
+    {
+      "t": 41.9,
+      "pc": "08133390",
+      "phase": "Life-effect-flags-written",
+      "registers": [
+        "0200f3f0",
+        "000000a0",
+        "00000080",
+        "00000004",
+        "0200f3f0",
+        "083a87b0",
+        "02015a04",
+        "0200f400",
+        "00000004",
+        "020159e4",
+        "00000000",
+        "00000000",
+        "00000001",
+        "0300793c",
+        "081338bf",
+        "08133390",
+        "0000003f"
+      ],
+      "during": "a64-Life-post-final-native",
+      "context": 33616880,
+      "context_words": [
+        33554824,
+        33554560,
+        33554560
+      ],
+      "flags": 160,
+      "canonical_joins": [
+        {
+          "canonical": 33554824,
+          "id": 5,
+          "name": 139793095,
+          "hp": 241,
+          "mp": 211,
+          "ko_suffered": 0
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 221,
+          "mp": 85,
+          "ko_suffered": 2
+        },
+        {
+          "canonical": 33554560,
+          "id": 7,
+          "name": 33562396,
+          "hp": 221,
+          "mp": 85,
+          "ko_suffered": 2
+        }
+      ]
+    },
+    {
+      "t": 49.6,
+      "pc": "080a7198",
+      "phase": "EXP-award",
+      "registers": [
+        "00000063",
+        "080a7199",
+        "02000188",
+        "00000000",
+        "02022ff4",
+        "00000000",
+        "02022f5c",
+        "02022ff4",
+        "02022f9d",
+        "0200f5b8",
+        "00000000",
+        "00000000",
+        "00f80000",
+        "03007da4",
+        "080a7199",
+        "080a7198",
+        "0000003f"
+      ],
+      "during": "a64-Life-post-final-native",
+      "unit": {
+        "canonical": 33554824,
+        "id": 5,
+        "name": 139793095,
+        "hp": 241,
+        "mp": 211,
+        "ko_suffered": 0
+      },
+      "unit_hex": "c71255080805010507286300010101010101010101000000f100f100d300dd001a017d019e01db01810093004b01190153015d015818090000004b1e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee803920050010600000000000000000000000000000000ff0000000000000000002000000000050a01030506010203fc0002000005000187",
+      "caller_lr": "080a7199",
+      "old_exp": 99,
+      "awarded_exp": 30
+    },
+    {
+      "t": 49.6,
+      "pc": "080c9b8c",
+      "phase": "level-up-before",
+      "registers": [
+        "02000188",
+        "02000188",
+        "00000081",
+        "00000000",
+        "02022ff4",
+        "00000000",
+        "02022f5c",
+        "02022ff4",
+        "02022f9d",
+        "0200f5b8",
+        "00000000",
+        "00000000",
+        "00f80000",
+        "03007da4",
+        "080a71c5",
+        "080c9b8c",
+        "6000003f"
+      ],
+      "during": "a64-Life-post-final-native",
+      "unit": {
+        "canonical": 33554824,
+        "id": 5,
+        "name": 139793095,
+        "hp": 241,
+        "mp": 211,
+        "ko_suffered": 0
+      },
+      "unit_hex": "c71255080805010507280000010101010101010101000000f100f100d300dd001a017d019e01db01810093004b01190153015d015818090000004b1e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee803920050010600000000000000000000000000000000ff0000000000000000002000000000050a01030506010203fc0002000005000187",
+      "caller_lr": "080a71c5"
+    },
+    {
+      "t": 49.7,
+      "pc": "080a71c4",
+      "phase": "level-up-after",
+      "registers": [
+        "00000001",
+        "080a71c5",
+        "a0000000",
+        "80000000",
+        "02022ff4",
+        "00000000",
+        "02022f5c",
+        "02022ff4",
+        "02022f9d",
+        "0200f5b8",
+        "00000000",
+        "00000000",
+        "00000001",
+        "03007da4",
+        "080c9ddd",
+        "080a71c4",
+        "0000003f"
+      ],
+      "during": "a64-Life-post-final-native",
+      "unit": {
+        "canonical": 33554824,
+        "id": 5,
+        "name": 139793095,
+        "hp": 241,
+        "mp": 211,
+        "ko_suffered": 0
+      },
+      "unit_hex": "c71255080805010507290000010101010101010101000000f100f800d300de0022018401a501e101810093004b01190153015d015818090000004b1e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee803940050010600000000000000000000000000000000ff0000000000000000002000000000050a01030506010203fc0002000005000187",
+      "caller_lr": "080c9ddd",
+      "level_up_result": 1
+    }
+  ],
+  "post_Life_roster": [
+    {
+      "slot": 0,
+      "addr": "020159e8",
+      "name": 139882990,
+      "side_raw": 32769,
+      "ct": 499,
+      "ea": 0,
+      "id": 0,
+      "type": 1,
+      "base_job": 41,
+      "race": 5,
+      "job": 41,
+      "level": 40,
+      "hp": 319,
+      "max_hp": 319,
+      "mp": 120,
+      "max_mp": 120,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Jon",
+      "side_bit": true,
+      "unaffiliated": false,
+      "live": true
+    },
+    {
+      "slot": 1,
+      "addr": "02015af0",
+      "name": 139882543,
+      "side_raw": 32769,
+      "ct": 0,
+      "ea": 0,
+      "id": 1,
+      "type": 1,
+      "base_job": 5,
+      "race": 1,
+      "job": 5,
+      "level": 42,
+      "hp": 300,
+      "max_hp": 300,
+      "mp": 60,
+      "max_mp": 60,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Velasquez",
+      "side_bit": true,
+      "unaffiliated": false,
+      "live": true
+    },
+    {
+      "slot": 2,
+      "addr": "02015bf8",
+      "name": 139881543,
+      "side_raw": 32769,
+      "ct": 93,
+      "ea": 0,
+      "id": 2,
+      "type": 1,
+      "base_job": 40,
+      "race": 5,
+      "job": 40,
+      "level": 40,
+      "hp": 303,
+      "max_hp": 303,
+      "mp": 79,
+      "max_mp": 79,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Godfrey",
+      "side_bit": true,
+      "unaffiliated": false,
+      "live": true
+    },
+    {
+      "slot": 3,
+      "addr": "02015d00",
+      "name": 139881681,
+      "side_raw": 32769,
+      "ct": 0,
+      "ea": 0,
+      "id": 3,
+      "type": 1,
+      "base_job": 36,
+      "race": 5,
+      "job": 36,
+      "level": 41,
+      "hp": 323,
+      "max_hp": 323,
+      "mp": 102,
+      "max_mp": 114,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Schneider",
+      "side_bit": true,
+      "unaffiliated": false,
+      "live": true
+    },
+    {
+      "slot": 4,
+      "addr": "02015e08",
+      "name": 139881253,
+      "side_raw": 32769,
+      "ct": 169,
+      "ea": 0,
+      "id": 4,
+      "type": 1,
+      "base_job": 22,
+      "race": 3,
+      "job": 22,
+      "level": 40,
+      "hp": 231,
+      "max_hp": 231,
+      "mp": 179,
+      "max_mp": 179,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Carson",
+      "side_bit": true,
+      "unaffiliated": false,
+      "live": true
+    },
+    {
+      "slot": 5,
+      "addr": "02015f10",
+      "name": 139793095,
+      "side_raw": 129,
+      "ct": 311,
+      "ea": 0,
+      "id": 5,
+      "type": 8,
+      "base_job": 5,
+      "race": 1,
+      "job": 5,
+      "level": 41,
+      "hp": 241,
+      "max_hp": 248,
+      "mp": 211,
+      "max_mp": 222,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Montblanc",
+      "side_bit": false,
+      "unaffiliated": false,
+      "live": true
+    },
+    {
+      "slot": 6,
+      "addr": "02016018",
+      "name": 139793257,
+      "side_raw": 4097,
+      "ct": 369,
+      "ea": 0,
+      "id": 6,
+      "type": 20,
+      "base_job": 104,
+      "race": 23,
+      "job": 104,
+      "level": 10,
+      "hp": 10,
+      "max_hp": 10,
+      "mp": 10,
+      "max_mp": 10,
+      "is_rom_name": true,
+      "is_ram_name": false,
+      "name_text": "Judge",
+      "side_bit": false,
+      "unaffiliated": true,
+      "live": true
+    },
+    {
+      "slot": 7,
+      "addr": "02016120",
+      "name": 33562396,
+      "side_raw": 129,
+      "ct": 494,
+      "ea": 0,
+      "id": 7,
+      "type": 2,
+      "base_job": 5,
+      "race": 1,
+      "job": 5,
+      "level": 50,
+      "hp": 221,
+      "max_hp": 442,
+      "mp": 85,
+      "max_mp": 85,
+      "is_rom_name": false,
+      "is_ram_name": true,
+      "name_text": "Marche",
+      "side_bit": false,
+      "unaffiliated": false,
+      "live": true
+    }
+  ],
+  "Wait_facing": {
+    "observed_at": 284029.5492712,
+    "member": 33554824,
+    "actor_wrapper": 33695500,
+    "direction": 1,
+    "context": 33740960,
+    "callback": 33742168,
+    "hp": 241,
+    "mp": 211
+  },
+  "Wait_events": [],
+  "STOP_injected": {
+    "stage": "Wait-final",
+    "t": 57.8,
+    "input_write_count": 85
+  },
+  "STOP_observed": {
+    "t": 57.8,
+    "input_write_count": 85
+  },
+  "Wait_final_attempted": false,
+  "error": "RecoveryStateError('STOP observed; Life research input forbidden')",
+  "gameplay_writes": [
+    {
+      "t": 12.104,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 12.157,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 12.21,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 12.263,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 12.315,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 13.573,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 13.626,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 13.678,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 13.73,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 13.782,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 15.059,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 15.111,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 15.165,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 15.217,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 15.269,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 16.559,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 16.611,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 16.663,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 16.715,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 16.767,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 18.028,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 18.082,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 18.135,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 18.187,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 18.239,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 19.496,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 19.549,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 19.601,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 19.655,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 19.707,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 20.977,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 21.03,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 21.081,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 21.133,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 21.186,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 22.456,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 22.509,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 22.562,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 22.614,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 22.667,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 23.926,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 23.978,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 24.031,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 24.084,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 24.136,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 25.397,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 25.45,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 25.503,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 25.555,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 25.607,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 28.958,
+      "val": 32,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 29.009,
+      "val": 32,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 29.062,
+      "val": 32,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 29.116,
+      "val": 32,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 29.169,
+      "val": 32,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 32.023,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 32.076,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 32.128,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 32.18,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 32.234,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 35.59,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 35.641,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 35.694,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 35.746,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 35.798,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 39.141,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 39.193,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 39.245,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 39.297,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 39.35,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 53.45,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 53.503,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 53.554,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 53.607,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 53.659,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 54.918,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 54.971,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 55.023,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 55.076,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 55.129,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 56.388,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 56.44,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 56.492,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 56.544,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 56.597,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    }
+  ],
+  "fixture_writes": [],
+  "life_engine_errors": [],
+  "inputs_unchanged": true
+}

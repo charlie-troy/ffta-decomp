@@ -1,7 +1,7 @@
 {
   "milestone": "A6.4",
   "date": "2026-10-08",
-  "status": "unknown",
+  "status": "pass",
   "scope": "Research-only KO/Life target contract; entry depends on A6.3 public acceptance",
   "criteria": [
     {
@@ -26,11 +26,13 @@
     },
     {
       "id": "two-fresh-revive-Wait-continuations",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Independent source-stable wait02/wait03 owned PIDs82784/81720: Life HP0->221, MP221->211, attributed level-up, one Wait, next Carson4 canonical/wrapper/restored8roster/cursor join. Retained auditors22 mutants each."
     },
     {
       "id": "STOP-reserve-and-adversarial-guards",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Live navigation/Life-final/Wait-final STOP with no later writes, reserve212 rejects remaining211; refusal audits13/13/13/12 mutants. Life final20, target57/58/59, effect42, Wait39; unchanged living37/interface7/public-Cure38 regressions."
     }
   ],
   "source_sha256": {
@@ -51,7 +53,7 @@
     "tools/validate_recovery_life_menu.py": "eda08b81d67628bb1d08c0a801a383eb229219876ba86c17de08d58b1a4276e0",
     "tools/validate_recovery_action_set.py": "19f09bd1e9b926a2766f2e6c9f3eae13a9c9acb826cf92b4946485586056fbd9",
     "tools/recovery_life_target.py": "60c8bd54e6a64095393786638edacdd396ee4928cf6f4fa774145c52d9aa3766",
-    "tools/probe_recovery_life_overlay.py": "fac4817b9b80b3ad4a9e7cfb3150e7d6e697afc7ecbdab093951be69c03a7c10",
+    "tools/probe_recovery_life_overlay.py": "0e4d363202a3ff824d6f66cdf1ce42c35d5ede8ad5ddfa17bd115f839726bc37",
     "tools/validate_recovery_life_overlay.py": "bb0f52abd693968d2bf7f29383df144143be9557ce757429e06272dcd8601fdc",
     "tools/recovery_life_final.py": "af92b61866df173e127d25428e751da0ec4b67651d8eb5f5e19af1a7b74336a1",
     "tools/validate_recovery_life_final.py": "6a1a63eca8b043f4ef4401b968058cac63d002863475fd88d952164279c6ab9e",
@@ -59,7 +61,10 @@
     "tools/recovery_life_effect.py": "8dcb15bde6f7feddbe2bae9f7c62644eb58fff0c8b3f0f090b4c9935dfccfddb",
     "tools/validate_recovery_life_effect.py": "365fbeabcb075b013a348e3769f995ad06dcd2cf747a4c9354b7872b396df180",
     "tools/recovery_life_wait.py": "588f9367f658b759b12e606d80b53d9f3c51c2a2816725de0c9fdcc912334214",
-    "tools/validate_recovery_life_wait.py": "0a9459ddaaf796de854d34758f79125616662e3d3f5c871ce892c1b7a38dd48c"
+    "tools/validate_recovery_life_wait.py": "0a9459ddaaf796de854d34758f79125616662e3d3f5c871ce892c1b7a38dd48c",
+    "tools/audit_recovery_life_run.py": "85c595809c2d655375f1ea65fb0ce8eb4622fb9e9dfa7c4b7fd73d8557cde99c",
+    "tools/audit_recovery_life_refusal.py": "63d6bc7e56f30e0afaeb1ada7b1dcd0b0421409948a4e7f365fd571d3ecb7087",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
   },
   "evidence_sha256": {
     "outputs/autobattle/a64-ability-metadata.json": "e69a6d90fb4c680d71af08396121748d39b13461347a2359bcac16386038aab6",
@@ -108,7 +113,26 @@
     "outputs/autobattle/a64-life-wait-facing-01/Life-overlay.json": "50fc245b0d2a5278726e4ce2ea5356d688e570f0857ccc28f6e0b22f66ba3af2",
     "outputs/autobattle/a64-life-effect-guards-03.json": "446804315613eb71d69f8eae737f581daa1af3f26461d305229ef8ad13a31e58",
     "outputs/autobattle/a64-life-wait-01/Life-overlay.json": "0b0cd2f463a7f606a3d3b71b3bd7aeffe9315f180f9d8ea7aee38a7b9f0667dc",
-    "outputs/autobattle/a64-life-wait-01/Life-engine.jsonl": "7670deb1c6a3351ff8999cfb13551433d6fd1b79d4163cebf403c083abaf535f"
+    "outputs/autobattle/a64-life-wait-01/Life-engine.jsonl": "7670deb1c6a3351ff8999cfb13551433d6fd1b79d4163cebf403c083abaf535f",
+    "outputs/autobattle/a64-life-wait-02/Life-overlay.json": "71a191b71a2a9aea03eb009699b5fdd9e1fa12425b3902e63fb79126144adc58",
+    "outputs/autobattle/a64-life-wait-02/Life-engine.jsonl": "27f54884b3a46ffc5ad8f48e880b4165a7e355b8750e9ceb56bd61476295b6ff",
+    "outputs/autobattle/a64-life-wait-03/Life-overlay.json": "90db0470aa4d04b732eb05aba4ad66f4cf0a64c6a32986ba46d79a353aa54784",
+    "outputs/autobattle/a64-life-wait-03/Life-engine.jsonl": "e543aeecce6dfbcf5c122c60cf38086f3812aef0be702f15221793ec31cacf17",
+    "outputs/autobattle/a64-life-wait-02-audit-02.json": "335958157f5c2fc40aa4c4550df83b5edcd5f941338ebc998a6ef601970df3c1",
+    "outputs/autobattle/a64-life-wait-03-audit-02.json": "6fb72010484a24ce77a5b3647b2c94e7ad197ab01a7c34e378c72772cfd89cd3",
+    "outputs/autobattle/a64-life-STOP-navigation-01/Life-overlay.json": "acd622d7320ab341bb15f85c9dd00d4467068f2cf6dd96181847e4e66089ef8d",
+    "outputs/autobattle/a64-life-STOP-final-01/Life-overlay.json": "5d7e9b1a9b3b1efa500a5905b3e9a7f6c444a9d9a26bbb97efcb0f61ce9b1135",
+    "outputs/autobattle/a64-life-STOP-Wait-01/Life-overlay.json": "5e04321e56d39572d8cf88316bfd874ee6b0076b554fb4b99294fa1f66cfc332",
+    "outputs/autobattle/a64-life-STOP-Wait-01/Life-engine.jsonl": "11a3587a04d1bef6cba0ec77db3e96b647dcf4b5859a85953ef62eb739ba68f9",
+    "outputs/autobattle/a64-life-reserve-01/Life-overlay.json": "c55010ebd43463d6e191464f4a72d08b74a29d8a3da76672e3985895bd2c3e76",
+    "outputs/autobattle/a64-life-reserve-policy.json": "2003ef37f6b96461ae0befd31af1d6498272d3848fa3087e5afc6bda7f1a7170",
+    "outputs/autobattle/a64-life-STOP-navigation-01-audit-02.json": "8429102fac761a8b7c63fb3b5f12fc2fd9f22e87d77caf145659e4731abdee28",
+    "outputs/autobattle/a64-life-STOP-final-01-audit-02.json": "82c2ab927d70bd141c7290f2293ae55461f9e56967dd73bfadea3e23a4931b39",
+    "outputs/autobattle/a64-life-STOP-Wait-01-audit.json": "721a43d0b51d5f360d7fff7e5fc5e91a8899376ce66184c3a34de5201df1cc6b",
+    "outputs/autobattle/a64-life-reserve-01-audit-02.json": "1d0cce0acc53928fc61a8396d93fb1028e7223f74a81fefb692f7ee0842f6ced",
+    "outputs/autobattle/a64-existing-living-guards-02.json": "d8876b486bcc4355bd9ad2481817c97e729f7b2ce466351c797ae65b589b6218",
+    "outputs/autobattle/a64-existing-interface-guards-02.json": "5db4fcf2742bcf2e0f2b0709d06159266ba554a06a40a3c0fd2df4280e0855c6",
+    "outputs/autobattle/a64-existing-cure-mutations-02.json": "50588e2b57b1808b4aedddd84d8c23fe38c98408c308552ecef4e37992dee92d"
   },
   "observations": [
     "Read-only table: Life ID5/base MP10; Full-Life ID6/base MP20.",
@@ -124,11 +148,13 @@
     "Corrected fixture exposes enabled Life5 at cost10. Two pre-acceptance Life joins show one KO-only table entry but cursor remains caster. 31 list and 57 overlay controls pass; target acceptance and revival remain UNKNOWN.",
     "Fresh guarded Life cast03: native HP0->221/MP221->211, Life context caster/target/target and flags0->32, EXP award30, native080C9B8C level40->41 and observed growth, restored command Action disabled/Wait enabled. No Wait in this accepted capture; full lifecycle criterion UNKNOWN.",
     "Cast01/02 rejected the real EXP99 level-up rather than weakening pre-action identity. A separate post-effect verifier now requires paired native growth and unchanged remaining identity; 42 retained mutations reject. Wait facing39 and final Life20 host controls pass. Facing01 was captured while its effect verifier source changed; inputs_unchanged=false, host facing replay only, excluded from fresh acceptance.",
-    "Wait01 correctly stops before Wait at an overstrict Life flag check: native08133388..90 ORs0x20, observed0x80->0xA0. The corrected verifier checks exact OR preservation rather than assuming initial0; fresh repeat required. Native growth and target store retained, no continuation acceptance."
+    "Wait01 correctly stops before Wait at an overstrict Life flag check: native08133388..90 ORs0x20, observed0x80->0xA0. The corrected verifier checks exact OR preservation rather than assuming initial0; fresh repeat required. Native growth and target store retained, no continuation acceptance.",
+    "Bounded A6.4 research accepted: wait02/wait03 independently reload, exactly one Life and one Wait each, source-stable, native HP/MP/level-up attribution, next enemyCarson4 independently joined. Live STOP at navigation, authorized Life final and post-Life Wait final prevents later input; reserve212 declines remaining211. Retained full-run22 and refusal13/13/13/12 mutants reject. Public revive remains UNKNOWN in separate A6.5."
   ],
   "limitations": [
     "Table metadata is not engine availability, KO semantics, target acceptance or revival proof.",
     "Existing Cure/living-only readers remain unchanged.",
-    "No public revive or item support."
+    "No public revive or item support.",
+    "PASS is restricted to the eight-unit corrected EXP99 fixture, Montblanc5/Life5/cost10, adjacent genuine KO Marche7. No public runner integration, arbitrary KO family, Full-Life or item claim."
   ]
 }

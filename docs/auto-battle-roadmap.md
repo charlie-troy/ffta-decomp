@@ -9,7 +9,7 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**A6.4 engine KO, corrected fixture reload, enabled Life/cost and selected KO target now have bounded PASS evidence. A single source-stable cast attributes revival and native level-up; complete two fresh Life/Wait continuations and live STOP/reserve/refusal gates before closing research. Public revival remains gated.**
+**A6.4 is bounded research PASS: two source-stable Life/Wait/independent-next-actor runs, native HP/MP/level-up attribution and live STOP/reserve controls. Proceed to A6.5 public revival integration with separate public lifecycle/receipt/regression gates. Public revival remains UNKNOWN until those gates pass.**
 Two public ally casts, damage-policy refusal/Wait, both STOP/manual/same-PID
 handoffs, two unsupported-family zero-input controls, the six-case self-Cure
 matrix and ordinary live Move/Wait pass on current production sources.
