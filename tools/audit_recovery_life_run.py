@@ -19,7 +19,7 @@ from recovery_menu_list import ResearchMenuList
 from recovery_party_continuation import observe_party_continuation
 from tactics_policy import evaluate, validate_policy
 from validate_recovery_life_menu import Memory
-from probe_recovery_ko_lifecycle import source_dependencies
+from recovery_source_versions import verify_source_versions
 
 
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -28,8 +28,8 @@ def digest(data):return hashlib.sha256(data).hexdigest()
 def audit(directory,doc,rom,refs):
     require(doc['status']=='observed-Life-Wait-continuation' and doc['inputs_unchanged']
             and not doc['fixture_writes'] and not doc['raw_writes']==[], 'Life run authority differs')
-    require(set(source_dependencies('probe_recovery_life_overlay')) <= set(doc['source_sha256'])
-            and doc['source_sha256'].get('baserom.gba')==digest(rom), 'Life source closure missing')
+    verify_source_versions(doc['source_sha256'],'probe_recovery_life_overlay',refs)
+    require(doc['source_sha256'].get('baserom.gba')==digest(rom), 'Life source closure missing')
     require(doc['policy_document']==json.loads(Path('configs/tactics/healer.json').read_text()),
             'Life full policy differs from its source document')
     for name,expected in doc['source_sha256'].items():

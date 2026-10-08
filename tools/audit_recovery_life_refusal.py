@@ -11,7 +11,7 @@ from recovery_menu import require
 from recovery_menu_list import ResearchMenuList
 from tactics_policy import evaluate, validate_policy
 from validate_recovery_life_menu import Memory
-from probe_recovery_ko_lifecycle import source_dependencies
+from recovery_source_versions import verify_source_versions
 
 
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -21,9 +21,7 @@ def audit(directory,doc,rom):
     stop=doc['status']=='observed-STOP-refusal'
     require(stop or doc['status']=='observed-policy-reserve-refusal','not an identified Life refusal')
     require(doc['inputs_unchanged'] and not doc['fixture_writes'],'refusal source/write authority differs')
-    require(set(source_dependencies('probe_recovery_life_overlay'))<=set(doc['source_sha256']),
-            'refusal source closure missing')
-    for p,h in doc['source_sha256'].items():require(sha(p)==h,'refusal source differs: '+p)
+    verify_source_versions(doc['source_sha256'],'probe_recovery_life_overlay',('HEAD','19f8497'))
     for n,h in doc.get('capture_sha256',{}).items():require(sha(directory/n)==h,'refusal capture differs: '+n)
     writes=doc['raw_writes'];require(writes and len(writes)%5==0,'missing/incomplete refusal input ledger')
     require([{k:v for k,v in r.items() if k!='event'} for r in writes]==doc['gameplay_writes'],

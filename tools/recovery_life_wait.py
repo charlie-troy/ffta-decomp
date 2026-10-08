@@ -80,13 +80,14 @@ class LifeWaitBoundary:
                          'max_mp':integer(u,0x1E,2),'tile':list(u[0xF6:0xF8])},
                 'candidates':[{'id':'wait','kind':'wait','action_id':10,'legal':True,'cost':0}]}
 
-    def commit(self,token,transport,policy,stopped):
+    def commit(self,token,transport,policy,stopped,*,choose=None):
         require(not self.final_attempted,'Wait final input already attempted')
-        stopped();snapshot=self.policy_snapshot(token);decision=evaluate(snapshot,policy)
+        choose=choose or (lambda snapshot:evaluate(snapshot,policy))
+        stopped();snapshot=self.policy_snapshot(token);decision=choose(snapshot)
         require((decision.get('decision') or {}).get('candidate_id')=='wait','policy declined Wait')
         self.events.append({'event':'final_policy','policy':deepcopy(policy),
                             'snapshot':snapshot,'evaluation':decision,'facing':token.receipt()})
-        stopped();snapshot=self.policy_snapshot(token);decision=evaluate(snapshot,policy)
+        stopped();snapshot=self.policy_snapshot(token);decision=choose(snapshot)
         require((decision.get('decision') or {}).get('candidate_id')=='wait','policy declined final Wait')
         self.events.append({'event':'revalidated_final_policy','policy':deepcopy(policy),
                             'snapshot':snapshot,'evaluation':decision})

@@ -12,11 +12,12 @@ from tactics_policy import evaluate
 
 class LifeFinalGate:
     def __init__(self, reader, transport, policy, *, stop_check=lambda: False,
-                 before_final=lambda: None):
+                 before_final=lambda: None, choose=None):
         self.reader, self.transport, self.policy = reader, transport, policy
         self.stop_check, self.before_final = stop_check, before_final
         self.started, self.final_attempted = False, False
         self.events = []
+        self.choose = choose or (lambda snapshot:evaluate(snapshot,self.policy))
 
     def check_stop(self):
         require(not self.stop_check(), 'STOP observed; Life final input forbidden')
@@ -29,7 +30,7 @@ class LifeFinalGate:
         require(isinstance(token,LifeOverlayToken) and token.stage == 'confirmation',
                 'Life final input lacks the accepted final target token')
         snapshot = self.reader.policy_snapshot(token)
-        decision = evaluate(snapshot,self.policy)
+        decision = self.choose(snapshot)
         self.events.append({'event': 'policy', 'policy': deepcopy(self.policy),
                             'snapshot': snapshot, 'evaluation': decision, 'token': token.receipt()})
         require((decision.get('decision') or {}).get('candidate_id') == 'life-ally',
@@ -38,7 +39,7 @@ class LifeFinalGate:
         self.check_stop()
         token = self.reader.revalidate(token,at_target=True)
         snapshot = self.reader.policy_snapshot(token)
-        final_decision = evaluate(snapshot,self.policy)
+        final_decision = self.choose(snapshot)
         require((final_decision.get('decision') or {}).get('candidate_id') == 'life-ally',
                 'final policy declined Life; no final input')
         self.events.append({'event': 'final_policy', 'policy': deepcopy(self.policy),

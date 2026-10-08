@@ -1,0 +1,369 @@
+{
+  "status": "pass-retained-Life-Wait-facing",
+  "scope": "Replay a native Wait facing capture; host STOP and single-attempt controls.",
+  "controls": [
+    "mode",
+    "selection",
+    "member",
+    "callback",
+    "state",
+    "driver",
+    "control",
+    "processor",
+    "wrapper",
+    "facing-owner",
+    "facing-active",
+    "direction",
+    "active-callback",
+    "caster-0x0",
+    "caster-0x9",
+    "caster-0x18",
+    "caster-0x1a",
+    "caster-0x1c",
+    "caster-0x28",
+    "caster-0xf2",
+    "caster-0xf6",
+    "caster-0x104",
+    "target-0x0",
+    "target-0x9",
+    "target-0x18",
+    "target-0x1a",
+    "target-0x1c",
+    "target-0x28",
+    "target-0xf2",
+    "target-0xf6",
+    "target-0x104",
+    "STOP-1",
+    "STOP-2",
+    "STOP-3",
+    "STOP-4",
+    "duplicate-delivered",
+    "duplicate-partial",
+    "duplicate-disconnect",
+    "expired"
+  ],
+  "valid_events": [
+    {
+      "event": "final_policy",
+      "policy": {
+        "schema": "ffta-tactics-policy/2",
+        "fallback": "wait",
+        "observation": {
+          "max_age_seconds": 3.0
+        },
+        "assignments": {
+          "party": {
+            "player": {
+              "rules": [
+                {
+                  "id": "revive-before-attack",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Life",
+                    "relation": "ally",
+                    "target_hp": {
+                      "eq": 0
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "a KO'd ally is exactly HP 0; the absolute predicate is used because a percent floors a 1-HP high-max ally to 0 too"
+                },
+                {
+                  "id": "heal-wounded-ally",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "ally",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "target_hp_pct": {
+                      "lte": 50
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "heal the weakest wounded ally; the MP predicate is the reserve that keeps at least 8 MP after the cast"
+                },
+                {
+                  "id": "heal-self",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "self",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "actor_hp_pct": {
+                      "lte": 40
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "self-heal below 40% while still holding the MP reserve"
+                },
+                {
+                  "id": "pressure-enemy",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "relation": "enemy"
+                  },
+                  "note": "otherwise take the engine-offered action on the weakest enemy"
+                },
+                {
+                  "id": "use-potion-last-resort",
+                  "enabled": false,
+                  "select": "first",
+                  "when": {
+                    "kind": "item",
+                    "item_name": "Potion",
+                    "item_count": {
+                      "gte": 1
+                    }
+                  },
+                  "note": "never-use-item by default: consumables are disabled, so this rule stays disabled and the party consumes nothing"
+                }
+              ],
+              "note": "Healer preset for every player-side actor without its own character assignment. Ordered revive -> heal ally -> heal self -> attack; every choice still comes only from the engine-legal candidates the adapter supplies."
+            }
+          }
+        },
+        "consumables": false,
+        "note": "A6 resource/recovery preset. Consumables stay disabled (no `consumables` flag), so the item rule cannot fire; the MP reserve is the remaining_mp_after_cost predicate. A learned heal is never a candidate by itself -- the engine must offer it."
+      },
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 0,
+        "actor": {
+          "name": "Montblanc",
+          "id": 5,
+          "job_id": 5,
+          "side": "player",
+          "hp": 241,
+          "max_hp": 248,
+          "mp": 211,
+          "max_mp": 222,
+          "tile": [
+            5,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "wait",
+            "kind": "wait",
+            "action_id": 10,
+            "legal": true,
+            "cost": 0
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "fallback",
+        "reason": "fallback:wait",
+        "scope": "party",
+        "rule_id": "fallback",
+        "decision": {
+          "candidate_id": "wait",
+          "kind": "wait",
+          "action_id": 10,
+          "target": null,
+          "target_id": null,
+          "scope": "party",
+          "rule_id": "fallback",
+          "fallback": true,
+          "reason": "fallback:wait"
+        },
+        "detail": null
+      },
+      "facing": {
+        "observed_at": 1,
+        "member": 33554824,
+        "actor_wrapper": 33695500,
+        "direction": 1,
+        "context": 33740960,
+        "callback": 33742168,
+        "hp": 241,
+        "mp": 211
+      }
+    },
+    {
+      "event": "revalidated_final_policy",
+      "policy": {
+        "schema": "ffta-tactics-policy/2",
+        "fallback": "wait",
+        "observation": {
+          "max_age_seconds": 3.0
+        },
+        "assignments": {
+          "party": {
+            "player": {
+              "rules": [
+                {
+                  "id": "revive-before-attack",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Life",
+                    "relation": "ally",
+                    "target_hp": {
+                      "eq": 0
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "a KO'd ally is exactly HP 0; the absolute predicate is used because a percent floors a 1-HP high-max ally to 0 too"
+                },
+                {
+                  "id": "heal-wounded-ally",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "ally",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "target_hp_pct": {
+                      "lte": 50
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "heal the weakest wounded ally; the MP predicate is the reserve that keeps at least 8 MP after the cast"
+                },
+                {
+                  "id": "heal-self",
+                  "enabled": true,
+                  "select": "first",
+                  "when": {
+                    "kind": "ability",
+                    "ability_name": "Cure",
+                    "relation": "self",
+                    "target_hp": {
+                      "gt": 0
+                    },
+                    "actor_hp_pct": {
+                      "lte": 40
+                    },
+                    "remaining_mp_after_cost": {
+                      "gte": 8
+                    }
+                  },
+                  "note": "self-heal below 40% while still holding the MP reserve"
+                },
+                {
+                  "id": "pressure-enemy",
+                  "enabled": true,
+                  "select": "lowest-target-hp",
+                  "when": {
+                    "relation": "enemy"
+                  },
+                  "note": "otherwise take the engine-offered action on the weakest enemy"
+                },
+                {
+                  "id": "use-potion-last-resort",
+                  "enabled": false,
+                  "select": "first",
+                  "when": {
+                    "kind": "item",
+                    "item_name": "Potion",
+                    "item_count": {
+                      "gte": 1
+                    }
+                  },
+                  "note": "never-use-item by default: consumables are disabled, so this rule stays disabled and the party consumes nothing"
+                }
+              ],
+              "note": "Healer preset for every player-side actor without its own character assignment. Ordered revive -> heal ally -> heal self -> attack; every choice still comes only from the engine-legal candidates the adapter supplies."
+            }
+          }
+        },
+        "consumables": false,
+        "note": "A6 resource/recovery preset. Consumables stay disabled (no `consumables` flag), so the item rule cannot fire; the MP reserve is the remaining_mp_after_cost predicate. A learned heal is never a candidate by itself -- the engine must offer it."
+      },
+      "snapshot": {
+        "schema": "ffta-tactics-snapshot/2",
+        "identity": "verified",
+        "age_seconds": 0,
+        "actor": {
+          "name": "Montblanc",
+          "id": 5,
+          "job_id": 5,
+          "side": "player",
+          "hp": 241,
+          "max_hp": 248,
+          "mp": 211,
+          "max_mp": 222,
+          "tile": [
+            5,
+            10
+          ]
+        },
+        "candidates": [
+          {
+            "id": "wait",
+            "kind": "wait",
+            "action_id": 10,
+            "legal": true,
+            "cost": 0
+          }
+        ]
+      },
+      "evaluation": {
+        "outcome": "fallback",
+        "reason": "fallback:wait",
+        "scope": "party",
+        "rule_id": "fallback",
+        "decision": {
+          "candidate_id": "wait",
+          "kind": "wait",
+          "action_id": 10,
+          "target": null,
+          "target_id": null,
+          "scope": "party",
+          "rule_id": "fallback",
+          "fallback": true,
+          "reason": "fallback:wait"
+        },
+        "detail": null
+      }
+    },
+    {
+      "event": "final_input_requested",
+      "mask": 1
+    },
+    {
+      "event": "final_input_delivered",
+      "hits": 5
+    }
+  ],
+  "source_sha256": {
+    "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
+    "tools/validate_recovery_life_wait.py": "0a9459ddaaf796de854d34758f79125616662e3d3f5c871ce892c1b7a38dd48c"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-life-wait-facing-01\\Wait-facing-ewram.bin": "6cbd62bf62dd39f0240110ffd479e46836600bb1864f6b7c372a2f30a661ba46",
+    "outputs\\autobattle\\a64-life-wait-facing-01\\Life-overlay.json": "50fc245b0d2a5278726e4ce2ea5356d688e570f0857ccc28f6e0b22f66ba3af2"
+  },
+  "limitations": [
+    "Retained reader/host transport proof only; no live STOP or continuation claim.",
+    "Capture source unchanged flag: False"
+  ]
+}

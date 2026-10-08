@@ -1,0 +1,84 @@
+{
+  "milestone": "A6.5",
+  "date": "2026-10-08",
+  "status": "unknown",
+  "scope": "Opt-in public integration of A6.4 exact eight-unit Life fixture; public acceptance separate from research",
+  "prerequisite": {
+    "milestone": "A6.4",
+    "status": "pass",
+    "receipt": "docs/receipts/autobattle/A6.4.json",
+    "commit": "19f8497"
+  },
+  "criteria": [
+    {
+      "id": "schema2-public-interface-and-shared-reader",
+      "status": "pass",
+      "scope": "Explicit mutually exclusive --bounded-ally-life requires schema2 before emulator; 10 host controls. Shared native transaction and public TacticsAdapter calls; fresh public02 verified."
+    },
+    {
+      "id": "two-fresh-public-Life-Wait-continuations",
+      "status": "unknown"
+    },
+    {
+      "id": "live-reserve-refusal-and-default-refusal",
+      "status": "unknown"
+    },
+    {
+      "id": "STOP-navigation-final-Wait-and-zero-later-input",
+      "status": "unknown"
+    },
+    {
+      "id": "same-PID-manual-handoff-resume",
+      "status": "unknown"
+    },
+    {
+      "id": "raw-policy-source-identity-effect-receipt-mutations",
+      "status": "unknown"
+    },
+    {
+      "id": "existing-Cure-and-runner-regressions",
+      "status": "unknown"
+    }
+  ],
+  "source_sha256": {
+    "tools/run_autobattle.py": "0e9e85d6b081e387669934b2e9a929aa7352756545be97b8ebcfb5185c03cb1c",
+    "tools/autobattle_runtime.py": "e849de62fe308f73883a550ce4148c8c42e0e5bc5c31b685743b90add846a904",
+    "tools/validate_autobattle_runtime.py": "eb26489de4ef4bdf756d6f56bd7b9b094831eb3400ff431a8ec3afcf4e76acc5",
+    "tools/life_recovery_runtime.py": "c500c9a5d6e65b8c9b2b3b25319047280d7ca6d25079dcdc27580a04e4d49f8a",
+    "tools/life_recovery_transaction.py": "e41c994fc226fb6de13cca140ed529b051ab3d1d5b667254c2f84c51ef87ae2b",
+    "tools/life_recovery_receipt.py": "e28d454990616614be5a10ee6aacc59e09509badadaa9ba6790f8fc05a58d5cc",
+    "tools/recovery_life_target.py": "60c8bd54e6a64095393786638edacdd396ee4928cf6f4fa774145c52d9aa3766",
+    "tools/recovery_life_final.py": "4ad604a0363308eee0f5defd113d7f1cc25e247cbb09cd55d9eca88fd76337af",
+    "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
+    "tools/recovery_life_trace.py": "61f0b6ecbf3603d7dd28b3e4aba0905dfe03b6ba4e66cc75b9230807a4073ab6",
+    "tools/recovery_life_effect.py": "8dcb15bde6f7feddbe2bae9f7c62644eb58fff0c8b3f0f090b4c9935dfccfddb",
+    "tools/recovery_source_versions.py": "3fef21940a6debb21a037514efb037fbe166ef3a9940a0f9db8f44542f39e783",
+    "tools/validate_life_recovery_interface.py": "57dd01a02fa3a3f5dca5b4ac19d51f1f96f3d991dfb60f332d00acf2a5117c0c",
+    "tools/validate_life_recovery_runtime.py": "6923b76e532052618061bc35ee3e0e3ba15a03655402a2bad62e64a47d322111",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a65-public-interface-01.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
+    "outputs/autobattle/a65-Life-final-host-01.json": "9709b9ad3dd71406404d142e61527272031e0562604f6600caa979632ba30b83",
+    "outputs/autobattle/a65-Wait-host-01.json": "dff36666c3f7c5cec5641d98edf82627834687c7b39b89819ae6306636313487",
+    "outputs/autobattle/a65-existing-interface-01.json": "5db4fcf2742bcf2e0f2b0709d06159266ba554a06a40a3c0fd2df4280e0855c6",
+    "outputs/autobattle/a65-public-Life-01-mutations.json": "24e8ea929f75ab5a6c69577fbc7c78c82094630b468af702834949c18a6c7302",
+    "outputs/autobattle/a65-public-Life-01/run.json": "e31f2137d6a4aff6f5b3906ff9417d3d7d726951c5c287babea75d5efeb61a8d",
+    "outputs/autobattle/a65-public-Life-01/events.jsonl": "e3c079c35eddda766928212d1101632dae781cd999f8bf15de735fbe302809f3",
+    "outputs/autobattle/a65-public-Life-01/input-log.jsonl": "0c78f6eac41107a088716aea8b03a6e153ffcd3122a30d94744ba429a1c5f85d",
+    "outputs/autobattle/a65-public-Life-01/Life-transaction-1/Life-engine.jsonl": "5925e2f4a2aa111eb3ee25a1a72655eba830035b26275dc5fc3c024c9981b08c",
+    "outputs/autobattle/a65-public-Life-02/run.json": "e8841bed38be0dd1a3fc8f8b5dcca446015080e9771b724e0f99571f4d3fbf7c",
+    "outputs/autobattle/a65-public-Life-02/events.jsonl": "9964a62327beff77e2349dfb9d3b3c88282ceea132044acc7f714e70151a5be9",
+    "outputs/autobattle/a65-public-Life-02/input-log.jsonl": "8ce7ad8e4846312f4204079c8a0ac3c15bbe22ed0a15ca984fcdba196008efb2",
+    "outputs/autobattle/a65-public-Life-02/Life-transaction-1/Life-engine.jsonl": "22489541f370f804a8d542bda872d9042635027dda171ac2af4f4702eecc59c9"
+  },
+  "limitations": [
+    "No public revival acceptance yet.",
+    "Exact Montblanc5/Life5/cost10/Marche7 and EXP99 native level-up fixture only.",
+    "Full-Life, arbitrary KO parties, items and ROM-native automation remain outside this packet."
+  ],
+  "observations": [
+    "Public01/02 each record identified-ally-life5 target7, native HP0->221, MP221->211, level40->41, guarded Wait and Carson4 next actor. Both source/input unchanged and public validators pass; max-turns1 stops stalled intentionally, no battle-completion claim. Public01 pilot source versions partly superseded; public02 exact implementation checkpoint is retained. Repeat current public implementation after remaining gate work.",
+    "35 public receipt mutations reject on public01. STOP/reserve/default refusal and same-PID lifecycle are pending."
+  ]
+}

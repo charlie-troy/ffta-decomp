@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "scope": "Public recovery flags reject invalid policies and families before input.",
+  "checks": [
+    {
+      "case": "missing schema2",
+      "status": "pass",
+      "emulator_touched": false
+    },
+    {
+      "case": "schema1 refused",
+      "status": "pass",
+      "emulator_touched": false
+    },
+    {
+      "case": "exclusive fixture flags",
+      "status": "pass",
+      "emulator_touched": false
+    },
+    {
+      "case": "self-only caster",
+      "status": "pass",
+      "raw_writes": 0
+    },
+    {
+      "case": "wrong party count",
+      "status": "pass",
+      "raw_writes": 0
+    },
+    {
+      "case": "wrong caster job",
+      "status": "pass",
+      "raw_writes": 0
+    },
+    {
+      "case": "wrong caster tile",
+      "status": "pass",
+      "raw_writes": 0
+    }
+  ]
+}

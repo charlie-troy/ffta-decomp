@@ -1,5 +1,17 @@
 # Project log
 
+## 2026-10-08 - A6.5 public Life implementation checkpoint
+
+Added mutually exclusive schema2 --bounded-ally-life and shared state-driven
+Life transaction; production living-Cure readers remain unchanged. Public01/02
+record Life5 target7, native HP0->221/MP221->211/level40->41, one Wait and
+independent next Carson4. Both preserve input/source files and pass the public
+validator; the one-turn budget stops intentionally as stalled, not completed.
+Public interface10, Life final20/Wait39 and public receipt35 mutation controls
+pass. A6.5 remains UNKNOWN pending further fresh current acceptance, live
+STOP/reserve/default refusal and same-PID manual/resume lifecycle. Historical
+research source versions resolve by their actual captured import closure.
+
 ## 2026-10-08 - A6.4 bounded Life research passes
 
 All six A6.4 research criteria now pass in the corrected eight-unit fixture.

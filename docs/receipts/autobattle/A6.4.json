@@ -53,18 +53,20 @@
     "tools/validate_recovery_life_menu.py": "eda08b81d67628bb1d08c0a801a383eb229219876ba86c17de08d58b1a4276e0",
     "tools/validate_recovery_action_set.py": "19f09bd1e9b926a2766f2e6c9f3eae13a9c9acb826cf92b4946485586056fbd9",
     "tools/recovery_life_target.py": "60c8bd54e6a64095393786638edacdd396ee4928cf6f4fa774145c52d9aa3766",
-    "tools/probe_recovery_life_overlay.py": "0e4d363202a3ff824d6f66cdf1ce42c35d5ede8ad5ddfa17bd115f839726bc37",
+    "tools/probe_recovery_life_overlay.py": "44fbd08f02a039455d353e584cc66364a393912995d0690c77cb9eb1d1a13e23",
     "tools/validate_recovery_life_overlay.py": "bb0f52abd693968d2bf7f29383df144143be9557ce757429e06272dcd8601fdc",
-    "tools/recovery_life_final.py": "af92b61866df173e127d25428e751da0ec4b67651d8eb5f5e19af1a7b74336a1",
+    "tools/recovery_life_final.py": "4ad604a0363308eee0f5defd113d7f1cc25e247cbb09cd55d9eca88fd76337af",
     "tools/validate_recovery_life_final.py": "6a1a63eca8b043f4ef4401b968058cac63d002863475fd88d952164279c6ab9e",
     "tools/recovery_life_trace.py": "61f0b6ecbf3603d7dd28b3e4aba0905dfe03b6ba4e66cc75b9230807a4073ab6",
     "tools/recovery_life_effect.py": "8dcb15bde6f7feddbe2bae9f7c62644eb58fff0c8b3f0f090b4c9935dfccfddb",
     "tools/validate_recovery_life_effect.py": "365fbeabcb075b013a348e3769f995ad06dcd2cf747a4c9354b7872b396df180",
-    "tools/recovery_life_wait.py": "588f9367f658b759b12e606d80b53d9f3c51c2a2816725de0c9fdcc912334214",
+    "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
     "tools/validate_recovery_life_wait.py": "0a9459ddaaf796de854d34758f79125616662e3d3f5c871ce892c1b7a38dd48c",
-    "tools/audit_recovery_life_run.py": "85c595809c2d655375f1ea65fb0ce8eb4622fb9e9dfa7c4b7fd73d8557cde99c",
-    "tools/audit_recovery_life_refusal.py": "63d6bc7e56f30e0afaeb1ada7b1dcd0b0421409948a4e7f365fd571d3ecb7087",
-    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
+    "tools/audit_recovery_life_run.py": "6d85c20c32dbfb50d1343d65fcd1975b376727e954997e6f852bef72c73cd60f",
+    "tools/audit_recovery_life_refusal.py": "377f2b4f69f757c42200c85922825dcca4790d8ece01590b6684ba5f5aeec0b4",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
+    "tools/life_recovery_transaction.py": "e41c994fc226fb6de13cca140ed529b051ab3d1d5b667254c2f84c51ef87ae2b",
+    "tools/recovery_source_versions.py": "3fef21940a6debb21a037514efb037fbe166ef3a9940a0f9db8f44542f39e783"
   },
   "evidence_sha256": {
     "outputs/autobattle/a64-ability-metadata.json": "e69a6d90fb4c680d71af08396121748d39b13461347a2359bcac16386038aab6",
@@ -149,7 +151,8 @@
     "Fresh guarded Life cast03: native HP0->221/MP221->211, Life context caster/target/target and flags0->32, EXP award30, native080C9B8C level40->41 and observed growth, restored command Action disabled/Wait enabled. No Wait in this accepted capture; full lifecycle criterion UNKNOWN.",
     "Cast01/02 rejected the real EXP99 level-up rather than weakening pre-action identity. A separate post-effect verifier now requires paired native growth and unchanged remaining identity; 42 retained mutations reject. Wait facing39 and final Life20 host controls pass. Facing01 was captured while its effect verifier source changed; inputs_unchanged=false, host facing replay only, excluded from fresh acceptance.",
     "Wait01 correctly stops before Wait at an overstrict Life flag check: native08133388..90 ORs0x20, observed0x80->0xA0. The corrected verifier checks exact OR preservation rather than assuming initial0; fresh repeat required. Native growth and target store retained, no continuation acceptance.",
-    "Bounded A6.4 research accepted: wait02/wait03 independently reload, exactly one Life and one Wait each, source-stable, native HP/MP/level-up attribution, next enemyCarson4 independently joined. Live STOP at navigation, authorized Life final and post-Life Wait final prevents later input; reserve212 declines remaining211. Retained full-run22 and refusal13/13/13/12 mutants reject. Public revive remains UNKNOWN in separate A6.5."
+    "Bounded A6.4 research accepted: wait02/wait03 independently reload, exactly one Life and one Wait each, source-stable, native HP/MP/level-up attribution, next enemyCarson4 independently joined. Live STOP at navigation, authorized Life final and post-Life Wait final prevents later input; reserve212 declines remaining211. Retained full-run22 and refusal13/13/13/12 mutants reject. Public revive remains UNKNOWN in separate A6.5.",
+    "A6.5 extracts the accepted state-driven transaction into life_recovery_transaction.py and adds optional public policy callbacks. A6.4 historical source closures resolve from exact captured import graphs at19f8497/6ab4e70; separate public acceptance remains open."
   ],
   "limitations": [
     "Table metadata is not engine availability, KO semantics, target acceptance or revival proof.",
