@@ -1,0 +1,250 @@
+{
+  "status": "pass-public-Life-receipt-mutations",
+  "scope": "Mutate a real public Life run through the full public runtime validator.",
+  "run": "outputs\\autobattle\\a65-public-Life-03",
+  "rejected": [
+    {
+      "case": "missing journal",
+      "errors": [
+        "turn event 3: bounded recovery journal missing"
+      ]
+    },
+    {
+      "case": "missing adapter",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life policy observations missing/repeated)"
+      ]
+    },
+    {
+      "case": "wrong adapter target",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life policy/adapter differs)"
+      ]
+    },
+    {
+      "case": "wrong adapter actor",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life policy/adapter differs)"
+      ]
+    },
+    {
+      "case": "stale Life policy",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life policy/adapter differs)"
+      ]
+    },
+    {
+      "case": "missing full policy",
+      "errors": [
+        "event 3: invalid recovery journal (policy.schema: must be one of ('ffta-tactics-policy/1', 'ffta-tactics-policy/2'))"
+      ]
+    },
+    {
+      "case": "empty raw journal",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)"
+      ]
+    },
+    {
+      "case": "empty request journal",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)"
+      ]
+    },
+    {
+      "case": "empty ledger",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run"
+      ]
+    },
+    {
+      "case": "truncated ledger",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)"
+      ]
+    },
+    {
+      "case": "post terminal",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=72.1): ['key_write']"
+      ]
+    },
+    {
+      "case": "duplicate Life final",
+      "errors": [
+        "event 3: invalid recovery journal (duplicate public Life/Wait final)"
+      ]
+    },
+    {
+      "case": "duplicate Wait final",
+      "errors": [
+        "event 3: invalid recovery journal (duplicate public Life/Wait final)"
+      ]
+    },
+    {
+      "case": "missing native trace",
+      "errors": [
+        "event 3: invalid recovery journal (Life level-up witness missing or repeated)"
+      ]
+    },
+    {
+      "case": "native error",
+      "errors": [
+        "event 3: invalid recovery journal (public Life altered fixture/trace failed)"
+      ]
+    },
+    {
+      "case": "fixture write",
+      "errors": [
+        "event 3: invalid recovery journal (public Life altered fixture/trace failed)"
+      ]
+    },
+    {
+      "case": "missing before raw unit",
+      "errors": [
+        "event 3: invalid recovery journal (Life canonical capture set differs)"
+      ]
+    },
+    {
+      "case": "missing after raw unit",
+      "errors": [
+        "event 3: invalid recovery journal ('33554824')"
+      ]
+    },
+    {
+      "case": "changed raw growth",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life actor identity/resources differ)"
+      ]
+    },
+    {
+      "case": "invented revived HP",
+      "errors": [
+        "event 3: invalid recovery journal (partial public native Life effect differs)"
+      ]
+    },
+    {
+      "case": "invented EXP",
+      "errors": [
+        "event 3: invalid recovery journal (Life EXP award attribution differs)"
+      ]
+    },
+    {
+      "case": "missing level-up",
+      "errors": [
+        "event 3: invalid recovery journal (Life level-up witness missing or repeated)"
+      ]
+    },
+    {
+      "case": "wrong action",
+      "errors": [
+        "turn event 3: invalid actor-linked result (ally-Life actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "wrong target",
+      "errors": [
+        "turn event 3: invalid actor-linked result (ally-Life actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "target MP spent",
+      "errors": [
+        "turn event 3: invalid actor-linked result (ally-Life actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "caster no MP spent",
+      "errors": [
+        "turn event 3: invalid actor-linked result (ally-Life actor/effect/target differs)"
+      ]
+    },
+    {
+      "case": "stale Wait actor",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life policy/adapter differs)"
+      ]
+    },
+    {
+      "case": "invented next player",
+      "errors": [
+        "event 3: invalid recovery journal (public Life next actor attribution differs)"
+      ]
+    },
+    {
+      "case": "stale next canonical",
+      "errors": [
+        "event 3: invalid recovery journal (public Life next actor attribution differs)"
+      ]
+    },
+    {
+      "case": "stale next wrapper",
+      "errors": [
+        "event 3: invalid recovery journal (public Life next actor attribution differs)"
+      ]
+    },
+    {
+      "case": "no restored roster",
+      "errors": [
+        "event 3: invalid recovery journal (public Life restored roster/growth missing)"
+      ]
+    },
+    {
+      "case": "stale baseline level",
+      "errors": [
+        "event 3: invalid recovery journal (public Life restored roster/growth missing)"
+      ]
+    },
+    {
+      "case": "wrong trace count",
+      "errors": [
+        "event 3: invalid recovery journal (public Life trace lifecycle differs)"
+      ]
+    },
+    {
+      "case": "wrong halt",
+      "errors": [
+        "event 3: invalid recovery journal (public Life halt differs)"
+      ]
+    },
+    {
+      "case": "source changed",
+      "errors": [
+        "bounded recovery inputs changed during execution",
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "missing source proof",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "empty source closure",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "changed source after",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_life_recovery_runtime.py": "524499c4d6a110582600c0dcf53c33b5072cc581f7196b0c954cac40df377681",
+    "tools/life_recovery_receipt.py": "d488b6af26bd21994423d247b648e12d76ade5bba234082e6e822df2d8ae9693",
+    "tools/validate_autobattle_runtime.py": "98e802fc581bfc44b5f6d4204aa5cf149eddff198a4eadeebf16ba53faf9ae33"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a65-public-Life-03\\run.json": "f81a7e65db97d53ed55476e45fed2c6b456b2671eb3fdb760a07b788ef8130dc",
+    "outputs\\autobattle\\a65-public-Life-03\\events.jsonl": "0c88588e44681eca9c8bac9b670504e7826815305ee2bbde81537dbd321dda28",
+    "outputs\\autobattle\\a65-public-Life-03\\input-log.jsonl": "4d1799928870e4d5280e83c23d84ca80517df60ce575e9a123adb550214ce5d5"
+  },
+  "limitations": [
+    "Retained public validator audit; not a fresh public battle."
+  ]
+}

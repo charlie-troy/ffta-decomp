@@ -1,0 +1,1 @@
+Exact intermediate validator reconstructed from4ccb7f0 by removing the later same-PID flag check and diagnostic field. Its SHA256 matches the original stable public reserve capture. This preserves captured provenance without treating later code as the captured version.

@@ -1,0 +1,18 @@
+{
+  "status": "pass-read-only-boundary-diagnostic",
+  "scope": "Exercise read-only status decoding under the actual small-packet constraint.",
+  "checks": [
+    "all22 units read below512 byte packet bound",
+    "unique fixture identities",
+    "Sleep absent",
+    "Sleep flag and duration present",
+    "no input or write API"
+  ],
+  "source_sha256": {
+    "tools/recovery_boundary_diagnostic.py": "2b72c63c1a5a7bc0cc36b1a6e4ac73cce5ba3cbec6c8ed6e440988a9fc6decce",
+    "tools/validate_recovery_boundary_diagnostic.py": "2a358659b83fe2ae3e477e2a3d5c7773651fe05e1bf33a963ba6afffd4885b98"
+  },
+  "limitations": [
+    "Host decoder controls only; native Sleep requires a live diagnostic capture."
+  ]
+}

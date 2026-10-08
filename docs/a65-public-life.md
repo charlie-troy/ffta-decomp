@@ -53,3 +53,15 @@ process state for inspection. GDB is a read-only monitor during manual input.
 The bounded-resume audit rejects five changes, including false PID adoption,
 missing first-leg source proofs and automated input in the manual gap. This
 audit passes for the failed attempt; the lifecycle gate remains UNKNOWN.
+
+The third capture (PID16628) records the diagnostic failure explicitly: mGBA
+truncated the whole-array RSP reply. The corrected reader fetches one264-byte
+unit per request; host tests enforce the512-byte bound and exercise Sleep
+present/absent with no input API. A fresh diagnostic capture is still required.
+
+`audit_life_public_sources.py` resolves the captured Python import graph from
+exact local/Git bytes. Public Life03 and the full manual closure on Wait03 pass.
+Reserve01 used an intermediate validator version; its archived reconstruction
+matches the capture SHA256 exactly and is accepted only by that exact hash.
+Use `--source-dir outputs/autobattle/a65-source-history` with Git refs790f333
+and4ccb7f0 to reproduce that provenance audit. This is retained-source evidence.

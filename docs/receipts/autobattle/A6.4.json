@@ -66,7 +66,7 @@
     "tools/audit_recovery_life_refusal.py": "377f2b4f69f757c42200c85922825dcca4790d8ece01590b6684ba5f5aeec0b4",
     "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
     "tools/life_recovery_transaction.py": "1f758c25a8ac0586257d23acbe75c5e808c2bbfa2ab238b294974c85173c1687",
-    "tools/recovery_source_versions.py": "3fef21940a6debb21a037514efb037fbe166ef3a9940a0f9db8f44542f39e783"
+    "tools/recovery_source_versions.py": "a870a297793e13ee585bb8332507f59fdf79b3ad28a977d1a0edf5cdf18a477e"
   },
   "evidence_sha256": {
     "outputs/autobattle/a64-ability-metadata.json": "e69a6d90fb4c680d71af08396121748d39b13461347a2359bcac16386038aab6",

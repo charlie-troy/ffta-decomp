@@ -33,7 +33,7 @@
     {
       "id": "same-PID-manual-handoff-resume",
       "status": "unknown",
-      "scope": "Wait01 PID79496 and Wait02 PID76672 verified manual window Wait and exact PID adoption. Both resumed with zero identified player turns at150/300 second bounds; do not accept adoption as control. Sleep screenshot hypothesis requires native RAM diagnostic."
+      "scope": "Wait01 PID79496 and Wait02 PID76672 verified manual window Wait and exact PID adoption. Both resumed with zero identified player turns at150/300 second bounds; do not accept adoption as control. Sleep screenshot hypothesis requires native RAM diagnostic. Wait03 PID16628 repeats the bounded failure; full manual Python import closure now resolves exactly. Diagnostic failed honestly on oversized RSP reads; unit-size fix under fresh observation."
     },
     {
       "id": "raw-policy-source-identity-effect-receipt-mutations",
@@ -58,19 +58,21 @@
     "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
     "tools/recovery_life_trace.py": "61f0b6ecbf3603d7dd28b3e4aba0905dfe03b6ba4e66cc75b9230807a4073ab6",
     "tools/recovery_life_effect.py": "65d7a22c6d368835c098cb32af517694576a3d2d375b9bb85270dc3610800a4c",
-    "tools/recovery_source_versions.py": "3fef21940a6debb21a037514efb037fbe166ef3a9940a0f9db8f44542f39e783",
+    "tools/recovery_source_versions.py": "a870a297793e13ee585bb8332507f59fdf79b3ad28a977d1a0edf5cdf18a477e",
     "tools/validate_life_recovery_interface.py": "305ced4bd57c5f59fa4e7acdacc5d096da384f594b7c3a78d953e68f9c0bace1",
     "tools/validate_life_recovery_runtime.py": "524499c4d6a110582600c0dcf53c33b5072cc581f7196b0c954cac40df377681",
     "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
     "tools/run_life_cli_stop.py": "2e1d0f78ca787438979ade86ab7fcdf030338c9b3191754a391f7ace61ba5657",
     "tools/manual_life_wait_handoff.py": "370a30df2e7e0d13535ad42e8e3d7059e098ff8450ae52120b04d292b605d365",
     "tools/validate_life_recovery_decline.py": "9219dc3982b903f23be67a82227042efb0589075cadb5a3b1cf60318ff6f2958",
-    "tools/recovery_boundary_diagnostic.py": "6aaf71c26c1fd9a2b5f15766aca162ef6bc4c42d07ad62db5191168b22f3c48d",
+    "tools/recovery_boundary_diagnostic.py": "2b72c63c1a5a7bc0cc36b1a6e4ac73cce5ba3cbec6c8ed6e440988a9fc6decce",
     "tools/run_life_recovery_handoff.py": "11c11e0bb0fe4d6deaf021a61dd39c9476610cf46ace5a1cf95f76bbace5a40e",
     "tools/validate_life_recovery_handoff.py": "fd76dde7d3c580225a845ad18b53242ca12d4618a5d8eeb94ff2599c48e1f3b1",
     "tools/validate_life_recovery_default.py": "b3a1bd979244d821563e4bfb7ce904aa4c61ba190c9551834388539dd5bdde64",
     "tools/validate_life_recovery_fixture.py": "ca07065dae40d634b332bb369732b149c6b8e7c243fabe641efc7f6468482f10",
-    "tools/validate_life_recovery_resume_bound.py": "154d15b1d6b99063ff1ba6565fd815c2b21d374be018c125a65116fd0022dca2"
+    "tools/validate_life_recovery_resume_bound.py": "154d15b1d6b99063ff1ba6565fd815c2b21d374be018c125a65116fd0022dca2",
+    "tools/audit_life_public_sources.py": "65ec9c71421307e7a5c2ff69f6e6a0f70de80311cb65a30ad8dbdaa6e59e0f1e",
+    "tools/validate_recovery_boundary_diagnostic.py": "2a358659b83fe2ae3e477e2a3d5c7773651fe05e1bf33a963ba6afffd4885b98"
   },
   "evidence_sha256": {
     "outputs/autobattle/a65-public-interface-01.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
@@ -141,7 +143,22 @@
     "outputs/autobattle/a65-public-unsupported-01/input-log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "outputs/autobattle/a65-public-unsupported-01/run.json": "a9e0844f05e146405911a0989cf2b11e4e0d1e4e803d8bcaa0f6e3695e632cec",
     "outputs/autobattle/a65-public-unsupported-01-checks.json": "4e3e3747f32d38f949c85dc5459ef91dbea445ae4499e0439397c1fb395cb07f",
-    "outputs/autobattle/a65-public-STOP-Wait-02-bound-checks.json": "8ce54d4ec1da838a157f076de73ec8e413fd74c49fa7596aeb19b3ef232a37c8"
+    "outputs/autobattle/a65-public-STOP-Wait-02-bound-checks.json": "8ce54d4ec1da838a157f076de73ec8e413fd74c49fa7596aeb19b3ef232a37c8",
+    "outputs/autobattle/a65-public-STOP-Wait-03/events.jsonl": "e72017105b0a15f2aa30c277c4f74e793e99e473978edf4efdc24c670e42348b",
+    "outputs/autobattle/a65-public-STOP-Wait-03/input-log.jsonl": "1a23987c52148dea37c443f8d662005ff063178d946003646854af80a2cb0fbd",
+    "outputs/autobattle/a65-public-STOP-Wait-03/manual-Life-Wait.json": "297a3eb64a86a19e1371e73bde73fd63348d8edb7eb08c9535ad46ac5d4c6c2c",
+    "outputs/autobattle/a65-public-STOP-Wait-03/paused-run.json": "d96de59079b6ca1391a06fe613b91ea96629b424136095c526a4659a891df673",
+    "outputs/autobattle/a65-public-STOP-Wait-03/run.json": "ae7a0bea4690ad6cc6ee54c9871528f78d8d35a375976cb0efd2356465edcdf7",
+    "outputs/autobattle/a65-public-STOP-Wait-03/STOP-trigger.json": "2c0df3ee0f6376acd2b2cf1b6434dd9c3179a6aeeeee8a20405a18d3f06b6cd2",
+    "outputs/autobattle/a65-public-STOP-Wait-03/Life-transaction-1/Life-engine.jsonl": "27040de516a1c0f3017db422b18c773c844a98615cb6fc2029a811d9e9d594ec",
+    "outputs/autobattle/a65-public-STOP-Wait-03-bound-checks.json": "7a125ab531e9db2056dfcfda5c4ca17b1b5f0a30dfc3dabee9e69914ea8f7c32",
+    "outputs/autobattle/a65-public-STOP-Wait-03-sources.json": "4f6a4523b8b804c620b6f9cb3ce2f6ec099c663ddcf9fb799ef5e42bce2fa066",
+    "outputs/autobattle/a65-public-Life-03-sources.json": "1a352d04789bf360b22c4ea45598565490f31a91b606495fbfac74a36fe8641c",
+    "outputs/autobattle/a65-public-Life-03-mutations-03.json": "c835e8d532af0d0586c8263b57eb8d32ec055bc03668fad9d85203982de7a2de",
+    "outputs/autobattle/a65-public-reserve-01-sources.json": "820f8194403b3114136c12ee73b028ea34dd82590b426ec726755b9e8cdd1db8",
+    "outputs/autobattle/a65-research-regression-01.json": "9a6e8bd97da753b6e6158b156004132f28892e416097ea93c66c708df798c9ee",
+    "outputs/autobattle/a65-boundary-diagnostic-host-01.json": "235f46e62719b271f420db51d0d318a77455170123d82841caeef1c49be1bb03",
+    "outputs/autobattle/a65-source-history/tools/validate_autobattle_runtime.py": "22d5c3d93a7d327d8525f99010835ee5792cf367adc39b9aa17268f3e6de0f24"
   },
   "limitations": [
     "No public revival acceptance yet.",

@@ -1,0 +1,58 @@
+{
+  "status": "pass-captured-Life-source-closures",
+  "scope": "Resolve captured public Life import closures against exact local/Git bytes.",
+  "resolutions": [
+    {
+      "leg": 0,
+      "entry": "life_recovery_runtime",
+      "closure": [
+        "ability_resources",
+        "ability_table",
+        "autobattle_identity",
+        "autobattle_runtime",
+        "build_recovery_fixture",
+        "ffta_names",
+        "ffta_text",
+        "fixture_guard",
+        "life_recovery_runtime",
+        "life_recovery_transaction",
+        "party_recovery_runtime",
+        "probe_control_handoff",
+        "probe_recovery_ko_lifecycle",
+        "probe_recovery_party",
+        "recovery_ally_confirmation",
+        "recovery_ally_executor",
+        "recovery_ally_preview",
+        "recovery_ally_target",
+        "recovery_continuation",
+        "recovery_executor",
+        "recovery_ko_trace",
+        "recovery_life_effect",
+        "recovery_life_final",
+        "recovery_life_target",
+        "recovery_life_trace",
+        "recovery_life_wait",
+        "recovery_menu",
+        "recovery_menu_list",
+        "recovery_party",
+        "recovery_party_continuation",
+        "recovery_runtime",
+        "recovery_transport",
+        "status_flags",
+        "tactics_adapter",
+        "tactics_policy",
+        "trace_mgba"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/audit_life_public_sources.py": "7d1b4d4f4f2e7f0e991d8cb3844bd570e6a0ffecb82598ff6e657888fb585f6c",
+    "tools/recovery_source_versions.py": "3fef21940a6debb21a037514efb037fbe166ef3a9940a0f9db8f44542f39e783"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a65-public-Life-03\\run.json": "f81a7e65db97d53ed55476e45fed2c6b456b2671eb3fdb760a07b788ef8130dc"
+  },
+  "limitations": [
+    "Captured source provenance only; not new gameplay or successful resume."
+  ]
+}

@@ -7,14 +7,21 @@ import subprocess
 from recovery_menu import require
 
 
-def verify_source_versions(pins,entry,refs=()):
+def verify_source_versions(pins,entry,refs=(),directories=()):
     resolved={}
     for path,expected in pins.items():
         local=Path(path)
         data=local.read_bytes() if local.is_file() else None
         if data is None or hashlib.sha256(data).hexdigest()!=expected:
             data=None
+            for directory in directories:
+                candidate=Path(directory)/path
+                if candidate.is_file():
+                    captured=candidate.read_bytes()
+                    if hashlib.sha256(captured).hexdigest()==expected:
+                        data=captured;break
             for ref in refs:
+                if data is not None:break
                 proc=subprocess.run(['git','show',ref+':'+path],capture_output=True)
                 if proc.returncode==0 and hashlib.sha256(proc.stdout).hexdigest()==expected:
                     data=proc.stdout;break

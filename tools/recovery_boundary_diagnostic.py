@@ -6,12 +6,11 @@ from recovery_menu import MEMBERS, MEMBER_COUNT, integer, exact
 def capture_boundary_diagnostic(g, probe):
     blocks = {}
     for label, address, count in [('mirror', ROSTER, 8), ('canonical', MEMBERS, MEMBER_COUNT)]:
-        raw = exact(g, address, count * STRIDE)
-        if len(raw) != count * STRIDE:
-            raise ValueError('short terminal diagnostic ' + label)
         players = []
         for index in range(count):
-            unit = raw[index * STRIDE:(index + 1) * STRIDE]
+            # Stay below mGBA's RSP reply limit; a whole canonical array
+            # exceeds it and can yield an unusable prefix.
+            unit = exact(g, address + index * STRIDE, STRIDE)
             if unit[0x104] not in (5, 7) or integer(unit, 0) == 0:
                 continue
             players.append({'address': address + index * STRIDE, 'raw': unit.hex(),
