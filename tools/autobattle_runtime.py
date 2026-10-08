@@ -58,6 +58,7 @@ EVENT_SCHEMA = {
     # scope/rule, observation age, offered candidates). None without a policy.
     "tactics": None,
     "recovery": None,
+    "boundary_diagnostic": None,
 }
 
 

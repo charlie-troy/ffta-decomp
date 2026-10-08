@@ -1,0 +1,74 @@
+{
+  "status": "read-only-post-crash-observation",
+  "pid": 85332,
+  "listener_pid_verified": true,
+  "wall_time": 1791497898.967227,
+  "gameplay_writes": 0,
+  "diagnostic": {
+    "scope": "Read-only terminal evidence; observations never authorize input or completion.",
+    "party": {
+      "mirror": [
+        {
+          "address": 33644304,
+          "raw": "c71255080805010507290000010101010101010101000000f100f800d300de0021018501a601e101810093004b01190153015d015818090000004b1e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3e029400aa000600000003000000000000000000000000ff0000200000000000002000000000050a01030506010203fc0002000005000187",
+          "id": 5,
+          "name": 139793095,
+          "hp": 241,
+          "mp": 211,
+          "status_EB": 0,
+          "sleep": false,
+          "sleep_duration": 0
+        },
+        {
+          "address": 33644832,
+          "raw": "1c1f00020205010507326300010101010101010101000000dd00ba0155005500070214027601c00181000c000b01280153015d018e020a0000002c8b0b000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee2c009b00aa006300000003000000000000000000000000ff0000200000000000009a02000000040a02020505010203fc0001000007000201",
+          "id": 7,
+          "name": 33562396,
+          "hp": 221,
+          "mp": 85,
+          "status_EB": 0,
+          "sleep": false,
+          "sleep_duration": 0
+        }
+      ],
+      "canonical": [
+        {
+          "address": 33554560,
+          "raw": "1c1f00020205010507326300010101010101010101000000dd00ba0155005500070214027601c00181000c000b01280153015d018e020a0000002c8b0b000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee2c009b00aa006300000003000000000000000000000000ff0000200000000000009a02000000040a02020505010203fc0001000007000201",
+          "id": 7,
+          "name": 33562396,
+          "hp": 221,
+          "mp": 85,
+          "status_EB": 0,
+          "sleep": false,
+          "sleep_duration": 0
+        },
+        {
+          "address": 33554824,
+          "raw": "c71255080805010507290000010101010101010101000000f100f800d300de0021018501a601e101810093004b01190153015d015818090000004b1e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3e029400aa000600000003000000000000000000000000ff0000200000000000002000000000050a01030506010203fc0002000005000187",
+          "id": 5,
+          "name": 139793095,
+          "hp": 241,
+          "mp": 211,
+          "status_EB": 0,
+          "sleep": false,
+          "sleep_duration": 0
+        }
+      ]
+    },
+    "target_cursor": [
+      11,
+      8
+    ],
+    "command_cursor": 0,
+    "sleep_reader": {
+      "getter": 135060260,
+      "offset": 235,
+      "mask": 4,
+      "duration_offset": 223
+    }
+  },
+  "limitations": [
+    "Public resume crashed before final receipt; this separate later observation does not repair it."
+  ]
+}

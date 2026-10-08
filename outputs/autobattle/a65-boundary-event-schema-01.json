@@ -1,0 +1,14 @@
+{
+  "status": "pass-diagnostic-event-schema",
+  "checks": [
+    "actual runtime event serializer accepts diagnostic",
+    "validator whitelist accepts serialized fields"
+  ],
+  "source_sha256": {
+    "tools/autobattle_runtime.py": "6c200c650d40c535f751a22d88c995893db89038dc2e40d271bf3c6751ee6dec",
+    "tools/validate_autobattle_runtime.py": "98e802fc581bfc44b5f6d4204aa5cf149eddff198a4eadeebf16ba53faf9ae33"
+  },
+  "limitations": [
+    "Host serialization only; no repaired or successful native resume."
+  ]
+}

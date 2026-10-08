@@ -48,7 +48,7 @@
   ],
   "source_sha256": {
     "tools/run_autobattle.py": "ff8fa77e72e66410dd0e6796dc976bd9f422ab2a5d749ed8f1422bbca8be8d66",
-    "tools/autobattle_runtime.py": "cc477d14d16bb155c91c489a0304af1071a116904cda355ac4e2a4eaede670c0",
+    "tools/autobattle_runtime.py": "6c200c650d40c535f751a22d88c995893db89038dc2e40d271bf3c6751ee6dec",
     "tools/validate_autobattle_runtime.py": "98e802fc581bfc44b5f6d4204aa5cf149eddff198a4eadeebf16ba53faf9ae33",
     "tools/life_recovery_runtime.py": "0b03dde158f2bfc1edc25c659eccfd211e597556ee510e9c8b712892ef65e2be",
     "tools/life_recovery_transaction.py": "1f758c25a8ac0586257d23acbe75c5e808c2bbfa2ab238b294974c85173c1687",
@@ -158,12 +158,28 @@
     "outputs/autobattle/a65-public-reserve-01-sources.json": "820f8194403b3114136c12ee73b028ea34dd82590b426ec726755b9e8cdd1db8",
     "outputs/autobattle/a65-research-regression-01.json": "9a6e8bd97da753b6e6158b156004132f28892e416097ea93c66c708df798c9ee",
     "outputs/autobattle/a65-boundary-diagnostic-host-01.json": "235f46e62719b271f420db51d0d318a77455170123d82841caeef1c49be1bb03",
-    "outputs/autobattle/a65-source-history/tools/validate_autobattle_runtime.py": "22d5c3d93a7d327d8525f99010835ee5792cf367adc39b9aa17268f3e6de0f24"
+    "outputs/autobattle/a65-source-history/tools/validate_autobattle_runtime.py": "22d5c3d93a7d327d8525f99010835ee5792cf367adc39b9aa17268f3e6de0f24",
+    "outputs/autobattle/a65-public-Life-04/events.jsonl": "a5910c70c86fc4dc0f44ac04086842b5071417b56cf376f05521abb132a4ebcd",
+    "outputs/autobattle/a65-public-Life-04/input-log.jsonl": "71392685386f7378b1107c25c41ceac76fca4c1eb58b061185dd3e6ffe0fd527",
+    "outputs/autobattle/a65-public-Life-04/run.json": "b1376b43920be62d5815eebd5497fb52b105ec5647bee5e77cdfb81c320ad4b1",
+    "outputs/autobattle/a65-public-Life-04/Life-transaction-1/Life-engine.jsonl": "16f535ac86976fa9ca537fa8ad4752cb26deb05a7a289d03872fafc2da805018",
+    "outputs/autobattle/a65-public-STOP-Wait-04/events.jsonl": "a8b7112981f45e3c25bac7bd197525e965c398913e9558323df87a54778a4515",
+    "outputs/autobattle/a65-public-STOP-Wait-04/input-log.jsonl": "f34f9e6af1388b5f5e50d71baebf9590eb377f4116a10c51c858ebc921214c08",
+    "outputs/autobattle/a65-public-STOP-Wait-04/manual-Life-Wait.json": "2526a52d37a8e6f72a37d354041ae87c4235d21748cf42d3c9db408e69d800dd",
+    "outputs/autobattle/a65-public-STOP-Wait-04/paused-run.json": "4e8dde014ff9627e2ca04ac0f942c92a41510fa4e5e34057ef1a8868aac05e86",
+    "outputs/autobattle/a65-public-STOP-Wait-04/post-crash-status.json": "c19c0b119483c35d995355d70bc56595bf3654ec480a72a249b2819bf3ce2195",
+    "outputs/autobattle/a65-public-STOP-Wait-04/run.json": "981e71387c281f5f9a51be20e9adae83fd058220bb92d82ecc29eb1da6a6497c",
+    "outputs/autobattle/a65-public-STOP-Wait-04/STOP-trigger.json": "826f8338c40a117f3ef5f94dccd5bd0468c769fcbc2dae7ce39884d213d0cf2a",
+    "outputs/autobattle/a65-public-STOP-Wait-04/Life-transaction-1/Life-engine.jsonl": "28b73162d9f4ac497574c94a068a7973ef16b4b18bb910574258b0291e368ca2",
+    "outputs/autobattle/a65-public-Life-04-checks.json": "b057a2f75cf83f49b81f5bb3d180178435647d46c96098454168ca9c51bd2b7f",
+    "outputs/autobattle/a65-public-Life-04-sources.json": "c8ab526b58b6499e3d02759c507cb84ddbaa73a319fca75a7fa06392170f2707",
+    "outputs/autobattle/a65-boundary-event-schema-01.json": "0fb5298c7f19985fae227ce2dee41eba9d89d0efd541cf6497fbc816428bc585"
   },
   "limitations": [
     "No public revival acceptance yet.",
     "Exact Montblanc5/Life5/cost10/Marche7 and EXP99 native level-up fixture only.",
-    "Full-Life, arbitrary KO parties, items and ROM-native automation remain outside this packet."
+    "Full-Life, arbitrary KO parties, items and ROM-native automation remain outside this packet.",
+    "Wait04 resume crashed at diagnostic event serialization; invalid capture excluded. Later same-PID raw observation finds Sleep absent, not a repair. Serializer fixed and host-tested; fresh resume remains required."
   ],
   "observations": [
     "Public01/02 each record identified-ally-life5 target7, native HP0->221, MP221->211, level40->41, guarded Wait and Carson4 next actor. Both source/input unchanged and public validators pass; max-turns1 stops stalled intentionally, no battle-completion claim. Public01 pilot source versions partly superseded; public02 exact implementation checkpoint is retained. Repeat current public implementation after remaining gate work.",

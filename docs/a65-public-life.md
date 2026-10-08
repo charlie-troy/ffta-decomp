@@ -65,3 +65,15 @@ Reserve01 used an intermediate validator version; its archived reconstruction
 matches the capture SHA256 exactly and is accepted only by that exact hash.
 Use `--source-dir outputs/autobattle/a65-source-history` with Git refs790f333
 and4ccb7f0 to reproduce that provenance audit. This is retained-source evidence.
+
+Wait04 PID85332 exposed a second event whitelist: the diagnostic was decoded
+but rejected by the runtime serializer before terminal finalization. That
+capture is invalid and is excluded from acceptance. The schema omission is
+fixed and the actual serializer/validator whitelist host control passes.
+A later read-only observation on that same verified PID decoded both canonical
+and mirror party records: neither ally had Sleep (+EB04 clear, +DF zero),
+HP241/221 and MP211/85 were preserved. This later observation does not repair
+the failed run or explain every earlier missing menu. The owned PID was ended.
+Next packet: fresh same-PID resume with the corrected diagnostic serializer,
+then trace the fresh-menu ownership rejection against native actor/cursor and
+status history. Do not repeat longer timeouts without a discriminating witness.
