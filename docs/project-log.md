@@ -1,5 +1,18 @@
 # Project log
 
+## 2026-10-08 - Life target acceptance and attributed revival research
+
+A6.4 canonical KO target criterion passes in the selected preview/Do it fixture.
+Current preview58/final59 and single-attempt Life gate20 controls pass. Fresh
+cast03 spends10MP and revives Marche0->221HP, with native Life result and HP
+store witnesses. EXP99 also awards30 and levels Montblanc40->41; native paired
+level-up captures verify growth before a separate post-action reader rebinds.
+Forty-two retained effect controls reject. Restored command consumes Action
+and enables Wait. Two revival/Wait/continuation runs and live refusal gates
+remain UNKNOWN. Facing01 changed effect source during capture and is excluded
+from fresh acceptance; its retained Wait reader/host39 controls are bounded.
+No public revive support. See A6.4 receipt and KO/Life research notes.
+
 ## 2026-10-08 - Reconstructed ability sets expose enabled Life
 
 A6.4 enabled-Life/effective-cost criterion now passes for the corrected disposable

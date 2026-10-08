@@ -1,0 +1,88 @@
+{
+  "status": "pass-retained-Life-effect",
+  "scope": "Retained actual Life/level-up replay and adversarial attribution checks.",
+  "valid": {
+    "status": "bounded-Life-effect-and-native-level-up",
+    "target_hp": [
+      0,
+      221
+    ],
+    "caster_mp": [
+      221,
+      211
+    ],
+    "level": [
+      40,
+      41
+    ],
+    "awarded_exp": 30,
+    "native_growth_offsets": [
+      9,
+      26,
+      30,
+      32,
+      34,
+      36,
+      38,
+      210
+    ],
+    "caster_after_sha256": "20b50941f6aed5fea01e932c8f11fdc8fb878c1a907c023ad01b5b3fa0f5f438",
+    "target_after_sha256": "5ca05dba3fc911f4b047789b9dcdd143205727cd5045373e0acea9e00462d561"
+  },
+  "rejected": [
+    "missing-EXP-award",
+    "duplicate-EXP-award",
+    "missing-level-up-before",
+    "duplicate-level-up-before",
+    "missing-level-up-after",
+    "duplicate-level-up-after",
+    "missing-HP-store-before",
+    "duplicate-HP-store-before",
+    "missing-HP-store-after",
+    "duplicate-HP-store-after",
+    "missing-Life-effect-entry",
+    "duplicate-Life-effect-entry",
+    "missing-Life-effect-flags-written",
+    "duplicate-Life-effect-flags-written",
+    "EXP-award-old_exp",
+    "EXP-award-awarded_exp",
+    "EXP-award-t",
+    "level-up-before-caller_lr",
+    "level-up-after-level_up_result",
+    "level-up-after-unit_hex",
+    "Life-effect-flags-written-flags",
+    "Life-effect-entry-context_words",
+    "HP-store-after-stored_hp",
+    "HP-store-after-t",
+    "caster-post-0x0",
+    "caster-post-0x9",
+    "caster-post-0x18",
+    "caster-post-0x1a",
+    "caster-post-0x1c",
+    "caster-post-0x28",
+    "caster-post-0xf2",
+    "caster-post-0xf6",
+    "caster-post-0x104",
+    "target-post-0x0",
+    "target-post-0x9",
+    "target-post-0x18",
+    "target-post-0x1a",
+    "target-post-0x1c",
+    "target-post-0x28",
+    "target-post-0xf2",
+    "target-post-0xf6",
+    "target-post-0x104"
+  ],
+  "source_sha256": {
+    "tools/recovery_life_effect.py": "8dcb15bde6f7feddbe2bae9f7c62644eb58fff0c8b3f0f090b4c9935dfccfddb",
+    "tools/validate_recovery_life_effect.py": "365fbeabcb075b013a348e3769f995ad06dcd2cf747a4c9354b7872b396df180"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-life-cast-03\\Life-overlay.json": "243bc61786e3743f7c4dc5f08f408b02405302803cdd5648471960224ab8e7d1",
+    "outputs\\autobattle\\a64-life-cast-03\\final-prompt-second-ewram.bin": "dfe935d6c91a038a81f69681e5190c80a88620cdac2cfe29c59e257856c05caa",
+    "outputs\\autobattle\\a64-life-cast-03\\after-Life-ewram.bin": "779e2595971df98d631311671d07f3cbe2bb81c10d7864a4a065383477faf110"
+  },
+  "limitations": [
+    "Retained replay, not a fresh cast or Wait continuation."
+  ]
+}

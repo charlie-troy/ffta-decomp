@@ -9,8 +9,9 @@ import time
 
 from fixture_guard import BATTLE_STRUCT, STRIDE
 from probe_control_handoff import TARGET_X
-from recovery_menu import MEMBERS, MEMBER_COUNT, MENU_ROOT, PLAYER_DRIVER, LIST, DESCRIPTION, exact, integer, require
+from recovery_menu import MEMBERS, MEMBER_COUNT, MENU_ROOT, PLAYER_DRIVER, LIST, DESCRIPTION, CONFIRM, exact, integer, require
 from ability_resources import effective_mp_cost
+from tactics_policy import SNAPSHOT_SCHEMA2
 
 ACCEPTANCE_CURSOR = 0x0200F3B8
 
@@ -62,11 +63,15 @@ class LifeOverlayReader:
     def preview_snapshot(self):
         return self._snapshot('preview')
 
+    def confirmation_snapshot(self):
+        return self._snapshot('confirmation')
+
     def _snapshot(self, stage):
         g, menu = self.g, self.menu
-        require(stage in ('overlay','preview'), 'Life target stage is unknown')
-        mode, selection, handler, controller_state, target_flags = (
-            (7,5,LIST,3,0) if stage == 'overlay' else (12,0,DESCRIPTION,0x102,0x6C))
+        require(stage in ('overlay','preview','confirmation'), 'Life target stage is unknown')
+        mode, selection, handler, controller_state, target_flags, target_state = {
+            'overlay': (7,5,LIST,3,0,10), 'preview': (12,0,DESCRIPTION,0x102,0x6C,10),
+            'confirmation': (11,0,CONFIRM,0x102,0x20,2)}[stage]
         require(integer(exact(g,MENU_ROOT,4),0) == menu.context, 'Life root moved')
         root = exact(g,menu.context,0x30)
         callback = exact(g,menu.callback,0x18)
@@ -84,28 +89,30 @@ class LifeOverlayReader:
         header = exact(g,BATTLE_STRUCT,0xA4)
         actor_wrapper = exact(g,menu.wrapper,0x10)
         require(integer(actor_wrapper,0) == self.caster and integer(header,0) == menu.wrapper
-                and integer(header,12) == integer(header,16) == 0
+                and integer(header,12) == (menu.wrapper if stage == 'confirmation' else 0)
+                and integer(header,16) == 0
                 and header[0xA2] == 1 and header[0xA1] == 0, 'Life target table or accepted copies differ')
         ability = exact(g,BATTLE_STRUCT+0xEC,2)
         flags = exact(g,BATTLE_STRUCT+0x1112,2)
         state = exact(g,BATTLE_STRUCT+0x1118,2)
-        require(integer(ability,0,2) == 5 and integer(flags,0,2) == target_flags and integer(state,0,2) == 10,
+        require(integer(ability,0,2) == 5 and integer(flags,0,2) == target_flags and integer(state,0,2) == target_state,
                 'Life target processor differs')
         target_wrapper = integer(header,0x50)
         wrapper = exact(g,target_wrapper,0x10)
         require(target_wrapper != menu.wrapper and integer(wrapper,0) == self.target,
                 'Life target wrapper does not join canonical KO')
-        if stage == 'preview':
+        if stage in ('preview','confirmation'):
             require(integer(header,4) == menu.wrapper and integer(header,8) == target_wrapper,
                     'Life preview did not accept the canonical KO wrapper')
         reads = [(MENU_ROOT,menu.context.to_bytes(4,'little')), (menu.context,root),
-                 (menu.callback,callback), (menu.manager+4,active), (PLAYER_DRIVER+4,driver[4:12]),
+                 (menu.callback,callback[:0x16]), (menu.manager+4,active), (PLAYER_DRIVER+4,driver[4:12]),
                  (PLAYER_DRIVER+0x60,driver[0x60:0x64]), (PLAYER_DRIVER+0xDC,driver[0xDC:0xDE]),
                  (menu.wrapper,actor_wrapper), (target_wrapper,wrapper),
                  (BATTLE_STRUCT+0xEC,ability), (BATTLE_STRUCT+0x1112,flags), (BATTLE_STRUCT+0x1118,state)]
         # Live preview captures differ at +93/+94/+9C while the accepted
         # wrapper, table, resources and coordinates agree. These animation
         # bytes are not a targeting decision and cannot invalidate its token.
+        # The final controller also animates +16; its input state is +14 u16.
         reads.extend((BATTLE_STRUCT+o,header[o:o+n]) for o,n in ((0,0x18),(0x50,4),(0xA1,2)))
         for address,baseline in self.units.items():
             unit = exact(g,address,STRIDE)
@@ -130,10 +137,14 @@ class LifeOverlayReader:
         require(cursor == tuple(display) and cursor in (tuple(self.pins[self.caster]['tile']),target_tile),
                 'Life cursor is outside the captured two tiles')
         reads.extend([(TARGET_X,display),(ACCEPTANCE_CURSOR,x),(ACCEPTANCE_CURSOR+4,y)])
-        if stage == 'preview':
+        if stage in ('preview','confirmation'):
             committed = exact(g,BATTLE_STRUCT+0x109,2)
             require(cursor == tuple(committed) == target_tile, 'Life preview committed tile differs')
             reads.append((BATTLE_STRUCT+0x109,committed))
+        if stage == 'confirmation':
+            cursor_byte = exact(g,menu.callback+0x18+0x69,1)
+            require(cursor_byte == b'\0', 'Life final prompt is not on Do it')
+            reads.append((menu.callback+0x18+0x69,cursor_byte))
         require(all(exact(g,a,len(b)) == b for a,b in reads), 'Life overlay changed during read')
         digest = hashlib.sha256(repr([(a,b.hex()) for a,b in reads]).encode()).hexdigest()
         return LifeOverlayToken(self.clock(),self.caster,self.target,target_wrapper,cursor,target_tile,digest,stage)
@@ -145,3 +156,19 @@ class LifeOverlayReader:
         require(replace(current,observed_at=token.observed_at) == token, 'Life overlay token changed')
         require(not at_target or current.cursor == current.target_tile, 'Life KO cursor is not selected')
         return current
+
+    def policy_snapshot(self, token):
+        require(isinstance(token,LifeOverlayToken) and token.stage == 'confirmation',
+                'Life policy candidate requires the accepted final prompt')
+        token = self.revalidate(token,at_target=True)
+        caster,target = self.pins[self.caster],self.pins[self.target]
+        return {'schema': SNAPSHOT_SCHEMA2, 'identity': 'verified',
+            'age_seconds': max(0,self.clock()-token.observed_at),
+            'actor': {'name': caster['name_text'], 'id': caster['id'],
+                'job_id': self.menu.owner['job'], 'side': 'player',
+                'hp': caster['hp'], 'max_hp': caster['max_hp'],
+                'mp': caster['mp'], 'max_mp': caster['max_mp'], 'tile': caster['tile']},
+            'candidates': [{'id': 'life-ally', 'kind': 'ability', 'action_id': 5,
+                'legal': True, 'cost': 10, 'ability_name': 'Life', 'relation': 'ally',
+                'target': {'kind': 'unit','id': target['id']}, 'target_hp': 0,
+                'target_max_hp': target['max_hp'], 'target_mp': target['mp']}]}

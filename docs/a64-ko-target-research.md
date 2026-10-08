@@ -166,3 +166,28 @@ coordinates remain at caster5,10; the KO table alone is not selected targeting.
 rejects57 mutations/controls. Its coherent KO cursor control is synthetic.
 Next: guarded adjacent LEFT, selected-target preview, final prompt, then only
 after their independent guards pass a bounded research revival.
+
+## Selected KO, single cast and native level-up (2026-10-08)
+
+Fresh final-prompt02 joins the sole genuine KO target after guarded LEFT to4,10,
+target-selection A and description A. Preview mode12/state102/flags6C becomes
+Do it mode11/state102/flags20; no cast input in that capture. Current retained
+preview58/final59 mutants reject. LifeFinalGate reevaluates the full pinned
+policy immediately before one latched final request;20 host controls reject.
+
+Cast03 independently reloads the corrected state, delivers exactly one gated
+Life final A and observes native target HP0->221, caster MP221->211 and Life
+result context [caster,target,target]/flags0->32. The caster starts EXP99:
+native reward080A7198 awards30, caller080A71C0 enters080C9B8C with EXP reset,
+and return080A71C4 captures level40->41 plus actual growth. The strict original
+pre-action reader correctly rejected that identity change in cast01/02.
+A separate verifier now checks full before/after units against the paired
+native growth captures before rebinding the post-action reader. It accepts
+only the observed fixture;42 retained effect mutations reject. Restored command
+Action is disabled and Wait enabled. Cast03 stops there; continuation UNKNOWN.
+
+The separate post-Life Wait facing reader rejects39 host mutations/STOP/duplicate
+controls. Facing01 is host-reader evidence only: effect source was edited while
+it ran, so inputs_unchanged=false explicitly excludes fresh acceptance. Next:
+two source-stable Life/Wait/independent next-actor runs, live STOP and reserve
+refusals, and a receipt validator. Production Cure/living-only readers unchanged.

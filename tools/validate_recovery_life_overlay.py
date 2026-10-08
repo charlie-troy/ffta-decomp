@@ -17,19 +17,23 @@ def main():
     ap.add_argument('--capture', required=True)
     ap.add_argument('--rom', default='baserom.gba')
     ap.add_argument('--out', required=True)
-    ap.add_argument('--stage', choices=('overlay','preview'), default='overlay')
+    ap.add_argument('--stage', choices=('overlay','preview','confirmation'), default='overlay')
     args = ap.parse_args()
     directory = Path(args.capture)
     doc = json.loads((directory/'Life-overlay.json').read_text())
     sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
-    preview = args.stage == 'preview'
-    require(doc['status'] == ('captured-Life-target-selection-only' if preview else 'captured-Life-overlay-only')
+    confirmation = args.stage == 'confirmation'
+    preview = args.stage in ('preview','confirmation')
+    expected_status = ('captured-Life-final-prompt-only' if confirmation else
+                       'captured-Life-target-selection-only' if preview else 'captured-Life-overlay-only')
+    require((doc['status'] == expected_status or
+             (args.stage == 'preview' and doc['status'] == 'captured-Life-final-prompt-only'))
             and doc['inputs_unchanged'] and doc['target_acceptance'] == preview and not doc['final_confirmation']
             and not doc['fixture_writes'], 'capture authority differs')
     rom = Path(args.rom).read_bytes()
     require(sha(args.rom) == doc['source_sha256'][args.rom], 'ROM differs')
     paths = [directory/(p['tag']+'-ewram.bin') for p in doc['phases']
-             if p['tag'].startswith('selected-' if preview else 'overlay-')]
+             if p['tag'].startswith('final-prompt-' if confirmation else 'selected-' if preview else 'overlay-')]
     require(len(paths) >= 2, 'missing second Life overlay join')
     for path in paths:
         require(sha(path) == doc['capture_sha256'][path.name], 'capture hash differs')
@@ -40,7 +44,7 @@ def main():
         units = {p['canonical']: g.read_mem(p['canonical'],STRIDE) for p in doc['party']}
         return g,menu,LifeOverlayReader(g,menu,doc['party'],units,clock=clock)
     tokens = []
-    snapshot = lambda r: r.preview_snapshot() if preview else r.snapshot()
+    snapshot = lambda r: r.confirmation_snapshot() if confirmation else r.preview_snapshot() if preview else r.snapshot()
     for path in paths:
         g,menu,r = reader(path.read_bytes())
         token = snapshot(r)
@@ -85,7 +89,7 @@ def main():
             ('count-zero',BATTLE_STRUCT+0xA2,b'\0'),('Cure-count-two',BATTLE_STRUCT+0xA2,b'\x02'),
             ('index',BATTLE_STRUCT+0xA1,b'\x01'),('accepted-copy',BATTLE_STRUCT+12,b'\x01\0\0\0'),
             ('processor-ability',BATTLE_STRUCT+0xEC,b'\x01\0'),
-            ('target-flags',BATTLE_STRUCT+0x1112,b'\0\0' if preview else b'\x6c\0'),('target-state',BATTLE_STRUCT+0x1118,b'\x02\0'),
+            ('target-flags',BATTLE_STRUCT+0x1112,b'\0\0' if preview else b'\x6c\0'),('target-state',BATTLE_STRUCT+0x1118,b'\x0a\0' if confirmation else b'\x02\0'),
             ('display-cursor',TARGET_X,b'\x3f\x3f'),('acceptance-x',ACCEPTANCE_CURSOR,b'\x3f\0')]:
         reject(label,[(address,value)])
     alias = MEMBERS+13*STRIDE
@@ -104,6 +108,8 @@ def main():
         r.revalidate(token,at_target=True)
         reject('accepted-preview-wrapper',[(BATTLE_STRUCT+8,menu.wrapper.to_bytes(4,'little'))])
         reject('committed-preview-tile',[(BATTLE_STRUCT+0x109,b'\x3f\x3f')])
+        if confirmation:
+            reject('Cancel-cursor',[(menu.callback+0x18+0x69,b'\x01')])
     now = [1]
     g,m,r = reader(data,clock=lambda: now[0])
     old = snapshot(r)
