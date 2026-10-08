@@ -116,3 +116,22 @@ The action-set mapping or cached-menu reconstruction is unresolved; raw
 secondary7 alone cannot certify White Magic. `a64-Life-frontier.json` records
 the mismatch. Stop guessing group IDs: identify the native action-set source
 and menu reconstruction before another availability claim.
+
+### Native secondary action-set dependency
+
+`python tools/validate_recovery_action_set.py --out outputs/autobattle/a64-action-set-dependency.json`
+passes three isolated actual-ROM helper executions on the retained Montblanc
+capture. Native `080CCE60` selector2 reads both secondary job `+8` and secondary
+ability-set byte `+0x36` (at080CCEAC/080CCECC). Captured `+0x36=1` triggers the
+fallback at080CCEF8, returning pointer0851BAE4/bounds1,15 even with job7.
+A synthetic change of only secondary job to0 preserves that fallback. Native
+job property `080C8570(7,7,0x0C)` returns9; an isolated `+0x36=9` mutation with
+job7 returns0851BB64/bounds58,68, containing global Life5 at row62.
+The ordinary menu builder also reads `+0x36` directly at080272F0..08027300.
+
+This narrows the next fixture experiment to reconstructing both canonical and
+mirror secondary ability-state from the native job property, then exporting
+and independently reloading before observing the enabled list. These are
+synthetic helper executions, not a live corrected fixture. The prior Steal
+list/visual Black Magic discrepancy and rendered HP mismatch remain unresolved.
+No Life availability, targeting or revival criterion is promoted.

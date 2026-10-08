@@ -1,5 +1,14 @@
 # Project log
 
+## 2026-10-08 - Native secondary ability-set dependency
+
+Three isolated actual-ROM helper cases identify the next A6.4 fixture correction:
+`080CCE60` reads secondary job +8 and ability-state +0x36. Captured +0x36=1
+forces a fallback; job7's native property0c=9 instead returns the White Magic
+range containing Life5. This is synthetic replay only. A corrected live fixture,
+enabled Life, target acceptance and revival remain UNKNOWN. See the research
+doc and `a64-action-set-dependency.json`; the HP/render mismatch remains open.
+
 ## 2026-10-08 - Genuine engine KO and disposable Life fixture checkpoint
 
 A6.4 now has bounded PASS evidence for its engine-KO lifecycle and independent

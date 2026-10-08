@@ -1,0 +1,124 @@
+{
+  "status": "pass-synthetic-secondary-action-set-dependency",
+  "scope": "Execute the native action-set helper on a retained KO-fixture caster.\n\nSynthetic replay only: this does not open a live menu or establish Life legality.\n",
+  "helper": "080cce60",
+  "property_accessor": "080c8570",
+  "secondary_job_property_0c": 9,
+  "observations": [
+    {
+      "label": "captured",
+      "secondary_job": 7,
+      "ability_set": 1,
+      "table_pointer": "0851bae4",
+      "returned_bounds": [
+        1,
+        15
+      ],
+      "unit_reads": [
+        {
+          "pc": "080cceac",
+          "offset": 8,
+          "size": 1
+        },
+        {
+          "pc": "080cceba",
+          "offset": 8,
+          "size": 1
+        },
+        {
+          "pc": "080ccecc",
+          "offset": 54,
+          "size": 1
+        },
+        {
+          "pc": "080ccece",
+          "offset": 6,
+          "size": 1
+        }
+      ]
+    },
+    {
+      "label": "job-only-control",
+      "secondary_job": 0,
+      "ability_set": 1,
+      "table_pointer": "0851bae4",
+      "returned_bounds": [
+        1,
+        15
+      ],
+      "unit_reads": [
+        {
+          "pc": "080cceac",
+          "offset": 8,
+          "size": 1
+        },
+        {
+          "pc": "080cceba",
+          "offset": 8,
+          "size": 1
+        },
+        {
+          "pc": "080ccecc",
+          "offset": 54,
+          "size": 1
+        },
+        {
+          "pc": "080ccece",
+          "offset": 6,
+          "size": 1
+        }
+      ]
+    },
+    {
+      "label": "native-property-synthetic",
+      "secondary_job": 7,
+      "ability_set": 9,
+      "table_pointer": "0851bb64",
+      "returned_bounds": [
+        58,
+        68
+      ],
+      "unit_reads": [
+        {
+          "pc": "080cceac",
+          "offset": 8,
+          "size": 1
+        },
+        {
+          "pc": "080cceba",
+          "offset": 8,
+          "size": 1
+        },
+        {
+          "pc": "080ccecc",
+          "offset": 54,
+          "size": 1
+        },
+        {
+          "pc": "080ccece",
+          "offset": 6,
+          "size": 1
+        }
+      ]
+    }
+  ],
+  "Life_entry": {
+    "index": 62,
+    "global_id": 5
+  },
+  "next": "Prepare disposable canonical and mirror +0x36 using the native property; independently reload and observe the live menu before claiming availability.",
+  "limitations": [
+    "Synthetic unit mutation under Unicorn only; no new live inputs.",
+    "The rendered/canonical HP mismatch remains unresolved.",
+    "No enabled Life, target acceptance or revival claim."
+  ],
+  "source_sha256": {
+    "tools/validate_recovery_action_set.py": "0c6495040fa4f4607c00ddd7b62c7f04d533b4aaaade1e5e729a4329fee79655",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a64-life-groups-01\\action-group-ewram.bin": "fe1358196b2667449f5325def35cc8c8665bd8b2892b96188cda03018b362080",
+    "outputs\\autobattle\\a64-life-groups-01\\Life-menu.json": "401dac6cf3300b6141b07f08cd2857ae2e68381f0df1c1548b23d20425045f40"
+  }
+}
