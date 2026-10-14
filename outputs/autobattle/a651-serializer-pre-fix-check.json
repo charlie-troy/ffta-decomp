@@ -1,0 +1,9 @@
+{
+  "status": "pass-expected-pre-fix-failure",
+  "ref": "0c658ca",
+  "command": "python tools/validate_life_diagnostic_integration.py --runtime-ref 0c658ca --out NEW.json",
+  "expected_failure": "TypeError: event() got an unexpected field 'boundary_diagnostic' (not in EVENT_SCHEMA)",
+  "limitations": [
+    "Real historical serializer failure under current host harness; not native gameplay."
+  ]
+}

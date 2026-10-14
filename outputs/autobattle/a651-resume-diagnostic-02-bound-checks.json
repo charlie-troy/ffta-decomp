@@ -1,0 +1,51 @@
+{
+  "status": "pass-bounded-resume-audit",
+  "acceptance": "same-PID-player-control-UNKNOWN",
+  "scope": "Audit a failed Life resume without promoting adoption to player-control proof.",
+  "turns": 0,
+  "pid": 17188,
+  "rejected": [
+    {
+      "case": "old source changed",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "old closure absent",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "old after-pins absent",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "PID mismatch",
+      "errors": [
+        "Life resume lacks verified same-PID adoption"
+      ]
+    },
+    {
+      "case": "automated input in manual gap",
+      "errors": [
+        "input-log: 1 automation press/drive between leg 1's paused stop and the resume marker (input during the handoff gap must be manual)"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_life_recovery_resume_bound.py": "154d15b1d6b99063ff1ba6565fd815c2b21d374be018c125a65116fd0022dca2",
+    "tools/validate_autobattle_runtime.py": "98e802fc581bfc44b5f6d4204aa5cf149eddff198a4eadeebf16ba53faf9ae33"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a651-resume-diagnostic-02\\run.json": "5f2e66f266ade4089339b1cbf9f19e8af4b9c349b76189a1e33ce385075c926d",
+    "outputs\\autobattle\\a651-resume-diagnostic-02\\events.jsonl": "100056e45a4c447e3528b345d3bafdabdcb9ac2df4480dae84383e07a0f6b5ef",
+    "outputs\\autobattle\\a651-resume-diagnostic-02\\input-log.jsonl": "4ae05bd650e70e03faa812eacfddd1db8e596377696ae9768978c187949ccd7c"
+  },
+  "limitations": [
+    "Adoption and truthful bounded stop only; no resumed player turn or completed battle."
+  ]
+}

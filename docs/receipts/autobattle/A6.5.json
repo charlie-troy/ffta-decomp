@@ -65,14 +65,14 @@
     "tools/run_life_cli_stop.py": "2e1d0f78ca787438979ade86ab7fcdf030338c9b3191754a391f7ace61ba5657",
     "tools/manual_life_wait_handoff.py": "370a30df2e7e0d13535ad42e8e3d7059e098ff8450ae52120b04d292b605d365",
     "tools/validate_life_recovery_decline.py": "9219dc3982b903f23be67a82227042efb0589075cadb5a3b1cf60318ff6f2958",
-    "tools/recovery_boundary_diagnostic.py": "2b72c63c1a5a7bc0cc36b1a6e4ac73cce5ba3cbec6c8ed6e440988a9fc6decce",
+    "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4",
     "tools/run_life_recovery_handoff.py": "11c11e0bb0fe4d6deaf021a61dd39c9476610cf46ace5a1cf95f76bbace5a40e",
     "tools/validate_life_recovery_handoff.py": "fd76dde7d3c580225a845ad18b53242ca12d4618a5d8eeb94ff2599c48e1f3b1",
     "tools/validate_life_recovery_default.py": "b3a1bd979244d821563e4bfb7ce904aa4c61ba190c9551834388539dd5bdde64",
     "tools/validate_life_recovery_fixture.py": "ca07065dae40d634b332bb369732b149c6b8e7c243fabe641efc7f6468482f10",
     "tools/validate_life_recovery_resume_bound.py": "154d15b1d6b99063ff1ba6565fd815c2b21d374be018c125a65116fd0022dca2",
     "tools/audit_life_public_sources.py": "65ec9c71421307e7a5c2ff69f6e6a0f70de80311cb65a30ad8dbdaa6e59e0f1e",
-    "tools/validate_recovery_boundary_diagnostic.py": "2a358659b83fe2ae3e477e2a3d5c7773651fe05e1bf33a963ba6afffd4885b98"
+    "tools/validate_recovery_boundary_diagnostic.py": "67988d5f2320b8783f042e39ca82434e38960988a7a6c336b783d8fec28b16ae"
   },
   "evidence_sha256": {
     "outputs/autobattle/a65-public-interface-01.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
@@ -185,5 +185,11 @@
     "Public01/02 each record identified-ally-life5 target7, native HP0->221, MP221->211, level40->41, guarded Wait and Carson4 next actor. Both source/input unchanged and public validators pass; max-turns1 stops stalled intentionally, no battle-completion claim. Public01 pilot source versions partly superseded; public02 exact implementation checkpoint is retained. Repeat current public implementation after remaining gate work.",
     "35 public receipt mutations reject on public01. STOP/reserve/default refusal and same-PID lifecycle are pending.",
     "Current public02/public03 source-stable revivals and public38 mutation audits pass. Actual CLI STOP navigation and Life-final pause before Life final input, with owned kill cleanup; partial journals reject8/11 mutations. Partial policy snapshots, attempt latches and native effects are now validated even on a STOP/refusal journal. Reserve/default refusal and post-Life same-PID lifecycle remain pending."
-  ]
+  ],
+  "diagnostic_slice": {
+    "milestone": "A6.5.1",
+    "receipt": "docs/receipts/autobattle/A6.5.1.json",
+    "status": "pass",
+    "resumed_player_control": "unknown"
+  }
 }

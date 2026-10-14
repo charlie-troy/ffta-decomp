@@ -9,7 +9,7 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**A6.4 remains bounded research PASS. A6.5 has two public Life/Wait continuations, live reserve/default and STOP controls, and fresh Cure regressions; same-PID resumed player control remains UNKNOWN after150/300-second bounds. Continue A6.5 with native terminal status/menu evidence; do not count adoption as control.**
+**A6.5.1 is bounded PASS: current-source same-PID diagnostic, real serializer/validator/cleanup failures and raw mirror/status/source controls. Continue A6.5.2 native actor/menu timing and ownership history; A6.5 resumed player control remains UNKNOWN.**
 Two public ally casts, damage-policy refusal/Wait, both STOP/manual/same-PID
 handoffs, two unsupported-family zero-input controls, the six-case self-Cure
 matrix and ordinary live Move/Wait pass on current production sources.

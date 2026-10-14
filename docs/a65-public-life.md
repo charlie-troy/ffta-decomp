@@ -77,3 +77,5 @@ the failed run or explain every earlier missing menu. The owned PID was ended.
 Next packet: fresh same-PID resume with the corrected diagnostic serializer,
 then trace the fresh-menu ownership rejection against native actor/cursor and
 status history. Do not repeat longer timeouts without a discriminating witness.
+
+On2026-10-14 A6.5.1 passes its diagnostic slice; see `docs/receipts/autobattle/A6.5.1.json`. Fresh resume02 completes a valid diagnostic with all eight raw mirror units/count, both canonical identities, and cursor. The mirror is unidentified scratch (count0x0202243C), not a usable roster. Neither canonical ally is asleep at that terminal.14 raw mutations and5 bounded-resume mutations reject, both captured import closures resolve. Six integrated terminal/cleanup host cases pass and fail on the pre-fix serializer. A6.5 control stays UNKNOWN; next observe native player picks, live menus and exact adapter rejection across the same timeline.

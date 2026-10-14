@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from types import SimpleNamespace
 
-from fixture_guard import ROSTER, STRIDE
+from fixture_guard import BATTLE_STRUCT, ROSTER, STRIDE
 from recovery_menu import MEMBERS, MEMBER_COUNT, require
 from recovery_boundary_diagnostic import capture_boundary_diagnostic
 
@@ -13,6 +13,7 @@ from recovery_boundary_diagnostic import capture_boundary_diagnostic
 def main():
     ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--out',required=True)
     args=ap.parse_args();memory=bytearray(0x40000);reads=[]
+    offset=BATTLE_STRUCT-0x02000000;memory[offset:offset+4]=(8).to_bytes(4,'little')
     for base,slot,unit_id in [(ROSTER,5,5),(ROSTER,7,7),(MEMBERS,1,5),(MEMBERS,0,7)]:
         start=base-0x02000000+slot*STRIDE
         memory[start:start+4]=(0x08001234+unit_id).to_bytes(4,'little')
@@ -25,7 +26,7 @@ def main():
     g=SimpleNamespace(read_mem=read)
     probe=SimpleNamespace(read_target_cursor=lambda:(5,10),read_cmd_cursor=lambda:0)
     negative=capture_boundary_diagnostic(g,probe)
-    require(len(reads)==8+MEMBER_COUNT,'diagnostic did not read each complete unit')
+    require(len(reads)==1+8+MEMBER_COUNT,'diagnostic did not read structure and each complete unit')
     require(all(not r['sleep'] for rows in negative['party'].values() for r in rows),
             'negative Sleep decoder differs')
     for rows in negative['party'].values():

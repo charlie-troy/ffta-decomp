@@ -1,5 +1,11 @@
 # Project log
 
+## 2026-10-14 - A6.5.1 diagnostic slice passes; native boundary history next
+
+Fresh current-source Life STOP/manual Wait/same-PID resume02 (PID17188) completes a valid bounded terminal receipt. Canonical allies remain alive and not asleep; the terminal battle mirror is unidentified scratch (count0x0202243C), preserved as eight raw units rather than treated as missing actors. No resumed player turn is claimed. First pilot01 omitted unfiltered mirror/structure data and is excluded from the complete diagnostic gate.
+
+Actual terminal serializer/validator plus real session cleanup pass six host failure cases, and the same harness fails at0c658ca's missing schema field.14 diagnostic and5 bounded-resume mutants reject; full public/manual source closures resolve. A6.5.1 is bounded PASS, A6.5 remains UNKNOWN. Next A6.5.2 observes native picks and adapter decisions with a matched no-Life default-Wait control; pre-register timing/ownership falsifiers. See `docs/receipts/autobattle/A6.5.1.json`.
+
 ## 2026-10-08 - A6.5 public refusal, regression and bounded resume checkpoint
 
 - Live reserve212 rejects remaining211; default no-opt-in offers only Move/Wait and commits Wait with no Life MP spend/revival. Receipt mutants11/5 reject.

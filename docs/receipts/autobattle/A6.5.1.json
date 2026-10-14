@@ -1,0 +1,76 @@
+{
+  "milestone": "A6.5.1",
+  "date": "2026-10-14",
+  "status": "pass",
+  "scope": "Current-source diagnostic serialization and truthful bounded same-PID Life resume; no resumed player-control acceptance",
+  "criteria": [
+    {
+      "id": "real-serializer-validator-cleanup",
+      "status": "pass",
+      "scope": "Six host cases exercise actual _finish/event/validator and FixtureSession.__exit__/stop with fake hardware; missing/truncated/timeout/cursor/screenshot failure preserve terminal/owned cleanup."
+    },
+    {
+      "id": "pre-fix-reproduction",
+      "status": "pass",
+      "scope": "Same harness on0c658ca rejects boundary_diagnostic at real serializer; temporary-file cleanup preserves TypeError."
+    },
+    {
+      "id": "fresh-complete-diagnostic",
+      "status": "pass",
+      "scope": "Fresh run02 PID17188 public STOP/manual window Wait/same-PID adoption; source stable, valid stalled receipt, all eight raw mirror records and structure preserved."
+    },
+    {
+      "id": "raw-source-mutation-gates",
+      "status": "pass",
+      "scope": "14 diagnostic mutants,5 failed-resume mutants reject; both public/manual captured Python import closures resolve."
+    },
+    {
+      "id": "truthful-native-status-and-no-input-authority",
+      "status": "pass",
+      "scope": "Canonical MontblancHP241/MP211, MarcheHP110/MP85; neither asleep at terminal. Mirror unidentified/count0x0202243C and cursor8,10; never used as input authority."
+    }
+  ],
+  "source_sha256": {
+    "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4",
+    "tools/autobattle_runtime.py": "6c200c650d40c535f751a22d88c995893db89038dc2e40d271bf3c6751ee6dec",
+    "tools/validate_autobattle_runtime.py": "98e802fc581bfc44b5f6d4204aa5cf149eddff198a4eadeebf16ba53faf9ae33",
+    "tools/validate_life_boundary_diagnostic.py": "953227094dee6cb32e9f296b852aff255d02ddf511a599fa5e4e600d8ade6a9f",
+    "tools/validate_life_diagnostic_integration.py": "affe7c4e1fad8143ba4015323509dfdf830c1d0f49a46c0f20f51da9a62c6581",
+    "tools/validate_recovery_boundary_diagnostic.py": "67988d5f2320b8783f042e39ca82434e38960988a7a6c336b783d8fec28b16ae",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/run_life_recovery_handoff.py": "11c11e0bb0fe4d6deaf021a61dd39c9476610cf46ace5a1cf95f76bbace5a40e",
+    "tools/run_life_cli_stop.py": "2e1d0f78ca787438979ade86ab7fcdf030338c9b3191754a391f7ace61ba5657",
+    "tools/manual_life_wait_handoff.py": "370a30df2e7e0d13535ad42e8e3d7059e098ff8450ae52120b04d292b605d365",
+    "tools/recovery_source_versions.py": "a870a297793e13ee585bb8332507f59fdf79b3ad28a977d1a0edf5cdf18a477e"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a651-resume-diagnostic-01/events.jsonl": "389467934abac7c00057f30a0bad738a089722566abb5e7b20f75f03cf378e97",
+    "outputs/autobattle/a651-resume-diagnostic-01/input-log.jsonl": "59948d7921c2b0b09c37a8587f2eace68cae7ed3e22e17bcee41a612e3b1ce7a",
+    "outputs/autobattle/a651-resume-diagnostic-01/manual-Life-Wait.json": "9567230af7bd06c680547c99444b81bd30bf7f4547a49657e5a57a3e88d8cac3",
+    "outputs/autobattle/a651-resume-diagnostic-01/paused-run.json": "0a2c83423b0014931d09c9f6351e17596be431a0bea47e70e09699bd463ee06d",
+    "outputs/autobattle/a651-resume-diagnostic-01/run.json": "b74e79f86d682137ed1e26124b02d6d6d5a6924187955fe2b90d68c028624610",
+    "outputs/autobattle/a651-resume-diagnostic-01/STOP-trigger.json": "708d8f45c932929e2f0363fa3830a2a7db0a8f22c2498452809f79c45057dd6e",
+    "outputs/autobattle/a651-resume-diagnostic-01/Life-transaction-1/Life-engine.jsonl": "6b22c3d03d32e797d02c306bfec965d69e4f40afde3563f8c206537d9cd1580b",
+    "outputs/autobattle/a651-resume-diagnostic-02/events.jsonl": "100056e45a4c447e3528b345d3bafdabdcb9ac2df4480dae84383e07a0f6b5ef",
+    "outputs/autobattle/a651-resume-diagnostic-02/input-log.jsonl": "4ae05bd650e70e03faa812eacfddd1db8e596377696ae9768978c187949ccd7c",
+    "outputs/autobattle/a651-resume-diagnostic-02/manual-Life-Wait.json": "577f43d872544feb7c6a812a87f91eae8bbfd2fadb0ad7aec377052334eac514",
+    "outputs/autobattle/a651-resume-diagnostic-02/paused-run.json": "9836cba4be8a90de1afc072e4a2db7aacc5854e68b6ddae99b78ac9d9b9a619a",
+    "outputs/autobattle/a651-resume-diagnostic-02/run.json": "5f2e66f266ade4089339b1cbf9f19e8af4b9c349b76189a1e33ce385075c926d",
+    "outputs/autobattle/a651-resume-diagnostic-02/STOP-trigger.json": "adffddbb34b3334134cc417ddb64e0e69629b5afb2c5691637bc0461b332084f",
+    "outputs/autobattle/a651-resume-diagnostic-02/Life-transaction-1/Life-engine.jsonl": "7f84739b4801312ba75860698c2f944709bd5c72bfe37aeea318ff7592b9ad5e",
+    "outputs/autobattle/a651-diagnostic-integration-02.json": "73f44c0c1b993cfb080f3f1692f4d28d251b8293490dc409655d94d6789d0821",
+    "outputs/autobattle/a651-diagnostic-decoder-02.json": "8ea97cca7424537eae933bcf80904c4206e91a4391907d0ad911564feede59e8",
+    "outputs/autobattle/a651-resume-diagnostic-01-bound-checks.json": "5bccc0ec7b15f5114b70b746923b9a1f338a05405c684ed0c246efb918213d28",
+    "outputs/autobattle/a651-resume-diagnostic-01-sources.json": "4c356bda5275983e53e6f8a9f981c709aa2f545fe4e29823fed41f4c83e6a8cf",
+    "outputs/autobattle/a651-resume-diagnostic-02-diagnostic-checks.json": "fb7722ab1c4edffeaae8522fa1541349d31d2750b96656a5dc0f36b23bf3c3a2",
+    "outputs/autobattle/a651-resume-diagnostic-02-bound-checks.json": "9c4fe35e7899397df7ed486b926b5d8e2e129530fe4eadb7ad12fb25bf2b8da2",
+    "outputs/autobattle/a651-resume-diagnostic-02-sources.json": "ae16aef97c5b36c7c2bfdac87b4ba63663e71d526880f0881b7caebef15f87e5",
+    "outputs/autobattle/a651-serializer-pre-fix-check.json": "28d58ff0d77bd607c7adf07011bb5b1dbdfdeb00b04758b6b87f9bb22a4a94d6"
+  },
+  "limitations": [
+    "A6.5 same-PID resumed player control remains UNKNOWN; zero resumed player turns.",
+    "First run01 is valid bounded lifecycle but lacks unfiltered mirror/structure data; excluded from complete diagnostic criterion.",
+    "Terminal no-Sleep does not prove earlier status history or timing causality.",
+    "Historical Wait04 invalid resume remains excluded."
+  ]
+}
