@@ -699,6 +699,11 @@ must come from the observed engine list, never guessed cursor/group IDs. Keep
 consumables disabled by default and do not publish an item candidate until
 current ownership, count, target, resource and legality fields are verified.
 
+A6.6.1 checkpoint (2026-10-14): native inventory/owned Item joins, live count0/1,
+wounded self-Potion overlay and25 corruptions pass; source/target identity is
+bounded. Current law/compliance and final prompt remain UNKNOWN. See A6.6.1
+receipt and `docs/a66-consumable-research.md`; no consumable executor enabled.
+
 A6.6.2 follows only after that reader passes: one legal healing item, a guarded
 single final input, actual count decrement/HP effect/turn completion, last-item
 reserve and zero-count refusals, two reloads and STOP controls. Separate native

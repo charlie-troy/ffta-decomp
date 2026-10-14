@@ -30,7 +30,8 @@ def main():
     assert len(raw)==0x40000 and hashlib.sha256(raw).hexdigest()==doc['capture_sha256']['Item-list-ewram.bin']
     memory=Memory(raw);member=doc['groups']['member'];owner=doc['owner']
     reader=OwnedItemList(memory,rom,owner,member);token=reader.snapshot();reader.revalidate(token)
-    assert token.items[0][1:5]==(362,'Potion',251,60)
+    potion_count=doc['inventory_before']['items']['362']['available']
+    assert token.items[0][1:5]==(362,'Potion',251,potion_count)
     assert len(token.items)==13 and token.excluded_rows==((15,265,'Draw Weapon: no consumable count'),)
     assert all(row[1]!=366 for row in token.items)
     rejected=[]
@@ -77,7 +78,7 @@ def main():
     except RecoveryStateError as exc:rejected.append({'case':'fresh Frog with stale enabled Potion','reason':str(exc)})
     else:raise AssertionError('fresh stale status/enable combination accepted')
     result={'status':'pass','scope':__doc__,'joined':token.receipt(),'rejected':rejected,
-            'checks':['native Potion 60 and Ether 6 joined','absent Elixir zero excluded',
+            'checks':[f'native Potion {potion_count} and Ether 6 joined','absent Elixir zero excluded',
                       'Draw Weapon row15 has no count and is excluded','disabled native row stays disabled'],
             'source_sha256':{p:hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in
                 ['tools/consumable_menu.py','tools/consumable_inventory.py','tools/validate_consumable_menu.py']},

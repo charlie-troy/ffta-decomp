@@ -13,6 +13,7 @@ import time
 from autobattle_identity import ActorAdapter, IdentityError
 from consumable_inventory import ConsumableInventory, INVENTORY, ITEM_IDS
 from consumable_menu import OwnedItemList
+from consumable_overlay import PotionOverlayReader
 from emulate import Gba
 from ffta_names import Names, UI_STRINGS
 from fixture_guard import FixtureSession, STRIDE
@@ -123,6 +124,7 @@ def main():
                     require(item_token.rows[item_token.scroll+item_token.cursor]==1
                             and item_token.items[0][0]==1 and item_token.items[0][-1],
                             'Potion must already be the enabled current native row')
+                    overlay_reader=PotionOverlayReader(item_reader,item_token)
                     stopped();item_reader.revalidate(item_token);stopped()
                     hits=transport.press(1,tag='a66-inspect-Potion-target-only',stop_check=stopped)
                     result['inputs'].append({'mask':1,'hits':hits,'before_Item':item_token.receipt()})
@@ -136,6 +138,8 @@ def main():
                         'driver':exact(transport.g,0x0200F4E8,0xE0).hex(),
                         'inventory_unchanged':inventory.snapshot()==before}
                     require(result['Potion_overlay_raw']['inventory_unchanged'],'opening Potion overlay spent inventory')
+                    overlay_token=overlay_reader.snapshot();overlay_reader.revalidate(overlay_token)
+                    result['Potion_overlay']=overlay_token.receipt()
                     result['status']='pass-owned-Item-reader-with-unaccepted-Potion-overlay'
                 require(not session.writes,'research probe edited RAM')
             session.screenshot(str(out/'Item-list.png'));probe.disarm(strict=True)

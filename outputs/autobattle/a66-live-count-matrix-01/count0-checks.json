@@ -1,0 +1,28 @@
+{
+  "status": "pass",
+  "scope": "Check live zero/one Potion lists without selecting a consumable.",
+  "Potion_count": 0,
+  "Potion_rows": [],
+  "rejected": [
+    {
+      "case": "count becomes stale",
+      "reason": "Item list omits an available consumable"
+    },
+    {
+      "case": "invalid reservation",
+      "reason": "invalid consumable quantity/reservation"
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_consumable_count_capture.py": "c422b3bb67067f8ce13c1913f687de7acaedb09a82e91e3f6a7594500e2abd50",
+    "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
+    "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count0-Item-list\\inventory.json": "4bd8f345e773a0ee17a00ffabc56ec22aada5f57450addf3119cc2fe6c514638",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count0-Item-list\\Item-list-ewram.bin": "ffa9b73c50bb72df0348a5aee12b4d5a70e2cc056551e537ffa0a6ce756d1590"
+  },
+  "limitations": [
+    "Counts were constructed in separate disposable fixtures; no consumption or final item input."
+  ]
+}

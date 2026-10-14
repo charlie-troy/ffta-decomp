@@ -67,3 +67,42 @@ Next: decode that overlay's canonical target/source and current law constraints,
 then acquire a coherent wounded Item-owning fixture. Native flag13 is pinned
 but its gameplay/law meaning remains open. Do not advance A6.6.2 until those
 reader prerequisites pass. Receipt: `docs/receipts/autobattle/A6.6.1.json`.
+
+## Wounded self-overlay and live count controls
+
+The new constructed `a66-wounded-Item-fixture-01/consumable-recovery.ss0`
+reloads with HP100/241 matching the HUD and Potion2. Only two actor HP records
+and the Potion owned/reserved bytes were edited in the copied construction
+session. No gameplay input occurs on build/reload. The original files remain
+unchanged; this is a fixture, not a healing action.
+
+`a66-wounded-Potion-overlay-01` pins source=target02000188, wrapper/table,
+cursor and processor ability251/item362. Count remains2 and no accepted-target
+copy exists.25 mutations reject wrong source/target, consumed inventory,
+aliases, changed controller and already-confirmed states. Exact44-module
+source closure resolves, including the retained pre-alias-hardening source.
+
+`a66-live-count-matrix-01` passes both live constructed count controls. Potion0
+is absent from the native Item list; Potion1 appears enabled. Both agree with
+actual080CB2B4 and reject stale count/reservation. No item is selected in these
+count controls. Default disabled/last-item host policy119 remains separate.
+
+Reproduction (fresh output directories required):
+
+```powershell
+python tools/build_consumable_fixture.py --out outputs/autobattle/a66-wounded-NEW
+python tools/probe_consumable_inventory.py --state outputs/autobattle/a66-wounded-NEW/consumable-recovery.ss0 --inspect-potion-target --out outputs/autobattle/a66-overlay-NEW
+python tools/validate_consumable_overlay.py --capture outputs/autobattle/a66-overlay-NEW --out outputs/autobattle/a66-overlay-NEW-checks.json
+python tools/run_consumable_reader_matrix.py --out outputs/autobattle/a66-count-NEW
+```
+
+The matrix uses Python psutil (verified installed7.2.2) to clean up only its
+owned child process tree if a subprocess fails or times out. It retains partial
+evidence. Run one emulator-owning probe at a time (port2345).
+
+Current open prerequisite: current law identity/compliance and final prompt
+legality. START from the command menu is inert. One guarded B yields field
+mode0/driver54, then START opens native System mode1/driver67 with observed
+rows1..6 (Turn Order, Mission, Law Cards, Options, Flee, Save Now). Law Cards
+row3 may be opened for inspection; no card application is authorized by this
+reader. A6.6.2 consumption and public A6.6.3 stay gated.

@@ -1,0 +1,62 @@
+{
+  "status": "pass",
+  "scope": "Verify consumable research capture bytes, input scope and source closure.",
+  "closure": [
+    "ability_resources",
+    "ability_table",
+    "autobattle_identity",
+    "autobattle_runtime",
+    "build_recovery_fixture",
+    "consumable_inventory",
+    "consumable_menu",
+    "consumable_overlay",
+    "emulate",
+    "ffta_names",
+    "ffta_text",
+    "fixture_guard",
+    "life_recovery_runtime",
+    "life_recovery_transaction",
+    "party_recovery_runtime",
+    "player_boundary_observer",
+    "probe_consumable_inventory",
+    "probe_control_handoff",
+    "probe_recovery_ko_lifecycle",
+    "probe_recovery_party",
+    "recovery_ally_confirmation",
+    "recovery_ally_executor",
+    "recovery_ally_preview",
+    "recovery_ally_target",
+    "recovery_boundary_diagnostic",
+    "recovery_continuation",
+    "recovery_executor",
+    "recovery_ko_trace",
+    "recovery_life_effect",
+    "recovery_life_final",
+    "recovery_life_target",
+    "recovery_life_trace",
+    "recovery_life_wait",
+    "recovery_menu",
+    "recovery_menu_list",
+    "recovery_party",
+    "recovery_party_continuation",
+    "recovery_runtime",
+    "recovery_transport",
+    "status_flags",
+    "tactics_adapter",
+    "tactics_policy",
+    "trace_mgba",
+    "wait_ally_continuation"
+  ],
+  "input_count": 5,
+  "raw_writes": 25,
+  "source_sha256": {
+    "tools/audit_consumable_capture.py": "10a3ca3bd15584dbd65963ad9b418fb38352598f5fa70526cc08a1ec72614a09",
+    "tools/recovery_source_versions.py": "a870a297793e13ee585bb8332507f59fdf79b3ad28a977d1a0edf5cdf18a477e"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count1-Item-list\\inventory.json": "ac8b5489105f9db35fc9dcbce323b6219ae17ec39d315e7f83ef2ad84e16c912"
+  },
+  "limitations": [
+    "Research provenance and open-list/overlay input scope only; no legal use or HP effect."
+  ]
+}

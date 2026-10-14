@@ -27,17 +27,38 @@
     {
       "id": "target-and-law-legality-for-executable-item",
       "status": "unknown",
-      "scope": "Overlay target/source/canonical legality not yet decoded. Native runtime flag13 value tracked; law identity and broader constraints remain unproved. No item candidate published."
+      "scope": "Bounded self-overlay identity now passes on coherent wounded fixture. Current law identity/compliance and final prompt remain UNKNOWN; no executable item candidate."
+    },
+    {
+      "id": "coherent-wounded-Item-fixture",
+      "status": "pass",
+      "scope": "Fresh independently reloaded constructed Montblanc HP100/241 and Potion2; HUD matches canonical HP. Three construction writes, zero gameplay input on construction/reload; exact41-module build closure."
+    },
+    {
+      "id": "live-zero-and-one-count-list-controls",
+      "status": "pass",
+      "scope": "Two independent constructed fixtures and owned native Item-list reloads. Count0 omits Potion; count1 includes enabled Potion. Each rejects changed count/reservation; source closures44 and native accessor counts agree."
+    },
+    {
+      "id": "pinned-unaccepted-self-Potion-overlay",
+      "status": "pass",
+      "scope": "Wounded source=target Montblanc canonical02000188, ability251/item362/count2. Native wrapper/table/cursor join, no accepted copies or count change.25 source/target/count/callback mutations rejected; captured44-module closure resolves."
     }
   ],
   "source_sha256": {
     "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
     "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
-    "tools/probe_consumable_inventory.py": "5d175d153bbb65bede5c0a7d760604ed1a65c68efee7a84f474d8aef97e4ec8a",
+    "tools/probe_consumable_inventory.py": "4fed1739334d1f9b51418338536aab55f57a8efa3c7d5e9d5e9733cb96373882",
     "tools/validate_consumable_inventory.py": "aa62451cf753df6f161268e0f446565b4f63f8cec75f6729a149ca9bc41d4f5f",
-    "tools/validate_consumable_menu.py": "fd3fdcfe0b5c2664535e26c267a5813c4cbc50a6dc4200421aaa05d9e4db0a55",
+    "tools/validate_consumable_menu.py": "d55ee24bbbc735105c6cbf15490cf58bc54d936def6c18303878938637753970",
     "tools/validate_consumable_builder.py": "0ca0e0866db69a9fbb33bb7042151f15d9bc6276b6b2f8191e4e6229d7ebc6a2",
-    "tools/audit_consumable_capture.py": "10a3ca3bd15584dbd65963ad9b418fb38352598f5fa70526cc08a1ec72614a09"
+    "tools/audit_consumable_capture.py": "10a3ca3bd15584dbd65963ad9b418fb38352598f5fa70526cc08a1ec72614a09",
+    "tools/build_consumable_fixture.py": "ef339058fef56fb8f0d3aacd9d005f083e9c70dca2034210fada564441ff7418",
+    "tools/consumable_overlay.py": "205b9e49325c145154e2860cb2ee20fbc11b42b3f92ec596f58750229ddfba03",
+    "tools/probe_consumable_law_menu.py": "9636502171d4a819764addc3e92a3a0fff5881fd4479904d2eab7fe0805559fa",
+    "tools/run_consumable_reader_matrix.py": "9502b0ae475cac766b0775686d8ae169f1f3cbcb1fc5dc749e3e3c8decfc918c",
+    "tools/validate_consumable_count_capture.py": "c422b3bb67067f8ce13c1913f687de7acaedb09a82e91e3f6a7594500e2abd50",
+    "tools/validate_consumable_overlay.py": "9a73e681999aedd47caa7ae3b779bbb50e502fed0029de2ac4673b437b0cafdc"
   },
   "evidence_sha256": {
     "outputs/autobattle/a66-inventory-controls-02.json": "2dd94170530e380930b17a70df92c07a6860378b95018279d628a21545f183e0",
@@ -52,7 +73,30 @@
     "outputs/autobattle/a66-source-history/tools/probe_consumable_inventory.py": "ab664e439471f73ca2cd63edeca7fdbc04bf01f2ab168bf7e602368f3000f242",
     "outputs/autobattle/a66-Item-list-02/Item-list-ewram.bin": "8802287bc302ad75c1e65df58334c7eba1ffef7d0756379d0c2d1f42a5777e25",
     "outputs/autobattle/a66-Potion-overlay-03/Item-list-ewram.bin": "48d22b08570d840bfd3824cedc1bdb49dafbc7f5844631e4fd59172cc0897f15",
-    "outputs/autobattle/a66-Potion-overlay-03/Potion-overlay-ewram.bin": "5a6a9ca94910824d37f03699a2dee05f916e78b80d7f7020dc8b605a3da63ad3"
+    "outputs/autobattle/a66-Potion-overlay-03/Potion-overlay-ewram.bin": "5a6a9ca94910824d37f03699a2dee05f916e78b80d7f7020dc8b605a3da63ad3",
+    "outputs/autobattle/a66-wounded-Item-fixture-01/fixture.json": "1c25adadedbb02293ecf6e43b9605fe124d9831cf4d0485fe096ae789d2a1a08",
+    "outputs/autobattle/a66-wounded-fixture-source-checks-01.json": "781768c526061404d582b3b7ee46d33d33c8a8a7cd0648a1b218be0015fbba5c",
+    "outputs/autobattle/a66-wounded-Potion-overlay-01/inventory.json": "39483015c07fa2e8adb082401548cf84c9f352878d35dc818759f18e89989f99",
+    "outputs/autobattle/a66-wounded-Potion-reader-controls-01.json": "16fcd91d0fd65466628ee6577571c58836c03fdc79ccb1a171737415da5248a0",
+    "outputs/autobattle/a66-wounded-Potion-overlay-controls-02.json": "d518f29970ab9a9177e4a7f725920a5f4ecd6b838c592c76a87b3cf4d9276547",
+    "outputs/autobattle/a66-wounded-Potion-source-checks-02.json": "9e5620183de6c138011f8c57a745e68862afedc9a9a21d0910018a94091f38b3",
+    "outputs/autobattle/a66-source-history-overlay/tools/consumable_overlay.py": "e2125237bfb60ae2ab09a2b5a4d3ec7162ab026b28cb2de8507bdc85e8127ee9",
+    "outputs/autobattle/a66-live-count-matrix-01/count0-checks.json": "17a89e1838367459c95b241fa897c19b8a27b03c67b9f360d48d13cdf2b712e1",
+    "outputs/autobattle/a66-live-count-matrix-01/count0-sources.json": "2e8456fa23f1c718865a1e67579f225aa59417e2dca240e68ea6982f2301dec3",
+    "outputs/autobattle/a66-live-count-matrix-01/count1-checks.json": "b9dc213543ec9fb6dc9f64ad189d952164624b9004278bdf40cf6c3fd0d12498",
+    "outputs/autobattle/a66-live-count-matrix-01/count1-sources.json": "37021025172789a4d305dc68459a77ead552f0705bcd268683d36ecab17fef10",
+    "outputs/autobattle/a66-live-count-matrix-01/matrix.json": "0bde5a04baa9bee3923ad78bba469cfdc570b08dc2aea3d68b6f123812e59afd",
+    "outputs/autobattle/a66-live-count-matrix-01/count0-fixture/fixture.json": "02f26b0077464865271997e3cbb55553fb5e871c60fd76f7a9e830eb8056822c",
+    "outputs/autobattle/a66-live-count-matrix-01/count0-Item-list/inventory.json": "4bd8f345e773a0ee17a00ffabc56ec22aada5f57450addf3119cc2fe6c514638",
+    "outputs/autobattle/a66-live-count-matrix-01/count1-fixture/fixture.json": "943e4967a1df83b828df8d01a01c2d808badc26b819d7e745f61b84ac77797d0",
+    "outputs/autobattle/a66-live-count-matrix-01/count1-Item-list/inventory.json": "ac8b5489105f9db35fc9dcbce323b6219ae17ec39d315e7f83ef2ad84e16c912",
+    "outputs/autobattle/a66-wounded-Item-fixture-01/consumable-recovery.ss0": "4260b5d3f6f0f0f9c349b3649ae385fa74f55d8478d1763deb248465c5856163",
+    "outputs/autobattle/a66-wounded-Potion-overlay-01/Item-list-ewram.bin": "cf91b58520023aab9033fcfa2a0e4307ca584da89db5ea0c7f173c07be97c218",
+    "outputs/autobattle/a66-wounded-Potion-overlay-01/Potion-overlay-ewram.bin": "6719b47f51fb2d19f7add8ac545e34a2d73713ba7e64feee9966cead3fbcad20",
+    "outputs/autobattle/a66-live-count-matrix-01/count0-fixture/consumable-recovery.ss0": "06f1a77b3b295ef775457841e206817a6586bfc6579a251d95fcbff9fadab876",
+    "outputs/autobattle/a66-live-count-matrix-01/count0-Item-list/Item-list-ewram.bin": "ffa9b73c50bb72df0348a5aee12b4d5a70e2cc056551e537ffa0a6ce756d1590",
+    "outputs/autobattle/a66-live-count-matrix-01/count1-fixture/consumable-recovery.ss0": "bb9cc82d308b51e36d932fdb873f15993bade8453567c72dc1d7e7e466bacb8a",
+    "outputs/autobattle/a66-live-count-matrix-01/count1-Item-list/Item-list-ewram.bin": "0b716f7c069c549dd5f9732343a6303f7840aaefc174715ab1d936f9696e9924"
   },
   "excluded_runs": [
     {
@@ -71,5 +115,5 @@
     "Native count/helper/builder0/1 controls use isolated synthetic RAM; no original ROM/save/state changed.",
     "Binaries remain local; compact metadata and exact captured source snapshots are committed."
   ],
-  "next_task": "Decode the unaccepted Potion overlay target/source/legality on a coherent wounded Item-owning fixture; identify current law constraints before enabling any final use."
+  "next_task": "Finish read-only System/Law Cards inspection and decode current law constraints; then native preview/final-prompt legality before A6.6.2 single-use witness."
 }

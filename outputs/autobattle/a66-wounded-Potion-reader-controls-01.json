@@ -1,0 +1,325 @@
+{
+  "status": "pass",
+  "scope": "Replay a native Item capture and reject unavailable, foreign and stale joins.",
+  "joined": {
+    "member": 33554824,
+    "context": 33740960,
+    "callback": 33742168,
+    "cursor": 0,
+    "scroll": 0,
+    "rows": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "enabled": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "items": [
+      [
+        1,
+        362,
+        "Potion",
+        251,
+        2,
+        true
+      ],
+      [
+        2,
+        363,
+        "Hi-Potion",
+        252,
+        99,
+        true
+      ],
+      [
+        3,
+        364,
+        "X-Potion",
+        253,
+        99,
+        true
+      ],
+      [
+        4,
+        365,
+        "Ether",
+        254,
+        6,
+        true
+      ],
+      [
+        6,
+        375,
+        "Phoenix Down",
+        256,
+        99,
+        true
+      ],
+      [
+        7,
+        369,
+        "Echo Screen",
+        257,
+        99,
+        true
+      ],
+      [
+        8,
+        370,
+        "Maiden Kiss",
+        258,
+        99,
+        true
+      ],
+      [
+        9,
+        371,
+        "Soft",
+        259,
+        99,
+        true
+      ],
+      [
+        10,
+        373,
+        "Bandage",
+        263,
+        96,
+        true
+      ],
+      [
+        11,
+        372,
+        "Holy Water",
+        260,
+        99,
+        true
+      ],
+      [
+        12,
+        367,
+        "Antidote",
+        261,
+        99,
+        true
+      ],
+      [
+        13,
+        374,
+        "Cureall",
+        264,
+        99,
+        true
+      ],
+      [
+        14,
+        368,
+        "Eye Drops",
+        262,
+        99,
+        true
+      ]
+    ],
+    "excluded_rows": [
+      [
+        15,
+        265,
+        "Draw Weapon: no consumable count"
+      ]
+    ],
+    "inventory_raw": "6a0102006f01630075016000770163006b0163006c0163007001630071016300720163007301630074016300760163006d01060000000000",
+    "inventory_sha256": "3d9b5a4a862b939828fe20cb4ccdb1189403e14229ffa092de6e83ad06903e77",
+    "unit_sha256": "84ec2e666333303f7cf2c390237fec32f42ed7392e39b99e659fff9626c2c6f0",
+    "list_sha256": "23c749adb9ded80c040322c1746da95696aeba4a49f3db80c83b99e6231ddf05",
+    "availability_flag13": 0
+  },
+  "rejected": [
+    {
+      "case": "KO actor",
+      "reason": "Item actor resources/side invalid"
+    },
+    {
+      "case": "actor MP changed",
+      "reason": "stale/foreign Item list token"
+    },
+    {
+      "case": "foreign id",
+      "reason": "Item canonical identity changed"
+    },
+    {
+      "case": "foreign name",
+      "reason": "Item canonical identity changed"
+    },
+    {
+      "case": "race changed",
+      "reason": "Item canonical identity changed"
+    },
+    {
+      "case": "job changed",
+      "reason": "Item canonical identity changed"
+    },
+    {
+      "case": "secondary Item removed",
+      "reason": "Item secondary group/mode differs"
+    },
+    {
+      "case": "enemy side",
+      "reason": "Item canonical identity changed"
+    },
+    {
+      "case": "foreign menu owner",
+      "reason": "Item allocation/owner changed"
+    },
+    {
+      "case": "wrong mode",
+      "reason": "Item secondary group/mode differs"
+    },
+    {
+      "case": "wrong action group",
+      "reason": "Item secondary group/mode differs"
+    },
+    {
+      "case": "callback moved",
+      "reason": "Item allocation/owner changed"
+    },
+    {
+      "case": "manager moved",
+      "reason": "Item allocation/owner changed"
+    },
+    {
+      "case": "foreign driver owner",
+      "reason": "Item driver/callback is unowned"
+    },
+    {
+      "case": "foreign driver peer",
+      "reason": "Item driver/callback is unowned"
+    },
+    {
+      "case": "active target processor",
+      "reason": "Item driver/callback is unowned"
+    },
+    {
+      "case": "wrong driver state",
+      "reason": "Item driver/callback is unowned"
+    },
+    {
+      "case": "nonaccepting callback",
+      "reason": "Item list is not accepting input"
+    },
+    {
+      "case": "wrong handler",
+      "reason": "Item list is not accepting input"
+    },
+    {
+      "case": "invalid menu race",
+      "reason": "Item list race/count/cursor invalid"
+    },
+    {
+      "case": "invalid cursor",
+      "reason": "Item list race/count/cursor invalid"
+    },
+    {
+      "case": "zero row count",
+      "reason": "Item list race/count/cursor invalid"
+    },
+    {
+      "case": "short inventory pointer",
+      "reason": "RAM pointer outside EWRAM"
+    },
+    {
+      "case": "zero Potion count",
+      "reason": "Item list contains an exhausted/missing inventory item"
+    },
+    {
+      "case": "last Potion invalidates old token",
+      "reason": "stale/foreign Item list token"
+    },
+    {
+      "case": "reserved Potion invalidates old token",
+      "reason": "stale/foreign Item list token"
+    },
+    {
+      "case": "aliased item id",
+      "reason": "foreign/aliased consumable inventory item"
+    },
+    {
+      "case": "foreign inventory id",
+      "reason": "foreign/aliased consumable inventory item"
+    },
+    {
+      "case": "aliased canonical id",
+      "reason": "Item canonical actor alias"
+    },
+    {
+      "case": "changed native availability flag13",
+      "reason": "stale/foreign Item list token"
+    },
+    {
+      "case": "unknown native availability flag13",
+      "reason": "unknown native availability flag13 value"
+    },
+    {
+      "case": "row alias",
+      "reason": "Item rows/flags invalid or aliased"
+    },
+    {
+      "case": "invalid row",
+      "reason": "Item rows/flags invalid or aliased"
+    },
+    {
+      "case": "invalid enabled byte",
+      "reason": "Item rows/flags invalid or aliased"
+    },
+    {
+      "case": "stale engine disabled flag",
+      "reason": "stale/foreign Item list token"
+    },
+    {
+      "case": "fresh Frog with stale enabled Potion",
+      "reason": "stale enabled Item row disagrees with native status/flag13"
+    }
+  ],
+  "checks": [
+    "native Potion 2 and Ether 6 joined",
+    "absent Elixir zero excluded",
+    "Draw Weapon row15 has no count and is excluded",
+    "disabled native row stays disabled"
+  ],
+  "source_sha256": {
+    "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
+    "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
+    "tools/validate_consumable_menu.py": "d55ee24bbbc735105c6cbf15490cf58bc54d936def6c18303878938637753970"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-wounded-Potion-overlay-01\\inventory.json": "39483015c07fa2e8adb082401548cf84c9f352878d35dc818759f18e89989f99",
+    "outputs\\autobattle\\a66-wounded-Potion-overlay-01\\Item-list-ewram.bin": "cf91b58520023aab9033fcfa2a0e4307ca584da89db5ea0c7f173c07be97c218"
+  },
+  "limitations": [
+    "Retained live RAM replay; target/law legality and consumption remain UNKNOWN."
+  ]
+}

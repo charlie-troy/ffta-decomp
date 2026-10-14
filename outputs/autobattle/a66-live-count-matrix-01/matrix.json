@@ -1,0 +1,28 @@
+{
+  "scope": "Build isolated count fixtures and capture native Item lists sequentially.",
+  "status": "pass-live-zero-one-Item-reader-controls",
+  "cases": [
+    {
+      "count": 0,
+      "fixture": "outputs\\autobattle\\a66-live-count-matrix-01\\count0-fixture",
+      "capture": "outputs\\autobattle\\a66-live-count-matrix-01\\count0-Item-list",
+      "status": "pass"
+    },
+    {
+      "count": 1,
+      "fixture": "outputs\\autobattle\\a66-live-count-matrix-01\\count1-fixture",
+      "capture": "outputs\\autobattle\\a66-live-count-matrix-01\\count1-Item-list",
+      "status": "pass"
+    }
+  ],
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count0-checks.json": "17a89e1838367459c95b241fa897c19b8a27b03c67b9f360d48d13cdf2b712e1",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count0-sources.json": "2e8456fa23f1c718865a1e67579f225aa59417e2dca240e68ea6982f2301dec3",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count1-checks.json": "b9dc213543ec9fb6dc9f64ad189d952164624b9004278bdf40cf6c3fd0d12498",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count1-sources.json": "37021025172789a4d305dc68459a77ead552f0705bcd268683d36ecab17fef10",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count0-fixture\\fixture.json": "02f26b0077464865271997e3cbb55553fb5e871c60fd76f7a9e830eb8056822c",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count0-Item-list\\inventory.json": "4bd8f345e773a0ee17a00ffabc56ec22aada5f57450addf3119cc2fe6c514638",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count1-fixture\\fixture.json": "943e4967a1df83b828df8d01a01c2d808badc26b819d7e745f61b84ac77797d0",
+    "outputs\\autobattle\\a66-live-count-matrix-01\\count1-Item-list\\inventory.json": "ac8b5489105f9db35fc9dcbce323b6219ae17ec39d315e7f83ef2ad84e16c912"
+  }
+}

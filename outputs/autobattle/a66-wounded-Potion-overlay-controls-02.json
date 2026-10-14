@@ -1,0 +1,134 @@
+{
+  "status": "pass",
+  "scope": "Reject wrong-source, stale-count and already-accepted Potion overlays.",
+  "overlay": {
+    "source": 33554824,
+    "target": 33554824,
+    "wrapper": 33695500,
+    "ability_id": 251,
+    "item_id": 362,
+    "count": 2,
+    "hp": 100,
+    "max_hp": 241,
+    "tile": [
+      5,
+      10
+    ],
+    "inventory_sha256": "3d9b5a4a862b939828fe20cb4ccdb1189403e14229ffa092de6e83ad06903e77",
+    "raw_sha256": "4b05d5ac4cc5ec2634b0da786095214db2d2b1d42aae86591b8fe252c7c0acce"
+  },
+  "rejected": [
+    {
+      "case": "wrong selected ability",
+      "reason": "Potion overlay selection/source/peer differs"
+    },
+    {
+      "case": "wrong selection",
+      "reason": "Potion overlay selection/source/peer differs"
+    },
+    {
+      "case": "foreign overlay peer",
+      "reason": "Potion overlay selection/source/peer differs"
+    },
+    {
+      "case": "wrong overlay mode",
+      "reason": "Potion overlay selection/source/peer differs"
+    },
+    {
+      "case": "foreign source wrapper",
+      "reason": "Potion overlay target list/source/copies differ"
+    },
+    {
+      "case": "foreign target wrapper",
+      "reason": "Potion overlay target list/source/copies differ"
+    },
+    {
+      "case": "extra target",
+      "reason": "Potion overlay target list/source/copies differ"
+    },
+    {
+      "case": "invalid target index",
+      "reason": "Potion overlay target list/source/copies differ"
+    },
+    {
+      "case": "accepted source copy",
+      "reason": "Potion overlay target list/source/copies differ"
+    },
+    {
+      "case": "accepted target copy",
+      "reason": "Potion overlay target list/source/copies differ"
+    },
+    {
+      "case": "wrong processor ability",
+      "reason": "Potion overlay is not unaccepted targeting"
+    },
+    {
+      "case": "final state already active",
+      "reason": "Potion overlay is not unaccepted targeting"
+    },
+    {
+      "case": "confirmation flag",
+      "reason": "Potion overlay is not unaccepted targeting"
+    },
+    {
+      "case": "foreign target processor",
+      "reason": "Potion overlay driver/source differs"
+    },
+    {
+      "case": "wrong driver state",
+      "reason": "Potion overlay driver/source differs"
+    },
+    {
+      "case": "cached UI still owns input",
+      "reason": "Potion overlay still has active cached UI"
+    },
+    {
+      "case": "non-target callback",
+      "reason": "Potion list has not yielded to target processor"
+    },
+    {
+      "case": "HP changed",
+      "reason": "Potion canonical actor/target changed"
+    },
+    {
+      "case": "inventory consumed",
+      "reason": "Potion inventory changed before acceptance"
+    },
+    {
+      "case": "cursor x differs",
+      "reason": "Potion cursor/canonical target tile differs"
+    },
+    {
+      "case": "cursor y differs",
+      "reason": "Potion cursor/canonical target tile differs"
+    },
+    {
+      "case": "law flag changed",
+      "reason": "Potion native availability flag changed"
+    },
+    {
+      "case": "canonical source alias",
+      "reason": "Potion source/target canonical alias appeared"
+    },
+    {
+      "case": "foreign driver peer",
+      "reason": "Potion overlay driver/source differs"
+    },
+    {
+      "case": "foreign wrapped target",
+      "reason": "Potion canonical actor/target changed"
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_consumable_overlay.py": "9a73e681999aedd47caa7ae3b779bbb50e502fed0029de2ac4673b437b0cafdc",
+    "tools/consumable_overlay.py": "205b9e49325c145154e2860cb2ee20fbc11b42b3f92ec596f58750229ddfba03"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-wounded-Potion-overlay-01\\inventory.json": "39483015c07fa2e8adb082401548cf84c9f352878d35dc818759f18e89989f99",
+    "outputs\\autobattle\\a66-wounded-Potion-overlay-01\\Item-list-ewram.bin": "cf91b58520023aab9033fcfa2a0e4307ca584da89db5ea0c7f173c07be97c218",
+    "outputs\\autobattle\\a66-wounded-Potion-overlay-01\\Potion-overlay-ewram.bin": "6719b47f51fb2d19f7add8ac545e34a2d73713ba7e64feee9966cead3fbcad20"
+  },
+  "limitations": [
+    "Target overlay identity only; no legal final item confirmation or consumption."
+  ]
+}

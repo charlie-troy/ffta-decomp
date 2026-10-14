@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-14 - Wounded Item overlay and live zero/one inventory controls pass
+
+Constructed and independently reloaded coherent Montblanc HP100/241/Potion2 fixture (three recorded construction writes, no gameplay input). Pinned self-Potion overlay joins canonical source/target, wrapper/table/cursor, ability251/item362/count2;25 mutants reject. Native live count matrix0/1 passes with Potion absent/enabled respectively, unchanged inventory, stale-count/reservation refusals and44-module source closures. No item is consumed. Law identity/compliance and final-prompt legality remain UNKNOWN; System access now identified via guarded command B then field START. See A6.6.1.
+
 ## 2026-10-14 - A6.6.1 native inventory and owned Item join; target/law still UNKNOWN
 
 Mapped02001EE4 inventory pool and080CB2B4 count accessor, joined13 observed consumables to Montblanc5 Item list, and excluded Draw Weapon row15. Native33 accessor controls,36 retained-reader mutants and8 actual builder controls pass. Two source-stable captures preserve Item rows/counts; one additional guarded Potion selection reaches an unaccepted overlay without consumption. Original battle-start retries correctly refuse transient ownership and a different actor lacking Item. No final item input or public candidate is enabled. See A6.6.1 receipt; next decode overlay target/law and acquire coherent wounded Item owner.
