@@ -1,0 +1,70 @@
+{
+  "status": "pass-public-Life-decline",
+  "scope": "Validate public Life refusal/STOP semantics and adversarial partial journals.",
+  "mode": "navigation",
+  "rejected": [
+    {
+      "case": "missing raw journal",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)"
+      ]
+    },
+    {
+      "case": "empty ledger",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run",
+        "paused run.json but input-log.jsonl never latched the stop"
+      ]
+    },
+    {
+      "case": "missing source proof",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "invented final Life",
+      "errors": [
+        "event 3: invalid recovery journal (partial public final-attempt latch differs)"
+      ]
+    },
+    {
+      "case": "invented final Wait",
+      "errors": [
+        "event 3: invalid recovery journal (partial public final-attempt latch differs)"
+      ]
+    },
+    {
+      "case": "duplicate request",
+      "errors": [
+        "event 3: invalid recovery journal (duplicate public Life/Wait final)"
+      ]
+    },
+    {
+      "case": "wrong trace cleanup",
+      "errors": [
+        "event 3: invalid recovery journal (public Life trace lifecycle differs)"
+      ]
+    },
+    {
+      "case": "post terminal input",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=16.566): ['key_write']"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_life_recovery_decline.py": "3cc5963b9ddf8bcca67d8fab7e39449a5e4ef126067d3a7831eb4417cd7f1395",
+    "tools/life_recovery_receipt.py": "d488b6af26bd21994423d247b648e12d76ade5bba234082e6e822df2d8ae9693",
+    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a653-repeat-STOP-navigation\\run.json": "8face9ca293fc543deba1088a540e0a90d1d50a36c982dc2db6fa06f63d56226",
+    "outputs\\autobattle\\a653-repeat-STOP-navigation\\events.jsonl": "ccf77fbfd1414a3b79a060b09daebeed129a92b47fa290c290631381a2a9e9ae",
+    "outputs\\autobattle\\a653-repeat-STOP-navigation\\input-log.jsonl": "1366281ec4adb79b8d6cebde3b37b1cfb0da4c56ae9ca3ace40edd75ba7287a0"
+  },
+  "limitations": [
+    "Captured public lifecycle audit only; no new emulator execution."
+  ]
+}

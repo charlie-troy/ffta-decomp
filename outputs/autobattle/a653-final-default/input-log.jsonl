@@ -1,0 +1,24 @@
+{"event": "key_write", "t": 13.81, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 13.862, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 13.915, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 13.968, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 14.022, "val": 128, "hits": 5, "manual": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 13.757, "duration": 1.466, "hits": 5, "aborted": false}
+{"event": "key_write", "t": 16.436, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 16.489, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 16.542, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 16.594, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 16.647, "val": 128, "hits": 5, "manual": false}
+{"event": "press", "mask": 128, "tag": "c3:wait-nav-down", "t": 16.435, "duration": 1.413, "hits": 5, "aborted": false}
+{"event": "key_write", "t": 19.058, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 19.111, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 19.164, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 19.216, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 19.269, "val": 1, "hits": 5, "manual": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 19.057, "duration": 1.412, "hits": 5, "aborted": false}
+{"event": "key_write", "t": 21.692, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 21.745, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 21.797, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 21.849, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 21.902, "val": 1, "hits": 5, "manual": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 21.692, "duration": 1.411, "hits": 5, "aborted": false}

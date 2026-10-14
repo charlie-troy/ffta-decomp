@@ -316,6 +316,7 @@ def main(argv=None):
             "bounded_ally_cure": args.bounded_ally_cure,
             "bounded_ally_life": args.bounded_ally_life,
             "observe_player_boundaries": args.observe_player_boundaries,
+            "ordinary_raw_input": runtime.ordinary_raw_input,
             "player_identities": [list((r["name_text"], r["id"]))
                                   for r in runtime.adapter.expected],
         }

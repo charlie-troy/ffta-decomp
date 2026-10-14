@@ -1,81 +1,77 @@
-# A6.5 public Life integration
+# A6.5 bounded public Life integration
 
-Status: implementation and public bounded turns pass; lifecycle acceptance is
-still UNKNOWN. Canonical gate: `docs/receipts/autobattle/A6.5.json`.
-A6.4 research PASS is a prerequisite, not public acceptance by itself.
+Accepted2026-10-14. Canonical gate: `docs/receipts/autobattle/A6.5.json`;
+final lifecycle/regressions: `docs/receipts/autobattle/A6.5.3.json`.
 
-The explicit `--bounded-ally-life` opt-in uses the same native state-driven
-transaction as research. It is mutually exclusive with both Cure fixture
-flags and requires schema2 tactics before launching the emulator. It supports
-only the corrected eight-unit Montblanc5/Life5/cost10/genuine KO Marche7 fixture.
-Its EXP99 level-up is observed natively before post-action identity is rebound.
-Full-Life, arbitrary KO parties and items remain outside this contract.
+The explicit schema2 `--bounded-ally-life` opt-in supports only the corrected
+eight-unit Montblanc5/Life5/cost10/genuine KO Marche7 fixture. It shares the
+A6.4 native state-driven transaction and verifies native HP/MP and the EXP99
+level-up before rebinding the actor's identity. The flag is mutually exclusive
+with both Cure opt-ins. Full-Life, arbitrary KO parties, items, whole-battle
+recovery and ROM-native automation remain outside this acceptance.
+
+## Current evidence
+
+- Two historical source-stable public Life/Wait/next-actor turns retain their
+  exact kernel scope; fresh final-source full Life, recovery STOP and manual
+  continuation repeat the affected public paths.
+- Same-PID lifecycle on PID67648: real public STOP, window-only manual Wait,
+  exact adoption and one identified resumed Montblanc Wait with20 actual
+  register writes. Source/handoff/input/history audits pass.
+- Independent final-source repeat on PID58184: one zero-seed resumed Wait and
+  independently owned next Marche7 command menu;19 input/completion mutations
+  reject and both captured source closures resolve.
+- Full Life38, ally-Cure38, self-Cure26, default5, unsupported zero-input,
+  reserve11, navigation STOP8 and final STOP11 fresh scoped regression checks.
+
+The false stall came from treating a new sequencer seed as the only completion
+signal. A next ally can already own an accepting command menu without a new
+seed. `wait_ally_continuation.py` verifies changed canonical wrapper/member,
+restored roster, pinned party, own cursor and the accepting native command
+list. Its original Wait row mixup is corrected: table8/9/10/11 uses Wait10;
+legacy cursor index2 is not that row ID. Existing actor/STOP/input guards stay
+in force. An unreadable, stale, same, foreign or blocked actor never supplies
+this completion witness.
+
+Ordinary Move/Wait now logs actual register writes. A completed Wait's select
+and confirm input must occur inside that boundary and before the next-menu
+witness; a preceding Life leg cannot supply missing resumed inputs. Recovery
+transport retains its separate logger, without duplicate writes.
+
+## Reproduce bounded controls
 
 ```
 python tools/run_autobattle.py --state outputs/autobattle/a64-life-fixture-02/life-recovery.ss0 --scenario configs/battle-scenarios/a4-two-player.json --tactics-policy configs/tactics/healer.json --bounded-ally-life --run-id NEW --max-turns 1 --wall-timeout 180 --on-stop kill --yes
-python tools/validate_autobattle_runtime.py outputs/autobattle/NEW
-python tools/validate_life_recovery_runtime.py --run outputs/autobattle/NEW --out outputs/autobattle/NEW-checks.json
+python tools/run_life_recovery_handoff.py --run-id NEW-HANDOFF --wall-timeout 300
+python tools/run_life_final_regressions.py --prefix NEW-MATRIX
 ```
 
-A one-turn budget intentionally stops as stalled after the attributed turn;
-this is not whole-battle completion. Public02/public03 independently revive,
-Wait and join next Carson4 with unchanged sources. Public receipt mutation
-checks reject38 changes. Partial STOP/refusal journals also retain adapter,
-policy, attempt-latch, transport and any completed native effect checks.
+Use new IDs. One-turn budget stops truthfully as stalled after its attributed
+turn; it is not whole-battle completion. The matrix uses already verified local
+fixtures and owns sequential CLI cleanup; no RAM/ROM setup is inferred.
 
-## Lifecycle gates
+## Historical exclusions and source provenance
 
-| Gate | Required evidence | Current result |
-|---|---|---|
-| Native public transaction | Two independent owned reloads, accepted target, actual HP/MP/growth, Wait/next actor | Bounded PASS public02/public03 |
-| CLI interface | Schema2 required, exclusive flags, wrong owner/job/race/tile/party before input | PASS10 host controls,31 exact pre-navigation fixture mutants, plus live unsupported seven-unit refusal before input |
-| STOP navigation/final | Actual STOP latch and no later automation writes | PASS navigation01/final01 |
-| STOP post-Life Wait | Attributed effect preserved, Wait final unattempted, real owned handoff | PASS Wait01 pause |
-| Manual/resume | Window-only manual Wait, same PID adoption and a later identified public player turn | UNKNOWN; Wait01/Wait02 adopted but no resumed player turn at150/300 seconds |
-| Reserve/default refusal | Actual remaining211 versus reserve212; no opt-in never casts Life | PASS reserve01/default01,11/5 mutants |
-| Regressions | Existing Cure and runner receipt gates; fresh public Cure controls | PASS fresh ally-Cure38/self-Cure26 plus default Wait |
+Wait01/02 adopted but yielded no resumed player turn; Wait03's oversized RSP
+read and Wait04's serializer failure did not produce valid diagnostics. Their
+later screenshots/status reads never repaired those captures. A6.5.1's current
+serializer/validator/cleanup and full raw mirror diagnostic resolve that slice.
+A6.5.2 records native picks and accepting menus before the completion fix.
 
-The first manual Wait on PID79496 passed with zero stub gameplay writes and
-an independent next enemy. Same-PID adoption also passed, but the150-second
-shared-clock budget ended before any resumed player turn. Keep the gate UNKNOWN.
-A second fresh pause on PID76672 with a300-second resume budget also ended
-without an identified player turn. The terminal screenshot suggests Sleep on
-both allies; this is a hypothesis until native RAM is captured. The next
-control adds read-only terminal canonical/mirror status evidence, including
-the known Sleep getter0x080CDB24, +EB mask04 and +DF duration. Do not relax
-identity checks or lengthen the same timeout without new evidence.
+The first final-source reserve changed a validator file during execution and
+is excluded; the stable repeat supplies that criterion. Navigation STOP can
+include one already-pending second press before observation: measured1.453s
+latency stays inside2s, with zero writes after the latch and no accepted Life
+target or final cast. The auditor checks those facts rather than assuming one
+completed navigation entry.
 
-The reusable lifecycle driver is `tools/run_life_recovery_handoff.py`.
-It uses the public CLI, `run_life_cli_stop.py`, the verified owned-window helper,
-and the public `--resume` path. A failed child preserves its logs and owned
-process state for inspection. GDB is a read-only monitor during manual input.
+`audit_life_public_sources.py` resolves each captured import graph against exact
+local/Git bytes. Intermediate validator reconstructions under
+`outputs/autobattle/a65-source-history` and `a653-source-history` are usable
+only when their bytes match the original capture SHA256. JSON/JSONL evidence
+preserves its original bytes in Git. See the receipts for exact versions and
+failed/tainted exclusions; dated history remains in the project log.
 
-The bounded-resume audit rejects five changes, including false PID adoption,
-missing first-leg source proofs and automated input in the manual gap. This
-audit passes for the failed attempt; the lifecycle gate remains UNKNOWN.
-
-The third capture (PID16628) records the diagnostic failure explicitly: mGBA
-truncated the whole-array RSP reply. The corrected reader fetches one264-byte
-unit per request; host tests enforce the512-byte bound and exercise Sleep
-present/absent with no input API. A fresh diagnostic capture is still required.
-
-`audit_life_public_sources.py` resolves the captured Python import graph from
-exact local/Git bytes. Public Life03 and the full manual closure on Wait03 pass.
-Reserve01 used an intermediate validator version; its archived reconstruction
-matches the capture SHA256 exactly and is accepted only by that exact hash.
-Use `--source-dir outputs/autobattle/a65-source-history` with Git refs790f333
-and4ccb7f0 to reproduce that provenance audit. This is retained-source evidence.
-
-Wait04 PID85332 exposed a second event whitelist: the diagnostic was decoded
-but rejected by the runtime serializer before terminal finalization. That
-capture is invalid and is excluded from acceptance. The schema omission is
-fixed and the actual serializer/validator whitelist host control passes.
-A later read-only observation on that same verified PID decoded both canonical
-and mirror party records: neither ally had Sleep (+EB04 clear, +DF zero),
-HP241/221 and MP211/85 were preserved. This later observation does not repair
-the failed run or explain every earlier missing menu. The owned PID was ended.
-Next packet: fresh same-PID resume with the corrected diagnostic serializer,
-then trace the fresh-menu ownership rejection against native actor/cursor and
-status history. Do not repeat longer timeouts without a discriminating witness.
-
-On2026-10-14 A6.5.1 passes its diagnostic slice; see `docs/receipts/autobattle/A6.5.1.json`. Fresh resume02 completes a valid diagnostic with all eight raw mirror units/count, both canonical identities, and cursor. The mirror is unidentified scratch (count0x0202243C), not a usable roster. Neither canonical ally is asleep at that terminal.14 raw mutations and5 bounded-resume mutations reject, both captured import closures resolve. Six integrated terminal/cleanup host cases pass and fail on the pre-fix serializer. A6.5 control stays UNKNOWN; next observe native player picks, live menus and exact adapter rejection across the same timeline.
+Next packet: A6.6 inventory/count/engine availability and consumable execution.
+Current schema2 supports host item predicates behind disabled-by-default
+consumable scopes; public Item execution is still unproven and disabled.

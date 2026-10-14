@@ -1,5 +1,11 @@
 # Project log
 
+## 2026-10-14 - A6.5 bounded public Life lifecycle passes
+
+A6.5.1 valid diagnostics and A6.5.2 native opportunity/Wait completion work reach the final lifecycle gate. The seed-only post-Wait check was too narrow for a next ally menu; the new witness joins canonical driver/wrapper, restored roster and accepting next command menu, without relaxing actor/STOP guards. Native PID65752 resumes to one Wait and next Marche7 without a new seed. Current PID67648 resumes one identified Wait with20 actual register writes; handoff6/input9/history7/source checks pass. Current validator rejects17 zero-seed receipt/input corruptions.
+
+Eight final-behavior controls pass: full Life38, ally-Cure38, self-Cure26, default5, unsupported zero-input, reserve11, navigation STOP8, final STOP11. Navigation's one pending second press precedes the observed latch; latency1.453s and no later input/cast. The source-tainted first reserve is excluded and repeated. Capture versions and SHA256-preserving snapshots are retained. A6.5 PASS is the exact eight-unit Life/EXP99 family, not Full-Life, items, arbitrary KO parties, whole-battle recovery or ROM-native automation. See `docs/receipts/autobattle/A6.5.3.json`. Next scope A6.6 inventory/consumable legality; second current resume remains a repeatability control.
+
 ## 2026-10-14 - Same-PID resumed Wait succeeds; receipt input window next
 
 Corrected native Wait row10 produces one attributed resumed Montblanc Wait on PID65752 and independently joins Marche7's command menu, without another sequencer seed. Real terminal screenshot inspected; canonical/roster/menu witness contains153 raw reads. The public handoff validator passes6 mutants, both source closures and observer history pass. This is bounded progress, not whole-battle completion.

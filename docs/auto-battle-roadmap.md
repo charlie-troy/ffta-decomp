@@ -9,47 +9,7 @@ Earlier “closed” log entries are historical claims, not dependency clearance
 
 ## Current worker assignment
 
-**A6.5.1 is bounded PASS: current-source same-PID diagnostic, real serializer/validator/cleanup failures and raw mirror/status/source controls. Continue A6.5.2 native actor/menu timing and ownership history; A6.5 resumed player control remains UNKNOWN.**
-Two public ally casts, damage-policy refusal/Wait, both STOP/manual/same-PID
-handoffs, two unsupported-family zero-input controls, the six-case self-Cure
-matrix and ordinary live Move/Wait pass on current production sources.
-See `docs/a63-public-ally-recovery.md` and `A6.3.json` for exact hashes.
-The opt-in public self-Cure matrix now has six passing current-source cases:
-two accepted casts, reserve decline, engine-disabled Cure and both no-match
-fallbacks. Both final STOP/manual/same-PID receipts pass, including eight
-rejected mutations each; the real two-ally fixture rejects with zero input.
-A6's wounded-party, ally/KO and item criteria remain open.
-A5 is closed for the narrow family (2026-10-06): the public runner follows
-per-character rules (two job-5 allies take different commands in one battle),
-and on equivalent starting states changing one condition value changes both the
-decision and the engine result (Montblanc: 177/241 HP, Wait under `<= 80`;
-84/241 HP, Move under `<= 30`), with Marche as an unchanged control. Audit:
-the saved fixture matches but intervening damage differs, so these are not
-identical decision states; both HP values fall between the thresholds. STOP, the
-monitor-client handoff and same-PID resume were re-run on this revision, and two
-integration defects found by that evidence are fixed with regressions (adopted-
-session cleanup; resume scenario mismatch). Ability targeting, movement
-preference, law/status-conditioned play and complete-battle outcomes under a
-policy remain open and are named in the receipt.
-A5.1 is accepted (2026-10-06): the public runner drives the two-ally fixture
-with validated actor-linked Move/Wait, and the live manual takeover plus
-same-process resume pass on one battle (see `docs/a51-integration.md`).
-A5.3 is proven (2026-10-06) for a deliberately **narrow** family: with
-`run_autobattle.py --tactics-policy PATH` the adapter offers only the commands
-the decoded menu names (Move/Wait), one live run followed per-character rules
-(Marche Move, Montblanc Wait on the same battle) and another followed one
-engine-read condition (actor HP percent, 100% -> Move, 73% -> Wait), both
-engine-verified. Ability candidates, MP cost and range targeting remain
-unproven and cannot become enabled options (`docs/tactics-policy.md`).
-A5.2 is frozen (2026-10-06): `tools/tactics_policy.py` + `configs/tactics/`
-implement the frozen schema in `docs/tactics-policy.md`, with a pure host
-suite at 94/94 (`python tools/validate_tactics_policy.py`). No live wiring or
-engine-legality claim belongs to A5.2; A5.3 proves the adapter seam.
-A4 remains a bounded feasibility demonstration, not a completed
-multi-character product. C1–C3 are accepted for the documented fixture and
-same-process handoff. A8 investigation is complete; selectable acceleration
-and two-speed equivalence remain UNKNOWN. A6/A7/A10 are unlocked; A9 final
-acceptance also waits for A8.
+**A6.5 is bounded PASS on the exact eight-unit Life/EXP99 fixture. Continue A6.6 inventory and consumable legality research; Item execution, Full-Life, arbitrary KO parties and whole-battle recovery remain unproven.** Read [public Life](a65-public-life.md) and `docs/receipts/autobattle/A6.5.3.json` for the accepted scope and exclusions.
 
 This checkout remains the decompilation/modding and Windows companion project.
 The independent ROM-native hack has its own ROM-XX roadmap and evidence.
@@ -711,7 +671,9 @@ reserve and adversarial controls. Public revive integration is a later packet.
 Read-only table Life ID5/base cost10 is metadata, not target/availability proof.
 
 
-### A6.5 - Public bounded Life integration (ACTIVE)
+### A6.5 - Public bounded Life integration (bounded PASS; exact fixture)
+
+Updated2026-10-14: lifecycle and final scoped regressions pass. Earlier worker sub-gates below remain the acceptance contract; current dispatch is A6.6.
 
 See [public Life contract](a65-public-life.md) and `docs/receipts/autobattle/A6.5.json`.
 The explicit schema2 opt-in shares the A6.4 transaction and verifies native
@@ -722,6 +684,30 @@ on the same PID and produces a later identified public player turn.150/300
 second bounds adopted correctly but produced no such turn. Capture native
 status/menu evidence; do not weaken ownership or infer control from adoption.
 Full-Life, items, arbitrary KO parties and whole-battle claims remain gated.
+
+### A6.6 - Inventory and consumable legality (READY; research first)
+
+Prerequisite: bounded A6.5 PASS at `docs/receipts/autobattle/A6.5.3.json`.
+Host schema2 item predicates/last-item controls are prior contract evidence;
+`docs/item-table.md` maps metadata, not live inventory, availability or use.
+
+A6.6.1 owns one reusable read-only inventory/UI probe. Identify the actual
+inventory pointer, item IDs, counts, count accessor and actor-owned Item list.
+Join native rows to canonical inventory and table IDs; verify zero/one/multiple,
+missing/aliased/stale data and runtime law/availability constraints. Item rows
+must come from the observed engine list, never guessed cursor/group IDs. Keep
+consumables disabled by default and do not publish an item candidate until
+current ownership, count, target, resource and legality fields are verified.
+
+A6.6.2 follows only after that reader passes: one legal healing item, a guarded
+single final input, actual count decrement/HP effect/turn completion, last-item
+reserve and zero-count refusals, two reloads and STOP controls. Separate native
+consumption from an enemy effect or an inventory read that merely changed.
+
+A6.6.3 integrates the accepted reader into the public schema2 path, then runs
+current-source STOP/window manual/same-PID resumed player result and all affected
+Cure/Life/default regressions and receipt mutations. A6.6 remains UNKNOWN until
+all required native gates pass. Full-Life and whole-battle A9 stay outside it.
 
 ### A7 — Movement tactics (P1, bounded research then implementation)
 

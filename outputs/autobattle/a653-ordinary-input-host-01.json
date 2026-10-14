@@ -1,0 +1,24 @@
+{
+  "status": "pass-ordinary-raw-input-logging",
+  "scope": "Exercise real ordinary press logging without duplicating recovery transport ownership.",
+  "cases": [
+    {
+      "recovery": false,
+      "actual_writes": 2,
+      "serialized": 2
+    },
+    {
+      "recovery": true,
+      "actual_writes": 2,
+      "serialized": 0
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_ordinary_input_logging.py": "c84c48aff4fbe2d84aaa80146b323a3cabf3de7a4a853546703d07db21cf397b",
+    "tools/autobattle_runtime.py": "1cfe15b1d5511eab94fe516acf1dfb3283f76222e0f26508c42c89ac7a6131d0",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80"
+  },
+  "limitations": [
+    "Real transport/log path with fake hardware; no native gameplay."
+  ]
+}

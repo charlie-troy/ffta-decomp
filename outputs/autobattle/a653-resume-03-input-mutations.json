@@ -1,0 +1,105 @@
+{
+  "status": "pass-public-Wait-next-ally-mutations",
+  "scope": "Mutate a real zero-seed next-ally Wait through the complete public receipt validator.",
+  "rejected": [
+    {
+      "case": "missing completion proof",
+      "errors": [
+        "turn event 10: invalid actor-linked result (zero-seed Wait lacks next-ally completion evidence)"
+      ]
+    },
+    {
+      "case": "empty post raw reads",
+      "errors": [
+        "turn event 10: invalid actor-linked result (Wait continuation raw read missing)"
+      ]
+    },
+    {
+      "case": "empty origin reads",
+      "errors": [
+        "turn event 10: invalid actor-linked result (Wait continuation raw read missing)"
+      ]
+    },
+    {
+      "case": "missing original command",
+      "errors": [
+        "turn event 10: invalid actor-linked result ('command')"
+      ]
+    },
+    {
+      "case": "foreign original wrapper",
+      "errors": [
+        "turn event 10: invalid actor-linked result (Wait origin wrapper/member not owned)"
+      ]
+    },
+    {
+      "case": "same completed actor",
+      "errors": [
+        "turn event 10: invalid actor-linked result (Wait next actor metadata differs)"
+      ]
+    },
+    {
+      "case": "foreign next canonical",
+      "errors": [
+        "turn event 10: invalid actor-linked result (Wait next actor metadata differs)"
+      ]
+    },
+    {
+      "case": "wrong next source",
+      "errors": [
+        "turn event 10: invalid actor-linked result (Wait next-ally attribution/time differs)"
+      ]
+    },
+    {
+      "case": "changed selected actor MP",
+      "errors": [
+        "turn event 10: invalid actor-linked result (Wait origin actor fields differ from selection)"
+      ]
+    },
+    {
+      "case": "empty input log",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)",
+        "turn event 10: invalid Wait completion input interval (Wait select/confirm input missing or repeated)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run"
+      ]
+    },
+    {
+      "case": "no resumed input",
+      "errors": [
+        "turn event 10: invalid Wait completion input interval (Wait select/confirm input missing or repeated)"
+      ]
+    },
+    {
+      "case": "missing input log resume",
+      "errors": [
+        "input-log: 4 successful press/drive started after the stop was latched (t=62.863): ['c3:echo-down', 'c3:wait-nav-down', 'c3:select-wait']"
+      ]
+    },
+    {
+      "case": "zero-seed proof/source both deleted",
+      "errors": [
+        "turn event 10: invalid actor-linked result (zero-seed Wait lacks next-ally completion evidence)"
+      ]
+    },
+    {
+      "case": "input after terminal",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=259.9): ['key_write']"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_wait_ally_runtime.py": "89486e0c720306767b873fec33c77374e755705f7f8c4f990e2429f89f8bdea8",
+    "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f",
+    "tools/validate_autobattle_runtime.py": "731bb47fcd1d0102d6fd5c141fcb1b30e33452ff35eeea71d59761a641ba7ef1"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a652-resume-ally-completion-03\\run.json": "6bd0a8a62c9e2b5725ccff5b5df1c2d206f4a9749771a6daf9d505659cf36aaf",
+    "outputs\\autobattle\\a652-resume-ally-completion-03\\events.jsonl": "f2d3525eada127a94b82d6a2a115ff462626d9c4591e8403a2b8476ce357cbbb",
+    "outputs\\autobattle\\a652-resume-ally-completion-03\\input-log.jsonl": "424b22ed6a322076c5ab1d62c01e782e18de1598ae64e30f8b89cc5c29fcbe5b"
+  },
+  "limitations": [
+    "Retained full receipt mutations; no new gameplay or whole-battle claim."
+  ]
+}

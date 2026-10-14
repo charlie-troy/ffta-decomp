@@ -1,7 +1,7 @@
 {
   "milestone": "A6.5",
-  "date": "2026-10-08",
-  "status": "unknown",
+  "date": "2026-10-14",
+  "status": "pass",
   "scope": "Opt-in public integration of A6.4 exact eight-unit Life fixture; public acceptance separate from research",
   "prerequisite": {
     "milestone": "A6.4",
@@ -32,13 +32,13 @@
     },
     {
       "id": "same-PID-manual-handoff-resume",
-      "status": "unknown",
-      "scope": "Wait01 PID79496 and Wait02 PID76672 verified manual window Wait and exact PID adoption. Both resumed with zero identified player turns at150/300 second bounds; do not accept adoption as control. Sleep screenshot hypothesis requires native RAM diagnostic. Wait03 PID16628 repeats the bounded failure; full manual Python import closure now resolves exactly. Diagnostic failed honestly on oversized RSP reads; unit-size fix under fresh observation."
+      "status": "pass",
+      "scope": "PID65752 native next-ally zero-seed resume, and current PID67648 one identified resumed Wait with20 actual register writes; window-only manual Wait and exact adopted PID confirmed. Full/source/handoff/mutation audits pass. PID58184 final-source repeat independently passes native zero-seed/current raw-input path and19 mutants."
     },
     {
       "id": "raw-policy-source-identity-effect-receipt-mutations",
       "status": "pass",
-      "scope": "Public full38, partial STOP8/11/11, reserve11/default5 and failed-resume5 mutants reject. Previous-leg source stability and exact adoption flags independently checked; no successful resume claimed."
+      "scope": "Public full38, partial STOP8/11/11, reserve11/default5 and failed-resume5 mutants reject. Previous-leg source stability and exact adoption flags independently checked; no successful resume claimed. Current Wait input-window17 and raw resumed-Wait9 mutants reject; absent resumed input cannot borrow first-leg writes."
     },
     {
       "id": "existing-Cure-and-runner-regressions",
@@ -47,9 +47,9 @@
     }
   ],
   "source_sha256": {
-    "tools/run_autobattle.py": "9da5f414414d5175c24185ebc47813ed93b2d4ad125fd58106633695cc3ef557",
-    "tools/autobattle_runtime.py": "41a8f0ff0dc098f79256e221bfdcc8c1d871ceae9162c77e8e75e8b7d8f90cd8",
-    "tools/validate_autobattle_runtime.py": "c9289d05bad4081b8f2114422f61a61dfccfcc3ff8b1c4905218143c63a557d7",
+    "tools/run_autobattle.py": "a6452d18d40cfaab812bfa8ac68971a29bfac9e32d03c962b6cd24e75891ef6c",
+    "tools/autobattle_runtime.py": "1cfe15b1d5511eab94fe516acf1dfb3283f76222e0f26508c42c89ac7a6131d0",
+    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433",
     "tools/life_recovery_runtime.py": "0b03dde158f2bfc1edc25c659eccfd211e597556ee510e9c8b712892ef65e2be",
     "tools/life_recovery_transaction.py": "1f758c25a8ac0586257d23acbe75c5e808c2bbfa2ab238b294974c85173c1687",
     "tools/life_recovery_receipt.py": "d488b6af26bd21994423d247b648e12d76ade5bba234082e6e822df2d8ae9693",
@@ -64,7 +64,7 @@
     "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b",
     "tools/run_life_cli_stop.py": "2e1d0f78ca787438979ade86ab7fcdf030338c9b3191754a391f7ace61ba5657",
     "tools/manual_life_wait_handoff.py": "370a30df2e7e0d13535ad42e8e3d7059e098ff8450ae52120b04d292b605d365",
-    "tools/validate_life_recovery_decline.py": "9219dc3982b903f23be67a82227042efb0589075cadb5a3b1cf60318ff6f2958",
+    "tools/validate_life_recovery_decline.py": "3cc5963b9ddf8bcca67d8fab7e39449a5e4ef126067d3a7831eb4417cd7f1395",
     "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4",
     "tools/run_life_recovery_handoff.py": "9aea52d53eb5c55d566a4d9bcf92386f5a64c92c78dae80793cb22dfc93da8f2",
     "tools/validate_life_recovery_handoff.py": "fd76dde7d3c580225a845ad18b53242ca12d4618a5d8eeb94ff2599c48e1f3b1",
@@ -176,10 +176,9 @@
     "outputs/autobattle/a65-boundary-event-schema-01.json": "0fb5298c7f19985fae227ce2dee41eba9d89d0efd541cf6497fbc816428bc585"
   },
   "limitations": [
-    "No public revival acceptance yet.",
-    "Exact Montblanc5/Life5/cost10/Marche7 and EXP99 native level-up fixture only.",
-    "Full-Life, arbitrary KO parties, items and ROM-native automation remain outside this packet.",
-    "Wait04 resume crashed at diagnostic event serialization; invalid capture excluded. Later same-PID raw observation finds Sleep absent, not a repair. Serializer fixed and host-tested; fresh resume remains required."
+    "Bounded exact eight-unit Life5/cost10/Montblanc5/KO Marche7/EXP99 fixture only.",
+    "Full-Life, arbitrary KO parties, items, whole-battle recovery and ROM-native automation remain outside acceptance.",
+    "Prior failed/invalid/tainted captures remain exclusions; successful adoption alone was never counted as resumed control."
   ],
   "observations": [
     "Public01/02 each record identified-ally-life5 target7, native HP0->221, MP221->211, level40->41, guarded Wait and Carson4 next actor. Both source/input unchanged and public validators pass; max-turns1 stops stalled intentionally, no battle-completion claim. Public01 pilot source versions partly superseded; public02 exact implementation checkpoint is retained. Repeat current public implementation after remaining gate work.",
@@ -191,5 +190,6 @@
     "receipt": "docs/receipts/autobattle/A6.5.1.json",
     "status": "pass",
     "resumed_player_control": "unknown"
-  }
+  },
+  "final_lifecycle_receipt": "docs/receipts/autobattle/A6.5.3.json"
 }

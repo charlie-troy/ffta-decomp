@@ -1,0 +1,161 @@
+{
+  "milestone": "A6.5.3",
+  "date": "2026-10-14",
+  "status": "pass",
+  "scope": "Final-source bounded public Life lifecycle and exact-fixture regressions; no whole-battle/Full-Life/item claim",
+  "criteria": [
+    {
+      "id": "same-PID-window-manual-resumed-player-result",
+      "status": "pass",
+      "scope": "PID67648 current-source Life STOP, window-only manual Wait, same-PID adoption and one identified ordinary Montblanc Wait with20 real register writes; handoff6/input9/source/history7 checks pass. Independent final-source repeat PID58184 completes zero-seed next-Marche Wait with real register writes;19 full input/completion mutants and both source closures pass."
+    },
+    {
+      "id": "zero-seed-next-ally-completion-and-corruption",
+      "status": "pass",
+      "scope": "PID65752 accepted native zero-seed next-Marche command witness; current validator rejects17 mutations including deleted resumed input and missing native origin/post reads. Updated current raw capture proves ordinary key publication."
+    },
+    {
+      "id": "final-source-regression-controls",
+      "status": "pass",
+      "scope": "Eight current-behavior controls in cases list; Life38, ally-Cure38, self-Cure26, default5, reserve11, navigation8, final11 mutants. Unsupported-family zero-input receipt verifies."
+    },
+    {
+      "id": "observed-STOP-no-later-input",
+      "status": "pass",
+      "scope": "Public global checks zero writes after latch in all STOP captures. Navigation repeat includes one already-pending second press before latch; measured1.453s detection latency within2s, no accepted Life target or final cast."
+    }
+  ],
+  "cases": [
+    {
+      "run_id": "a653-final-Life",
+      "pid": 50488,
+      "turns": 1,
+      "source_stable": true
+    },
+    {
+      "run_id": "a653-final-ally-Cure",
+      "pid": 70484,
+      "turns": 1,
+      "source_stable": true
+    },
+    {
+      "run_id": "a653-final-self-Cure",
+      "pid": 18252,
+      "turns": 1,
+      "source_stable": true
+    },
+    {
+      "run_id": "a653-final-default",
+      "pid": 119472,
+      "turns": 1,
+      "source_stable": true
+    },
+    {
+      "run_id": "a653-final-unsupported",
+      "pid": 92620,
+      "turns": 0,
+      "source_stable": true
+    },
+    {
+      "run_id": "a653-repeat-reserve",
+      "pid": 92652,
+      "turns": 0,
+      "source_stable": true
+    },
+    {
+      "run_id": "a653-repeat-STOP-navigation",
+      "pid": 95060,
+      "turns": 0,
+      "source_stable": true
+    },
+    {
+      "run_id": "a653-last-STOP-final",
+      "pid": 39152,
+      "turns": 0,
+      "source_stable": true
+    }
+  ],
+  "source_sha256": {
+    "tools/autobattle_runtime.py": "1cfe15b1d5511eab94fe516acf1dfb3283f76222e0f26508c42c89ac7a6131d0",
+    "tools/run_autobattle.py": "a6452d18d40cfaab812bfa8ac68971a29bfac9e32d03c962b6cd24e75891ef6c",
+    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433",
+    "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f",
+    "tools/validate_wait_ally_runtime.py": "9472e738f5dec4b1edaf736eecd7ea54ebce79966f33ff9806ac60be12c0e50b",
+    "tools/validate_ordinary_input_logging.py": "c84c48aff4fbe2d84aaa80146b323a3cabf3de7a4a853546703d07db21cf397b",
+    "tools/validate_life_recovery_decline.py": "3cc5963b9ddf8bcca67d8fab7e39449a5e4ef126067d3a7831eb4417cd7f1395",
+    "tools/run_life_final_regressions.py": "040fc989e926045574ecbc427b19b04694bb8d8558cda867354e02572719b846"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a653-final-Life/checks.json": "0395a0afabab71689329dfa3f738f8789fe7a04ab143c2420416190eacd4ea09",
+    "outputs/autobattle/a653-final-Life/events.jsonl": "ed61612c57323bc5edf43aa79176206dc80b6f89d76a251151db278d59d31b89",
+    "outputs/autobattle/a653-final-Life/input-log.jsonl": "78f7d43a722779407c9c0582c37946934a3e13c15874b4d8abb50f9f5b7a24a1",
+    "outputs/autobattle/a653-final-Life/run.json": "760bafd7bfbc6443d20fb6af05b2cba9620c976fa0a3750a1e825bb39cbffa54",
+    "outputs/autobattle/a653-final-Life/sources.json": "88bf26fdf9077759fd50d89f702d99146441e314c40d120d99239f8f6c515d86",
+    "outputs/autobattle/a653-final-Life/Life-transaction-1/Life-engine.jsonl": "08b22403416b075c458220117e60e3d817317b3967f8176eb56bfc998621b461",
+    "outputs/autobattle/a653-final-ally-Cure/checks.json": "3221e8592b7da6755ce3dcebfb4e3e2597a7fc4c07f7a51bdc2386611fabbd61",
+    "outputs/autobattle/a653-final-ally-Cure/events.jsonl": "00ce85c66db7427c9e2741f83822f23cbf01a6817275fb72d5ab767b4305f75a",
+    "outputs/autobattle/a653-final-ally-Cure/input-log.jsonl": "9d08b3176ea3a4313edf5b70966c16b14c369a5e350073a8d3c97cfaab8d793e",
+    "outputs/autobattle/a653-final-ally-Cure/run.json": "5d9a8a6db4278caae75e30ff0d9498db3f657fe35bf8f245f33ded45bbfa18b4",
+    "outputs/autobattle/a653-final-self-Cure/checks.json": "7b9c3d19a7c9ed0e99f8d76579b9995acdaf79325cc470ee6e5455052b594dfc",
+    "outputs/autobattle/a653-final-self-Cure/events.jsonl": "e0a350b3479ba60e87d51b4ce2465efcb8b900025eda4468a7bcc378c39e9689",
+    "outputs/autobattle/a653-final-self-Cure/input-log.jsonl": "033bd2ce33f91d2284cfd94cc7e8d453838f09155253c319632a996782639b80",
+    "outputs/autobattle/a653-final-self-Cure/run.json": "6608c93713e07018d76d83e7be2a587ee6b2e67681ef0e9abb7a1a224046cdc7",
+    "outputs/autobattle/a653-final-default/checks.json": "ef8ceda3f27670dbc5bca54e5b9da37875bae2f847b597fac42e3df99902c69e",
+    "outputs/autobattle/a653-final-default/events.jsonl": "8dc797b2a698bf8e6881a9226a081098bc46b7274656aa0df45117f0476c03c5",
+    "outputs/autobattle/a653-final-default/input-log.jsonl": "87336c928b45c23f49c684b64fb4428e615b31c5ffcf131cd6165deee9d9aec3",
+    "outputs/autobattle/a653-final-default/run.json": "8393290ae7e1dede6a0fa9e61793448128aca492bb06bda11a0b9edbd0802fdb",
+    "outputs/autobattle/a653-final-unsupported/events.jsonl": "0a4b39fe5658241d0e4fcdfb75dccb8f2dc364e6fa730f634d11e69f03616f24",
+    "outputs/autobattle/a653-final-unsupported/input-log.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "outputs/autobattle/a653-final-unsupported/run.json": "8404e7ef8803073ba4ed8b3552f73215e6479f9ac4b1d9ae56e8dfa76b65b37a",
+    "outputs/autobattle/a653-repeat-reserve/checks.json": "fb384d2ca06ceefda299b7e96fac663de3a64c1995f4fb9ced06488d794dc3b1",
+    "outputs/autobattle/a653-repeat-reserve/events.jsonl": "4c1e7604dba67c4020c422802e8aaa93405799959ddfb0850eec85519c86ff1a",
+    "outputs/autobattle/a653-repeat-reserve/input-log.jsonl": "f9c675454843ea73ec18d40a33e061b24c97e1c191220ffe4eb29d243a074c13",
+    "outputs/autobattle/a653-repeat-reserve/run.json": "bcb05f0118378b0c8974ddc46fce8e19d47b539a90709856ae08c5bfe53b9bbe",
+    "outputs/autobattle/a653-repeat-reserve/sources.json": "898e1a2faefab4ff30e140b3190144dfa5c11dd895ab0e1ecb4a703df91d26d0",
+    "outputs/autobattle/a653-repeat-STOP-navigation/checks.json": "cbaca10307b5b92268656e80dd12626d49a5a827894c095ab3636cef0e4d4491",
+    "outputs/autobattle/a653-repeat-STOP-navigation/events.jsonl": "ccf77fbfd1414a3b79a060b09daebeed129a92b47fa290c290631381a2a9e9ae",
+    "outputs/autobattle/a653-repeat-STOP-navigation/input-log.jsonl": "1366281ec4adb79b8d6cebde3b37b1cfb0da4c56ae9ca3ace40edd75ba7287a0",
+    "outputs/autobattle/a653-repeat-STOP-navigation/paused-run.json": "797a73ff8769480ff439bc3ad04311ec36b123c1f5f781c1614893a8feb6a3c5",
+    "outputs/autobattle/a653-repeat-STOP-navigation/run.json": "8face9ca293fc543deba1088a540e0a90d1d50a36c982dc2db6fa06f63d56226",
+    "outputs/autobattle/a653-repeat-STOP-navigation/STOP-trigger.json": "acce93457ab0888f404cd40f7ead797f26b49db3bda197f5a62ab88ab46932ee",
+    "outputs/autobattle/a653-last-STOP-final/checks.json": "dadc3f6ee8a89103a28d203a6d0eb629dd9d569bda40f511cbb0cc3c6fae9215",
+    "outputs/autobattle/a653-last-STOP-final/events.jsonl": "23aba44394da37616b2e3bd1fd726117aceaa7d5c3fee57f984231bd282c1140",
+    "outputs/autobattle/a653-last-STOP-final/input-log.jsonl": "9145afcf51d06c035b74771943737b9305b57fb4c815a778044b5b302b700561",
+    "outputs/autobattle/a653-last-STOP-final/paused-run.json": "a06418c3836bfd11b8198a5b1399ed82b12dd97a5cb9b29fb3225e78f0ca2ccf",
+    "outputs/autobattle/a653-last-STOP-final/run.json": "1743454e6590eb698143674ddd0abacbccf070a77fdf2eb72c365cb77e9deb90",
+    "outputs/autobattle/a653-last-STOP-final/STOP-trigger.json": "c6fda508d8a009bcda2a1ef2d4f46b5e3d8fa8548e83a367a5f9ddb77c17a0e4",
+    "outputs/autobattle/a653-resume-final-01/events.jsonl": "24edcacd32d1a06e141db2ece1a92c1953e1b942a4d47d42076dbec21b1c29e5",
+    "outputs/autobattle/a653-resume-final-01/handoff-checks.json": "b926e320f66d21879945d6dcb21d050c9f73ae541caed63fc191609938c18d8c",
+    "outputs/autobattle/a653-resume-final-01/input-log.jsonl": "9f9c15167ddff1adc9a27f1a1889c5cd57031f2cd621f440d6f73b4389d96069",
+    "outputs/autobattle/a653-resume-final-01/manual-Life-Wait.json": "5311076bdcac972e74611c141525e754d7ec295b39092b898068cf6b9cd205aa",
+    "outputs/autobattle/a653-resume-final-01/paused-run.json": "5e81b54815b681019ae280463c9346f3572220e4a2e0c44303df0868b51417a8",
+    "outputs/autobattle/a653-resume-final-01/player-boundary-observer.jsonl": "c38863acd1ba744413887906444e7b829d5d248a13eb3a8897824996ef2f687b",
+    "outputs/autobattle/a653-resume-final-01/run.json": "e77b6c55f6fc475b064d0bb1f380e2ca208d30b69fa76a692d42e21d3d1af689",
+    "outputs/autobattle/a653-resume-final-01/STOP-trigger.json": "a576b4ded07855a4a4171f27a44fa2ba0eebfb3fbf9c3a19c1772d62dd58c96c",
+    "outputs/autobattle/a653-resume-final-01/Life-transaction-1/Life-engine.jsonl": "ffc8b124a0fa525705a77965fdb594e027ba033d981b5165ead8fd8d2b6486a1",
+    "outputs/autobattle/a653-ordinary-input-host-01.json": "235229b0c7df52076378d75b3b1122a006da7ca5a7f61ef17ec37a8ac685f09e",
+    "outputs/autobattle/a653-resume-03-input-mutations.json": "db3d5174a32ecb1fc192ccf72fe41cdb428130d9718e0e66d7b0050618b0417d",
+    "outputs/autobattle/a653-resume-final-01-mutations.json": "dd50073ebe11010fccbf05542a5a84ab21bf379768a41f3f26a9e87663e1373b",
+    "outputs/autobattle/a653-resume-final-01-sources-02.json": "33c53a381388a536bf594946a6d611b1050d74b732460fb48bcb088e572880a2",
+    "outputs/autobattle/a653-resume-final-01-history-checks.json": "29b9d6413ddbc1f3295a62e5d749d74198a96da6473bf1e9f748cb9898e38c4a",
+    "outputs/autobattle/a653-resume-final-01-handoff-checks-02.json": "1c8367ce1fa4a80f819d2a66a45c6f24929443584e63799689f8bc71449d3738",
+    "outputs/autobattle/a653-next-ally-final-validation.json": "9f73c13a7da9527918ee80c739d8da659f6be63cfea5cff18e21d7a11dde121f",
+    "outputs/autobattle/a653-source-history/tools/validate_autobattle_runtime.py": "731bb47fcd1d0102d6fd5c141fcb1b30e33452ff35eeea71d59761a641ba7ef1",
+    "outputs/autobattle/a653-resume-final-02/events.jsonl": "ad3e0f8a801642842011063ab54b4d12f154cdf86275a0e38d50c0c5e6e9f8be",
+    "outputs/autobattle/a653-resume-final-02/handoff-checks.json": "2b033bdecaa6ff5ba92b29266a3bce3f39a3eb1c688d8468fd69b9351ddefdab",
+    "outputs/autobattle/a653-resume-final-02/input-log.jsonl": "834c7c4e088937674fc7bc783fa786318c1a345f27eb6c0a160ae8adc843a6ef",
+    "outputs/autobattle/a653-resume-final-02/manual-Life-Wait.json": "9c86a4fe6e784b0b76f1803bcf047ddbc8cdcfc9c02ee048b29bb8602ef9b79e",
+    "outputs/autobattle/a653-resume-final-02/paused-run.json": "33ead8ca42983d4e9b40f1ce996531134abcfdbbc2e42802798486478a2f72da",
+    "outputs/autobattle/a653-resume-final-02/run.json": "9020862eeceefe502c8fbd0259ad719177d9b01243ca60a59412a209c95b5f38",
+    "outputs/autobattle/a653-resume-final-02/STOP-trigger.json": "2603973e0f3afe63192c5e62115a829dc500d895d4047c21e279017a51eb0168",
+    "outputs/autobattle/a653-resume-final-02/Life-transaction-1/Life-engine.jsonl": "b1778cd171710a5dd4a4a07e4bfa4f11b28c3e1c2582777a89c3ba7c023bd553",
+    "outputs/autobattle/a653-resume-final-02-mutations.json": "4e5883f2b79874da4d312e92ddbb21952a89450343a38e792db47191c4ffaaca",
+    "outputs/autobattle/a653-resume-final-02-sources.json": "88d3fdfaf217b8d359b1385731c6d4280966adfda15c7c5389ec5b6ddfbc8c73"
+  },
+  "limitations": [
+    "Exact eight-unit Montblanc5/Life5/cost10/genuine KO Marche7/EXP99 family only.",
+    "Historical paired full Life/Wait turns retained for unchanged native action kernel; current full Life and current manual/resume integrated captures rerun affected behavior.",
+    "a653-final-reserve changed validator source during capture; excluded and repeated as a653-repeat-reserve.",
+    "Intermediate validator source reconstructed only with exact captured SHA256 match; validation-only update did not change those captured native inputs."
+  ]
+}

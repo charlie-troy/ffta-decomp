@@ -1,0 +1,88 @@
+{
+  "status": "pass-public-Life-decline",
+  "scope": "Validate public Life refusal/STOP semantics and adversarial partial journals.",
+  "mode": "Life-final",
+  "rejected": [
+    {
+      "case": "missing raw journal",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)"
+      ]
+    },
+    {
+      "case": "empty ledger",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run",
+        "paused run.json but input-log.jsonl never latched the stop"
+      ]
+    },
+    {
+      "case": "missing source proof",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "invented final Life",
+      "errors": [
+        "event 3: invalid recovery journal (partial public final-attempt latch differs)"
+      ]
+    },
+    {
+      "case": "invented final Wait",
+      "errors": [
+        "event 3: invalid recovery journal (partial public final-attempt latch differs)"
+      ]
+    },
+    {
+      "case": "duplicate request",
+      "errors": [
+        "event 3: invalid recovery journal (duplicate public Life/Wait final)"
+      ]
+    },
+    {
+      "case": "wrong trace cleanup",
+      "errors": [
+        "event 3: invalid recovery journal (public Life trace lifecycle differs)"
+      ]
+    },
+    {
+      "case": "missing adapter",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life policy observations missing/repeated)"
+      ]
+    },
+    {
+      "case": "wrong legal target",
+      "errors": [
+        "event 3: invalid recovery journal (partial public Life policy/adapter differs)"
+      ]
+    },
+    {
+      "case": "changed policy",
+      "errors": [
+        "event 3: invalid recovery journal (policy.schema: must be one of ('ffta-tactics-policy/1', 'ffta-tactics-policy/2'))"
+      ]
+    },
+    {
+      "case": "post terminal input",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=42.23): ['key_write']"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_life_recovery_decline.py": "3cc5963b9ddf8bcca67d8fab7e39449a5e4ef126067d3a7831eb4417cd7f1395",
+    "tools/life_recovery_receipt.py": "d488b6af26bd21994423d247b648e12d76ade5bba234082e6e822df2d8ae9693",
+    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a653-last-STOP-final\\run.json": "1743454e6590eb698143674ddd0abacbccf070a77fdf2eb72c365cb77e9deb90",
+    "outputs\\autobattle\\a653-last-STOP-final\\events.jsonl": "23aba44394da37616b2e3bd1fd726117aceaa7d5c3fee57f984231bd282c1140",
+    "outputs\\autobattle\\a653-last-STOP-final\\input-log.jsonl": "9145afcf51d06c035b74771943737b9305b57fb4c815a778044b5b302b700561"
+  },
+  "limitations": [
+    "Captured public lifecycle audit only; no new emulator execution."
+  ]
+}

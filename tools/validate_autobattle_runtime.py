@@ -386,6 +386,43 @@ def validate(out_dir):
 
     valid_raw_ids = {id(record) for record in valid_raw}
 
+    # A previous recovery leg's input does not prove this ordinary Wait.
+    # Bind select/confirm and, on current captures, actual register writes
+    # to the completed boundary and the independently captured next menu.
+    active_boundary=None
+    for index,event in enumerate(events):
+        if event.get('kind') in ('start','stop'):active_boundary=None
+        elif event.get('kind')=='boundary':active_boundary=event
+        elif (event.get('kind')=='turn' and (event.get('selected_action') or {}).get('kind')=='identified-wait'
+              and ((event.get('engine_result') or {}).get('progress') or run.get('ordinary_raw_input') is True)):
+            try:
+                if active_boundary is None:raise ValueError('missing Wait input boundary')
+                start,end=active_boundary['t'],event['t']
+                progress=event['engine_result'].get('progress')
+                rows=[r for r in ilog if type(r.get('t')) in (int,float) and start-0.051<=r['t']<=end+0.051]
+                pair=[]
+                for tag in ('c3:select-wait','c3:confirm-wait'):
+                    candidates=[r for r in rows if r.get('event')=='press' and r.get('tag')==tag]
+                    if len(candidates)!=1:raise ValueError('Wait select/confirm input missing or repeated')
+                    press=candidates[0]
+                    if (press.get('mask')!=1 or type(press.get('hits'))!=int or press['hits']<1
+                        or press.get('aborted') or type(press.get('duration')) not in (float,int)
+                        or not math.isfinite(press['duration']) or press['duration']<0):
+                        raise ValueError('Wait select/confirm input malformed or unexecuted')
+                    pair.append(press)
+                if pair[0]['t']+pair[0]['duration']>pair[1]['t']+0.051:
+                    raise ValueError('Wait input order/interval differs')
+                if progress is not None and (progress['origin']['captured_t']>pair[0]['t']+0.051
+                    or pair[1]['t']+pair[1]['duration']>progress['captured_t']+0.051):
+                    raise ValueError('Wait input is outside before/after witness')
+                if run.get('ordinary_raw_input') is True:
+                    for press in pair:
+                        writes=[r for r in valid_raw if press['t']-0.001<=r['t']<=press['t']+press['duration']+0.001]
+                        if len(writes)!=press['hits'] or any(r['val']&1==0 for r in writes):
+                            raise ValueError('Wait select/confirm raw register writes missing or differ')
+            except (KeyError,TypeError,ValueError) as exc:
+                fail(f'turn event {index}: invalid Wait completion input interval ({exc})',errors)
+
     def owns_input(record):
         if record.get("event") == "key_write":
             return id(record) in valid_raw_ids

@@ -1,0 +1,11 @@
+{"event": "key_write", "t": 13.69, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 13.743, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 13.795, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 13.847, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 13.899, "val": 128, "hits": 5, "manual": false}
+{"event": "key_write", "t": 15.154, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 15.207, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 15.26, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 15.313, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 15.365, "val": 1, "hits": 5, "manual": false}
+{"event": "stop_requested", "t": 16.566, "detection_latency_s": 1.453, "note": "STOP file observed; no further gameplay key injections permitted"}

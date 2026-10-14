@@ -19,3 +19,5 @@ outputs/autobattle/a651-*/**/*.json -text whitespace=cr-at-eol
 outputs/autobattle/a651-*/**/*.jsonl -text whitespace=cr-at-eol
 outputs/autobattle/a652-*/**/*.json -text whitespace=cr-at-eol
 outputs/autobattle/a652-*/**/*.jsonl -text whitespace=cr-at-eol
+outputs/autobattle/a653-*/**/*.json -text whitespace=cr-at-eol
+outputs/autobattle/a653-*/**/*.jsonl -text whitespace=cr-at-eol

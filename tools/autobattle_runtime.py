@@ -155,6 +155,13 @@ class BattleRuntime:
         # shared wall clock with the probe's write log (validator rule: a
         # write is "after stop_requested" relative to the SAME t0)
         self.p.t0 = self.t0
+        self.ordinary_raw_input=not (self.bounded_self_cure or self.bounded_ally_cure or self.bounded_ally_life)
+        if self.ordinary_raw_input:
+            note_write=self.p.note_key_write
+            def log_write(value,hits):
+                note_write(value,hits)
+                self._log_input({'event':'key_write',**self.p.key_write_log[-1]})
+            self.p.note_key_write=log_write
         # boundary bounds: the re-arming menu wait may not run past the
         # wall budget (resume rebases t0, so the probe must see the same
         # clock) and may not press past a latched stop

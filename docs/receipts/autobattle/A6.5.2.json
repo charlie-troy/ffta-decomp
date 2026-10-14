@@ -1,7 +1,7 @@
 {
   "milestone": "A6.5.2",
   "date": "2026-10-14",
-  "status": "unknown",
+  "status": "pass",
   "scope": "Native actor/menu observation and seed-only post-Wait completion diagnosis; completion change not yet accepted",
   "hypothesis_receipt": "docs/a652-player-boundary-investigation.md",
   "criteria": [
@@ -27,22 +27,23 @@
     },
     {
       "id": "current-source-native-integration-and-regressions",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Native Wait10 next-ally completion, current input-range/raw publication gates and eight fresh scoped final-behavior regressions; see A6.5.3."
     }
   ],
   "source_sha256": {
     "tools/player_boundary_observer.py": "13506de71de1844a813ceaf19da5a549ea6d418e16cb5af0b3e22dd2a573eb13",
     "tools/validate_player_boundary_observer.py": "e159195770a883c443581967e52f90ee07fe5b19b82009810f300f19d137c262",
     "tools/validate_player_boundary_history.py": "a1ce9d96794da7886d30dd26f4b193a98af94a55bc9cbb0064dc9b7aaf99cd9d",
-    "tools/run_autobattle.py": "9da5f414414d5175c24185ebc47813ed93b2d4ad125fd58106633695cc3ef557",
+    "tools/run_autobattle.py": "a6452d18d40cfaab812bfa8ac68971a29bfac9e32d03c962b6cd24e75891ef6c",
     "tools/run_life_recovery_handoff.py": "9aea52d53eb5c55d566a4d9bcf92386f5a64c92c78dae80793cb22dfc93da8f2",
-    "tools/autobattle_runtime.py": "41a8f0ff0dc098f79256e221bfdcc8c1d871ceae9162c77e8e75e8b7d8f90cd8",
+    "tools/autobattle_runtime.py": "1cfe15b1d5511eab94fe516acf1dfb3283f76222e0f26508c42c89ac7a6131d0",
     "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
     "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
     "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f",
     "tools/validate_wait_ally_continuation.py": "257a24f320c792561cfff1e1c31f4e216bf947e0dbca47514fadb33bb3d05f0f",
-    "tools/validate_wait_ally_runtime.py": "89486e0c720306767b873fec33c77374e755705f7f8c4f990e2429f89f8bdea8",
-    "tools/validate_autobattle_runtime.py": "c9289d05bad4081b8f2114422f61a61dfccfcc3ff8b1c4905218143c63a557d7"
+    "tools/validate_wait_ally_runtime.py": "9472e738f5dec4b1edaf736eecd7ea54ebce79966f33ff9806ac60be12c0e50b",
+    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433"
   },
   "evidence_sha256": {
     "outputs/autobattle/a652-resume-observer-01/events.jsonl": "d781ff521626977bf3bb7cf2242da6467af31f9f94477d01f3120635d64ce9dc",

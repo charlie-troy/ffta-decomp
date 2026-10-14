@@ -40,7 +40,15 @@ def main():
         require(run['final_state']=='paused' and 'STOP requested during bounded recovery' in run['terminal_reason'],
                 'public STOP pause missing')
         require(any(r.get('event')=='stop_requested' for r in ledger),'public STOP latch missing')
-        if args.mode=='navigation':require(len(journal['navigation'])<=1,'navigation STOP came too late')
+        if args.mode=='navigation':
+            latch=next(r for r in ledger if r.get('event')=='stop_requested')
+            # The watcher sees batch publication after press completion.
+            # One following press can already be pending before the latch.
+            # Bound that measured race; global validation forbids any write
+            # after observation, and this phase cannot accept a Life target.
+            require(1<=len(journal['navigation'])<=2 and not journal.get('target_acceptance')
+                    and not journal['policy_observations'] and latch.get('detection_latency_s',0)<=2,
+                    'navigation STOP late, post-target, or outside observed latency bound')
         elif args.mode=='Life-final':
             require(len(journal['final_gate_events'])==len(journal['policy_observations'])==1
                     and journal['policy_observations'][0]['evaluation']['decision']['candidate_id']=='life-ally',

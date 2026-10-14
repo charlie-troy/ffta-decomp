@@ -1,0 +1,58 @@
+{
+  "status": "pass-Life-public-handoff",
+  "scope": "Audit public post-Life STOP, owned window Wait and same-PID public resume.",
+  "pid": 58184,
+  "rejected": [
+    {
+      "case": "missing resume",
+      "errors": [
+        "expected exactly 1 start event(s), got 2",
+        "input-log: 24 successful press/drive started after the stop was latched (t=62.559): ['key_write', 'key_write', 'key_write']"
+      ]
+    },
+    {
+      "case": "wrong resumed PID",
+      "errors": [
+        "Life resume lacks verified same-PID adoption"
+      ]
+    },
+    {
+      "case": "invented source stability",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "missing old source closure",
+      "errors": [
+        "public Life source closure/unchanged proof missing"
+      ]
+    },
+    {
+      "case": "no resume ledger",
+      "errors": [
+        "input-log: 24 successful press/drive started after the stop was latched (t=62.559): ['key_write', 'key_write', 'key_write']"
+      ]
+    },
+    {
+      "case": "automation in manual gap",
+      "errors": [
+        "input-log: 1 automation press/drive between leg 1's paused stop and the resume marker (input during the handoff gap must be manual)"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_life_recovery_handoff.py": "fd76dde7d3c580225a845ad18b53242ca12d4618a5d8eeb94ff2599c48e1f3b1",
+    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a653-resume-final-02\\run.json": "9020862eeceefe502c8fbd0259ad719177d9b01243ca60a59412a209c95b5f38",
+    "outputs\\autobattle\\a653-resume-final-02\\paused-run.json": "33ead8ca42983d4e9b40f1ce996531134abcfdbbc2e42802798486478a2f72da",
+    "outputs\\autobattle\\a653-resume-final-02\\events.jsonl": "ad3e0f8a801642842011063ab54b4d12f154cdf86275a0e38d50c0c5e6e9f8be",
+    "outputs\\autobattle\\a653-resume-final-02\\input-log.jsonl": "834c7c4e088937674fc7bc783fa786318c1a345f27eb6c0a160ae8adc843a6ef",
+    "outputs\\autobattle\\a653-resume-final-02\\manual-Life-Wait.json": "9c86a4fe6e784b0b76f1803bcf047ddbc8cdcfc9c02ee048b29bb8602ef9b79e"
+  },
+  "limitations": [
+    "Exact post-Life Wait manual boundary only; no whole-battle completion claim."
+  ]
+}
