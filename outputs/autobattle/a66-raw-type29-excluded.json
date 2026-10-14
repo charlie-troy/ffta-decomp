@@ -1,0 +1,68 @@
+{
+  "status": "pass-table-metadata-only",
+  "scope": "Native accessor type29/name mapping only; live inventory, Item availability, count and use UNKNOWN",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "accessor": "080CA7A4",
+  "table": "0851D180",
+  "entries": [
+    {
+      "item_id": 355,
+      "name": "Fortune Ring",
+      "item_type": 29,
+      "native_type_accessor": 29,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 356,
+      "name": "Magic Ring",
+      "item_type": 29,
+      "native_type_accessor": 29,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 357,
+      "name": "Angel Ring",
+      "item_type": 29,
+      "native_type_accessor": 29,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 358,
+      "name": "Scarab",
+      "item_type": 29,
+      "native_type_accessor": 29,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 359,
+      "name": "Ruby Earring",
+      "item_type": 29,
+      "native_type_accessor": 29,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 360,
+      "name": "Star Armlet",
+      "item_type": 29,
+      "native_type_accessor": 29,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 361,
+      "name": "Mindu Gem",
+      "item_type": 29,
+      "native_type_accessor": 29,
+      "live_count": null,
+      "engine_available": null
+    }
+  ],
+  "limitations": [
+    "No inventory pointer, native count, battle legality or consumption claim."
+  ]
+}

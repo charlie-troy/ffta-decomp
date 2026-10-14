@@ -1,0 +1,81 @@
+{
+  "status": "pass-public-Wait-next-ally-mutations",
+  "scope": "Mutate a real zero-seed next-ally Wait through the complete public receipt validator.",
+  "rejected": [
+    {
+      "case": "empty input log",
+      "errors": [
+        "event 3: invalid recovery journal (public Life raw ledger differs)",
+        "turn event 11: invalid Wait completion input interval (Wait select/confirm input missing or repeated)",
+        "input-log.jsonl is empty but the run records committed turns \u2014 the raw write log cannot be missing for an input-owning run"
+      ]
+    },
+    {
+      "case": "no resumed input",
+      "errors": [
+        "turn event 11: invalid Wait completion input interval (Wait select/confirm input missing or repeated)"
+      ]
+    },
+    {
+      "case": "missing input log resume",
+      "errors": [
+        "input-log: 24 successful press/drive started after the stop was latched (t=62.611): ['key_write', 'key_write', 'key_write']"
+      ]
+    },
+    {
+      "case": "duplicate final confirm",
+      "errors": [
+        "turn event 11: invalid Wait completion input interval (Wait select/confirm input missing or repeated)"
+      ]
+    },
+    {
+      "case": "missing final confirm",
+      "errors": [
+        "turn event 11: invalid Wait completion input interval (Wait select/confirm input missing or repeated)"
+      ]
+    },
+    {
+      "case": "wrong confirm mask",
+      "errors": [
+        "turn event 11: invalid Wait completion input interval (Wait select/confirm input malformed or unexecuted)"
+      ]
+    },
+    {
+      "case": "forged raw logging capability",
+      "errors": [
+        "ordinary raw-input capability disagrees with recovery mode"
+      ]
+    },
+    {
+      "case": "missing current raw writes",
+      "errors": [
+        "turn event 11: invalid Wait completion input interval (Wait select/confirm raw register writes missing or differ)"
+      ]
+    },
+    {
+      "case": "missing one final register write",
+      "errors": [
+        "turn event 11: invalid Wait completion input interval (Wait select/confirm raw register writes missing or differ)"
+      ]
+    },
+    {
+      "case": "input after terminal",
+      "errors": [
+        "input-log: 1 successful press/drive started after the stop was latched (t=241.7): ['key_write']"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_wait_ally_runtime.py": "d813ceeeb2e91ec8edd32f03478d41e4b5d8193898f4e65d4dc3a3988749dfac",
+    "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f",
+    "tools/validate_autobattle_runtime.py": "99ce0cdc6577091ea94f1b03eb80df7f057785ca2b6b0ec7c135c763b4acbb73"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a653-resume-final-01\\run.json": "e77b6c55f6fc475b064d0bb1f380e2ca208d30b69fa76a692d42e21d3d1af689",
+    "outputs\\autobattle\\a653-resume-final-01\\events.jsonl": "24edcacd32d1a06e141db2ece1a92c1953e1b942a4d47d42076dbec21b1c29e5",
+    "outputs\\autobattle\\a653-resume-final-01\\input-log.jsonl": "9f9c15167ddff1adc9a27f1a1889c5cd57031f2cd621f440d6f73b4389d96069"
+  },
+  "limitations": [
+    "Retained full receipt mutations; no new gameplay or whole-battle claim."
+  ]
+}

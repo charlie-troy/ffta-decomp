@@ -1,5 +1,11 @@
 # Project log
 
+## 2026-10-14 - A6.6 metadata/host bootstrap; live inventory remains UNKNOWN
+
+After bounded A6.5 PASS at24efadd, refreshed native item-table8/8 (7144 accessor loads) and host tactics119 checks. Consumable IDs362..375 use raw item_type30 and random-pool category29 (+0x18); raw type29 accessories355..361 are an excluded namespace mistake, not item candidates.080CC788 is random-item selection, not a count getter. The default test-output artifact was restored to its original tracked bytes; fresh119 checks are retained under a new A6.6 path.
+
+No inventory pointer, native count, actor Item list, law/target legality, consumption or HP effect is claimed. Next capture the owned Item list and its inventory/count join before enabling a candidate. See `docs/a66-consumable-research.md` and `docs/receipts/autobattle/A6.6.json`; all live item gates stay UNKNOWN.
+
 ## 2026-10-14 - A6.5 bounded public Life lifecycle passes
 
 A6.5.1 valid diagnostics and A6.5.2 native opportunity/Wait completion work reach the final lifecycle gate. The seed-only post-Wait check was too narrow for a next ally menu; the new witness joins canonical driver/wrapper, restored roster and accepting next command menu, without relaxing actor/STOP guards. Native PID65752 resumes to one Wait and next Marche7 without a new seed. Current PID67648 resumes one identified Wait with20 actual register writes; handoff6/input9/history7/source checks pass. Current validator rejects17 zero-seed receipt/input corruptions.

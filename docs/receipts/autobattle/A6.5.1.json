@@ -33,7 +33,7 @@
   "source_sha256": {
     "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4",
     "tools/autobattle_runtime.py": "1cfe15b1d5511eab94fe516acf1dfb3283f76222e0f26508c42c89ac7a6131d0",
-    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433",
+    "tools/validate_autobattle_runtime.py": "99ce0cdc6577091ea94f1b03eb80df7f057785ca2b6b0ec7c135c763b4acbb73",
     "tools/validate_life_boundary_diagnostic.py": "953227094dee6cb32e9f296b852aff255d02ddf511a599fa5e4e600d8ade6a9f",
     "tools/validate_life_diagnostic_integration.py": "affe7c4e1fad8143ba4015323509dfdf830c1d0f49a46c0f20f51da9a62c6581",
     "tools/validate_recovery_boundary_diagnostic.py": "67988d5f2320b8783f042e39ca82434e38960988a7a6c336b783d8fec28b16ae",

@@ -78,9 +78,9 @@
   "source_sha256": {
     "tools/autobattle_runtime.py": "1cfe15b1d5511eab94fe516acf1dfb3283f76222e0f26508c42c89ac7a6131d0",
     "tools/run_autobattle.py": "a6452d18d40cfaab812bfa8ac68971a29bfac9e32d03c962b6cd24e75891ef6c",
-    "tools/validate_autobattle_runtime.py": "f8e1734fc56974e62950b198a02a6e8d513107c70dec855d907e0bc076241433",
+    "tools/validate_autobattle_runtime.py": "99ce0cdc6577091ea94f1b03eb80df7f057785ca2b6b0ec7c135c763b4acbb73",
     "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f",
-    "tools/validate_wait_ally_runtime.py": "9472e738f5dec4b1edaf736eecd7ea54ebce79966f33ff9806ac60be12c0e50b",
+    "tools/validate_wait_ally_runtime.py": "d813ceeeb2e91ec8edd32f03478d41e4b5d8193898f4e65d4dc3a3988749dfac",
     "tools/validate_ordinary_input_logging.py": "c84c48aff4fbe2d84aaa80146b323a3cabf3de7a4a853546703d07db21cf397b",
     "tools/validate_life_recovery_decline.py": "3cc5963b9ddf8bcca67d8fab7e39449a5e4ef126067d3a7831eb4417cd7f1395",
     "tools/run_life_final_regressions.py": "040fc989e926045574ecbc427b19b04694bb8d8558cda867354e02572719b846"
@@ -150,12 +150,15 @@
     "outputs/autobattle/a653-resume-final-02/STOP-trigger.json": "2603973e0f3afe63192c5e62115a829dc500d895d4047c21e279017a51eb0168",
     "outputs/autobattle/a653-resume-final-02/Life-transaction-1/Life-engine.jsonl": "b1778cd171710a5dd4a4a07e4bfa4f11b28c3e1c2582777a89c3ba7c023bd553",
     "outputs/autobattle/a653-resume-final-02-mutations.json": "4e5883f2b79874da4d312e92ddbb21952a89450343a38e792db47191c4ffaaca",
-    "outputs/autobattle/a653-resume-final-02-sources.json": "88d3fdfaf217b8d359b1385731c6d4280966adfda15c7c5389ec5b6ddfbc8c73"
+    "outputs/autobattle/a653-resume-final-02-sources.json": "88d3fdfaf217b8d359b1385731c6d4280966adfda15c7c5389ec5b6ddfbc8c73",
+    "outputs/autobattle/a653-final-capability-checks.json": "6fc23461e90cb61f9becf5db2050f0faba1b38e24a8eafc96d7ed9bd1f2277a8",
+    "outputs/autobattle/a653-final-seeded-capability-checks.json": "56d6f04c31e74dfe5a23de4ee82a120e806cd1620bcb30c1506699754beb3620"
   },
   "limitations": [
     "Exact eight-unit Montblanc5/Life5/cost10/genuine KO Marche7/EXP99 family only.",
     "Historical paired full Life/Wait turns retained for unchanged native action kernel; current full Life and current manual/resume integrated captures rerun affected behavior.",
     "a653-final-reserve changed validator source during capture; excluded and repeated as a653-repeat-reserve.",
     "Intermediate validator source reconstructed only with exact captured SHA256 match; validation-only update did not change those captured native inputs."
-  ]
+  ],
+  "validator_followup": "Capability flag tampering rejected against retained native captures: 20 next-ally and 10 seeded input mutations; no new gameplay claim."
 }

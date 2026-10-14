@@ -1,0 +1,16 @@
+{
+  "status": "pass-prior-contract-refresh",
+  "native_item_table_checks": 8,
+  "native_accessor_loads": 7144,
+  "host_policy_checks": 119,
+  "scope": "Table semantics and host item opt-in contract only; no live count/availability/consumption proof",
+  "source_sha256": {
+    "tools/item_table.py": "cec2d4b90b97767159ab0fcbf727671988dcbbbe8d214d99fe4fff468de85e51",
+    "tools/validate_items.py": "22f7927c7e5bacd4609162f58b59bcf207966e7068ee932c51d212f99b28814c",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/validate_tactics_policy.py": "8cc503bcccdc122fe979a8d5d3d2316bb51c43c6af7216203438dfd840b1d5e3"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a66-policy-refresh-01/checks.json": "361a103121b5925b9b5cfafe95a599f9399a125546f91380d0f2f2cb40d46723"
+  }
+}

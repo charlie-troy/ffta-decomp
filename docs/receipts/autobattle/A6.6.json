@@ -1,0 +1,52 @@
+{
+  "milestone": "A6.6",
+  "date": "2026-10-14",
+  "status": "unknown",
+  "scope": "Inventory and consumable legality research; Item execution remains disabled",
+  "prerequisite": {
+    "milestone": "A6.5",
+    "status": "pass",
+    "commit": "24efadd"
+  },
+  "criteria": [
+    {
+      "id": "metadata-and-host-contract-bootstrap",
+      "status": "pass",
+      "scope": "Native item-table8/8 checks (7144 executed accessor loads), host policy119. Consumables362..375 raw type30/random category29; raw type29 accessories excluded."
+    },
+    {
+      "id": "live-inventory-pointer-and-count-accessor",
+      "status": "unknown"
+    },
+    {
+      "id": "actor-owned-Item-list-and-native-legality",
+      "status": "unknown"
+    },
+    {
+      "id": "actual-single-consumption-effect-completion",
+      "status": "unknown"
+    },
+    {
+      "id": "final-public-lifecycle-and-regressions",
+      "status": "unknown"
+    }
+  ],
+  "source_sha256": {
+    "tools/item_table.py": "cec2d4b90b97767159ab0fcbf727671988dcbbbe8d214d99fe4fff468de85e51",
+    "tools/validate_items.py": "22f7927c7e5bacd4609162f58b59bcf207966e7068ee932c51d212f99b28814c",
+    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/validate_tactics_policy.py": "8cc503bcccdc122fe979a8d5d3d2316bb51c43c6af7216203438dfd840b1d5e3"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a66-bootstrap-checks.json": "ee14f9e9edf64a3173b8cd18f6fc48750ef0dbdd53c2750f0124148a69eae21f",
+    "outputs/autobattle/a66-policy-refresh-01/checks.json": "361a103121b5925b9b5cfafe95a599f9399a125546f91380d0f2f2cb40d46723",
+    "outputs/autobattle/a66-consumable-metadata-02.json": "991faf42a5b75c497043c8194aa71d6f5813a5d2f876f0a65d9f98eb75d7820b",
+    "outputs/autobattle/a66-raw-type29-excluded.json": "79c3539d625452e40ec52142ee80be6d6c569b758a0e48caed2b5037d84a410b"
+  },
+  "limitations": [
+    "Item metadata and pure-host counts do not identify live inventory or authorize a consumable action.",
+    "No inventory address/count, actor Item availability, native target/law legality or decrement/HP/use claim.",
+    "Raw type29 bootstrap is retained as an excluded namespace mistake; category29 and raw type30 are different fields."
+  ]
+}

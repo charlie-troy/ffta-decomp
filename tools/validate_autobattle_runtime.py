@@ -92,6 +92,10 @@ def validate(out_dir):
     stops = [r for r in events if r.get("kind") == "stop"]
     resumed = bool(run.get("resumed"))
     previous_leg = run.get("previous_leg") or {}
+    if 'ordinary_raw_input' in run:
+        expected_raw=not any(run.get(k) for k in ('bounded_self_cure','bounded_ally_cure','bounded_ally_life'))
+        if type(run['ordinary_raw_input'])!=bool or run['ordinary_raw_input']!=expected_raw:
+            fail('ordinary raw-input capability disagrees with recovery mode',errors)
     if previous_leg and (previous_leg.get("final_state") != "paused"
                          or previous_leg.get("manual_handoff", {}).get("pid") != run.get("emulator_pid")):
         fail("resume previous-leg receipt is not the same paused PID", errors)

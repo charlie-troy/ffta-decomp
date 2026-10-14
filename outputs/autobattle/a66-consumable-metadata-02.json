@@ -1,0 +1,142 @@
+{
+  "status": "pass-metadata-only",
+  "scope": "Static random-category29 consumable names plus native raw-type accessor agreement; inventory/count/legality/use UNKNOWN",
+  "rom_sha256": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+  "table": "0851D180",
+  "accessor": "080CA7A4(prop3)",
+  "entries": [
+    {
+      "item_id": 362,
+      "name": "Potion",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 363,
+      "name": "Hi-Potion",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 364,
+      "name": "X-Potion",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 365,
+      "name": "Ether",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 366,
+      "name": "Elixir",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 367,
+      "name": "Antidote",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 368,
+      "name": "Eye Drops",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 369,
+      "name": "Echo Screen",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 370,
+      "name": "Maiden Kiss",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 371,
+      "name": "Soft",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 372,
+      "name": "Holy Water",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 373,
+      "name": "Bandage",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 374,
+      "name": "Cureall",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    },
+    {
+      "item_id": 375,
+      "name": "Phoenix Down",
+      "item_type": 30,
+      "random_category": 29,
+      "native_item_type_accessor": 30,
+      "live_count": null,
+      "engine_available": null
+    }
+  ],
+  "exclusions": [
+    "Raw item_type29 is accessories355..361, not consumables. Category29 is the distinct +0x18 random pool field.",
+    "080CC788 is a random item selector, not a category getter; no classification or inventory claim is inferred from its return."
+  ],
+  "limitations": [
+    "No native inventory pointer/count, Item availability, law/target legality or actual consumption witness."
+  ]
+}

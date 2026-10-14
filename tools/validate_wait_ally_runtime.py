@@ -50,6 +50,7 @@ def main():
         ('wrong confirm mask',lambda r,e,l:next(x for x in l if x.get('tag')=='c3:confirm-wait').__setitem__('mask',128)),
     ])
     if run.get('ordinary_raw_input') is True:
+        mutations.append(('forged raw logging capability',lambda r,e,l:r.__setitem__('ordinary_raw_input',False)))
         mutations.append(('missing current raw writes',lambda r,e,l:l.__setitem__(slice(None),
             [x for x in l if not (x.get('event')=='key_write' and x['t']>=boundary['t']-0.051)])))
         confirm=next(x for x in ledger if x.get('tag')=='c3:confirm-wait')
