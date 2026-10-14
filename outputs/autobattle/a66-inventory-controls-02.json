@@ -1,0 +1,48 @@
+{
+  "status": "pass",
+  "scope": "Execute the native count/mapping helpers against bounded inventory controls.",
+  "checks": [
+    "ROM row 1 maps to 362",
+    "ROM row 2 maps to 363",
+    "ROM row 3 maps to 364",
+    "ROM row 4 maps to 365",
+    "ROM row 5 maps to 366",
+    "ROM row 6 maps to 375",
+    "ROM row 7 maps to 369",
+    "ROM row 8 maps to 370",
+    "ROM row 9 maps to 371",
+    "ROM row 10 maps to 373",
+    "ROM row 11 maps to 372",
+    "ROM row 12 maps to 367",
+    "ROM row 13 maps to 374",
+    "ROM row 14 maps to 368",
+    "ROM count 0 minus reserved 0",
+    "ROM absent item at 0/0",
+    "ROM count 1 minus reserved 0",
+    "ROM absent item at 1/0",
+    "ROM count 2 minus reserved 0",
+    "ROM absent item at 2/0",
+    "ROM count 99 minus reserved 0",
+    "ROM absent item at 99/0",
+    "ROM count 2 minus reserved 1",
+    "ROM absent item at 2/1",
+    "ROM count 2 minus reserved 2",
+    "ROM absent item at 2/2",
+    "reject short pool",
+    "reject foreign item",
+    "reject reserved exceeds owned",
+    "reject invalid quantity",
+    "reject empty id with quantity",
+    "reject duplicate id",
+    "reject pool changed during read"
+  ],
+  "source_sha256": {
+    "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
+    "tools/validate_consumable_inventory.py": "aa62451cf753df6f161268e0f446565b4f63f8cec75f6729a149ca9bc41d4f5f",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19"
+  },
+  "limitations": [
+    "Isolated ROM helper executions on synthetic RAM; no live Item list or use proof."
+  ]
+}

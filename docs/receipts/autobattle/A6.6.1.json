@@ -1,0 +1,75 @@
+{
+  "milestone": "A6.6.1",
+  "date": "2026-10-14",
+  "status": "unknown",
+  "scope": "Bounded Item inventory/list reader; target/law prerequisite remains open",
+  "criteria": [
+    {
+      "id": "native-inventory-and-count-accessor",
+      "status": "pass",
+      "scope": "Pool02001EE4,14 records of u16 ID/u8 owned/u8 reserved.080CB2B4 availability=owned-reserved;080CB388 rows1..14.33 isolated actual-ROM controls; live Potion60/Ether6/Elixir0."
+    },
+    {
+      "id": "actor-owned-Item-list-join",
+      "status": "pass",
+      "scope": "Montblanc5 secondary Item1 mode7 accepting state0102 driver004B.13 consumables joined; non-consumable Draw Weapon row15 explicitly excluded. Two source-stable live captures and36 reader mutations."
+    },
+    {
+      "id": "zero-one-multiple-and-native-availability-controls",
+      "status": "pass",
+      "scope": "Eight actual-ROM08026B90 builder runs on captured RAM: Potion0/1/2/60,2 reserved,one left,Frog Maiden Kiss exception,flag13=1. Synthetic changes confined to Unicorn; not live consumption."
+    },
+    {
+      "id": "unaccepted-Potion-target-overlay",
+      "status": "pass",
+      "scope": "One enabled Potion selection reached native overlay, selected ability251, unchanged inventory. No target acceptance/final item input."
+    },
+    {
+      "id": "target-and-law-legality-for-executable-item",
+      "status": "unknown",
+      "scope": "Overlay target/source/canonical legality not yet decoded. Native runtime flag13 value tracked; law identity and broader constraints remain unproved. No item candidate published."
+    }
+  ],
+  "source_sha256": {
+    "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
+    "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
+    "tools/probe_consumable_inventory.py": "5d175d153bbb65bede5c0a7d760604ed1a65c68efee7a84f474d8aef97e4ec8a",
+    "tools/validate_consumable_inventory.py": "aa62451cf753df6f161268e0f446565b4f63f8cec75f6729a149ca9bc41d4f5f",
+    "tools/validate_consumable_menu.py": "fd3fdcfe0b5c2664535e26c267a5813c4cbc50a6dc4200421aaa05d9e4db0a55",
+    "tools/validate_consumable_builder.py": "0ca0e0866db69a9fbb33bb7042151f15d9bc6276b6b2f8191e4e6229d7ebc6a2",
+    "tools/audit_consumable_capture.py": "10a3ca3bd15584dbd65963ad9b418fb38352598f5fa70526cc08a1ec72614a09"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a66-inventory-controls-02.json": "2dd94170530e380930b17a70df92c07a6860378b95018279d628a21545f183e0",
+    "outputs/autobattle/a66-Item-menu-controls-03.json": "8949b1e86a706187c65f864875e8f41873a721f06695b107b009d52bec83afb2",
+    "outputs/autobattle/a66-Potion-reader-controls-03.json": "27272304a571771b6d92040ec16f04dbd5bbca6c8a04c64ea77ae9e95405b714",
+    "outputs/autobattle/a66-Potion-builder-controls-03.json": "5f42729842c7ce3b4447b4301389007665f05f014e77251174206d627a056f8f",
+    "outputs/autobattle/a66-Item-source-checks-02.json": "f8367bcb2443feaa2342ae14a2bceb8cca1ac992b3d5b9061c3ef588007ce72b",
+    "outputs/autobattle/a66-Potion-source-checks-03.json": "d0d89ab705b43738d517c1bc7b842c60854c5a50d73c932666729c1ba0b6a82f",
+    "outputs/autobattle/a66-Item-list-02/inventory.json": "6eca9d7755b54013d89a5c5bd4db61d53564d6b0515dea80834f8a077ed04320",
+    "outputs/autobattle/a66-Potion-overlay-03/inventory.json": "901694644114bd96e463558a807402d3c04a73fa7d2efa2751efdae4d106d0e5",
+    "outputs/autobattle/a66-source-history/tools/consumable_menu.py": "4d4d89a5dfaa6e30f7bf84edb4d79d8686c5feb32386d1b2a6b8389f1e4ca974",
+    "outputs/autobattle/a66-source-history/tools/probe_consumable_inventory.py": "ab664e439471f73ca2cd63edeca7fdbc04bf01f2ab168bf7e602368f3000f242",
+    "outputs/autobattle/a66-Item-list-02/Item-list-ewram.bin": "8802287bc302ad75c1e65df58334c7eba1ffef7d0756379d0c2d1f42a5777e25",
+    "outputs/autobattle/a66-Potion-overlay-03/Item-list-ewram.bin": "48d22b08570d840bfd3824cedc1bdb49dafbc7f5844631e4fd59172cc0897f15",
+    "outputs/autobattle/a66-Potion-overlay-03/Potion-overlay-ewram.bin": "5a6a9ca94910824d37f03699a2dee05f916e78b80d7f7020dc8b605a3da63ad3"
+  },
+  "excluded_runs": [
+    {
+      "run": "a66-Potion-overlay-01",
+      "reason": "Original battle-start mirror transient; zero input, no owner. Honest failure."
+    },
+    {
+      "run": "a66-Potion-overlay-02",
+      "reason": "Passive acquisition finds Marche7 whose action sets lack Item. Only Action opened; no Item/Potion selected. Never substitute guessed group."
+    }
+  ],
+  "limitations": [
+    "No native item consumption, HP effect, turn completion, public lifecycle or general actor coverage.",
+    "First accepted list captures use retained Life-fixture01 with cached display HP100 versus canonical241; counts match rendering. No healing-effect inference from that HUD.",
+    "Draw Weapon265 row15 is excluded even if enabled; it is not an inventory consumable.",
+    "Native count/helper/builder0/1 controls use isolated synthetic RAM; no original ROM/save/state changed.",
+    "Binaries remain local; compact metadata and exact captured source snapshots are committed."
+  ],
+  "next_task": "Decode the unaccepted Potion overlay target/source/legality on a coherent wounded Item-owning fixture; identify current law constraints before enabling any final use."
+}

@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-14 - A6.6.1 native inventory and owned Item join; target/law still UNKNOWN
+
+Mapped02001EE4 inventory pool and080CB2B4 count accessor, joined13 observed consumables to Montblanc5 Item list, and excluded Draw Weapon row15. Native33 accessor controls,36 retained-reader mutants and8 actual builder controls pass. Two source-stable captures preserve Item rows/counts; one additional guarded Potion selection reaches an unaccepted overlay without consumption. Original battle-start retries correctly refuse transient ownership and a different actor lacking Item. No final item input or public candidate is enabled. See A6.6.1 receipt; next decode overlay target/law and acquire coherent wounded Item owner.
+
 ## 2026-10-14 - A6.6 metadata/host bootstrap; live inventory remains UNKNOWN
 
 After bounded A6.5 PASS at24efadd, refreshed native item-table8/8 (7144 accessor loads) and host tactics119 checks. Consumable IDs362..375 use raw item_type30 and random-pool category29 (+0x18); raw type29 accessories355..361 are an excluded namespace mistake, not item candidates.080CC788 is random-item selection, not a count getter. The default test-output artifact was restored to its original tracked bytes; fresh119 checks are retained under a new A6.6 path.

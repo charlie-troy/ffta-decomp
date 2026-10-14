@@ -16,11 +16,13 @@
     },
     {
       "id": "live-inventory-pointer-and-count-accessor",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Pool02001EE4,14 records of u16 ID/u8 owned/u8 reserved.080CB2B4 availability=owned-reserved;080CB388 rows1..14.33 isolated actual-ROM controls; live Potion60/Ether6/Elixir0."
     },
     {
       "id": "actor-owned-Item-list-and-native-legality",
-      "status": "unknown"
+      "status": "unknown",
+      "scope": "Owned Item list/count join passes; target/law legality remains UNKNOWN. See A6.6.1."
     },
     {
       "id": "actual-single-consumption-effect-completion",
@@ -36,17 +38,24 @@
     "tools/validate_items.py": "22f7927c7e5bacd4609162f58b59bcf207966e7068ee932c51d212f99b28814c",
     "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
     "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
-    "tools/validate_tactics_policy.py": "8cc503bcccdc122fe979a8d5d3d2316bb51c43c6af7216203438dfd840b1d5e3"
+    "tools/validate_tactics_policy.py": "8cc503bcccdc122fe979a8d5d3d2316bb51c43c6af7216203438dfd840b1d5e3",
+    "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
+    "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
+    "tools/probe_consumable_inventory.py": "5d175d153bbb65bede5c0a7d760604ed1a65c68efee7a84f474d8aef97e4ec8a",
+    "tools/validate_consumable_inventory.py": "aa62451cf753df6f161268e0f446565b4f63f8cec75f6729a149ca9bc41d4f5f",
+    "tools/validate_consumable_menu.py": "fd3fdcfe0b5c2664535e26c267a5813c4cbc50a6dc4200421aaa05d9e4db0a55",
+    "tools/validate_consumable_builder.py": "0ca0e0866db69a9fbb33bb7042151f15d9bc6276b6b2f8191e4e6229d7ebc6a2",
+    "tools/audit_consumable_capture.py": "10a3ca3bd15584dbd65963ad9b418fb38352598f5fa70526cc08a1ec72614a09"
   },
   "evidence_sha256": {
     "outputs/autobattle/a66-bootstrap-checks.json": "ee14f9e9edf64a3173b8cd18f6fc48750ef0dbdd53c2750f0124148a69eae21f",
     "outputs/autobattle/a66-policy-refresh-01/checks.json": "361a103121b5925b9b5cfafe95a599f9399a125546f91380d0f2f2cb40d46723",
     "outputs/autobattle/a66-consumable-metadata-02.json": "991faf42a5b75c497043c8194aa71d6f5813a5d2f876f0a65d9f98eb75d7820b",
-    "outputs/autobattle/a66-raw-type29-excluded.json": "79c3539d625452e40ec52142ee80be6d6c569b758a0e48caed2b5037d84a410b"
+    "outputs/autobattle/a66-raw-type29-excluded.json": "79c3539d625452e40ec52142ee80be6d6c569b758a0e48caed2b5037d84a410b",
+    "docs\\receipts\\autobattle\\A6.6.1.json": "0d1a69e5223d49c6a4ea7fa83eb011c08889af1e46bcf58f65bd1854ec8a332a"
   },
   "limitations": [
-    "Item metadata and pure-host counts do not identify live inventory or authorize a consumable action.",
-    "No inventory address/count, actor Item availability, native target/law legality or decrement/HP/use claim.",
-    "Raw type29 bootstrap is retained as an excluded namespace mistake; category29 and raw type30 are different fields."
+    "Inventory and owned Item-list counts proved only for the named fixture; no executable candidate, target/law approval or use.",
+    "Public Item execution remains disabled. Draw Weapon row15 is excluded from consumables."
   ]
 }
