@@ -43,6 +43,11 @@
       "id": "pinned-unaccepted-self-Potion-overlay",
       "status": "pass",
       "scope": "Wounded source=target Montblanc canonical02000188, ability251/item362/count2. Native wrapper/table/cursor join, no accepted copies or count change.25 source/target/count/callback mutations rejected; captured44-module closure resolves."
+    },
+    {
+      "id": "native-current-law-observation",
+      "status": "pass",
+      "scope": "Guarded B/START/System row3 opens current Law Cards;25 raw writes, unchanged inventory and source closure.02003C32 capacity4,02003C34 IDs1,82,42,0. Actual0802D764 returns3; three isolated count controls. Label join625+ID matches inspected forbidden Skills/Dmg2Animal/Broadswords; inference only."
     }
   ],
   "source_sha256": {
@@ -58,7 +63,8 @@
     "tools/probe_consumable_law_menu.py": "9636502171d4a819764addc3e92a3a0fff5881fd4479904d2eab7fe0805559fa",
     "tools/run_consumable_reader_matrix.py": "9502b0ae475cac766b0775686d8ae169f1f3cbcb1fc5dc749e3e3c8decfc918c",
     "tools/validate_consumable_count_capture.py": "c422b3bb67067f8ce13c1913f687de7acaedb09a82e91e3f6a7594500e2abd50",
-    "tools/validate_consumable_overlay.py": "9a73e681999aedd47caa7ae3b779bbb50e502fed0029de2ac4673b437b0cafdc"
+    "tools/validate_consumable_overlay.py": "9a73e681999aedd47caa7ae3b779bbb50e502fed0029de2ac4673b437b0cafdc",
+    "tools/validate_consumable_law_capture.py": "f5aeaa1dcbe026153380f3a72bcbca99e1d99b7851070f251ba66be22f988643"
   },
   "evidence_sha256": {
     "outputs/autobattle/a66-inventory-controls-02.json": "2dd94170530e380930b17a70df92c07a6860378b95018279d628a21545f183e0",
@@ -96,7 +102,14 @@
     "outputs/autobattle/a66-live-count-matrix-01/count0-fixture/consumable-recovery.ss0": "06f1a77b3b295ef775457841e206817a6586bfc6579a251d95fcbff9fadab876",
     "outputs/autobattle/a66-live-count-matrix-01/count0-Item-list/Item-list-ewram.bin": "ffa9b73c50bb72df0348a5aee12b4d5a70e2cc056551e537ffa0a6ce756d1590",
     "outputs/autobattle/a66-live-count-matrix-01/count1-fixture/consumable-recovery.ss0": "bb9cc82d308b51e36d932fdb873f15993bade8453567c72dc1d7e7e466bacb8a",
-    "outputs/autobattle/a66-live-count-matrix-01/count1-Item-list/Item-list-ewram.bin": "0b716f7c069c549dd5f9732343a6303f7840aaefc174715ab1d936f9696e9924"
+    "outputs/autobattle/a66-live-count-matrix-01/count1-Item-list/Item-list-ewram.bin": "0b716f7c069c549dd5f9732343a6303f7840aaefc174715ab1d936f9696e9924",
+    "outputs/autobattle/a66-Law-Cards-open-01/law-menu.json": "1dc18f7ddfaa2780dda8c3482119fcff014db8b20fdebb8644de0c57538b27c8",
+    "outputs/autobattle/a66-Law-Cards-checks-01.json": "0bda793a396f6952104f2beeb7c88d5045a0fab4f17afba5f4dbc7d82b052374",
+    "outputs/autobattle/a66-Law-Cards-open-01/before-ewram.bin": "93d75b2fddef7f95fb63638364a423621563ae647c5713af9b7ab75f26e18a7a",
+    "outputs/autobattle/a66-Law-Cards-open-01/after-ewram.bin": "ce529fcd1434672dd198e280ab49eb3ede506b1f1fa709faf9e8a8b3f0370457",
+    "outputs/autobattle/a66-Law-Cards-open-01/cancel-ewram.bin": "394db5d8c900ca7dc1e4f4b873e485bdb65069fb11e15e3a84ebca1523f0af78",
+    "outputs/autobattle/a66-Law-Cards-open-01/System-ewram.bin": "80ccbb18680ac548c1d91edf6413e94005f6f535b56dafc371a60a49aede8e77",
+    "outputs/autobattle/a66-Law-Cards-open-01/battle-menu.png": "e665350b23fb4015dac963e51f723bac34a047b28648fa787fc6a84143322c50"
   },
   "excluded_runs": [
     {
@@ -115,5 +128,5 @@
     "Native count/helper/builder0/1 controls use isolated synthetic RAM; no original ROM/save/state changed.",
     "Binaries remain local; compact metadata and exact captured source snapshots are committed."
   ],
-  "next_task": "Finish read-only System/Law Cards inspection and decode current law constraints; then native preview/final-prompt legality before A6.6.2 single-use witness."
+  "next_task": "Classify self-Potion251/item362 against active Skills1, Animal82 and Broadswords42 using native law predicates; decode final prompt without final use. Current recommendation IDs and Potion law compliance remain UNKNOWN."
 }

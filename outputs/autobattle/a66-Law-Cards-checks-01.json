@@ -1,0 +1,111 @@
+{
+  "status": "pass-source-and-active-law-observation",
+  "scope": "Audit the bounded Law Cards observation; do not authorize item use.\n\nThe active IDs match the inspected panel labels at MAIN_STRINGS[625+ID].\nThat name join is an inference for these three observed IDs, not a decoded\ngeneral law accessor or evidence that Potion complies with the Skills law.\n",
+  "closure": [
+    "ability_resources",
+    "ability_table",
+    "autobattle_identity",
+    "autobattle_runtime",
+    "build_recovery_fixture",
+    "consumable_inventory",
+    "ffta_names",
+    "ffta_text",
+    "fixture_guard",
+    "life_recovery_runtime",
+    "life_recovery_transaction",
+    "party_recovery_runtime",
+    "player_boundary_observer",
+    "probe_consumable_law_menu",
+    "probe_control_handoff",
+    "probe_recovery_ko_lifecycle",
+    "probe_recovery_party",
+    "recovery_ally_confirmation",
+    "recovery_ally_executor",
+    "recovery_ally_preview",
+    "recovery_ally_target",
+    "recovery_boundary_diagnostic",
+    "recovery_continuation",
+    "recovery_executor",
+    "recovery_ko_trace",
+    "recovery_life_effect",
+    "recovery_life_final",
+    "recovery_life_target",
+    "recovery_life_trace",
+    "recovery_life_wait",
+    "recovery_menu",
+    "recovery_menu_list",
+    "recovery_party",
+    "recovery_party_continuation",
+    "recovery_runtime",
+    "recovery_transport",
+    "status_flags",
+    "tactics_adapter",
+    "tactics_policy",
+    "trace_mgba",
+    "wait_ally_continuation"
+  ],
+  "capacity_address": "02003C32",
+  "active_ids_address": "02003C34",
+  "native_count_accessor": "0802D764",
+  "active_ids": [
+    1,
+    82,
+    42,
+    0
+  ],
+  "native_count": 3,
+  "inferred_names_matching_inspected_panel": [
+    "Skills",
+    "Dmg2: Animal",
+    "Broadswords"
+  ],
+  "observed_recommended_labels": [
+    "Techniques",
+    "Status",
+    "Spears"
+  ],
+  "isolated_count_controls": [
+    {
+      "isolated_ids": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "native_nonzero_count": 0
+    },
+    {
+      "isolated_ids": [
+        1,
+        0,
+        0,
+        0
+      ],
+      "native_nonzero_count": 1
+    },
+    {
+      "isolated_ids": [
+        1,
+        82,
+        42,
+        0
+      ],
+      "native_nonzero_count": 3
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_consumable_law_capture.py": "f5aeaa1dcbe026153380f3a72bcbca99e1d99b7851070f251ba66be22f988643",
+    "tools/recovery_source_versions.py": "a870a297793e13ee585bb8332507f59fdf79b3ad28a977d1a0edf5cdf18a477e"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-Law-Cards-open-01\\law-menu.json": "1dc18f7ddfaa2780dda8c3482119fcff014db8b20fdebb8644de0c57538b27c8",
+    "outputs\\autobattle\\a66-Law-Cards-open-01\\before-ewram.bin": "93d75b2fddef7f95fb63638364a423621563ae647c5713af9b7ab75f26e18a7a",
+    "outputs\\autobattle\\a66-Law-Cards-open-01\\after-ewram.bin": "ce529fcd1434672dd198e280ab49eb3ede506b1f1fa709faf9e8a8b3f0370457",
+    "outputs\\autobattle\\a66-Law-Cards-open-01\\battle-menu.png": "e665350b23fb4015dac963e51f723bac34a047b28648fa787fc6a84143322c50"
+  },
+  "limitations": [
+    "Recommended-ID mapping not decoded.",
+    "Current Skills-law classification of Potion is UNKNOWN.",
+    "No card application, item selection, target acceptance or consumption."
+  ]
+}

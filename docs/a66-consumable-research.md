@@ -106,3 +106,20 @@ mode0/driver54, then START opens native System mode1/driver67 with observed
 rows1..6 (Turn Order, Mission, Law Cards, Options, Flee, Save Now). Law Cards
 row3 may be opened for inspection; no card application is authorized by this
 reader. A6.6.2 consumption and public A6.6.3 stay gated.
+
+## Current law display, not yet Potion compliance
+
+`a66-Law-Cards-open-01`, PID40048, opens the native law panel with the guarded
+B/START/System row3 route.25 raw key writes match those five presses; source
+closure and asset/capture hashes pass. No card is selected or applied. The panel
+shows forbidden Skills, Dmg2: Animal and Broadswords, recommending Techniques,
+Status and Spears. Native02003C32 capacity4 and02003C34 u16 IDs1,82,42,0 are
+unchanged by inspection; actual0802D764 counts3 nonzero entries. Isolated count
+controls0/1/3 pass. MAIN_STRINGS[625+ID] matches the three forbidden labels;
+this is a bounded inference, not a general decoded law-name accessor. The
+recommended-ID mapping remains unknown.
+
+Next executable step: trace the native law violation/classification predicates
+for active Skills1, Animal82 and Broadswords42 against source Montblanc5,
+self-target and Potion ability251/item362. Enabled Item rows and a legal cursor
+do not settle that question. Final-prompt legality and A6.6.2 remain gated.

@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-14 - Native law display reached; Potion compliance remains UNKNOWN
+
+Guarded command B, field START, System Law Cards row3 reaches the actual forbidden/recommended panel. PID40048 source-stable,25 attributed raw writes, unchanged inventory, no card application. Active law IDs02003C34=[1,82,42,0], capacity4; actual0802D764 counts3, isolated0/1/3 controls pass. Inferred MAIN_STRINGS[625+ID] joins inspected forbidden Skills/Dmg2Animal/Broadswords. Next classify self-Potion251/item362 against these native law predicates and final prompt; no consumable use is authorized by the reader yet. All owned emulator sessions are closed.
+
 ## 2026-10-14 - Wounded Item overlay and live zero/one inventory controls pass
 
 Constructed and independently reloaded coherent Montblanc HP100/241/Potion2 fixture (three recorded construction writes, no gameplay input). Pinned self-Potion overlay joins canonical source/target, wrapper/table/cursor, ability251/item362/count2;25 mutants reject. Native live count matrix0/1 passes with Potion absent/enabled respectively, unchanged inventory, stale-count/reservation refusals and44-module source closures. No item is consumed. Law identity/compliance and final-prompt legality remain UNKNOWN; System access now identified via guarded command B then field START. See A6.6.1.

@@ -51,14 +51,15 @@
     "tools/probe_consumable_law_menu.py": "9636502171d4a819764addc3e92a3a0fff5881fd4479904d2eab7fe0805559fa",
     "tools/run_consumable_reader_matrix.py": "9502b0ae475cac766b0775686d8ae169f1f3cbcb1fc5dc749e3e3c8decfc918c",
     "tools/validate_consumable_count_capture.py": "c422b3bb67067f8ce13c1913f687de7acaedb09a82e91e3f6a7594500e2abd50",
-    "tools/validate_consumable_overlay.py": "9a73e681999aedd47caa7ae3b779bbb50e502fed0029de2ac4673b437b0cafdc"
+    "tools/validate_consumable_overlay.py": "9a73e681999aedd47caa7ae3b779bbb50e502fed0029de2ac4673b437b0cafdc",
+    "tools/validate_consumable_law_capture.py": "f5aeaa1dcbe026153380f3a72bcbca99e1d99b7851070f251ba66be22f988643"
   },
   "evidence_sha256": {
     "outputs/autobattle/a66-bootstrap-checks.json": "ee14f9e9edf64a3173b8cd18f6fc48750ef0dbdd53c2750f0124148a69eae21f",
     "outputs/autobattle/a66-policy-refresh-01/checks.json": "361a103121b5925b9b5cfafe95a599f9399a125546f91380d0f2f2cb40d46723",
     "outputs/autobattle/a66-consumable-metadata-02.json": "991faf42a5b75c497043c8194aa71d6f5813a5d2f876f0a65d9f98eb75d7820b",
     "outputs/autobattle/a66-raw-type29-excluded.json": "79c3539d625452e40ec52142ee80be6d6c569b758a0e48caed2b5037d84a410b",
-    "docs/receipts/autobattle/A6.6.1.json": "8244a7928f04bd33a42cb796b0bf9f1e99e570b8686661f493fbfa5bdede9a8a"
+    "docs/receipts/autobattle/A6.6.1.json": "47447b3f8ebcfd0e014f0bf1f0ca7aae6e38707a7510f1b0c27c7c8e74ad0bf7"
   },
   "limitations": [
     "Inventory and owned Item-list counts proved only for the named fixture; no executable candidate, target/law approval or use.",
