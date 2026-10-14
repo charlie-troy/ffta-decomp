@@ -1,0 +1,22 @@
+{
+  "status": "pass-Life-diagnostic-integration",
+  "scope": "Exercise the real terminal serializer, validator and session cleanup with fake hardware.",
+  "cases": [
+    "none",
+    "missing",
+    "truncated",
+    "timeout",
+    "cursor-error",
+    "screenshot-error"
+  ],
+  "source_sha256": {
+    "tools/validate_life_diagnostic_integration.py": "affe7c4e1fad8143ba4015323509dfdf830c1d0f49a46c0f20f51da9a62c6581",
+    "tools/autobattle_runtime.py": "2365b675818d55059946bf88c66612e782b00af198173b69db2482c6010a75e3",
+    "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4",
+    "tools/validate_autobattle_runtime.py": "c9289d05bad4081b8f2114422f61a61dfccfcc3ff8b1c4905218143c63a557d7",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12"
+  },
+  "limitations": [
+    "Host terminal/cleanup integration with fake hardware; no fresh gameplay or CLI adoption proof."
+  ]
+}

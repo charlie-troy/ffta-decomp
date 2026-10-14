@@ -179,6 +179,8 @@ class BattleRuntime:
         self.owner = None
         self._pre_players = None
         self._engine_result = None
+        self._wait_origin = None
+        self._next_ally_progress = None
         self._boundary_seed_count = len(self.p.seeds)
         #                              waits, so a pause ends waits promptly
 
@@ -533,6 +535,8 @@ class BattleRuntime:
             self.event("note", note=f"fresh-menu identity rejected: {exc}; no input")
             return
         self._engine_result = None
+        self._wait_origin = None
+        self._next_ally_progress = None
         self._boundary_seed_count = len(self.p.seeds)
         prev = self.state
         self.state = TAKEOVER
@@ -628,6 +632,14 @@ class BattleRuntime:
             # longer offers must CANCEL (no input), not silently commit the
             # policy's unselected Wait.
             if waitplan is not None and policy_choice in (None, "wait"):
+                try:
+                    from wait_ally_continuation import capture_wait_origin
+                    self._wait_origin=capture_wait_origin(self.s,self.owner,self._pre_players,
+                        clock=lambda:time.time()-self.t0)
+                except ValueError:
+                    # Optional completion evidence has no input authority.
+                    # Existing echo/actor/STOP guards still own the command.
+                    self._wait_origin=None
                 self.event("note", **self._actor_fields(),
                            control_mode="external",
                            note="identified-wait candidate (sticky cursor "
@@ -882,10 +894,10 @@ class BattleRuntime:
                             stop_when=lambda _p: self._stop_check())
         # the Wait commit ends the turn: same wall-aware progress wait
         # as the route paths
-        committed = self.p.wait_progress(
+        committed = self._wait_identified_progress(plan_kind,
             seconds=min(150.0, max(10.0, self.wall_timeout -
                                    (time.time() - self.t0))),
-            want_seeds=self._boundary_seed_count + 1, stop_check=self._stop_check)
+            want_seeds=self._boundary_seed_count + 1)
         if not committed:
             # C1 rule: a latched STOP owns the exit — the wait returns
             # False on stop too, and a paused handoff must win over the
@@ -915,6 +927,18 @@ class BattleRuntime:
                          "STOP requested: battle left running for "
                          "manual play")
             return
+        if self._next_ally_progress is not None:
+            try:
+                from wait_ally_continuation import validate_next_ally_progress
+                post=self.adapter.snapshot()
+                self._engine_result=self.adapter.result(self.owner,self._pre_players,post,plan_kind,dest_used)
+                validate_next_ally_progress(self._next_ally_progress,self.owner,post)
+                self._engine_result['progress']=self._next_ally_progress
+            except ValueError as exc:
+                self._saw_unknown_modal=True
+                self.event('note',**self._actor_fields(),note=f'Wait next ally attribution rejected: {exc}; no turn claimed')
+                self.state=RUNNING
+                return
         # Report the actor's independently checked commit snapshot, rather
         # than a later enemy-phase read that can transiently wipe the record.
         row = next(r for r in self._engine_result["players_after"]
@@ -928,10 +952,34 @@ class BattleRuntime:
                    selected_target=sel_target,
                    position_before=before, position_after=after,
                    engine_result=self._engine_result,
-                   next_actor=self._next_seed_actor(),
+                   next_actor=(self._next_ally_actor() if self._next_ally_progress is not None else self._next_seed_actor()),
                    tactics=self._tactics_meta,
                    note=f"committed via {route_note}")
         self.state = RUNNING
+
+    def _wait_identified_progress(self,plan_kind,*,seconds,want_seeds):
+        if plan_kind!='identified-wait' or self._wait_origin is None:
+            return self.p.wait_progress(seconds=seconds,want_seeds=want_seeds,stop_check=self._stop_check)
+        from wait_ally_continuation import inspect_next_ally
+        deadline=time.time()+seconds
+        while time.time()<deadline:
+            if self._stop_check():return False
+            try:
+                proof=inspect_next_ally(self.s,self.owner,self._wait_origin,clock=lambda:time.time()-self.t0)
+            except ValueError:proof=None
+            if self._stop_check():return False
+            if proof is not None:
+                self._next_ally_progress=proof
+                return True
+            if len(self.p.seeds)>=want_seeds:return True
+            self.p.pump(2.0,'identified-Wait-completion',sample_every=60.0,tick=2.0,
+                        stop_when=lambda _p:self._stop_check())
+        return not self._stop_check() and len(self.p.seeds)>=want_seeds
+
+    def _next_ally_actor(self):
+        next_actor=self._next_ally_progress['next'];row=next_actor['actor']
+        return {'source':'owned-next-ally-command-menu','name':row['name_text'],'id':row['id'],
+                'job':row['job'],'side_bit':False,'canonical':next_actor['canonical'],'wrapper':next_actor['wrapper']}
 
     def _next_seed_actor(self):
         # Only independently decoded sequencer context names are reported.

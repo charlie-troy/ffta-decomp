@@ -28,6 +28,8 @@ def _input_hashes(args):
               "tools/run_autobattle.py", "tools/autobattle_runtime.py",
               "tools/autobattle_identity.py", "tools/probe_control_handoff.py",
               "tools/tactics_policy.py", "tools/tactics_adapter.py"]
+    from probe_recovery_ko_lifecycle import source_dependencies
+    inputs.extend(source_dependencies('wait_ally_continuation'))
     if args.resume:
         inputs.append('tools/recovery_boundary_diagnostic.py')
     if getattr(args,'observe_player_boundaries',False):

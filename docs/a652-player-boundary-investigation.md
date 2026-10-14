@@ -64,3 +64,5 @@ minimal control adds read-only next-ally command evidence to identified Wait
 completion; existing seeded enemy progress and all input identity/STOP guards
 retain their behavior. Validate a pre-fix regression, then fresh same-PID resume
 and an immediate-ally control, followed by affected existing regressions.
+
+The first witness integration run01 (PID111648) remains bounded with zero attributed turns despite native picks5/7 and Wait input. The host regression passes and fails onf3dac65, but native acceptance is UNKNOWN. The reused command reader may be too narrowly tied to its research phase; record the exact origin/continuation refusal before changing a predicate. No further timeout extension is justified.

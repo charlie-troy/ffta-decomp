@@ -243,6 +243,19 @@ def validate(out_dir):
                 elif action.get("kind") == "identified-wait":
                     if moved:
                         raise ValueError("Wait moved a player")
+                    progress=result.get('progress')
+                    next_actor=rec.get('next_actor') or {}
+                    no_new_seed=(boundary is not None and type(rec.get('seeds'))==int
+                        and type(boundary.get('seeds'))==int and rec['seeds']<=boundary['seeds'])
+                    if progress is not None or next_actor.get('source')=='owned-next-ally-command-menu' or no_new_seed:
+                        from wait_ally_continuation import validate_next_ally_progress
+                        if progress is None:raise ValueError('zero-seed Wait lacks next-ally completion evidence')
+                        later=validate_next_ally_progress(progress,row,list(post.values()))
+                        expected_next={'source':'owned-next-ally-command-menu','name':later['actor']['name_text'],
+                            'id':later['actor']['id'],'job':later['actor']['job'],'side_bit':False,
+                            'canonical':later['canonical'],'wrapper':later['wrapper']}
+                        if next_actor!=expected_next or progress['captured_t']>rec['t']+0.051:
+                            raise ValueError('Wait next-ally attribution/time differs')
                 elif action.get("kind") == "identified-self-cure":
                     recovery = rec.get("recovery") or {}
                     if (moved or len(pre) != 1 or not recovery

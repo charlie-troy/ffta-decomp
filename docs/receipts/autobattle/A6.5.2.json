@@ -22,7 +22,8 @@
     },
     {
       "id": "next-ally-completion-proof-and-pre-fix-regression",
-      "status": "unknown"
+      "status": "unknown",
+      "scope": "Pre-fix f3dac65 rejects supported host zero-seed next-ally menu; new host continuation/STOP and6 native-shape/5 receipt controls pass. Live first integration still no turn; trace refusal before claiming a fix."
     },
     {
       "id": "current-source-native-integration-and-regressions",
@@ -33,11 +34,15 @@
     "tools/player_boundary_observer.py": "4d9cdbe4bdb827adc085d5dc2c76819981dc3bd4c410022d7ad0de6ad8c4b768",
     "tools/validate_player_boundary_observer.py": "ae35346e2843fbf9fc6d97ff1034e5ff98e02184c1bc6398cbaf83428e462b08",
     "tools/validate_player_boundary_history.py": "9a4529e19e9f85435c9338f343b6cabcb56b65201ad36f6f514282ef755780e6",
-    "tools/run_autobattle.py": "6087e42f45279821bd41b02720f707613d6496d65804da591a2d56c9163e8d1c",
+    "tools/run_autobattle.py": "9da5f414414d5175c24185ebc47813ed93b2d4ad125fd58106633695cc3ef557",
     "tools/run_life_recovery_handoff.py": "9aea52d53eb5c55d566a4d9bcf92386f5a64c92c78dae80793cb22dfc93da8f2",
-    "tools/autobattle_runtime.py": "f7b7bcf3087369dc0ad275359a956228f7ff9c6f07facc880de2e5989d79ae58",
+    "tools/autobattle_runtime.py": "2365b675818d55059946bf88c66612e782b00af198173b69db2482c6010a75e3",
     "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
-    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557"
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/wait_ally_continuation.py": "d0f6f96a1e70f0f21008f44795b800ba7e407cf82e8e0e2dc346c2737ac0bae4",
+    "tools/validate_wait_ally_continuation.py": "72c71897ab84f5ed12ddba2adec6c4665865e23ce10d229578272e9fc6638867",
+    "tools/validate_wait_ally_runtime.py": "89486e0c720306767b873fec33c77374e755705f7f8c4f990e2429f89f8bdea8",
+    "tools/validate_autobattle_runtime.py": "c9289d05bad4081b8f2114422f61a61dfccfcc3ff8b1c4905218143c63a557d7"
   },
   "evidence_sha256": {
     "outputs/autobattle/a652-resume-observer-01/events.jsonl": "d781ff521626977bf3bb7cf2242da6467af31f9f94477d01f3120635d64ce9dc",
@@ -57,11 +62,35 @@
     "outputs/autobattle/a652-resume-observer-01-history-checks.json": "3716062d15920e46b06e9467f2308c5ea28b035b9e6c4b2c29992046016ed20a",
     "outputs/autobattle/a652-resume-observer-01-diagnostic-checks.json": "b01eeec02f3c74b78feb5272586dd97b8472098fdd8019d6336e20bf42235e25",
     "outputs/autobattle/a652-resume-observer-01-sources.json": "810cdc30f83f4bba38be73debd2bd937820ac767f3f95a4294fcb0edab697f1b",
-    "outputs/autobattle/a652-default-observer-01-history-checks.json": "e31de066ece4c89b381638d72a86760ca008676ab9285015f2261a82ebb0e64f"
+    "outputs/autobattle/a652-default-observer-01-history-checks.json": "e31de066ece4c89b381638d72a86760ca008676ab9285015f2261a82ebb0e64f",
+    "outputs/autobattle/a652-resume-ally-completion-01/events.jsonl": "62f06a5fe239a9ce09bef546dce4df15bf61512908c95300e4e35892d7281aa4",
+    "outputs/autobattle/a652-resume-ally-completion-01/input-log.jsonl": "6e5672e2f0411291ebe70aaebc5609e8aff1aac60a81f787c81d56280f34b561",
+    "outputs/autobattle/a652-resume-ally-completion-01/manual-Life-Wait.json": "c5183247b04e5c44ab9de6fbb1d89809b1b3e91f2769c301660ceb0848ca4902",
+    "outputs/autobattle/a652-resume-ally-completion-01/paused-run.json": "67afbda77131dc6d34c5742ab948da8934f66099687db937efed35402838c3ef",
+    "outputs/autobattle/a652-resume-ally-completion-01/player-boundary-observer.jsonl": "23e63b8340731508dbe654c1accacc252a2817f2eea5b5f85adc58c192ca603a",
+    "outputs/autobattle/a652-resume-ally-completion-01/run.json": "c52f7552748d0f910708071292231484aeaf14c4d3195ff10470d7d375a4151e",
+    "outputs/autobattle/a652-resume-ally-completion-01/STOP-trigger.json": "532b115d56e5678a7398c1e018bb98bf76bb3a9f028fb2327e2797be626fcce5",
+    "outputs/autobattle/a652-resume-ally-completion-01/Life-transaction-1/Life-engine.jsonl": "24c097308257a010ee3f64162a430fe4653f35ac13705f19f73da2bbce292803",
+    "outputs/autobattle/a652-Wait-next-ally-host-03.json": "dcc6a1aa44964c63c47dc8328b3b2e3f5eba189199f4e6751215b09f8f873189",
+    "outputs/autobattle/a652-retained-Life-01.json": "4bcae978c24a6911c53eb9ad6f3d40a9c3517235d8e2f42245545833d9ffe50e",
+    "outputs/autobattle/a652-retained-ally-Cure-01.json": "db7f1890a7e0e3b03ae0b939bbebc694528a6acfd44f936a82e4632c2f2cd284",
+    "outputs/autobattle/a652-retained-self-Cure-01.json": "197712d6ded2cb5ab550fa1d35943771f8cf02f3f8b2c60c0db6dec593491407",
+    "outputs/autobattle/a652-retained-default-01.json": "a17eb56f121838ed731e209f664dba420da6590a09b239e44bdb4d980990ddda",
+    "outputs/autobattle/a652-diagnostic-regression-01.json": "70fc8e6394e719998ca76ea0a26160d48cd7ede4e7d5058b984ccf0ab2c73d12",
+    "outputs/autobattle/a652-resume-ally-completion-01-sources.json": "4b59d2c4e211f4abf76b0ef2de383b00737e6c8a0a76bf5b31078760b4a1f5b4",
+    "outputs/autobattle/a652-Wait-next-ally-pre-fix-check.json": "e2a87a21f7477d33c639954ed6d0b5e7dc7d2a13db579885450410d2e2481776"
   },
   "limitations": [
     "Zero attributed resumed turns; no A6.5 lifecycle acceptance.",
     "Native next player and inspected screenshot support the diagnosis, not an implemented receipt gate.",
     "Post-Wait seed-only failure requires a new independently guarded continuation proof."
+  ],
+  "implementation_attempts": [
+    {
+      "run": "a652-resume-ally-completion-01",
+      "result": "bounded-no-attributed-turn",
+      "status": "unknown",
+      "scope": "First guarded next-ally witness integration; current-source stable, zero turns. Predicate refusal needs explicit instrumentation; no accepted fix."
+    }
   ]
 }

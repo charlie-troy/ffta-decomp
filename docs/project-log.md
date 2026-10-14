@@ -1,5 +1,11 @@
 # Project log
 
+## 2026-10-14 - Next-ally Wait completion witness remains in validation
+
+Added a read-only before/after wrapper, canonical party, restored roster and accepting command-menu witness for identified Wait. The actual runtime regression fails onf3dac65's seed-only completion and passes host next-ally/STOP plus6 state/5 receipt refusal controls; retained Life38, ally-Cure38, self-Cure26 and default5 receipt suites still pass. Public validation requires the raw witness when Wait reports no additional seed.
+
+First live integration (a652-resume-ally-completion-01, PID111648) keeps sources stable but still records zero turns. Preserve it as a bounded failure, not an accepted fix. Next instrument the exact origin/next-ally refusal; the shared research command reader may exclude an ordinary actor phase. Native control and A6.5 stay UNKNOWN.
+
 ## 2026-10-14 - Native observer locates post-Wait completion failure
 
 Read-only native picks and actual adapter attempts on a fresh Life resume (PID73308) show Montblanc's accepting command menu at t228.9/234.9, correct level41, own cursor and accepted owner. Guarded Wait sends four five-hit input legs, then native driver picks revived Marche7; the terminal screenshot shows Marche's command menu. The runtime records zero turns because its post-command wait accepts only a new sequencer seed. An immediate ally menu can remain open without that seed. The actor/level/ownership checks need no relaxation.

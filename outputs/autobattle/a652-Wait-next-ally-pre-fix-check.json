@@ -1,0 +1,6 @@
+{
+  "status": "pass-expected-pre-fix-failure",
+  "runtime_ref": "f3dac65",
+  "failure": "valid next ally command menu rejected solely for zero new seeds",
+  "scope": "Actual runtime progress/result with fake RAM/transport; not native action proof."
+}
