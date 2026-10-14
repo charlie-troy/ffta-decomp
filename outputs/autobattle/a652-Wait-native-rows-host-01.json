@@ -1,0 +1,52 @@
+{
+  "status": "pass-Wait-next-ally-regression",
+  "scope": "Host regression for an identified Wait ending directly at another ally's menu.",
+  "results": [
+    {
+      "stop": false,
+      "turns": 1,
+      "controls": [
+        "same actor wrapper",
+        "foreign member",
+        "wrong cursor",
+        "opening command",
+        "unrestored mirror",
+        "sleeping next actor"
+      ],
+      "raw_controls": [
+        "missing origin command",
+        "foreign origin wrapper",
+        "missing origin raw reads",
+        "wrong next actor",
+        "empty post-action raw"
+      ]
+    },
+    {
+      "stop": true,
+      "turns": 0,
+      "controls": [
+        "same actor wrapper",
+        "foreign member",
+        "wrong cursor",
+        "opening command",
+        "unrestored mirror",
+        "sleeping next actor"
+      ],
+      "raw_controls": [
+        "missing origin command",
+        "foreign origin wrapper",
+        "missing origin raw reads",
+        "wrong next actor",
+        "empty post-action raw"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/validate_wait_ally_continuation.py": "257a24f320c792561cfff1e1c31f4e216bf947e0dbca47514fadb33bb3d05f0f",
+    "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f",
+    "tools/autobattle_runtime.py": "41a8f0ff0dc098f79256e221bfdcc8c1d871ceae9162c77e8e75e8b7d8f90cd8"
+  },
+  "limitations": [
+    "Actual readers/runtime with fake RAM/transport; not fresh gameplay or action acceptance."
+  ]
+}

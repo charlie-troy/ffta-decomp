@@ -7,6 +7,8 @@ from recovery_menu import MEMBERS, MENU_ROOT, PLAYER_DRIVER, exact, integer, req
 from recovery_menu_list import ResearchMenuList
 from recovery_party_continuation import observe_party_continuation
 
+WAIT_COMMAND_ROW=10  # Native table8/9/10/11; cursor index2 is not its row ID.
+
 
 class CaptureReads:
     def __init__(self,g):self.g,self.reads=g,{}
@@ -39,7 +41,8 @@ def capture_wait_origin(session,owner,players,*,clock):
     require({p['id'] for p in pins}=={5,7},'Wait origin canonical aliases')
     member=next(p['canonical'] for p in pins if p['id']==owner['id'])
     menu=ResearchMenuList(g,rom,owner,member);command=menu.snapshot()
-    require(command.state=='command' and 2 in command.rows and command.enabled[command.rows.index(2)]==1,
+    require(command.state=='command' and command.rows.count(WAIT_COMMAND_ROW)==1
+            and command.enabled[command.rows.index(WAIT_COMMAND_ROW)]==1,
             'Wait origin command unavailable')
     return {'captured_t':round(clock(),3),'facing':{'actor_wrapper':menu.wrapper,'member':member},
         'pins':pins,'units':{str(a):u.hex() for a,u in units.items()},'baseline':baseline['slots'],
@@ -53,7 +56,8 @@ def inspect_next_ally(session,owner,origin,*,clock):
     later=observe_party_continuation(g,rom,owner,origin['facing'],origin['pins'],units,origin['baseline'])
     require(later['relation']=='ally','next actor is not another ally')
     menu=ResearchMenuList(g,rom,later['actor'],later['canonical']);command=menu.snapshot()
-    require(command.state=='command' and 2 in command.rows and command.enabled[command.rows.index(2)]==1,
+    require(command.state=='command' and command.rows.count(WAIT_COMMAND_ROW)==1
+            and command.enabled[command.rows.index(WAIT_COMMAND_ROW)]==1,
             'next ally command menu not accepting legal Wait')
     current=exact(g,later['canonical'],STRIDE)
     require(not current[0xEB]&4 and not current[0xEA]&0x80 and not current[0xE8]&0x40,
@@ -113,7 +117,7 @@ def validate_next_ally_progress(proof,owner,post_players):
     require(old_command['state']=='command' and old_command['member']==old_member
             and old_command['context']==old_context and old_command['callback']==old_callback
             and list(old_command['rows'])==old_rows and list(old_command['enabled'])==list(old_enabled)
-            and 2 in old_rows and old_enabled[old_rows.index(2)]==1
+            and old_rows.count(WAIT_COMMAND_ROW)==1 and old_enabled[old_rows.index(WAIT_COMMAND_ROW)]==1
             and old_command['unit_sha256']==hashlib.sha256(old).hexdigest(),
             'Wait origin command receipt/availability differs')
     require(integer(read(BATTLE_STRUCT,4),0)==8,'Wait continuation roster not restored')
@@ -167,7 +171,8 @@ def validate_next_ally_progress(proof,owner,post_players):
     require(0<count<=32 and cursor<count and scroll+cursor<count,'Wait next command bounds invalid')
     rows_raw=read(integer(obj,0x94),count*4);enabled=read(integer(obj,0x98),count)
     rows=[integer(rows_raw,i*4) for i in range(count)]
-    require(all(v in (0,1) for v in enabled) and 2 in rows and enabled[rows.index(2)]==1,
+    require(all(v in (0,1) for v in enabled) and rows.count(WAIT_COMMAND_ROW)==1
+            and enabled[rows.index(WAIT_COMMAND_ROW)]==1,
             'Wait next command unavailable')
     require(command['state']=='command' and command['member']==member and command['mode']==4
             and command['context']==context and command['callback']==callback and command['active']==callback

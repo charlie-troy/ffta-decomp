@@ -22,8 +22,8 @@
     },
     {
       "id": "next-ally-completion-proof-and-pre-fix-regression",
-      "status": "unknown",
-      "scope": "Pre-fix f3dac65 rejects supported host zero-seed next-ally menu; new host continuation/STOP and6 native-shape/5 receipt controls pass. Live first integration still no turn; trace refusal before claiming a fix."
+      "status": "pass",
+      "scope": "Native-table-backed host regression passes and first current native source uses Wait10, claims one zero-seed Wait with153 raw continuation reads and independent next Marche7. Same-PID lifecycle validator passes. Input-range corruption remains in final integration gate."
     },
     {
       "id": "current-source-native-integration-and-regressions",
@@ -39,7 +39,7 @@
     "tools/autobattle_runtime.py": "41a8f0ff0dc098f79256e221bfdcc8c1d871ceae9162c77e8e75e8b7d8f90cd8",
     "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
     "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
-    "tools/wait_ally_continuation.py": "d0f6f96a1e70f0f21008f44795b800ba7e407cf82e8e0e2dc346c2737ac0bae4",
+    "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f",
     "tools/validate_wait_ally_continuation.py": "257a24f320c792561cfff1e1c31f4e216bf947e0dbca47514fadb33bb3d05f0f",
     "tools/validate_wait_ally_runtime.py": "89486e0c720306767b873fec33c77374e755705f7f8c4f990e2429f89f8bdea8",
     "tools/validate_autobattle_runtime.py": "c9289d05bad4081b8f2114422f61a61dfccfcc3ff8b1c4905218143c63a557d7"
@@ -89,7 +89,19 @@
     "outputs/autobattle/a652-resume-ally-completion-02/Life-transaction-1/Life-engine.jsonl": "e0a520314d68e5d93e4c211874703194d9219ec96bcb3095c565c83a79aec7e0",
     "outputs/autobattle/a652-resume-ally-completion-02-sources.json": "08e11cde9b9fae7c54d7b87ea16e6d624745233193bef5d4686c72443e850296",
     "outputs/autobattle/a652-observer-host-03.json": "90c4a0a2dd5f9c8a2121fd78193f65f7d25a9c9dd5ed7ef66a6d779df1348852",
-    "outputs/autobattle/a652-Wait-next-ally-host-04.json": "b93297028b73d6a53b2e4f30b6c0c7a5065bee197758263e6faaab9d13e76e8c"
+    "outputs/autobattle/a652-Wait-next-ally-host-04.json": "b93297028b73d6a53b2e4f30b6c0c7a5065bee197758263e6faaab9d13e76e8c",
+    "outputs/autobattle/a652-resume-ally-completion-03/events.jsonl": "f2d3525eada127a94b82d6a2a115ff462626d9c4591e8403a2b8476ce357cbbb",
+    "outputs/autobattle/a652-resume-ally-completion-03/handoff-checks.json": "b5243e1579f7c5773c448a6ece489301ae5b39dd23e95c90c5dde6edb11232dd",
+    "outputs/autobattle/a652-resume-ally-completion-03/input-log.jsonl": "424b22ed6a322076c5ab1d62c01e782e18de1598ae64e30f8b89cc5c29fcbe5b",
+    "outputs/autobattle/a652-resume-ally-completion-03/manual-Life-Wait.json": "18aa6028246d8cc8109706d3cc5236736ed60402050a4c135ca7485b91f7e61c",
+    "outputs/autobattle/a652-resume-ally-completion-03/paused-run.json": "a52285f88faf58a13f30590f9d0d1a7f0c1e0b0eef590cf8973e07278b631aeb",
+    "outputs/autobattle/a652-resume-ally-completion-03/player-boundary-observer.jsonl": "a06d8a31353c96b6e92343bdc0890c47e97363c162c54f1fb5a1129dc241085b",
+    "outputs/autobattle/a652-resume-ally-completion-03/run.json": "6bd0a8a62c9e2b5725ccff5b5df1c2d206f4a9749771a6daf9d505659cf36aaf",
+    "outputs/autobattle/a652-resume-ally-completion-03/STOP-trigger.json": "f701aa69627cf102b48f5e558afc03193964d62f42a8f097ac8982bf55eacd59",
+    "outputs/autobattle/a652-resume-ally-completion-03/Life-transaction-1/Life-engine.jsonl": "b7ab1b1bd49f790559b2f9d1d609cb8db8860daa5bee48a90339ee4d059f0cae",
+    "outputs/autobattle/a652-Wait-native-rows-host-01.json": "91f3d2284a1932d0b47d443b421c0243a68a5c119d441d134556ec48b7de8144",
+    "outputs/autobattle/a652-resume-ally-completion-03-sources.json": "9829171b2ae816668055a0ff1b2f8ed544761771972cda4267a8be4ee1f1481b",
+    "outputs/autobattle/a652-resume-ally-completion-03-history-checks.json": "454f1d78d5c34f0a6cff956881ae51480f4f616ec641aa370e8f16bc16b855b3"
   },
   "limitations": [
     "Zero attributed resumed turns; no A6.5 lifecycle acceptance.",
@@ -109,6 +121,13 @@
       "status": "unknown",
       "result": "Wait origin command unavailable",
       "scope": "Native driver state37/0x25 is valid. New witness confused cursor position2 with native Wait row10; exact refusal recorded, source stable. No accepted turn."
+    },
+    {
+      "run": "a652-resume-ally-completion-03",
+      "pid": 65752,
+      "result": "one-attributed-resumed-Wait-to-next-ally-Marche7",
+      "status": "bounded-pass",
+      "scope": "Correct native Wait10; public same-PID handoff validator passes6 mutants, source closure passes. New mutation removing resumed inputs survives; acceptance still open."
     }
   ]
 }

@@ -1,0 +1,414 @@
+{
+  "status": "pass-player-boundary-history-audit",
+  "scope": "Audit native/adapter observation history; a valid history alone is not resumed control.",
+  "summary": {
+    "native_picks": [
+      {
+        "t": 92.2,
+        "id": 3,
+        "name": 139881681,
+        "member": 33567716,
+        "side_raw": 32769
+      },
+      {
+        "t": 127.5,
+        "id": 0,
+        "name": 139882990,
+        "member": 33567188,
+        "side_raw": 32769
+      },
+      {
+        "t": 159.3,
+        "id": 2,
+        "name": 139881543,
+        "member": 33566924,
+        "side_raw": 32769
+      },
+      {
+        "t": 188.8,
+        "id": 1,
+        "name": 139882543,
+        "member": 33566660,
+        "side_raw": 32769
+      },
+      {
+        "t": 211.3,
+        "id": 5,
+        "name": 139793095,
+        "member": 33554824,
+        "side_raw": 129
+      },
+      {
+        "t": 241.2,
+        "id": 7,
+        "name": 33562396,
+        "member": 33554560,
+        "side_raw": 129
+      }
+    ],
+    "native_player_picks": [
+      {
+        "t": 211.3,
+        "id": 5,
+        "name": 139793095,
+        "member": 33554824,
+        "side_raw": 129
+      },
+      {
+        "t": 241.2,
+        "id": 7,
+        "name": 33562396,
+        "member": 33554560,
+        "side_raw": 129
+      }
+    ],
+    "command_menu_opportunities": [
+      {
+        "t": 222.4,
+        "phase": "adapter-attempt",
+        "id": 5,
+        "canonical_ct": 1123,
+        "mirror_ct": 573,
+        "adapter": {
+          "rows": [
+            {
+              "slot": 5,
+              "addr": "02015f10",
+              "name": 139793095,
+              "side_raw": 129,
+              "ct": 573,
+              "ea": 0,
+              "id": 5,
+              "type": 8,
+              "base_job": 5,
+              "race": 1,
+              "job": 5,
+              "level": 41,
+              "hp": 81,
+              "max_hp": 247,
+              "mp": 216,
+              "max_mp": 222,
+              "is_rom_name": true,
+              "is_ram_name": false,
+              "name_text": "Montblanc",
+              "side_bit": false,
+              "unaffiliated": false,
+              "live": true,
+              "x": 5,
+              "y": 10
+            },
+            {
+              "slot": 7,
+              "addr": "02016120",
+              "name": 33562396,
+              "side_raw": 129,
+              "ct": 156,
+              "ea": 0,
+              "id": 7,
+              "type": 2,
+              "base_job": 5,
+              "race": 1,
+              "job": 5,
+              "level": 50,
+              "hp": 221,
+              "max_hp": 442,
+              "mp": 85,
+              "max_mp": 85,
+              "is_rom_name": false,
+              "is_ram_name": true,
+              "name_text": "Marche",
+              "side_bit": false,
+              "unaffiliated": false,
+              "live": true,
+              "x": 4,
+              "y": 10
+            }
+          ],
+          "owner": null,
+          "error": null
+        }
+      },
+      {
+        "t": 228.4,
+        "phase": "adapter-attempt",
+        "id": 5,
+        "canonical_ct": 1123,
+        "mirror_ct": 573,
+        "adapter": {
+          "rows": [
+            {
+              "slot": 5,
+              "addr": "02015f10",
+              "name": 139793095,
+              "side_raw": 129,
+              "ct": 573,
+              "ea": 0,
+              "id": 5,
+              "type": 8,
+              "base_job": 5,
+              "race": 1,
+              "job": 5,
+              "level": 41,
+              "hp": 81,
+              "max_hp": 247,
+              "mp": 216,
+              "max_mp": 222,
+              "is_rom_name": true,
+              "is_ram_name": false,
+              "name_text": "Montblanc",
+              "side_bit": false,
+              "unaffiliated": false,
+              "live": true,
+              "x": 5,
+              "y": 10
+            },
+            {
+              "slot": 7,
+              "addr": "02016120",
+              "name": 33562396,
+              "side_raw": 129,
+              "ct": 156,
+              "ea": 0,
+              "id": 7,
+              "type": 2,
+              "base_job": 5,
+              "race": 1,
+              "job": 5,
+              "level": 50,
+              "hp": 221,
+              "max_hp": 442,
+              "mp": 85,
+              "max_mp": 85,
+              "is_rom_name": false,
+              "is_ram_name": true,
+              "name_text": "Marche",
+              "side_bit": false,
+              "unaffiliated": false,
+              "live": true,
+              "x": 4,
+              "y": 10
+            }
+          ],
+          "owner": {
+            "slot": 5,
+            "addr": "02015f10",
+            "name": 139793095,
+            "side_raw": 129,
+            "ct": 573,
+            "ea": 0,
+            "id": 5,
+            "type": 8,
+            "base_job": 5,
+            "race": 1,
+            "job": 5,
+            "level": 41,
+            "hp": 81,
+            "max_hp": 247,
+            "mp": 216,
+            "max_mp": 222,
+            "is_rom_name": true,
+            "is_ram_name": false,
+            "name_text": "Montblanc",
+            "side_bit": false,
+            "unaffiliated": false,
+            "live": true,
+            "x": 5,
+            "y": 10
+          },
+          "error": null
+        }
+      }
+    ],
+    "adapter_attempts": [
+      {
+        "t": 86.2,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 89.3,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 92.3,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 95.4,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 98.5,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 121.3,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 124.3,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 127.4,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 130.4,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 133.7,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 154.8,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 157.8,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 160.8,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 163.9,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 183.0,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 186.1,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 189.1,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 192.2,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 205.6,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 208.7,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 211.7,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 214.8,
+        "accepted": false,
+        "error": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+        "prior": null
+      },
+      {
+        "t": 222.4,
+        "accepted": false,
+        "error": null,
+        "prior": [
+          [
+            "Montblanc",
+            5
+          ],
+          5,
+          false,
+          5,
+          10,
+          573,
+          0
+        ]
+      },
+      {
+        "t": 228.4,
+        "accepted": true,
+        "error": null,
+        "prior": [
+          [
+            "Montblanc",
+            5
+          ],
+          5,
+          false,
+          5,
+          10,
+          573,
+          0
+        ]
+      }
+    ],
+    "observer_errors": []
+  },
+  "rejected": [
+    "empty history",
+    "unknown phase",
+    "wrong native member",
+    "invented status",
+    "foreign canonical address",
+    "wrong structure",
+    "missing native pick"
+  ],
+  "source_sha256": {
+    "tools/validate_player_boundary_history.py": "a1ce9d96794da7886d30dd26f4b193a98af94a55bc9cbb0064dc9b7aaf99cd9d",
+    "tools/player_boundary_observer.py": "13506de71de1844a813ceaf19da5a549ea6d418e16cb5af0b3e22dd2a573eb13"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a652-resume-ally-completion-03\\run.json": "6bd0a8a62c9e2b5725ccff5b5df1c2d206f4a9749771a6daf9d505659cf36aaf",
+    "outputs\\autobattle\\a652-resume-ally-completion-03\\events.jsonl": "f2d3525eada127a94b82d6a2a115ff462626d9c4591e8403a2b8476ce357cbbb",
+    "outputs\\autobattle\\a652-resume-ally-completion-03\\input-log.jsonl": "424b22ed6a322076c5ab1d62c01e782e18de1598ae64e30f8b89cc5c29fcbe5b",
+    "outputs\\autobattle\\a652-resume-ally-completion-03\\player-boundary-observer.jsonl": "a06d8a31353c96b6e92343bdc0890c47e97363c162c54f1fb5a1129dc241085b"
+  },
+  "limitations": [
+    "Recorded observation history only; opportunity is not action commit, complete causal history or resumed control."
+  ]
+}

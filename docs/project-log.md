@@ -1,5 +1,11 @@
 # Project log
 
+## 2026-10-14 - Same-PID resumed Wait succeeds; receipt input window next
+
+Corrected native Wait row10 produces one attributed resumed Montblanc Wait on PID65752 and independently joins Marche7's command menu, without another sequencer seed. Real terminal screenshot inspected; canonical/roster/menu witness contains153 raw reads. The public handoff validator passes6 mutants, both source closures and observer history pass. This is bounded progress, not whole-battle completion.
+
+New public mutation checks expose a remaining gap: removing this resumed leg's input records still passes because the first leg's recovery inputs remain. Keep A6.5 and final integration UNKNOWN until the completed Wait requires its own select/confirm input interval and final-source regressions. Source/evidence receipts retain the earlier failed attempts and exclude toy command-ID fixtures.
+
 ## 2026-10-14 - Exact next-ally origin refusal reveals command-ID mixup
 
 Second instrumented live attempt (PID33444) preserves zero-turn failure and reports `Wait origin command unavailable`. Native driver0x25 and accepting list0x102 are correct. The new witness used cursor index2 instead of native Wait row10; captured command rows are8/9/10/11. Corrected host fixture now uses that actual table and fails on the same predicate. Exclude earlier synthetic0..3 table checks from native command semantics. Next correct only the row ID and repeat the registered current-source resume. No actor or phase guard relaxation is justified.
