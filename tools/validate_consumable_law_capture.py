@@ -37,6 +37,7 @@ def main():
                    for i,w in enumerate(writes[index*5:index*5+5]))
     raw=(root/'after-ewram.bin').read_bytes();before=(root/'before-ewram.bin').read_bytes()
     assert len(raw)==len(before)==0x40000
+    assert raw[0x1F3C:0x1F70]==before[0x1F3C:0x1F70], 'law-card pool changed during inspection'
     law=raw[0x3C32:0x3C3C];assert law==before[0x3C32:0x3C3C]
     assert law[0]==4
     ids=[int.from_bytes(law[2+i*2:4+i*2],'little') for i in range(4)]
@@ -54,6 +55,7 @@ def main():
     result={'status':'pass-source-and-active-law-observation','scope':__doc__,'closure':closure,
         'capacity_address':'02003C32','active_ids_address':'02003C34','native_count_accessor':'0802D764',
         'active_ids':ids,'native_count':actual,'inferred_names_matching_inspected_panel':labels,
+        'law_card_pool_unchanged':True,
         'observed_recommended_labels':['Techniques','Status','Spears'],'isolated_count_controls':controls,
         'source_sha256':{p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
             for p in ['tools/validate_consumable_law_capture.py','tools/recovery_source_versions.py']},

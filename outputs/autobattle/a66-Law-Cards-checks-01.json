@@ -59,6 +59,7 @@
     "Dmg2: Animal",
     "Broadswords"
   ],
+  "law_card_pool_unchanged": true,
   "observed_recommended_labels": [
     "Techniques",
     "Status",
@@ -94,7 +95,7 @@
     }
   ],
   "source_sha256": {
-    "tools/validate_consumable_law_capture.py": "f5aeaa1dcbe026153380f3a72bcbca99e1d99b7851070f251ba66be22f988643",
+    "tools/validate_consumable_law_capture.py": "f4470bdd9450139440a3119cfbdfc3248649aa3eb66f58803051410661f8b8da",
     "tools/recovery_source_versions.py": "a870a297793e13ee585bb8332507f59fdf79b3ad28a977d1a0edf5cdf18a477e"
   },
   "evidence_sha256": {
