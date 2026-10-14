@@ -48,7 +48,7 @@
   ],
   "source_sha256": {
     "tools/run_autobattle.py": "9da5f414414d5175c24185ebc47813ed93b2d4ad125fd58106633695cc3ef557",
-    "tools/autobattle_runtime.py": "2365b675818d55059946bf88c66612e782b00af198173b69db2482c6010a75e3",
+    "tools/autobattle_runtime.py": "41a8f0ff0dc098f79256e221bfdcc8c1d871ceae9162c77e8e75e8b7d8f90cd8",
     "tools/validate_autobattle_runtime.py": "c9289d05bad4081b8f2114422f61a61dfccfcc3ff8b1c4905218143c63a557d7",
     "tools/life_recovery_runtime.py": "0b03dde158f2bfc1edc25c659eccfd211e597556ee510e9c8b712892ef65e2be",
     "tools/life_recovery_transaction.py": "1f758c25a8ac0586257d23acbe75c5e808c2bbfa2ab238b294974c85173c1687",

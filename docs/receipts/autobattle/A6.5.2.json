@@ -31,16 +31,16 @@
     }
   ],
   "source_sha256": {
-    "tools/player_boundary_observer.py": "4d9cdbe4bdb827adc085d5dc2c76819981dc3bd4c410022d7ad0de6ad8c4b768",
-    "tools/validate_player_boundary_observer.py": "ae35346e2843fbf9fc6d97ff1034e5ff98e02184c1bc6398cbaf83428e462b08",
-    "tools/validate_player_boundary_history.py": "9a4529e19e9f85435c9338f343b6cabcb56b65201ad36f6f514282ef755780e6",
+    "tools/player_boundary_observer.py": "13506de71de1844a813ceaf19da5a549ea6d418e16cb5af0b3e22dd2a573eb13",
+    "tools/validate_player_boundary_observer.py": "e159195770a883c443581967e52f90ee07fe5b19b82009810f300f19d137c262",
+    "tools/validate_player_boundary_history.py": "a1ce9d96794da7886d30dd26f4b193a98af94a55bc9cbb0064dc9b7aaf99cd9d",
     "tools/run_autobattle.py": "9da5f414414d5175c24185ebc47813ed93b2d4ad125fd58106633695cc3ef557",
     "tools/run_life_recovery_handoff.py": "9aea52d53eb5c55d566a4d9bcf92386f5a64c92c78dae80793cb22dfc93da8f2",
-    "tools/autobattle_runtime.py": "2365b675818d55059946bf88c66612e782b00af198173b69db2482c6010a75e3",
+    "tools/autobattle_runtime.py": "41a8f0ff0dc098f79256e221bfdcc8c1d871ceae9162c77e8e75e8b7d8f90cd8",
     "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
     "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
     "tools/wait_ally_continuation.py": "d0f6f96a1e70f0f21008f44795b800ba7e407cf82e8e0e2dc346c2737ac0bae4",
-    "tools/validate_wait_ally_continuation.py": "72c71897ab84f5ed12ddba2adec6c4665865e23ce10d229578272e9fc6638867",
+    "tools/validate_wait_ally_continuation.py": "257a24f320c792561cfff1e1c31f4e216bf947e0dbca47514fadb33bb3d05f0f",
     "tools/validate_wait_ally_runtime.py": "89486e0c720306767b873fec33c77374e755705f7f8c4f990e2429f89f8bdea8",
     "tools/validate_autobattle_runtime.py": "c9289d05bad4081b8f2114422f61a61dfccfcc3ff8b1c4905218143c63a557d7"
   },
@@ -78,12 +78,24 @@
     "outputs/autobattle/a652-retained-default-01.json": "a17eb56f121838ed731e209f664dba420da6590a09b239e44bdb4d980990ddda",
     "outputs/autobattle/a652-diagnostic-regression-01.json": "70fc8e6394e719998ca76ea0a26160d48cd7ede4e7d5058b984ccf0ab2c73d12",
     "outputs/autobattle/a652-resume-ally-completion-01-sources.json": "4b59d2c4e211f4abf76b0ef2de383b00737e6c8a0a76bf5b31078760b4a1f5b4",
-    "outputs/autobattle/a652-Wait-next-ally-pre-fix-check.json": "e2a87a21f7477d33c639954ed6d0b5e7dc7d2a13db579885450410d2e2481776"
+    "outputs/autobattle/a652-Wait-next-ally-pre-fix-check.json": "e2a87a21f7477d33c639954ed6d0b5e7dc7d2a13db579885450410d2e2481776",
+    "outputs/autobattle/a652-resume-ally-completion-02/events.jsonl": "0fca72327f3d6d3c541f69c55e1ae67ab5f84f5db57fffaf8d284f9429b8b0f2",
+    "outputs/autobattle/a652-resume-ally-completion-02/input-log.jsonl": "d1f0b0d77baec196612773a528cefd8284e530b17376849356282aab588333c0",
+    "outputs/autobattle/a652-resume-ally-completion-02/manual-Life-Wait.json": "1d25bfc6aebaf8f378653bdf9be706b836db80a4b0dfa804591f5e3d5c4c8c3f",
+    "outputs/autobattle/a652-resume-ally-completion-02/paused-run.json": "179ea280e7e471e12ba29f92ef8448d4384e1125def144a635219caa9f33e407",
+    "outputs/autobattle/a652-resume-ally-completion-02/player-boundary-observer.jsonl": "b8ada4ee69d956c0e69f1a7d77f91335ed4ec0dbc6924d5c330ce8f82b5506b6",
+    "outputs/autobattle/a652-resume-ally-completion-02/run.json": "6a07907016f3fac351cb057438b7fd4a01f2d70d3c51b5a2521e8ba4311305c1",
+    "outputs/autobattle/a652-resume-ally-completion-02/STOP-trigger.json": "51a9fad162bbac3ff0d4540a3a7df15c3f54323b2dc2b4f46ae981aea9911219",
+    "outputs/autobattle/a652-resume-ally-completion-02/Life-transaction-1/Life-engine.jsonl": "e0a520314d68e5d93e4c211874703194d9219ec96bcb3095c565c83a79aec7e0",
+    "outputs/autobattle/a652-resume-ally-completion-02-sources.json": "08e11cde9b9fae7c54d7b87ea16e6d624745233193bef5d4686c72443e850296",
+    "outputs/autobattle/a652-observer-host-03.json": "90c4a0a2dd5f9c8a2121fd78193f65f7d25a9c9dd5ed7ef66a6d779df1348852",
+    "outputs/autobattle/a652-Wait-next-ally-host-04.json": "b93297028b73d6a53b2e4f30b6c0c7a5065bee197758263e6faaab9d13e76e8c"
   },
   "limitations": [
     "Zero attributed resumed turns; no A6.5 lifecycle acceptance.",
     "Native next player and inspected screenshot support the diagnosis, not an implemented receipt gate.",
-    "Post-Wait seed-only failure requires a new independently guarded continuation proof."
+    "Post-Wait seed-only failure requires a new independently guarded continuation proof.",
+    "Host03/04 used synthetic row IDs0..3; excluded from native command-semantic proof. New test uses captured8/9/10/11 table and reproduces unavailable origin on current implementation."
   ],
   "implementation_attempts": [
     {
@@ -91,6 +103,12 @@
       "result": "bounded-no-attributed-turn",
       "status": "unknown",
       "scope": "First guarded next-ally witness integration; current-source stable, zero turns. Predicate refusal needs explicit instrumentation; no accepted fix."
+    },
+    {
+      "run": "a652-resume-ally-completion-02",
+      "status": "unknown",
+      "result": "Wait origin command unavailable",
+      "scope": "Native driver state37/0x25 is valid. New witness confused cursor position2 with native Wait row10; exact refusal recorded, source stable. No accepted turn."
     }
   ]
 }

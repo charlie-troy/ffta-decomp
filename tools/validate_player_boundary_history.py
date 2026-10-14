@@ -44,9 +44,12 @@ def check(records):
             require(all(row[k]==expected[row['id']][k] for k in ('id','name','race','job','level')),
                     'canonical observer identity differs from adopted baseline')
         driver=rec['driver'];d=bytes.fromhex(driver['raw'])
-        require(driver['address']==PLAYER_DRIVER and len(d)==0x64
+        require(driver['address']==PLAYER_DRIVER and len(d) in (0x64,0xE0)
                 and integer(d,4)==driver['wrapper'] and integer(d,8)==driver['peer_wrapper'],
                 'observer raw driver differs')
+        if len(d)==0xE0:
+            require(integer(d,0xDC,2)==driver['state'] and integer(d,0xD0)==driver['control'],
+                    'observer native driver state/control differs')
         if driver.get('unit'):
             unit(driver['unit']);require(driver['unit']['address']==driver['member'],'driver member unit differs')
         menu=rec['menu']

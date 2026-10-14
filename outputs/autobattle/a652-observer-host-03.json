@@ -1,0 +1,19 @@
+{
+  "status": "pass-player-boundary-observer-host",
+  "checks": [
+    "read-only native pick",
+    "exact adapter refusal",
+    "context metadata",
+    "all hooks disarmed",
+    "invalid native pointer",
+    "existing hook delegation",
+    "actual inherited press suspends and restores native hook"
+  ],
+  "source_sha256": {
+    "tools/validate_player_boundary_observer.py": "e159195770a883c443581967e52f90ee07fe5b19b82009810f300f19d137c262",
+    "tools/player_boundary_observer.py": "13506de71de1844a813ceaf19da5a549ea6d418e16cb5af0b3e22dd2a573eb13"
+  },
+  "limitations": [
+    "Host observation/hook controls only; native ownership and timing require live evidence."
+  ]
+}

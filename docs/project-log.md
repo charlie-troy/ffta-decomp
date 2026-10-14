@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-14 - Exact next-ally origin refusal reveals command-ID mixup
+
+Second instrumented live attempt (PID33444) preserves zero-turn failure and reports `Wait origin command unavailable`. Native driver0x25 and accepting list0x102 are correct. The new witness used cursor index2 instead of native Wait row10; captured command rows are8/9/10/11. Corrected host fixture now uses that actual table and fails on the same predicate. Exclude earlier synthetic0..3 table checks from native command semantics. Next correct only the row ID and repeat the registered current-source resume. No actor or phase guard relaxation is justified.
+
 ## 2026-10-14 - Next-ally Wait completion witness remains in validation
 
 Added a read-only before/after wrapper, canonical party, restored roster and accepting command-menu witness for identified Wait. The actual runtime regression fails onf3dac65's seed-only completion and passes host next-ally/STOP plus6 state/5 receipt refusal controls; retained Life38, ally-Cure38, self-Cure26 and default5 receipt suites still pass. Public validation requires the raw witness when Wait reports no additional seed.

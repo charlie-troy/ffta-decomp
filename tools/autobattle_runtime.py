@@ -636,10 +636,11 @@ class BattleRuntime:
                     from wait_ally_continuation import capture_wait_origin
                     self._wait_origin=capture_wait_origin(self.s,self.owner,self._pre_players,
                         clock=lambda:time.time()-self.t0)
-                except ValueError:
+                except ValueError as exc:
                     # Optional completion evidence has no input authority.
                     # Existing echo/actor/STOP guards still own the command.
                     self._wait_origin=None
+                    self.event('note',**self._actor_fields(),note=f'Wait next-ally origin unavailable: {exc}; seeded progress required')
                 self.event("note", **self._actor_fields(),
                            control_mode="external",
                            note="identified-wait candidate (sticky cursor "
@@ -962,11 +963,16 @@ class BattleRuntime:
             return self.p.wait_progress(seconds=seconds,want_seeds=want_seeds,stop_check=self._stop_check)
         from wait_ally_continuation import inspect_next_ally
         deadline=time.time()+seconds
+        last_rejection=None
         while time.time()<deadline:
             if self._stop_check():return False
             try:
                 proof=inspect_next_ally(self.s,self.owner,self._wait_origin,clock=lambda:time.time()-self.t0)
-            except ValueError:proof=None
+            except ValueError as exc:
+                proof=None
+                if str(exc)!=last_rejection:
+                    self.event('note',**self._actor_fields(),note=f'Wait next-ally continuation unavailable: {exc}')
+                    last_rejection=str(exc)
             if self._stop_check():return False
             if proof is not None:
                 self._next_ally_progress=proof

@@ -45,9 +45,9 @@ class PlayerBoundaryProbe(Probe):
             record['structure']={'raw':count_raw.hex(),'count':integer(count_raw,0)}
             record['party']={'canonical':[unit_record(a,exact(self.g,a,STRIDE)) for a in (MEMBERS,MEMBERS+STRIDE)],
                 'mirror':[unit_record(ROSTER+i*STRIDE,exact(self.g,ROSTER+i*STRIDE,STRIDE)) for i in (5,7)]}
-            driver=exact(self.g,PLAYER_DRIVER,0x64)
+            driver=exact(self.g,PLAYER_DRIVER,0xE0)
             record['driver']={'address':PLAYER_DRIVER,'raw':driver.hex(),'wrapper':integer(driver,4),
-                'peer_wrapper':integer(driver,8),'state':integer(driver,0,2),'control':integer(driver,0x10,2)}
+                'peer_wrapper':integer(driver,8),'state':integer(driver,0xDC,2),'control':integer(driver,0xD0)}
             wrapper=integer(driver,4)
             if pointer(wrapper,4):
                 member=integer(exact(self.g,wrapper,4),0)

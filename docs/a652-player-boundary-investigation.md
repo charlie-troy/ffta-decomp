@@ -66,3 +66,5 @@ retain their behavior. Validate a pre-fix regression, then fresh same-PID resume
 and an immediate-ally control, followed by affected existing regressions.
 
 The first witness integration run01 (PID111648) remains bounded with zero attributed turns despite native picks5/7 and Wait input. The host regression passes and fails onf3dac65, but native acceptance is UNKNOWN. The reused command reader may be too narrowly tied to its research phase; record the exact origin/continuation refusal before changing a predicate. No further timeout extension is justified.
+
+The second live attempt (PID33444) records the exact cause: `Wait origin command unavailable`. Native driver state37/0x25 and LIST accepting state0x102 are correct. The new witness used the cursor index2 as a command row; the actual captured command table is8/9/10/11, with Wait10. Native-table-backed host regression reproduces the refusal. Earlier toy-table host03/04 are excluded from command-semantic acceptance. Correct only that identifier, then repeat the registered native test. Observer driver state/control now use the proven +DC/+D0 fields instead of unrelated prefix values.

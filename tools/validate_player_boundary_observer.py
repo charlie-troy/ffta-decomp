@@ -25,8 +25,9 @@ def main():
     unit=bytearray(STRIDE);unit[:4]=(0x08551234).to_bytes(4,'little');unit[0x104]=5
     unit[0x18:0x20]=b'\xf1\x00\xf7\x00\xd3\x00\xde\x00';unit[5:8]=bytes((5,1,5));unit[9]=41
     unit[0xF6:0xF8]=bytes((5,10));store(member,unit);store(ROSTER+5*STRIDE,unit)
-    store(wrapper,member.to_bytes(4,'little'));driver=bytearray(0x64)
-    driver[4:8]=driver[8:12]=wrapper.to_bytes(4,'little');store(PLAYER_DRIVER,driver)
+    store(wrapper,member.to_bytes(4,'little'));driver=bytearray(0xE0)
+    driver[4:8]=driver[8:12]=wrapper.to_bytes(4,'little');driver[0xDC:0xDE]=(0x25).to_bytes(2,'little')
+    store(PLAYER_DRIVER,driver)
     root=bytearray(0x30);root[4]=4;root[0x18:0x1C]=member.to_bytes(4,'little')
     root[0x28:0x2C]=callback.to_bytes(4,'little');store(context,root)
     cb=bytearray(0x18);cb[:4]=(0x08028DE1).to_bytes(4,'little');cb[0x14:0x16]=(0x100).to_bytes(2,'little');store(callback,cb)

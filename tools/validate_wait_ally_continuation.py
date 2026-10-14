@@ -28,6 +28,10 @@ def main():
         exec(compile(code,'historical_wait_runtime','exec'),namespace);cls=namespace['BattleRuntime']
     root=Path('outputs/autobattle/a652-resume-observer-01')
     events=[json.loads(s) for s in (root/'events.jsonl').read_text().splitlines()]
+    life_journal=next(e['recovery'] for e in events if e.get('recovery'))
+    command_rows=next(step['before']['rows'] for step in life_journal['navigation']
+                      if step['before']['state']=='command')
+    require(command_rows==[8,9,10,11],'native fixture command table changed')
     native=next(e['boundary_diagnostic'] for e in events if e.get('boundary_diagnostic'))
     template=bytearray(Path('outputs/autobattle/a65-public-Life-04/Life-transaction-1/after-Life-ewram.bin').read_bytes())
     rom=Path('baserom.gba').read_bytes();results=[]
@@ -54,7 +58,7 @@ def main():
                 store(callback,cb);store(manager+4,callback.to_bytes(4,'little'))
                 obj=bytearray(0x9C);obj[0x50:0x52]=(4).to_bytes(2,'little')
                 obj[0x94:0x98]=data.to_bytes(4,'little');obj[0x98:0x9C]=(data+16).to_bytes(4,'little')
-                store(callback+0x18,obj);store(data,b''.join(i.to_bytes(4,'little') for i in range(4)))
+                store(callback+0x18,obj);store(data,b''.join(i.to_bytes(4,'little') for i in command_rows))
                 store(data+16,b'\x01'*4)
                 store(TARGET_X,bytes((5 if identifier==5 else 4,)));store(TARGET_Y,b'\x0a');store(CMD_CURSOR,b'\x00')
             def packet():clock[0]+=3;raise socket.timeout('host no new sequencer seed')
