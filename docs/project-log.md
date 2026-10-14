@@ -1,5 +1,11 @@
 # Project log
 
+## 2026-10-14 - Native observer locates post-Wait completion failure
+
+Read-only native picks and actual adapter attempts on a fresh Life resume (PID73308) show Montblanc's accepting command menu at t228.9/234.9, correct level41, own cursor and accepted owner. Guarded Wait sends four five-hit input legs, then native driver picks revived Marche7; the terminal screenshot shows Marche's command menu. The runtime records zero turns because its post-command wait accepts only a new sequencer seed. An immediate ally menu can remain open without that seed. The actor/level/ownership checks need no relaxation.
+
+Same-observer no-Life default control accepts Montblanc at level40 and commits one Wait. Both histories pass raw audits with7 mutants and no observer errors; observer host7 exercises actual inherited press hook suspension/restoration. A6.5.2 is partial; pre-register guarded next-ally completion evidence and pre-fix regression before changing attribution. See `docs/a652-player-boundary-investigation.md` and `docs/receipts/autobattle/A6.5.2.json`. A6.5 remains UNKNOWN.
+
 ## 2026-10-14 - A6.5.1 diagnostic slice passes; native boundary history next
 
 Fresh current-source Life STOP/manual Wait/same-PID resume02 (PID17188) completes a valid bounded terminal receipt. Canonical allies remain alive and not asleep; the terminal battle mirror is unidentified scratch (count0x0202243C), preserved as eight raw units rather than treated as missing actors. No resumed player turn is claimed. First pilot01 omitted unfiltered mirror/structure data and is excluded from the complete diagnostic gate.

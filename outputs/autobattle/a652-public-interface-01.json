@@ -1,0 +1,19 @@
+{
+  "status": "pass-Life-public-interface",
+  "scope": "Reject public Life policy/fixture mismatches before transport or input.",
+  "controls": [
+    "missing-policy",
+    "schema1",
+    "self-mutual",
+    "ally-mutual",
+    "caster-id",
+    "caster-job",
+    "caster-race",
+    "caster-x",
+    "caster-y",
+    "party-count"
+  ],
+  "limitations": [
+    "Host pre-transport guards only; no live public Life acceptance."
+  ]
+}

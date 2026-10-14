@@ -1,0 +1,51 @@
+{
+  "status": "pass-native-terminal-status-diagnostic",
+  "scope": "Validate raw terminal Sleep observations without claiming resumed control.",
+  "observed": {
+    "canonical": {
+      "7": {
+        "sleep": false,
+        "duration": 0,
+        "hp": 221,
+        "mp": 85
+      },
+      "5": {
+        "sleep": false,
+        "duration": 0,
+        "hp": 241,
+        "mp": 216
+      }
+    },
+    "mirror_state": "party-mirror-joined",
+    "structure_count": 8
+  },
+  "rejected": [
+    "sleep",
+    "sleep_duration",
+    "hp",
+    "name",
+    "address",
+    "missing raw structure",
+    "wrong structure count",
+    "truncated raw structure",
+    "missing mirror unit",
+    "truncated mirror unit",
+    "foreign mirror address",
+    "missing cursor",
+    "invalid cursor",
+    "unknown status decoder"
+  ],
+  "acceptance": "same-PID-player-control-UNKNOWN",
+  "source_sha256": {
+    "tools/validate_life_boundary_diagnostic.py": "953227094dee6cb32e9f296b852aff255d02ddf511a599fa5e4e600d8ade6a9f",
+    "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a652-resume-observer-01\\run.json": "3d0e6510c44ba611cc60b8a4bb8a1b23551a880f5fa014c4b5d5c2b3bb7f5f02",
+    "outputs\\autobattle\\a652-resume-observer-01\\events.jsonl": "d781ff521626977bf3bb7cf2242da6467af31f9f94477d01f3120635d64ce9dc",
+    "outputs\\autobattle\\a652-resume-observer-01\\input-log.jsonl": "2136904f1b1d7794d4db40179d9721f5f4e3cf2d92a99647f85657b1ccd2fc32"
+  },
+  "limitations": [
+    "Native status at the bounded terminal only; not complete causal history or a resumed player turn."
+  ]
+}

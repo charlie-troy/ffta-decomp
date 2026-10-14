@@ -1,0 +1,129 @@
+{
+  "schema": "a3-run/2",
+  "run_id": "a652-default-observer-01",
+  "scenario": "a4-two-player",
+  "mode": "retail-ai",
+  "final_state": "stalled",
+  "turns": 1,
+  "seeds": 5,
+  "router_hits": 217,
+  "terminal_reason": "fresh-menu owner rejected: ambiguous/missing cursor match or unknown command",
+  "events": "outputs/autobattle\\a652-default-observer-01\\events.jsonl",
+  "emulator_handoff": "terminated",
+  "emulator_pid": 18328,
+  "bounded_self_cure": false,
+  "bounded_ally_cure": false,
+  "bounded_ally_life": false,
+  "observe_player_boundaries": true,
+  "player_identities": [
+    [
+      "Montblanc",
+      5
+    ],
+    [
+      "Marche",
+      7
+    ]
+  ],
+  "input_sha256": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/autobattle/a64-life-fixture-02/life-recovery.ss0": "925017c918bb1eadf3bace27024c7d5e5bfaf985738080c0f1c7bc5d6e637063",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "6087e42f45279821bd41b02720f707613d6496d65804da591a2d56c9163e8d1c",
+    "tools/autobattle_runtime.py": "f7b7bcf3087369dc0ad275359a956228f7ff9c6f07facc880de2e5989d79ae58",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/ability_table.py": "9ec959131119d9d4cdd491e3cbbdfdecf7778f0f6634572df02458f079e01f41",
+    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
+    "tools/ffta_text.py": "3f03a83eb15407816a0bdb7bda4a09cfa86517f6fb46a879e6f5696a30f32f27",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/player_boundary_observer.py": "4d9cdbe4bdb827adc085d5dc2c76819981dc3bd4c410022d7ad0de6ad8c4b768",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
+  },
+  "input_sha256_after": {
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "outputs/autobattle/a64-life-fixture-02/life-recovery.ss0": "925017c918bb1eadf3bace27024c7d5e5bfaf985738080c0f1c7bc5d6e637063",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/run_autobattle.py": "6087e42f45279821bd41b02720f707613d6496d65804da591a2d56c9163e8d1c",
+    "tools/autobattle_runtime.py": "f7b7bcf3087369dc0ad275359a956228f7ff9c6f07facc880de2e5989d79ae58",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/ability_table.py": "9ec959131119d9d4cdd491e3cbbdfdecf7778f0f6634572df02458f079e01f41",
+    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
+    "tools/ffta_text.py": "3f03a83eb15407816a0bdb7bda4a09cfa86517f6fb46a879e6f5696a30f32f27",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/player_boundary_observer.py": "4d9cdbe4bdb827adc085d5dc2c76819981dc3bd4c410022d7ad0de6ad8c4b768",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220",
+    "configs/tactics/healer.json": "e7198d350073aa777c08f9b96c387c279cb615d3137888e6aa4060a91033080b"
+  },
+  "inputs_unchanged": true,
+  "tactics_policy": {
+    "path": "configs/tactics/healer.json",
+    "schema": "ffta-tactics-policy/2",
+    "fallback": "wait",
+    "scopes": [
+      "party"
+    ],
+    "decisions": [
+      {
+        "policy": "configs/tactics/healer.json",
+        "outcome": "fallback",
+        "reason": "fallback:wait",
+        "scope": "party",
+        "rule_id": "fallback",
+        "detail": null,
+        "age_seconds": 1.625473976135254,
+        "candidates": [
+          "move",
+          "wait"
+        ],
+        "snapshot": {
+          "schema": "ffta-tactics-snapshot/1",
+          "identity": "verified",
+          "actor": {
+            "name": "Montblanc",
+            "id": 5,
+            "job_id": 5,
+            "side": "player",
+            "hp": 241,
+            "max_hp": 241,
+            "mp": 221,
+            "max_mp": 221,
+            "ct": 0,
+            "tile": [
+              5,
+              10
+            ]
+          },
+          "candidates": [
+            {
+              "id": "move",
+              "kind": "move",
+              "action_id": 0,
+              "legal": true,
+              "cost": 0
+            },
+            {
+              "id": "wait",
+              "kind": "wait",
+              "action_id": 2,
+              "legal": true,
+              "cost": 0
+            }
+          ],
+          "age_seconds": 1.625473976135254
+        }
+      }
+    ],
+    "note": "choices made by the frozen chooser among the commands the engine offered; the scenario's fixed actor_actions are not used in this run"
+  }
+}

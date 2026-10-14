@@ -30,6 +30,9 @@ def _input_hashes(args):
               "tools/tactics_policy.py", "tools/tactics_adapter.py"]
     if args.resume:
         inputs.append('tools/recovery_boundary_diagnostic.py')
+    if getattr(args,'observe_player_boundaries',False):
+        from probe_recovery_ko_lifecycle import source_dependencies
+        inputs.extend(source_dependencies('player_boundary_observer'))
     if args.bounded_self_cure:
         inputs.extend(["tools/recovery_runtime.py", "tools/recovery_transport.py",
                        "tools/recovery_menu.py", "tools/recovery_executor.py",
@@ -123,7 +126,11 @@ def main(argv=None):
                          "append to the same events/input logs, and drive "
                          "the battle to its end. The pid must match the "
                          "paused run's recorded handoff pid.")
+    ap.add_argument('--observe-player-boundaries',action='store_true',
+                    help='read-only A6.5.2 native pick/adapter history on an ordinary eight-unit Move/Wait leg')
     args = ap.parse_args(argv)
+    if args.observe_player_boundaries and (args.bounded_self_cure or args.bounded_ally_cure or args.bounded_ally_life):
+        ap.error('--observe-player-boundaries requires an ordinary Move/Wait leg')
 
     with open(args.scenario, encoding="utf-8") as fh:
         scenario = json.load(fh)
@@ -228,7 +235,8 @@ def main(argv=None):
                                 tactics_policy_source=args.tactics_policy,
                                 bounded_self_cure=args.bounded_self_cure,
                                 bounded_ally_cure=args.bounded_ally_cure,
-                                bounded_ally_life=args.bounded_ally_life)
+                                bounded_ally_life=args.bounded_ally_life,
+                                observe_player_boundaries=args.observe_player_boundaries)
         if not args.yes:
             ans = input("guards will run now; continue? [y/N] ").strip().lower()
             if ans != "y":
@@ -305,6 +313,7 @@ def main(argv=None):
             "bounded_self_cure": args.bounded_self_cure,
             "bounded_ally_cure": args.bounded_ally_cure,
             "bounded_ally_life": args.bounded_ally_life,
+            "observe_player_boundaries": args.observe_player_boundaries,
             "player_identities": [list((r["name_text"], r["id"]))
                                   for r in runtime.adapter.expected],
         }

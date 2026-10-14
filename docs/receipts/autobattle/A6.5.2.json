@@ -1,0 +1,67 @@
+{
+  "milestone": "A6.5.2",
+  "date": "2026-10-14",
+  "status": "unknown",
+  "scope": "Native actor/menu observation and seed-only post-Wait completion diagnosis; completion change not yet accepted",
+  "hypothesis_receipt": "docs/a652-player-boundary-investigation.md",
+  "criteria": [
+    {
+      "id": "read-only-observer-hook-contract",
+      "status": "pass",
+      "scope": "Seven host controls include real inherited press removing/restoring extra native hook, invalid pointers and exact refusal metadata."
+    },
+    {
+      "id": "registered-native-and-control-history",
+      "status": "pass",
+      "scope": "Same-observer Life resume and no-Life default-Wait control; both histories validate7 mutants, zero observer errors."
+    },
+    {
+      "id": "native-player-opportunity-discrimination",
+      "status": "pass",
+      "scope": "Resume identifies canonical player5, real accepting command list, correct level41 and own cursor; adapter accepts. Seed-only progress later bounds despite next native player7/menu; actor guards are not the defect."
+    },
+    {
+      "id": "next-ally-completion-proof-and-pre-fix-regression",
+      "status": "unknown"
+    },
+    {
+      "id": "current-source-native-integration-and-regressions",
+      "status": "unknown"
+    }
+  ],
+  "source_sha256": {
+    "tools/player_boundary_observer.py": "4d9cdbe4bdb827adc085d5dc2c76819981dc3bd4c410022d7ad0de6ad8c4b768",
+    "tools/validate_player_boundary_observer.py": "ae35346e2843fbf9fc6d97ff1034e5ff98e02184c1bc6398cbaf83428e462b08",
+    "tools/validate_player_boundary_history.py": "9a4529e19e9f85435c9338f343b6cabcb56b65201ad36f6f514282ef755780e6",
+    "tools/run_autobattle.py": "6087e42f45279821bd41b02720f707613d6496d65804da591a2d56c9163e8d1c",
+    "tools/run_life_recovery_handoff.py": "9aea52d53eb5c55d566a4d9bcf92386f5a64c92c78dae80793cb22dfc93da8f2",
+    "tools/autobattle_runtime.py": "f7b7bcf3087369dc0ad275359a956228f7ff9c6f07facc880de2e5989d79ae58",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a652-resume-observer-01/events.jsonl": "d781ff521626977bf3bb7cf2242da6467af31f9f94477d01f3120635d64ce9dc",
+    "outputs/autobattle/a652-resume-observer-01/input-log.jsonl": "2136904f1b1d7794d4db40179d9721f5f4e3cf2d92a99647f85657b1ccd2fc32",
+    "outputs/autobattle/a652-resume-observer-01/manual-Life-Wait.json": "7981c76c78793319a0bcd75ecabe72641dc9e357e26d131df1df281909e046fb",
+    "outputs/autobattle/a652-resume-observer-01/paused-run.json": "e706f1bb3e41ffe6a1ab1bc52cb2bc5745b6c91f578eb3f7da099a508db42fce",
+    "outputs/autobattle/a652-resume-observer-01/player-boundary-observer.jsonl": "4c566c1c45e69ff061f4ac87ba13efa9324965bbe3a0b51a39eebce6cda9320f",
+    "outputs/autobattle/a652-resume-observer-01/run.json": "3d0e6510c44ba611cc60b8a4bb8a1b23551a880f5fa014c4b5d5c2b3bb7f5f02",
+    "outputs/autobattle/a652-resume-observer-01/STOP-trigger.json": "036581975c649e778ab71a48e221cd2ea4cb79adf3c035c637c9408e9f9de985",
+    "outputs/autobattle/a652-resume-observer-01/Life-transaction-1/Life-engine.jsonl": "e0e9d5733d4ef184714d361cce42447d5396a1c0e4fcc450cdec5a8077e828de",
+    "outputs/autobattle/a652-default-observer-01/events.jsonl": "b97d16f886b1c0146658f40892c896d57dba8ca4629f22e96e56204207e0e6ed",
+    "outputs/autobattle/a652-default-observer-01/input-log.jsonl": "22a318a85b232b7694f0bb244613420b4b1879cd40b3b529d6337d0b912111b4",
+    "outputs/autobattle/a652-default-observer-01/player-boundary-observer.jsonl": "de30ada86ab4600c8bd18e8c40efe7dcbd0a99908ab7b7b2c7df75280ae78a38",
+    "outputs/autobattle/a652-default-observer-01/run.json": "b5855d1981f686bb4117dde7faf4f992e0a2faa2ab0afacd98be392decaa637e",
+    "outputs/autobattle/a652-observer-host-02.json": "38788751d13082936025fe08fda49977b431f1ccccfb358a40355684f2c43a3c",
+    "outputs/autobattle/a652-public-interface-01.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
+    "outputs/autobattle/a652-resume-observer-01-history-checks.json": "3716062d15920e46b06e9467f2308c5ea28b035b9e6c4b2c29992046016ed20a",
+    "outputs/autobattle/a652-resume-observer-01-diagnostic-checks.json": "b01eeec02f3c74b78feb5272586dd97b8472098fdd8019d6336e20bf42235e25",
+    "outputs/autobattle/a652-resume-observer-01-sources.json": "810cdc30f83f4bba38be73debd2bd937820ac767f3f95a4294fcb0edab697f1b",
+    "outputs/autobattle/a652-default-observer-01-history-checks.json": "e31de066ece4c89b381638d72a86760ca008676ab9285015f2261a82ebb0e64f"
+  },
+  "limitations": [
+    "Zero attributed resumed turns; no A6.5 lifecycle acceptance.",
+    "Native next player and inspected screenshot support the diagnosis, not an implemented receipt gate.",
+    "Post-Wait seed-only failure requires a new independently guarded continuation proof."
+  ]
+}

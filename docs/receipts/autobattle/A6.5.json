@@ -47,8 +47,8 @@
     }
   ],
   "source_sha256": {
-    "tools/run_autobattle.py": "ff8fa77e72e66410dd0e6796dc976bd9f422ab2a5d749ed8f1422bbca8be8d66",
-    "tools/autobattle_runtime.py": "6c200c650d40c535f751a22d88c995893db89038dc2e40d271bf3c6751ee6dec",
+    "tools/run_autobattle.py": "6087e42f45279821bd41b02720f707613d6496d65804da591a2d56c9163e8d1c",
+    "tools/autobattle_runtime.py": "f7b7bcf3087369dc0ad275359a956228f7ff9c6f07facc880de2e5989d79ae58",
     "tools/validate_autobattle_runtime.py": "98e802fc581bfc44b5f6d4204aa5cf149eddff198a4eadeebf16ba53faf9ae33",
     "tools/life_recovery_runtime.py": "0b03dde158f2bfc1edc25c659eccfd211e597556ee510e9c8b712892ef65e2be",
     "tools/life_recovery_transaction.py": "1f758c25a8ac0586257d23acbe75c5e808c2bbfa2ab238b294974c85173c1687",
@@ -66,7 +66,7 @@
     "tools/manual_life_wait_handoff.py": "370a30df2e7e0d13535ad42e8e3d7059e098ff8450ae52120b04d292b605d365",
     "tools/validate_life_recovery_decline.py": "9219dc3982b903f23be67a82227042efb0589075cadb5a3b1cf60318ff6f2958",
     "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4",
-    "tools/run_life_recovery_handoff.py": "11c11e0bb0fe4d6deaf021a61dd39c9476610cf46ace5a1cf95f76bbace5a40e",
+    "tools/run_life_recovery_handoff.py": "9aea52d53eb5c55d566a4d9bcf92386f5a64c92c78dae80793cb22dfc93da8f2",
     "tools/validate_life_recovery_handoff.py": "fd76dde7d3c580225a845ad18b53242ca12d4618a5d8eeb94ff2599c48e1f3b1",
     "tools/validate_life_recovery_default.py": "b3a1bd979244d821563e4bfb7ce904aa4c61ba190c9551834388539dd5bdde64",
     "tools/validate_life_recovery_fixture.py": "ca07065dae40d634b332bb369732b149c6b8e7c243fabe641efc7f6468482f10",

@@ -73,9 +73,21 @@ class BattleRuntime:
                  wall_timeout=600.0, max_turns=None, verbose=True,
                  resume=False, pause_at_boundary=False,
                  tactics_policy=None, tactics_policy_source=None, bounded_self_cure=False,
-                 bounded_ally_cure=False,bounded_ally_life=False):
+                 bounded_ally_cure=False,bounded_ally_life=False,observe_player_boundaries=False):
         self.s = session
-        if bounded_ally_life:
+        self.observe_player_boundaries=bool(observe_player_boundaries)
+        if self.observe_player_boundaries:
+            if bounded_self_cure or bounded_ally_cure or bounded_ally_life:
+                raise ValueError('player-boundary observer requires an ordinary Move/Wait leg')
+            from player_boundary_observer import PlayerBoundaryProbe
+            self.p=PlayerBoundaryProbe(session,verbose=verbose)
+            self.p.observer_path=os.path.join(out_dir,'player-boundary-observer.jsonl')
+            self.p.observer_context=lambda:{
+                'expected':[{k:r.get(k) for k in ('name','name_text','id','job','race','level','slot')}
+                            for r in self.adapter.expected] if self.adapter else [],
+                'adapter_prior':self.adapter.prior if self.adapter else None,
+                'last_rejection':self.adapter.last_rejection if self.adapter else None}
+        elif bounded_ally_life:
             from recovery_life_trace import LifeExecutionProbe
             self.p = LifeExecutionProbe(session,verbose=verbose)
         else:self.p = Probe(session, verbose=verbose)
@@ -345,9 +357,12 @@ class BattleRuntime:
         # would be stale — the 2026-09-17 victory-path wedge (a drive into
         # the results screen, bounded by B-recovery) was exactly that race.
         if not in_grace and not self._all_cts_zero():
+            rows=[];owner=None
             try:
                 rows = self.adapter.snapshot()
                 owner = self.adapter.observe(self.p, rows)
+                if self.observe_player_boundaries:
+                    self.p.observe_adapter_attempt(rows,owner,self.adapter.last_rejection)
                 if owner is not None:
                     self.owner = owner
                     self.p.active_player_slot = owner["slot"]
@@ -356,10 +371,12 @@ class BattleRuntime:
                     # turn) to the policy decision, never assumed.
                     self._owner_observed_at = time.time()
                     return TAKEOVER
-            except IdentityError:
+            except IdentityError as exc:
                 # Transient copies during enemy execution have no input
                 # authority. Bound by the existing no-progress timeout.
                 self.adapter.prior = None
+                if self.observe_player_boundaries:
+                    self.p.observe_adapter_attempt(rows,owner,str(exc))
         if in_grace:
             # defeat held but the engine's conclusion never arrived: bounds
             # only, so a live battle with a dead tracked player is bounded,
