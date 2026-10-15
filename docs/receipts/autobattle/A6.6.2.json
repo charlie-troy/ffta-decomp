@@ -1,0 +1,79 @@
+{
+  "milestone": "A6.6.2",
+  "date": "2026-10-15",
+  "status": "unknown",
+  "scope": "Bounded reaction-free EXP0 Montblanc self-Potion research; public execution disabled",
+  "criteria": [
+    {
+      "id": "single-final-input-and-native-consumption-HP-store",
+      "status": "pass",
+      "scope": "PID98260:45 attributed writes, native080CAA68/6A item362 quantity1 count2 to1;080A2298/9A canonical Montblanc5 HP100 to125, MP221 unchanged. Source-stable, no RAM edits."
+    },
+    {
+      "id": "host-STOP-reserve-stale-single-attempt",
+      "status": "pass",
+      "scope": "11 host protocol cases; no live STOP acceptance claim."
+    },
+    {
+      "id": "capture-adversarial-attribution",
+      "status": "pass",
+      "scope": "11 mutations reject foreign item/HP/wrapper, incorrect quantity/resources, taint and extra/partial writes."
+    },
+    {
+      "id": "two-reloads-Wait-and-next-actor",
+      "status": "unknown"
+    },
+    {
+      "id": "live-STOP-and-reserve-refusal",
+      "status": "unknown"
+    },
+    {
+      "id": "first-complete-use-Wait-next-actor",
+      "status": "pass",
+      "scope": "a662-single-use-turn-03:65 raw writes, native decrement/HP pair, guarded Wait and independent next actor;11 audit mutants. Second complete reload pending."
+    }
+  ],
+  "source_sha256": {
+    "tools/consumable_use_gate.py": "bf6282a32b830db703106dad5192387972dbb3f41c3ecbe33baab50fed605075",
+    "tools/consumable_effect_trace.py": "62dd779caea13b8eeebe2a63045ad81ca28e4182972fca9e1870e8ae2dbe450a",
+    "tools/validate_consumable_use.py": "235a9c284477a9226c986f1c1b483fd45e4557f109e17ab4e6863f6a896e859f",
+    "tools/validate_consumable_use_gate.py": "f30bfec437140c85167a4c0951ffc3651095e03bb2908a5d133f5b838a1c67e5",
+    "tools/build_consumable_fixture.py": "5bfb44c4109caec719575346059c28638047ae506ca10f03f3bb617a799918f1",
+    "tools/probe_consumable_inventory.py": "42eaf128eccdd1212c49b390cbd074981ff9ee778e6cb1bb34f46b135f354c75"
+  },
+  "evidence_sha256": {
+    "outputs/autobattle/a662-use-fixture-01/fixture.json": "1e9a617fb83ac0cdfddca63d25d327027cdaaf06c7561a88a6253ec6754c38a6",
+    "outputs/autobattle/a662-use-gate-controls-02.json": "b08bdccf4239c699ad8fcb5c5b864a5263ae61fb69f434c5563eb1ea77b877b9",
+    "outputs/autobattle/a662-single-use-02/inventory.json": "24aa159a2aeb15dd32f202db771886062d03898471a1455a33af00525c2a7861",
+    "outputs/autobattle/a662-single-use-02/native-Potion-hits.jsonl": "a8c3ff3e76fdf5cfad0390cd103b35787c50ee6365acfb3f67b8aa71f62a0936",
+    "outputs/autobattle/a662-single-use-checks-02.json": "50bccea5d82bfc44b184e582f5fdb2f8f3ba202e44959274163db5f3bd65d2e4",
+    "outputs/autobattle/a662-use-source-history/tools/consumable_effect_trace.py": "62dd779caea13b8eeebe2a63045ad81ca28e4182972fca9e1870e8ae2dbe450a",
+    "outputs/autobattle/a662-use-source-history/tools/consumable_use_gate.py": "bf6282a32b830db703106dad5192387972dbb3f41c3ecbe33baab50fed605075",
+    "outputs/autobattle/a662-use-source-history/tools/probe_consumable_inventory.py": "448eaa6e8a0305291075daa0841676caf90a10999f7a1b619bef4b5a7ba14e62",
+    "outputs/autobattle/a662-use-gate-controls-03.json": "b08bdccf4239c699ad8fcb5c5b864a5263ae61fb69f434c5563eb1ea77b877b9",
+    "outputs/autobattle/a662-single-use-checks-03.json": "50bccea5d82bfc44b184e582f5fdb2f8f3ba202e44959274163db5f3bd65d2e4",
+    "outputs/autobattle/a662-single-use-turn-03/inventory.json": "7a71c2667b0350d094ec0f678991bb9be9173cfcd5dcde5f919ad6ba1badb4d2",
+    "outputs/autobattle/a662-single-use-turn-03/native-Potion-hits.jsonl": "c5afe2f6268f77b5d14fe28449dce759962986f8cf9a6860b34d1f55dd0b06c0",
+    "outputs/autobattle/a662-turn-checks-03.json": "d12cfe824bbd00708a65bea0fbbc0e2bd162e07287d12d671362c1890d54c9a3"
+  },
+  "excluded_runs": [
+    {
+      "run": "a662-single-use-01",
+      "reason": "Actual count/HP changed, but effect-time processor ability had cleared; original attribution assertion failed."
+    },
+    {
+      "run": "a662-single-use-turn-01",
+      "reason": "Native decrement/HP observed but pinned command reader timed out; no turn completion claim."
+    },
+    {
+      "run": "a662-single-use-turn-02",
+      "reason": "EXP0 to10 explained canonical rebind; restored command proves Action consumed/Wait enabled. Stale pre-use inventory pin blocked Wait input, corrected to witnessed post-use pool. No completion claim."
+    }
+  ],
+  "limitations": [
+    "Native decrement is global; actor association is selected final context plus source wrapper and canonical HP store.",
+    "Effect-time processor ability is cleared; never infer ability from that zero field.",
+    "No public Item lifecycle acceptance."
+  ],
+  "next_task": "Finish command restoration/guarded Wait and independently attributed next actor on two reloads; capture live STOP/reserve refusals before A6.6.3."
+}

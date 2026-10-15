@@ -27,6 +27,7 @@ def main():
     ap.add_argument('--hp',type=int,default=100)
     ap.add_argument('--potion-count',type=int,default=2)
     ap.add_argument('--clear-reaction',action='store_true',help='Explicitly construct a reaction-free actor; no original asset changes')
+    ap.add_argument('--experience',type=int,help='Explicitly set copied actor EXP to avoid unrelated level-up prompts')
     ap.add_argument('--out',required=True)
     args=ap.parse_args();out=Path(args.out);out.mkdir(parents=True,exist_ok=False)
     sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -35,6 +36,7 @@ def main():
     expect=json.loads(Path(args.scenario).read_text())['guard_expectations'];expect['slot0_name']=int(expect['slot0_name'],0)
     state=out/'consumable-recovery.ss0'
     require(0<=args.potion_count<=99,'Potion fixture count bounds')
+    require(args.experience is None or 0<=args.experience<=99,'fixture EXP bounds')
     try:
         with FixtureSession(args.state,rom=args.rom,expect=expect,quiet=True,work_dir=str(out/'build-session')) as session:
             probe=Probe(session,verbose=False);owner=verified_owner(session,probe)
@@ -53,6 +55,8 @@ def main():
                     session.write_bytes(address+0x18,args.hp.to_bytes(2,'little'),'disposable Item fixture: wounded actor')
                     if args.clear_reaction:
                         session.write_u8(address+0x3A,0,'disposable Item fixture: clear reaction slot')
+                    if args.experience is not None:
+                        session.write_u8(address+0x0A,args.experience,'disposable Item fixture: explicit EXP')
                 session.write_bytes(record+2,bytes([args.potion_count,0]),'disposable Item fixture: Potion owned/reserved')
                 result.update(owner=owner,canonical=member,fixture_writes=session.writes,
                               gameplay_writes=getattr(probe,'key_write_log',[]))
@@ -65,6 +69,10 @@ def main():
                 require(owner['id']==5 and token.state=='command' and token.hp==args.hp
                         and count==args.potion_count,'fresh Item fixture reload differs')
                 require(not session.writes,'reload unexpectedly edited fixture')
+                if args.experience is not None:
+                    require(all(exact(transport.g,a+0x0A,1)[0]==args.experience for a in
+                        [member,ROSTER+owner['slot']*STRIDE]),'fresh fixture EXP reload differs')
+                    result['reloaded_experience']=args.experience
                 if args.clear_reaction:
                     unit=exact(transport.g,member,STRIDE);native=Gba(args.rom);native.uc.mem_write(member,unit)
                     require(unit[0x3A]==0 and native.call(0x080CD4D4,[member])==0,'native reaction getter differs after reload')

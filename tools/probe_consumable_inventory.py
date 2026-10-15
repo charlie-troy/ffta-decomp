@@ -17,9 +17,13 @@ from consumable_overlay import PotionOverlayReader
 from consumable_preview_gate import PotionPreviewGate
 from consumable_description import PotionDescriptionReader,PotionPromptInspectionGate
 from consumable_final import PotionFinalPromptReader
+from consumable_use_gate import PotionUseGate
+from consumable_effect_trace import PotionExecutionProbe
 from emulate import Gba
 from ffta_names import Names, UI_STRINGS
-from fixture_guard import FixtureSession, STRIDE
+from fixture_guard import FixtureSession, STRIDE,read_roster
+from recovery_life_wait import LifeWaitBoundary
+from recovery_party_continuation import observe_party_continuation
 from probe_control_handoff import Probe
 from probe_recovery_ko_lifecycle import source_dependencies
 from probe_recovery_party import block
@@ -40,9 +44,13 @@ def main():
                     help='One guarded self target-acceptance input; capture preview, never confirm item use')
     ap.add_argument('--inspect-potion-final-prompt',action='store_true',
                     help='Open the final prompt from a pinned description; never select Do it')
+    ap.add_argument('--execute-potion-once',action='store_true',help='Research only: one guarded final use and passive native HP-store observation')
+    ap.add_argument('--complete-potion-turn',action='store_true',help='After witnessed use, guarded Wait and independent next-actor observation')
     args=ap.parse_args()
     require(not args.accept_potion_target or args.inspect_potion_target,'preview requires explicit Potion overlay inspection')
     require(not args.inspect_potion_final_prompt or args.accept_potion_target,'final-prompt inspection requires target acceptance')
+    require(not args.execute_potion_once or args.inspect_potion_final_prompt,'single use requires final-context inspection')
+    require(not args.complete_potion_turn or args.execute_potion_once,'turn completion requires single-use witness')
     out=Path(args.out);out.mkdir(parents=True,exist_ok=False)
     sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
     paths=[args.state,args.rom,args.scenario]+source_dependencies('probe_consumable_inventory')
@@ -55,7 +63,9 @@ def main():
         with FixtureSession(args.state,rom=args.rom,expect=expect,quiet=True,work_dir=str(out/'session')) as session:
             session.g.sock.settimeout(2)
             result['pid']=session.pid
-            probe=Probe(session,verbose=False);adapter=ActorAdapter(session);owner=None
+            probe=(PotionExecutionProbe if args.execute_potion_once else Probe)(session,verbose=False)
+            if args.execute_potion_once:probe.item_log_path=out/'native-Potion-hits.jsonl'
+            adapter=ActorAdapter(session);owner=None
             deadline=time.monotonic()+100
             while owner is None and time.monotonic()<deadline:
                 require(not (out/'STOP').exists(),'STOP during passive owner acquisition')
@@ -185,6 +195,89 @@ def main():
                             final_token=final_reader.snapshot();final_reader.revalidate(final_token)
                             result['Potion_final_token']=final_token.receipt()
                             result['status']='captured-Potion-final-prompt-only'
+                            if args.execute_potion_once:
+                                unit=exact(transport.g,member,STRIDE)
+                                require(unit[0x0A]==0 and unit[0x3A]==0,'use witness requires explicit EXP0/reaction-free fixture')
+                                mp=integer(unit,0x1C,2)
+                                use_gate=PotionUseGate(final_reader,transport,stop_check=stopped)
+                                result['Potion_use_events']=use_gate.events
+                                result['Potion_use_input']=use_gate.execute(final_token)
+                                transport.interrupt();probe.arm(strict=True)
+                                deadline=time.monotonic()+35
+                                while time.monotonic()<deadline:
+                                    stopped();transport.halted=False
+                                    probe.pump(.5,'Potion-effect',sample_every=60,
+                                        stop_when=lambda p:any(h['phase']=='HP-store-after' and h['canonical']==member for h in p.item_hits))
+                                    if any(h['phase']=='HP-store-after' and h['canonical']==member for h in probe.item_hits):break
+                                transport.halted=False;transport.interrupt();probe.disarm(strict=True);stopped()
+                                require(not probe.item_errors,'native Potion trace errors')
+                                after_unit=exact(transport.g,member,STRIDE);after_inv=inventory.snapshot()
+                                result['Potion_after']={'hp':integer(after_unit,0x18,2),'mp':integer(after_unit,0x1C,2),
+                                    'count':after_inv.items()[362]['available'],'canonical':after_unit.hex(),
+                                    'inventory':after_inv.raw.hex(),'native_hits':probe.item_hits}
+                                path=out/'Potion-after-ewram.bin';path.write_bytes(block(transport.g,0x02000000,0x40000))
+                                result['capture_sha256'][path.name]=sha(path)
+                                require(result['Potion_after']['count']==final_token.count-1,'Potion did not decrement exactly once')
+                                require(final_token.hp<result['Potion_after']['hp']<=241 and result['Potion_after']['mp']==mp,
+                                        'Potion healing/unchanged MP not observed')
+                                require(any(h['phase']=='HP-store-after' and h['canonical']==member and h['id']==5
+                                    and h['hp']==result['Potion_after']['hp']
+                                    for h in probe.item_hits),'no actor-associated native Potion HP store')
+                                require(any(h['phase']=='inventory-decrement-before' and h['item']==362 and h['quantity']==1
+                                    and h['record']==0x02001EE4 and h['Potion_owned']==2 and h['stored_count']==1
+                                    for h in probe.item_hits) and any(h['phase']=='inventory-decrement-after'
+                                    and h['item']==362 and h['Potion_owned']==1 for h in probe.item_hits),
+                                    'no native single-Potion decrement pair')
+                                result['status']='observed-single-Potion-consumption-and-HP-store-only'
+                                if args.complete_potion_turn:
+                                    # Rebind only after the native HP store/count pair has passed.
+                                    menu=ResearchMenuList(transport.g,rom,owner,member)
+                                    deadline=time.monotonic()+12
+                                    while time.monotonic()<deadline:
+                                        stopped()
+                                        try:post=menu.snapshot()
+                                        except ValueError as exc:
+                                            result.setdefault('Potion_command_rejections',[]).append(str(exc))
+                                            now=exact(transport.g,member,STRIDE)
+                                            changes=[i for i,(a,b) in enumerate(zip(after_unit,now)) if a!=b]
+                                            if changes==[0x0A] and now[0x0A]==10:
+                                                result['Potion_EXP_reward']={'before':after_unit[0x0A],'after':10,'offset':10}
+                                                menu=ResearchMenuList(transport.g,rom,owner,member)
+                                            transport.cont();time.sleep(.25);continue
+                                        if post.state=='command':break
+                                        transport.cont();time.sleep(.25)
+                                    else:raise TimeoutError('Potion did not restore owned command; never retry')
+                                    require(post.rows.count(9)==1 and not post.enabled[post.rows.index(9)]
+                                        and post.rows.count(10)==1 and post.enabled[post.rows.index(10)],'Potion did not consume Action and leave Wait')
+                                    result['Potion_post_command']=post.receipt()
+                                    current=exact(transport.g,member,STRIDE)
+                                    baseline=[r for r in read_roster(transport.g,rom=rom)['slots'] if r['live']]
+                                    name=rom[owner['name']-0x08000000:owner['name']-0x08000000+32] if owner['name']>=0x08000000 else exact(transport.g,owner['name'],32)
+                                    pins=[{'canonical':member,'id':5,'tile':list(current[0xF6:0xF8]),'max_hp':241,'max_mp':221,
+                                           'name_sha256':hashlib.sha256(name).hexdigest()}]
+                                    # Selection now pins the independently witnessed post-use pool.
+                                    before=inventory.snapshot()
+                                    require(before==after_inv,'inventory changed after witnessed consumption')
+                                    units={member:current};select('command',10)
+                                    boundary=LifeWaitBoundary(transport.g,menu,units)
+                                    facing=boundary.snapshot();boundary.revalidate(facing)
+                                    result['Potion_Wait_events']=boundary.events
+                                    # Pure policy selects only the native legal Wait candidate.
+                                    policy={'schema':'ffta-tactics-policy/2','assignments':{},'fallback':'wait','observation':{'max_age_seconds':3}}
+                                    result['Potion_Wait']=boundary.commit(facing,transport,policy,stopped)
+                                    deadline=time.monotonic()+30
+                                    while time.monotonic()<deadline:
+                                        stopped()
+                                        try:continuation=observe_party_continuation(transport.g,rom,owner,facing.receipt(),pins,units,baseline)
+                                        except ValueError as exc:
+                                            result.setdefault('Potion_continuation_rejections',[]).append(str(exc))
+                                            transport.cont();time.sleep(.25);continue
+                                        break
+                                    else:raise TimeoutError('Potion Wait lacks independently attributed next actor')
+                                    result['Potion_continuation']=continuation
+                                    path=out/'Potion-next-actor-ewram.bin';path.write_bytes(block(transport.g,0x02000000,0x40000))
+                                    result['capture_sha256'][path.name]=sha(path)
+                                    result['status']='observed-Potion-use-Wait-and-next-actor'
                 require(not session.writes,'research probe edited RAM')
             session.screenshot(str(out/'Item-list.png'));probe.disarm(strict=True)
     except BaseException as exc:

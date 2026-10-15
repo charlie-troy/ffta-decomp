@@ -1,0 +1,65 @@
+{
+  "status": "pass",
+  "scope": "Host single-use protocol controls; no native consumption acceptance.",
+  "checks": [
+    {
+      "case": "success",
+      "press_attempts": 1,
+      "retry_refused": true
+    },
+    {
+      "case": "STOP",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "late STOP",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "stale",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "late stale",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "foreign",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "last item",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "zero",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "reserve",
+      "press_attempts": 0,
+      "retry_refused": true
+    },
+    {
+      "case": "partial",
+      "press_attempts": 1,
+      "retry_refused": true
+    },
+    {
+      "case": "ambiguous",
+      "press_attempts": 1,
+      "retry_refused": true
+    }
+  ],
+  "source_sha256": {
+    "tools/consumable_use_gate.py": "bf6282a32b830db703106dad5192387972dbb3f41c3ecbe33baab50fed605075",
+    "tools/validate_consumable_use_gate.py": "f30bfec437140c85167a4c0951ffc3651095e03bb2908a5d133f5b838a1c67e5"
+  }
+}

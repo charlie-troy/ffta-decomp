@@ -699,10 +699,11 @@ must come from the observed engine list, never guessed cursor/group IDs. Keep
 consumables disabled by default and do not publish an item candidate until
 current ownership, count, target, resource and legality fields are verified.
 
-A6.6.1 checkpoint (2026-10-14): native inventory/owned Item joins, live count0/1,
-wounded self-Potion overlay and25 corruptions pass; source/target identity is
-bounded. Current law/compliance and final prompt remain UNKNOWN. See A6.6.1
-receipt and `docs/a66-consumable-research.md`; no consumable executor enabled.
+A6.6.1 bounded reader PASS (2026-10-15): reaction-free Montblanc self-Potion
+final token, source-only native law matcher and22 mutations pass. A6.6.2 has
+one native count2 to1 / HP100 to125 witness (MP221 unchanged); Wait/next actor,
+two complete reloads and live STOP/refusal remain UNKNOWN. See receipts and
+`docs/a66-consumable-research.md`; public consumable execution remains disabled.
 
 A6.6.2 follows only after that reader passes: one legal healing item, a guarded
 single final input, actual count decrement/HP effect/turn completion, last-item

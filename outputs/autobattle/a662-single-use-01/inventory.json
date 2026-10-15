@@ -1,0 +1,1416 @@
+{
+  "schema": "ffta-consumable-inventory-research/1",
+  "status": "captured-Potion-final-prompt-only",
+  "scope": "Capture owned Item rows and inventory without selecting or consuming an item.\n\nCommand and Action navigation uses existing ownership/acceptance tokens. Once\nItem opens this research probe captures raw RAM, then stops; a raw list is not\npublished as an executable item candidate.\n",
+  "source_sha256": {
+    "outputs/autobattle/a662-use-fixture-01/consumable-recovery.ss0": "c7a8826a3f4c8980b91d97fa815b47eb3da491a205059f1d9ebf7550e2c89ca8",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19",
+    "configs/battle-scenarios/a4-two-player.json": "ff04c6ac8b997e8e9de3f0ae52b342da8a5ba974e48a1911985c243d623f6ca3",
+    "tools/ability_resources.py": "fafde3361324ec48e2b40e1c96aa7e188f3960f8ce596a752bb4a10eac06d00e",
+    "tools/ability_table.py": "9ec959131119d9d4cdd491e3cbbdfdecf7778f0f6634572df02458f079e01f41",
+    "tools/autobattle_identity.py": "498316d9fd41fa5560f873a6830cbceb1a97b75d36572d55b8c54447996ad557",
+    "tools/autobattle_runtime.py": "1cfe15b1d5511eab94fe516acf1dfb3283f76222e0f26508c42c89ac7a6131d0",
+    "tools/build_recovery_fixture.py": "3dd32d1e2379641b3f4c73f99e276edf30debd23b254e8be2b9c557c2017eb13",
+    "tools/consumable_description.py": "e9a3471045947203a82ceb94347df1eee40b37240e62bfb86d043324b948c3ad",
+    "tools/consumable_effect_trace.py": "b64b71bcf6529449e19748ad3d405fac9185e6a204e0a922bd7cab1b1e85690e",
+    "tools/consumable_final.py": "e8a30a5cdd7bffb4fbfe74161f2d9da8d07dcbcbcb9ccffa1ee4976073a64792",
+    "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
+    "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
+    "tools/consumable_overlay.py": "205b9e49325c145154e2860cb2ee20fbc11b42b3f92ec596f58750229ddfba03",
+    "tools/consumable_preview_gate.py": "992c20b0bff2b06326787f96300573f8f02d2476e9a1b6193e448b4f7b149ed0",
+    "tools/consumable_use_gate.py": "8c4d860e72c4eb8aea14195c3a8915526bc2ec89722f77ad345d705b96e5dcdd",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "tools/ffta_names.py": "e0d737bce4f06853b87fc50f2c479434eefb8844310c157e15972be44f53a983",
+    "tools/ffta_text.py": "3f03a83eb15407816a0bdb7bda4a09cfa86517f6fb46a879e6f5696a30f32f27",
+    "tools/fixture_guard.py": "d674fa404b76c5b34e38b09d51155c00badf7cdc264c20aace34045214cefd12",
+    "tools/life_recovery_runtime.py": "0b03dde158f2bfc1edc25c659eccfd211e597556ee510e9c8b712892ef65e2be",
+    "tools/life_recovery_transaction.py": "1f758c25a8ac0586257d23acbe75c5e808c2bbfa2ab238b294974c85173c1687",
+    "tools/party_recovery_runtime.py": "b4496209770115ea5628cd68ef3d0eee1c5ffccea2d50969b6808013b30b27c3",
+    "tools/player_boundary_observer.py": "13506de71de1844a813ceaf19da5a549ea6d418e16cb5af0b3e22dd2a573eb13",
+    "tools/probe_consumable_inventory.py": "17e68b27796b96d11aeb20c6af1b5a3c80edb8bbbe3be44a3c0e14c3f5c82abc",
+    "tools/probe_control_handoff.py": "d585df25f4b0717408a0edc4e7b44614cd517e7f9699414ef238087c4f6cbd80",
+    "tools/probe_recovery_ko_lifecycle.py": "fc5b0acd88859144804c699b6d29518e54b2182ef2a1563be6804a0f3ed8d0f2",
+    "tools/probe_recovery_party.py": "ff08f4a42968d45afd45d1dc7c77eec87e2434c4cb51a964739135409c2fc7a5",
+    "tools/recovery_ally_confirmation.py": "fe670132d75754a892c2ad926ed39137f0bb061cf0af27250e18c41329c6bf7f",
+    "tools/recovery_ally_executor.py": "8b0e1aac7eb7505cc475c871244e6179b0c0a5f69800a72e293bf35789e313c4",
+    "tools/recovery_ally_preview.py": "f1d77ae16b908306bec1d74596f8cca679c434bdbcb31ae858f61a6b6270a95f",
+    "tools/recovery_ally_target.py": "3221800edce967464be71815facb3085233dd6a7a541da7b22cb859c06696a2e",
+    "tools/recovery_boundary_diagnostic.py": "3d02df7712b6d09efcfb4789a7db729e9c0a002928c57024585baed74ddeccd4",
+    "tools/recovery_continuation.py": "2063b48329e8953ec32d25f11dda48c79a0ed0d58e2c24af0c60d68fdfcb0216",
+    "tools/recovery_executor.py": "e2c0f530a36ee8cd4dec17ddd2c9d6d77d62303de31624b2b3745240ba9f923f",
+    "tools/recovery_ko_trace.py": "280482e50e58dc26f882914b188d3ffd1dd72c3bbbc16564d7988ca6db01979b",
+    "tools/recovery_life_effect.py": "65d7a22c6d368835c098cb32af517694576a3d2d375b9bb85270dc3610800a4c",
+    "tools/recovery_life_final.py": "4ad604a0363308eee0f5defd113d7f1cc25e247cbb09cd55d9eca88fd76337af",
+    "tools/recovery_life_target.py": "60c8bd54e6a64095393786638edacdd396ee4928cf6f4fa774145c52d9aa3766",
+    "tools/recovery_life_trace.py": "61f0b6ecbf3603d7dd28b3e4aba0905dfe03b6ba4e66cc75b9230807a4073ab6",
+    "tools/recovery_life_wait.py": "81dda3631b7c928e255386e92d2911bf3a4571aa51fcbb9a60c88f58fdafa317",
+    "tools/recovery_menu.py": "f8718b8873de3a4e76ce6cdf72c5224861e61762e60005e205720b1b6a159975",
+    "tools/recovery_menu_list.py": "796981350ed72724cdd1eb09bad7f65e6a134ee1b40e99e55d179bc0e5361f0f",
+    "tools/recovery_party.py": "06d1df0dc323b71191ce2b36bba02c1be04bef26ccf6ed053c26171d3d828a95",
+    "tools/recovery_party_continuation.py": "e3ba10612af1207b9873af8d45c826085ccf98acc736c9f00643bd9e5f9ab4f9",
+    "tools/recovery_runtime.py": "53ed22a50d7bb451733ce818cd37534516f638485ea5e60da74c0675a930a640",
+    "tools/recovery_transport.py": "230b275b6ab3225fe23eb0bb726dc21d8900754e2698095cb6bce419b0d8891e",
+    "tools/status_flags.py": "2ff55c712605d7ea3901d58ea66817519653676238446744c68461cc4cdb3812",
+    "tools/tactics_adapter.py": "a4c873182ef85afe277f833c41d9718d1c78d13daaaff85f6250c5aa51f99f18",
+    "tools/tactics_policy.py": "e56bd33eb1af55f221b7e46de90ed2afe0804605370de236429815934264b24c",
+    "tools/trace_mgba.py": "918687d64f1383d5499dba09bbb4d175222bb4b023eee4a3f2f96059625a9220",
+    "tools/wait_ally_continuation.py": "18ba9ae0b9ad6f9739e454a52cdbec9fff271f3aac1ef91f9da5492732d6819f"
+  },
+  "observations": [
+    {
+      "state": "command",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "mp": 221,
+      "member": 33554824,
+      "mode": 4,
+      "context": 33740960,
+      "callback": 33742168,
+      "active": 33742168,
+      "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+      "decision_sha256": "29f3623d293dbe122341c8a0fa892e2056542b48e026550a14a9a2d3c8fe3167"
+    },
+    {
+      "state": "command",
+      "cursor": 1,
+      "scroll": 0,
+      "rows": [
+        8,
+        9,
+        10,
+        11
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "mp": 221,
+      "member": 33554824,
+      "mode": 4,
+      "context": 33740960,
+      "callback": 33742168,
+      "active": 33742168,
+      "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+      "decision_sha256": "4b5449a15c8105b387a73faf48d34e5904c4807c5223dd1eab5587946c6c9389"
+    },
+    {
+      "state": "action-group",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        12,
+        10,
+        1,
+        15
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "mp": 221,
+      "member": 33554824,
+      "mode": 5,
+      "context": 33740960,
+      "callback": 33742168,
+      "active": 33742556,
+      "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+      "decision_sha256": "573a063e18cc689193b80cc89bd294430149f16d288aac59ef2f403bb94fcc77"
+    },
+    {
+      "state": "action-group",
+      "cursor": 0,
+      "scroll": 0,
+      "rows": [
+        12,
+        10,
+        1,
+        15
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "mp": 221,
+      "member": 33554824,
+      "mode": 5,
+      "context": 33740960,
+      "callback": 33742168,
+      "active": 33742556,
+      "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+      "decision_sha256": "573a063e18cc689193b80cc89bd294430149f16d288aac59ef2f403bb94fcc77"
+    },
+    {
+      "state": "action-group",
+      "cursor": 1,
+      "scroll": 0,
+      "rows": [
+        12,
+        10,
+        1,
+        15
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "mp": 221,
+      "member": 33554824,
+      "mode": 5,
+      "context": 33740960,
+      "callback": 33742168,
+      "active": 33742556,
+      "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+      "decision_sha256": "27b5a6e38bfdb7d051ccee47d454cbdb15b009ebc7c7934549dd233112ec328a"
+    },
+    {
+      "state": "action-group",
+      "cursor": 2,
+      "scroll": 0,
+      "rows": [
+        12,
+        10,
+        1,
+        15
+      ],
+      "enabled": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "ability_ids": [],
+      "hp": 100,
+      "mp": 221,
+      "member": 33554824,
+      "mode": 5,
+      "context": 33740960,
+      "callback": 33742168,
+      "active": 33742556,
+      "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+      "decision_sha256": "5c9ec4ffbeb60b828f150ac849c66e1358eae3ff5c8b628dcf5912da94d5b3e5"
+    }
+  ],
+  "inputs": [
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "command",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 4,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+        "decision_sha256": "29f3623d293dbe122341c8a0fa892e2056542b48e026550a14a9a2d3c8fe3167"
+      }
+    },
+    {
+      "mask": 1,
+      "hits": 5,
+      "before": {
+        "state": "command",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 4,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742168,
+        "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+        "decision_sha256": "4b5449a15c8105b387a73faf48d34e5904c4807c5223dd1eab5587946c6c9389"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "action-group",
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          12,
+          10,
+          1,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 5,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742556,
+        "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+        "decision_sha256": "573a063e18cc689193b80cc89bd294430149f16d288aac59ef2f403bb94fcc77"
+      }
+    },
+    {
+      "mask": 128,
+      "hits": 5,
+      "before": {
+        "state": "action-group",
+        "cursor": 1,
+        "scroll": 0,
+        "rows": [
+          12,
+          10,
+          1,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 5,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742556,
+        "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+        "decision_sha256": "27b5a6e38bfdb7d051ccee47d454cbdb15b009ebc7c7934549dd233112ec328a"
+      }
+    },
+    {
+      "mask": 1,
+      "hits": 5,
+      "before": {
+        "state": "action-group",
+        "cursor": 2,
+        "scroll": 0,
+        "rows": [
+          12,
+          10,
+          1,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "ability_ids": [],
+        "hp": 100,
+        "mp": 221,
+        "member": 33554824,
+        "mode": 5,
+        "context": 33740960,
+        "callback": 33742168,
+        "active": 33742556,
+        "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+        "decision_sha256": "5c9ec4ffbeb60b828f150ac849c66e1358eae3ff5c8b628dcf5912da94d5b3e5"
+      }
+    },
+    {
+      "mask": 1,
+      "hits": 5,
+      "before_Item": {
+        "member": 33554824,
+        "context": 33740960,
+        "callback": 33742168,
+        "cursor": 0,
+        "scroll": 0,
+        "rows": [
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "enabled": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0
+        ],
+        "items": [
+          [
+            1,
+            362,
+            "Potion",
+            251,
+            2,
+            true
+          ],
+          [
+            2,
+            363,
+            "Hi-Potion",
+            252,
+            99,
+            true
+          ],
+          [
+            3,
+            364,
+            "X-Potion",
+            253,
+            99,
+            true
+          ],
+          [
+            4,
+            365,
+            "Ether",
+            254,
+            6,
+            true
+          ],
+          [
+            6,
+            375,
+            "Phoenix Down",
+            256,
+            99,
+            true
+          ],
+          [
+            7,
+            369,
+            "Echo Screen",
+            257,
+            99,
+            true
+          ],
+          [
+            8,
+            370,
+            "Maiden Kiss",
+            258,
+            99,
+            true
+          ],
+          [
+            9,
+            371,
+            "Soft",
+            259,
+            99,
+            true
+          ],
+          [
+            10,
+            373,
+            "Bandage",
+            263,
+            96,
+            true
+          ],
+          [
+            11,
+            372,
+            "Holy Water",
+            260,
+            99,
+            true
+          ],
+          [
+            12,
+            367,
+            "Antidote",
+            261,
+            99,
+            true
+          ],
+          [
+            13,
+            374,
+            "Cureall",
+            264,
+            99,
+            true
+          ],
+          [
+            14,
+            368,
+            "Eye Drops",
+            262,
+            99,
+            true
+          ]
+        ],
+        "excluded_rows": [
+          [
+            15,
+            265,
+            "Draw Weapon: no consumable count"
+          ]
+        ],
+        "inventory_raw": "6a0102006f01630075016000770163006b0163006c0163007001630071016300720163007301630074016300760163006d01060000000000",
+        "inventory_sha256": "3d9b5a4a862b939828fe20cb4ccdb1189403e14229ffa092de6e83ad06903e77",
+        "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+        "list_sha256": "1da3d031d40514dc5c93af3bdbf0409fa619c59402ed20097ccde6267933a3e5",
+        "availability_flag13": 0
+      }
+    }
+  ],
+  "pid": 15672,
+  "owner": {
+    "slot": 5,
+    "addr": "02015f10",
+    "name": 139793095,
+    "side_raw": 129,
+    "ct": 0,
+    "ea": 0,
+    "id": 5,
+    "type": 8,
+    "base_job": 5,
+    "race": 1,
+    "job": 5,
+    "level": 40,
+    "hp": 100,
+    "max_hp": 241,
+    "mp": 221,
+    "max_mp": 221,
+    "is_rom_name": true,
+    "is_ram_name": false,
+    "name_text": "Montblanc",
+    "side_bit": false,
+    "unaffiliated": false,
+    "live": true,
+    "x": 5,
+    "y": 10
+  },
+  "inventory_before": {
+    "raw": "6a0102006f01630075016000770163006b0163006c0163007001630071016300720163007301630074016300760163006d01060000000000",
+    "sha256": "3d9b5a4a862b939828fe20cb4ccdb1189403e14229ffa092de6e83ad06903e77",
+    "items": {
+      "362": {
+        "owned": 2,
+        "reserved": 0,
+        "available": 2,
+        "record": 33562340
+      },
+      "363": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562356
+      },
+      "364": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562360
+      },
+      "365": {
+        "owned": 6,
+        "reserved": 0,
+        "available": 6,
+        "record": 33562388
+      },
+      "366": {
+        "owned": 0,
+        "reserved": 0,
+        "available": 0,
+        "record": null
+      },
+      "375": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562352
+      },
+      "369": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562368
+      },
+      "370": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562372
+      },
+      "371": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562376
+      },
+      "373": {
+        "owned": 96,
+        "reserved": 0,
+        "available": 96,
+        "record": 33562348
+      },
+      "372": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562380
+      },
+      "367": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562344
+      },
+      "374": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562384
+      },
+      "368": {
+        "owned": 99,
+        "reserved": 0,
+        "available": 99,
+        "record": 33562364
+      }
+    }
+  },
+  "groups": {
+    "state": "action-group",
+    "cursor": 0,
+    "scroll": 0,
+    "rows": [
+      12,
+      10,
+      1,
+      15
+    ],
+    "enabled": [
+      1,
+      1,
+      1,
+      1
+    ],
+    "ability_ids": [],
+    "hp": 100,
+    "mp": 221,
+    "member": 33554824,
+    "mode": 5,
+    "context": 33740960,
+    "callback": 33742168,
+    "active": 33742556,
+    "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+    "decision_sha256": "573a063e18cc689193b80cc89bd294430149f16d288aac59ef2f403bb94fcc77"
+  },
+  "item_group_title": {
+    "row": 1,
+    "string_id": 106,
+    "title": "Item"
+  },
+  "capture_sha256": {
+    "Item-list-ewram.bin": "403b17830bfab27d7ed9152fda33d5eb9dc4c6e0b036d64b69d01727e7a7c3ee",
+    "Potion-overlay-ewram.bin": "5fe9a39344da79ae997e334b60db93c1d5cdbb21b5148f3ef7eab2ffc910b874",
+    "Potion-preview-ewram.bin": "bfe5e7100e10023f88b059a606782238da9b9136f3210ee0dd63cc078b4f20a9",
+    "Potion-final-prompt-ewram.bin": "c2a250bb8b20fb82d60d16acac06b607079bdc28195d9bb1dd2fbdc78ed930e0",
+    "Potion-after-ewram.bin": "433faf81d42b903af22fc6d6461bb9a66946c9bbb0933d086bdf12e1ca8e39b9"
+  },
+  "raw_list": {
+    "context": 33740960,
+    "root": "000000000700000000000000d7000000020000000000000088010002880100023cdd0202a0d8020258dd020281218121",
+    "callback": 33742168,
+    "object": "58dd0202000000000606000000e000060050000600000000000000000f040f0f4001200c05000100060f08020f000f000f000f00030001000000000000000000a0e10006acde020200000d10060d06070e0000000002200c817e0108a8dd0202680034000500000007000200057f0108a8dd0202e8002c0005000000190000000f040f0f0e004001021005010f0800000000000024de020288de0202",
+    "rows": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "enabled": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ]
+  },
+  "native_counts": {
+    "362": 2,
+    "363": 99,
+    "364": 99,
+    "365": 6,
+    "366": 0,
+    "375": 99,
+    "369": 99,
+    "370": 99,
+    "371": 99,
+    "373": 96,
+    "372": 99,
+    "367": 99,
+    "374": 99,
+    "368": 99
+  },
+  "joined_item_list": {
+    "member": 33554824,
+    "context": 33740960,
+    "callback": 33742168,
+    "cursor": 0,
+    "scroll": 0,
+    "rows": [
+      1,
+      2,
+      3,
+      4,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "enabled": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      0
+    ],
+    "items": [
+      [
+        1,
+        362,
+        "Potion",
+        251,
+        2,
+        true
+      ],
+      [
+        2,
+        363,
+        "Hi-Potion",
+        252,
+        99,
+        true
+      ],
+      [
+        3,
+        364,
+        "X-Potion",
+        253,
+        99,
+        true
+      ],
+      [
+        4,
+        365,
+        "Ether",
+        254,
+        6,
+        true
+      ],
+      [
+        6,
+        375,
+        "Phoenix Down",
+        256,
+        99,
+        true
+      ],
+      [
+        7,
+        369,
+        "Echo Screen",
+        257,
+        99,
+        true
+      ],
+      [
+        8,
+        370,
+        "Maiden Kiss",
+        258,
+        99,
+        true
+      ],
+      [
+        9,
+        371,
+        "Soft",
+        259,
+        99,
+        true
+      ],
+      [
+        10,
+        373,
+        "Bandage",
+        263,
+        96,
+        true
+      ],
+      [
+        11,
+        372,
+        "Holy Water",
+        260,
+        99,
+        true
+      ],
+      [
+        12,
+        367,
+        "Antidote",
+        261,
+        99,
+        true
+      ],
+      [
+        13,
+        374,
+        "Cureall",
+        264,
+        99,
+        true
+      ],
+      [
+        14,
+        368,
+        "Eye Drops",
+        262,
+        99,
+        true
+      ]
+    ],
+    "excluded_rows": [
+      [
+        15,
+        265,
+        "Draw Weapon: no consumable count"
+      ]
+    ],
+    "inventory_raw": "6a0102006f01630075016000770163006b0163006c0163007001630071016300720163007301630074016300760163006d01060000000000",
+    "inventory_sha256": "3d9b5a4a862b939828fe20cb4ccdb1189403e14229ffa092de6e83ad06903e77",
+    "unit_sha256": "296abb95c2f0ad7f9b41ced9fd841b2df2f7239256ede42113be7146c9717327",
+    "list_sha256": "1da3d031d40514dc5c93af3bdbf0409fa619c59402ed20097ccde6267933a3e5",
+    "availability_flag13": 0
+  },
+  "Potion_overlay_raw": {
+    "context": 33740960,
+    "root": "010000000700000000000000d700000002000000fb00000088010002880100023cdd0202a0d8020258dd020281218121",
+    "driver": "34f101020c2702020c270202000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009c2702022c2e0202000000000000000000000000000000000000000000000000e459010200000000000000005c2f020200000000000000000000000000000000000000003c240202010800009c27020200080000dc0502020000000000000000780f03020000fb004c00000000000000ff0000000000030000000000000000000000000000000000020709000000000048020000080a00000000000031000300",
+    "inventory_unchanged": true
+  },
+  "Potion_overlay": {
+    "source": 33554824,
+    "target": 33554824,
+    "wrapper": 33695500,
+    "ability_id": 251,
+    "item_id": 362,
+    "count": 2,
+    "hp": 100,
+    "max_hp": 241,
+    "tile": [
+      5,
+      10
+    ],
+    "inventory_sha256": "3d9b5a4a862b939828fe20cb4ccdb1189403e14229ffa092de6e83ad06903e77",
+    "raw_sha256": "32fb3a17704ef6273a339751c9cbb4a5eb4a839e15290101864deaa72c892205"
+  },
+  "Potion_target_input_events": [
+    {
+      "event": "target_input_requested",
+      "mask": 1
+    },
+    {
+      "event": "target_input_delivered",
+      "hits": 5
+    }
+  ],
+  "Potion_target_input": {
+    "outcome": "target-input-delivered-only",
+    "final_input": false
+  },
+  "Potion_preview_raw": {
+    "root": "000000000c010000000000003041010002000000fb00000088010002880100023cdd0202a0d8020258dd020281218121",
+    "driver": "34f101020c2702020c270202000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009c2702022c2e0202000000000000000000000000000000000000000000000000e459010200000000000000005c2f020200000000000000000000000000000000000000003c240202010800009c27020200080000dc0502020000000000000000780f03020000fb004c00000000000000ff0000000000030000000000000000000000000000000000020709000000000048020000080a00000000000031000300",
+    "inventory": "6a0102006f01630075016000770163006b0163006c0163007001630071016300720163007301630074016300760163006d01060000000000",
+    "canonical": "c712550808050105072800000101010101010101010000006400f100dd00dd001a017d019e01db01810093004b01190153015d01580a01000000001e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee803920050010600000000000000000000000000000000ff0000000000000000002000000000050a02030506010203fc0002000005000187"
+  },
+  "Potion_description": {
+    "source": 33554824,
+    "target": 33554824,
+    "ability": 251,
+    "item": 362,
+    "count": 2,
+    "hp": 100,
+    "tile": [
+      5,
+      10
+    ],
+    "raw_sha256": "c0fe4ce7f80d6f80d11e62aaf6f40665f1ef66878f8863657d02b0aba8eff8aa"
+  },
+  "Potion_prompt_events": [
+    {
+      "event": "prompt_inspection_input_requested",
+      "mask": 1
+    },
+    {
+      "event": "prompt_inspection_input_delivered",
+      "hits": 5
+    }
+  ],
+  "Potion_prompt_input": {
+    "outcome": "prompt-inspection-input-only",
+    "final_input": false
+  },
+  "Potion_final_prompt_raw": {
+    "root": "000000000b010000000000003041000002000000fb00000088010002880100023cdd0202a0d8020258dd020281218121",
+    "driver": "34f101020c2702020c270202000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009c2702022c2e0202000000000000000000000000000000000000000000000000e459010200000000000000005c2f020200000000000000000000000000000000000000003c240202010800009c27020200080000dc0502020000000000000000780f03020000fb004c00000000000000ff0000000000030000000000000000000000000000000000020709000000000048020000080a00000000000031000300",
+    "inventory": "6a0102006f01630075016000770163006b0163006c0163007001630071016300720163007301630074016300760163006d01060000000000",
+    "canonical": "c712550808050105072800000101010101010101010000006400f100dd00dd001a017d019e01db01810093004b01190153015d01580a01000000001e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee803920050010600000000000000000000000000000000ff0000000000000000002000000000050a02030506010203fc0002000005000187"
+  },
+  "Potion_final_token": {
+    "source": 33554824,
+    "target": 33554824,
+    "item": 362,
+    "ability": 251,
+    "count": 2,
+    "hp": 100,
+    "tile": [
+      5,
+      10
+    ],
+    "law_matches": [
+      [
+        1,
+        0
+      ],
+      [
+        82,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ],
+    "law_control": [
+      20,
+      1
+    ],
+    "native_unit_read_offsets": [
+      [
+        5,
+        1
+      ],
+      [
+        6,
+        1
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        8,
+        1
+      ],
+      [
+        24,
+        2
+      ],
+      [
+        53,
+        1
+      ],
+      [
+        54,
+        1
+      ],
+      [
+        232,
+        1
+      ]
+    ],
+    "raw_sha256": "5d6bd446928f5b26d6441e90a688b1a6e8aa4bb846afc1278fd6cef045d3c7eb"
+  },
+  "Potion_use_events": [
+    {
+      "event": "Potion_final_input_requested",
+      "mask": 1
+    },
+    {
+      "event": "Potion_final_input_delivered",
+      "hits": 5
+    }
+  ],
+  "Potion_use_input": {
+    "outcome": "final-input-delivered-only",
+    "actual_consumption_proved": false
+  },
+  "Potion_after": {
+    "hp": 125,
+    "mp": 221,
+    "count": 1,
+    "canonical": "c712550808050105072800000101010101010101010000007d00f100dd00dd001a017d019e01db01810093004b01190153015d01580a01000000001e4d000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee803920050010600000000000000000000000000000000ff0000000000000000002000000000050a02030506010203fc0002000005000187",
+    "inventory": "6a0101006f01630075016000770163006b0163006c0163007001630071016300720163007301630074016300760163006d01060000000000",
+    "native_hits": [
+      {
+        "t": 23.6,
+        "pc": "080a2298",
+        "phase": "HP-store-before",
+        "during": "Potion-effect",
+        "registers": [
+          "000000f1",
+          "080a2289",
+          "02000188",
+          "0000001e",
+          "0000007d",
+          "0000007d",
+          "02000188",
+          "00000003",
+          "0000004c",
+          "020159e4",
+          "020159e4",
+          "00000000",
+          "00000001",
+          "03007934",
+          "080a2289",
+          "080a2298",
+          "8000003f"
+        ],
+        "canonical": 33554824,
+        "id": 5,
+        "hp": 100,
+        "mp": 221,
+        "stored_hp": 125,
+        "processor_ability": 0,
+        "processor_source_wrapper": 33695500,
+        "processor_target_wrapper": 168099842,
+        "Potion_owned": 1,
+        "Potion_reserved": 0
+      },
+      {
+        "t": 23.7,
+        "pc": "080a229a",
+        "phase": "HP-store-after",
+        "during": "Potion-effect",
+        "registers": [
+          "000000f1",
+          "080a2289",
+          "02000188",
+          "0000001e",
+          "0000007d",
+          "0000007d",
+          "02000188",
+          "00000003",
+          "0000004c",
+          "020159e4",
+          "020159e4",
+          "00000000",
+          "00000001",
+          "03007934",
+          "080a2289",
+          "080a229a",
+          "8000003f"
+        ],
+        "canonical": 33554824,
+        "id": 5,
+        "hp": 125,
+        "mp": 221,
+        "stored_hp": 125,
+        "processor_ability": 0,
+        "processor_source_wrapper": 33695500,
+        "processor_target_wrapper": 168099842,
+        "Potion_owned": 1,
+        "Potion_reserved": 0
+      }
+    ]
+  },
+  "error": "RecoveryStateError('no actor-associated native Potion HP store')",
+  "gameplay_writes": [
+    {
+      "t": 4.087,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 4.14,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 4.193,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 4.246,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 4.298,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 5.56,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 5.613,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 5.665,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 5.718,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 5.77,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 7.032,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 7.084,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 7.137,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 7.19,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 7.243,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 8.5,
+      "val": 128,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 8.553,
+      "val": 128,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 8.605,
+      "val": 128,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 8.659,
+      "val": 128,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 8.711,
+      "val": 128,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 9.972,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 10.025,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 10.077,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 10.13,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 10.182,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 12.272,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 12.325,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 12.377,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 12.43,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 12.482,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 14.53,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 14.584,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 14.637,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 14.69,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 14.742,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 18.59,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 18.643,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 18.696,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 18.748,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 18.8,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    },
+    {
+      "t": 21.106,
+      "val": 1,
+      "hits": 1,
+      "manual": false
+    },
+    {
+      "t": 21.159,
+      "val": 1,
+      "hits": 2,
+      "manual": false
+    },
+    {
+      "t": 21.211,
+      "val": 1,
+      "hits": 3,
+      "manual": false
+    },
+    {
+      "t": 21.262,
+      "val": 1,
+      "hits": 4,
+      "manual": false
+    },
+    {
+      "t": 21.315,
+      "val": 1,
+      "hits": 5,
+      "manual": false
+    }
+  ],
+  "fixture_writes": [],
+  "inputs_unchanged": true
+}
