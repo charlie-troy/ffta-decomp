@@ -21,7 +21,8 @@
     },
     {
       "id": "two-reloads-Wait-and-next-actor",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Current-source clean-turn07/PID51040 and08/PID87840:65 attributed writes each, native decrement/HP pair, guarded Wait/independent next actor, terminal strict disarm and owned process close.14 audit mutations each."
     },
     {
       "id": "live-STOP-and-reserve-refusal",
@@ -36,10 +37,14 @@
   "source_sha256": {
     "tools/consumable_use_gate.py": "bf6282a32b830db703106dad5192387972dbb3f41c3ecbe33baab50fed605075",
     "tools/consumable_effect_trace.py": "62dd779caea13b8eeebe2a63045ad81ca28e4182972fca9e1870e8ae2dbe450a",
-    "tools/validate_consumable_use.py": "235a9c284477a9226c986f1c1b483fd45e4557f109e17ab4e6863f6a896e859f",
+    "tools/validate_consumable_use.py": "267551d9dd5a596e01b46372369cf2272af125b489087b80ff84783650008eb2",
     "tools/validate_consumable_use_gate.py": "f30bfec437140c85167a4c0951ffc3651095e03bb2908a5d133f5b838a1c67e5",
     "tools/build_consumable_fixture.py": "5bfb44c4109caec719575346059c28638047ae506ca10f03f3bb617a799918f1",
-    "tools/probe_consumable_inventory.py": "42eaf128eccdd1212c49b390cbd074981ff9ee778e6cb1bb34f46b135f354c75"
+    "tools/probe_consumable_inventory.py": "29d6c31f6cf218736b51ddd71ac5618743fe86bae6c7477dd90bfcb71eae838d",
+    "tools/consumable_transport.py": "f26652444f71c0033bce6924aa8f3eb4dd9ffdadea30d882b4c35d46da84bcee",
+    "tools/validate_consumable_transport.py": "9de40b1043617ec5207c174cec5e6103842385758ed12b1bb881a769f3d4947e",
+    "tools/validate_consumable_refusal.py": "ca147d33ad7d5d9bc6c5bd810aad8132e19c3203ce31b438977afe967422c26e",
+    "tools/run_consumable_refusal_matrix.py": "54a6cacdca44ad1dccf8f2c6e4bd1befc247c56de6cd931bccfa736c35dfa4f6"
   },
   "evidence_sha256": {
     "outputs/autobattle/a662-use-fixture-01/fixture.json": "1e9a617fb83ac0cdfddca63d25d327027cdaaf06c7561a88a6253ec6754c38a6",
@@ -54,7 +59,18 @@
     "outputs/autobattle/a662-single-use-checks-03.json": "50bccea5d82bfc44b184e582f5fdb2f8f3ba202e44959274163db5f3bd65d2e4",
     "outputs/autobattle/a662-single-use-turn-03/inventory.json": "7a71c2667b0350d094ec0f678991bb9be9173cfcd5dcde5f919ad6ba1badb4d2",
     "outputs/autobattle/a662-single-use-turn-03/native-Potion-hits.jsonl": "c5afe2f6268f77b5d14fe28449dce759962986f8cf9a6860b34d1f55dd0b06c0",
-    "outputs/autobattle/a662-turn-checks-03.json": "d12cfe824bbd00708a65bea0fbbc0e2bd162e07287d12d671362c1890d54c9a3"
+    "outputs/autobattle/a662-turn-checks-03.json": "d12cfe824bbd00708a65bea0fbbc0e2bd162e07287d12d671362c1890d54c9a3",
+    "outputs/autobattle/a662-clean-turn-checks-07.json": "a12271d44d51e4c1c341428e91a6978793350066e76b41bbb20b4cef15f554a4",
+    "outputs/autobattle/a662-clean-turn-checks-08.json": "847e24107b36733f6278617e943c66f7fc2f31c2c13c65fe55b897beb36f8f64",
+    "outputs/autobattle/a662-terminal-transport-controls-02.json": "a1fee9200845647d3ef3860cf7b6c4d47a72bfa910749828b1748a26adfabdb0",
+    "outputs/autobattle/a662-default-transport-regression-01.json": "6eb88d3f5b2479f11c488d547c37042a38f66ffa632e93c1a54ae92d967142a1",
+    "outputs/autobattle/a662-use-gate-controls-04.json": "b08bdccf4239c699ad8fcb5c5b864a5263ae61fb69f434c5563eb1ea77b877b9",
+    "outputs/autobattle/a662-clean-turn-07/inventory.json": "a7d2d20967121c0999d3420ee9d24dc6e4aa4f00f0324a137c03c2ab01024dca",
+    "outputs/autobattle/a662-clean-turn-07/native-Potion-hits.jsonl": "a8c3ff3e76fdf5cfad0390cd103b35787c50ee6365acfb3f67b8aa71f62a0936",
+    "outputs/autobattle/a662-clean-turn-08/inventory.json": "d156a6207305e17d285426df77665b40cbc9fa2b99383ec1bfd6eb9cfb8179dc",
+    "outputs/autobattle/a662-clean-turn-08/native-Potion-hits.jsonl": "6ca3bb142b564271252ea0454f1fe294481b5bb4e959af850e43365eb225a9a7",
+    "outputs/autobattle/a662-clean-turn-checks-07b.json": "78a97ec349e10bcecc04bb13c412001232564a6d67ce3cc23a9a3053179d40cb",
+    "outputs/autobattle/a662-clean-turn-checks-08b.json": "473efd2aff200224fec9fb2624c0cd27dae2d3be7d08b2b4e81675ab03cb37d4"
   },
   "excluded_runs": [
     {
@@ -68,6 +84,14 @@
     {
       "run": "a662-single-use-turn-02",
       "reason": "EXP0 to10 explained canonical rebind; restored command proves Action consumed/Wait enabled. Stale pre-use inventory pin blocked Wait input, corrected to witnessed post-use pool. No completion claim."
+    },
+    {
+      "run": "a662-single-use-turn-04",
+      "reason": "Use/Wait/next actor observed, but strict final breakpoint removal raced pending stop S05k. Excluded from clean reload acceptance; added explicit halt before disarm."
+    },
+    {
+      "run": "a662-clean-turn-06",
+      "reason": "Explicit interrupt still raced S02 on final disarm. Superseded by terminal research transport that never re-arms before process close."
     }
   ],
   "limitations": [
@@ -75,5 +99,5 @@
     "Effect-time processor ability is cleared; never infer ability from that zero field.",
     "No public Item lifecycle acceptance."
   ],
-  "next_task": "Finish command restoration/guarded Wait and independently attributed next actor on two reloads; capture live STOP/reserve refusals before A6.6.3."
+  "next_task": "Finish live refusal matrix STOP-final-use/post-effect/Wait-final, last-item and zero. Then A6.6.3 public schema2 integration and real CLI lifecycle; no public acceptance yet."
 }

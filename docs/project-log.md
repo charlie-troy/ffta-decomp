@@ -1,5 +1,13 @@
 # Project log
 
+## 2026-10-15 - Two clean Potion/Wait reloads; terminal cleanup corrected
+
+Explicit halt alone still raced S02. Terminal research transport now strictly disarms while halted and does not re-arm before owned process close; default public transport unchanged. Clean-turn07/PID51040 and08/PID87840 each show native count2 to1 / HP100 to125 / MP221,65 inputs, guarded Wait, independently joined Carson, strict disarm and process close.13 audit mutations each,4 terminal host cases and13 default transport regressions pass. Live refusal matrix running; STOP-final-use and post-effect already pass. A6.6.2 remains UNKNOWN until remaining STOP/last-item/zero cases; no public Item acceptance.
+
+## 2026-10-15 - First native Potion use and Wait continuation
+
+A6.6.2 native trace pins Potion362 quantity1 decrement2 to1, then Montblanc5 HP100 to125 with MP221 unchanged. EXP0 to10 reward explicitly reconciled. Fresh turn03 records65 raw writes, guarded Wait and independent next actor;11 receipt mutations and11 host single-attempt/STOP/reserve cases pass. Turn04 reaches next actor but strict cleanup races a pending stop; excluded until clean repeat. Added halt before final disarm; turn05 verification follows. A6.6.2 remains UNKNOWN pending two clean complete reloads and live STOP/refusal. Public Item remains disabled.
+
 ## 2026-10-15 - Bounded self-Potion final reader passes; use witness next
 
 Fresh reaction-free native capture reaches owned Do it with HP100/Potion2 unchanged, 40 raw writes and47-module closure. Native law matcher depends only on the pinned unit/stack; current1/82/42 clear, Items20 rejects,22 final-context mutations reject. Blizzard was reaction slot75, confirmed by native getter and disappearance after clearing only reaction. The accepted Cure control also displays dmg while actually healing, resolving that label concern without asserting Potion effect semantics. A6.6.1 bounded reader PASS; actual use/queue/turn completion and public lifecycle remain UNKNOWN. Next construct EXP0 reaction-free fixture for single-use witness. All owned sessions closed.

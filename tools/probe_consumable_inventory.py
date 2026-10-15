@@ -29,7 +29,7 @@ from probe_recovery_ko_lifecycle import source_dependencies
 from probe_recovery_party import block
 from recovery_menu import MEMBERS, MEMBER_COUNT, MENU_ROOT, exact, integer, require, RecoveryTransient
 from recovery_menu_list import ResearchMenuList
-from recovery_transport import RecoveryTransport
+from consumable_transport import ConsumableResearchTransport
 
 
 def main():
@@ -46,11 +46,13 @@ def main():
                     help='Open the final prompt from a pinned description; never select Do it')
     ap.add_argument('--execute-potion-once',action='store_true',help='Research only: one guarded final use and passive native HP-store observation')
     ap.add_argument('--complete-potion-turn',action='store_true',help='After witnessed use, guarded Wait and independent next-actor observation')
+    ap.add_argument('--inject-stop-at',choices=('final-use','post-effect','Wait-final'),help='Research cancellation control: create an actual STOP file at this boundary')
     args=ap.parse_args()
     require(not args.accept_potion_target or args.inspect_potion_target,'preview requires explicit Potion overlay inspection')
     require(not args.inspect_potion_final_prompt or args.accept_potion_target,'final-prompt inspection requires target acceptance')
     require(not args.execute_potion_once or args.inspect_potion_final_prompt,'single use requires final-context inspection')
     require(not args.complete_potion_turn or args.execute_potion_once,'turn completion requires single-use witness')
+    require(not args.inject_stop_at or args.execute_potion_once,'STOP injection requires bounded use experiment')
     out=Path(args.out);out.mkdir(parents=True,exist_ok=False)
     sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
     paths=[args.state,args.rom,args.scenario]+source_dependencies('probe_consumable_inventory')
@@ -58,7 +60,7 @@ def main():
             'source_sha256':{p:sha(p) for p in paths},'observations':[],'inputs':[]}
     expect=json.loads(Path(args.scenario).read_text())['guard_expectations']
     expect['slot0_name']=int(expect['slot0_name'],0)
-    probe=None
+    probe=None;session=None
     try:
         with FixtureSession(args.state,rom=args.rom,expect=expect,quiet=True,work_dir=str(out/'session')) as session:
             session.g.sock.settimeout(2)
@@ -76,7 +78,8 @@ def main():
                     result.setdefault('passive_rejections',[]).append(str(exc))
             require(owner is not None,'no independently verified fresh Item-menu owner')
             probe.active_player_slot=owner['slot'];adapter.revalidate(owner,probe);result['owner']=owner
-            with RecoveryTransport(probe) as transport:
+            with ConsumableResearchTransport(probe) as transport:
+                result['transport_events']=transport.events
                 rom=session.read_rom_bytes();names=Names(rom)
                 matches=[MEMBERS+i*STRIDE for i in range(MEMBER_COUNT)
                          if integer(exact(transport.g,MEMBERS+i*STRIDE,STRIDE),0)==owner['name']
@@ -86,8 +89,14 @@ def main():
                 inventory=ConsumableInventory(transport.g);before=inventory.snapshot()
                 result['inventory_before']={'raw':before.raw.hex(),'sha256':before.sha256,'items':before.items()}
                 def stopped():
+                    if (out/'STOP').exists():
+                        result.setdefault('stop_requested',{'t':time.monotonic(),'write_count':len(probe.key_write_log)})
                     require(not (out/'STOP').exists(),'STOP observed; research input forbidden')
                     return False
+                def inject_stop(phase):
+                    if args.inject_stop_at==phase:
+                        (out/'STOP').write_text(phase,encoding='utf-8')
+                        result['stop_injection']={'phase':phase,'t':time.monotonic(),'write_count':len(probe.key_write_log)}
                 def observe(kind):
                     for _ in range(20):
                         stopped()
@@ -201,7 +210,13 @@ def main():
                                 mp=integer(unit,0x1C,2)
                                 use_gate=PotionUseGate(final_reader,transport,stop_check=stopped)
                                 result['Potion_use_events']=use_gate.events
-                                result['Potion_use_input']=use_gate.execute(final_token)
+                                inject_stop('final-use')
+                                try:result['Potion_use_input']=use_gate.execute(final_token)
+                                except ValueError:
+                                    result['Potion_final_refusal']={'started':use_gate.started,'attempted':use_gate.attempted,
+                                        'hp':integer(exact(transport.g,member+0x18,2),0,2),
+                                        'inventory':inventory.snapshot().raw.hex()}
+                                    raise
                                 transport.interrupt();probe.arm(strict=True)
                                 deadline=time.monotonic()+35
                                 while time.monotonic()<deadline:
@@ -229,6 +244,7 @@ def main():
                                     and h['item']==362 and h['Potion_owned']==1 for h in probe.item_hits),
                                     'no native single-Potion decrement pair')
                                 result['status']='observed-single-Potion-consumption-and-HP-store-only'
+                                inject_stop('post-effect');stopped()
                                 if args.complete_potion_turn:
                                     # Rebind only after the native HP store/count pair has passed.
                                     menu=ResearchMenuList(transport.g,rom,owner,member)
@@ -264,6 +280,7 @@ def main():
                                     result['Potion_Wait_events']=boundary.events
                                     # Pure policy selects only the native legal Wait candidate.
                                     policy={'schema':'ffta-tactics-policy/2','assignments':{},'fallback':'wait','observation':{'max_age_seconds':3}}
+                                    inject_stop('Wait-final')
                                     result['Potion_Wait']=boundary.commit(facing,transport,policy,stopped)
                                     deadline=time.monotonic()+30
                                     while time.monotonic()<deadline:
@@ -279,12 +296,16 @@ def main():
                                     result['capture_sha256'][path.name]=sha(path)
                                     result['status']='observed-Potion-use-Wait-and-next-actor'
                 require(not session.writes,'research probe edited RAM')
-            session.screenshot(str(out/'Item-list.png'));probe.disarm(strict=True)
+            session.screenshot(str(out/'Item-list.png'))
+            # Terminal research exit already disarmed while halted. No trace
+            # restoration or second disarm can race a newly queued trace stop.
+            result['strict_trace_disarmed']=True
     except BaseException as exc:
         result['error']=repr(exc);raise
     finally:
         if probe is not None:
             result.update(gameplay_writes=getattr(probe,'key_write_log',[]),fixture_writes=probe.s.writes)
+        result['owned_process_closed']=session is not None and session.pid is None
         result['inputs_unchanged']=all(sha(p)==h for p,h in result['source_sha256'].items())
         (out/'inventory.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(result['status'],result['raw_list']['rows'])

@@ -73,7 +73,7 @@
   "source_sha256": {
     "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
     "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
-    "tools/probe_consumable_inventory.py": "42eaf128eccdd1212c49b390cbd074981ff9ee778e6cb1bb34f46b135f354c75",
+    "tools/probe_consumable_inventory.py": "29d6c31f6cf218736b51ddd71ac5618743fe86bae6c7477dd90bfcb71eae838d",
     "tools/validate_consumable_inventory.py": "aa62451cf753df6f161268e0f446565b4f63f8cec75f6729a149ca9bc41d4f5f",
     "tools/validate_consumable_menu.py": "d55ee24bbbc735105c6cbf15490cf58bc54d936def6c18303878938637753970",
     "tools/validate_consumable_builder.py": "0ca0e0866db69a9fbb33bb7042151f15d9bc6276b6b2f8191e4e6229d7ebc6a2",
