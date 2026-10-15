@@ -14,6 +14,8 @@ from autobattle_identity import ActorAdapter, IdentityError
 from consumable_inventory import ConsumableInventory, INVENTORY, ITEM_IDS
 from consumable_menu import OwnedItemList
 from consumable_overlay import PotionOverlayReader
+from consumable_preview_gate import PotionPreviewGate
+from consumable_description import PotionDescriptionReader,PotionPromptInspectionGate
 from emulate import Gba
 from ffta_names import Names, UI_STRINGS
 from fixture_guard import FixtureSession, STRIDE
@@ -33,7 +35,14 @@ def main():
     ap.add_argument('--out',required=True)
     ap.add_argument('--inspect-potion-target',action='store_true',
                     help='Select enabled Potion once, capture the overlay, then stop without target acceptance')
-    args=ap.parse_args();out=Path(args.out);out.mkdir(parents=True,exist_ok=False)
+    ap.add_argument('--accept-potion-target',action='store_true',
+                    help='One guarded self target-acceptance input; capture preview, never confirm item use')
+    ap.add_argument('--inspect-potion-final-prompt',action='store_true',
+                    help='Open the final prompt from a pinned description; never select Do it')
+    args=ap.parse_args()
+    require(not args.accept_potion_target or args.inspect_potion_target,'preview requires explicit Potion overlay inspection')
+    require(not args.inspect_potion_final_prompt or args.accept_potion_target,'final-prompt inspection requires target acceptance')
+    out=Path(args.out);out.mkdir(parents=True,exist_ok=False)
     sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
     paths=[args.state,args.rom,args.scenario]+source_dependencies('probe_consumable_inventory')
     result={'schema':'ffta-consumable-inventory-research/1','status':'unknown','scope':__doc__,
@@ -125,6 +134,7 @@ def main():
                             and item_token.items[0][0]==1 and item_token.items[0][-1],
                             'Potion must already be the enabled current native row')
                     overlay_reader=PotionOverlayReader(item_reader,item_token)
+                    description_reader=PotionDescriptionReader(item_reader,item_token)
                     stopped();item_reader.revalidate(item_token);stopped()
                     hits=transport.press(1,tag='a66-inspect-Potion-target-only',stop_check=stopped)
                     result['inputs'].append({'mask':1,'hits':hits,'before_Item':item_token.receipt()})
@@ -141,6 +151,35 @@ def main():
                     overlay_token=overlay_reader.snapshot();overlay_reader.revalidate(overlay_token)
                     result['Potion_overlay']=overlay_token.receipt()
                     result['status']='pass-owned-Item-reader-with-unaccepted-Potion-overlay'
+                    if args.accept_potion_target:
+                        gate=PotionPreviewGate(overlay_reader,transport,stop_check=stopped)
+                        result['Potion_target_input_events']=gate.events
+                        result['Potion_target_input']=gate.advance(overlay_token)
+                        transport.cont();time.sleep(1);transport.interrupt();stopped()
+                        preview=block(transport.g,0x02000000,0x40000)
+                        path=out/'Potion-preview-ewram.bin';path.write_bytes(preview)
+                        result['capture_sha256'][path.name]=sha(path)
+                        root=exact(transport.g,context,0x30)
+                        result['Potion_preview_raw']={'root':root.hex(),
+                            'driver':exact(transport.g,0x0200F4E8,0xE0).hex(),
+                            'inventory':inventory.snapshot().raw.hex(),
+                            'canonical':exact(transport.g,member,STRIDE).hex()}
+                        result['status']='captured-Potion-target-acceptance-only'
+                        if args.inspect_potion_final_prompt:
+                            description=description_reader.snapshot();description_reader.revalidate(description)
+                            result['Potion_description']=description.receipt()
+                            prompt_gate=PotionPromptInspectionGate(description_reader,transport,stop_check=stopped)
+                            result['Potion_prompt_events']=prompt_gate.events
+                            result['Potion_prompt_input']=prompt_gate.advance(description)
+                            transport.cont();time.sleep(1);transport.interrupt();stopped()
+                            path=out/'Potion-final-prompt-ewram.bin'
+                            path.write_bytes(block(transport.g,0x02000000,0x40000))
+                            result['capture_sha256'][path.name]=sha(path)
+                            result['Potion_final_prompt_raw']={'root':exact(transport.g,context,0x30).hex(),
+                                'driver':exact(transport.g,0x0200F4E8,0xE0).hex(),
+                                'inventory':inventory.snapshot().raw.hex(),
+                                'canonical':exact(transport.g,member,STRIDE).hex()}
+                            result['status']='captured-Potion-final-prompt-only'
                 require(not session.writes,'research probe edited RAM')
             session.screenshot(str(out/'Item-list.png'));probe.disarm(strict=True)
     except BaseException as exc:

@@ -1,0 +1,15 @@
+{
+  "status": "pass",
+  "scope": "Exercise one-attempt preview input, STOP precedence and stale-token refusal.",
+  "checks": [
+    "success single-attempt/no-final-input",
+    "STOP single-attempt/no-final-input",
+    "stale single-attempt/no-final-input",
+    "foreign single-attempt/no-final-input",
+    "partial single-attempt/no-final-input",
+    "ambiguous single-attempt/no-final-input"
+  ],
+  "limitations": [
+    "Host protocol controls only; no native preview, law or consumption claim."
+  ]
+}

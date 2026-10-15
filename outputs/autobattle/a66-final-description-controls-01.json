@@ -1,0 +1,45 @@
+{
+  "status": "pass",
+  "scope": "Replay native Potion description ownership and reject stale prompt-inspection authority.",
+  "description": {
+    "source": 33554824,
+    "target": 33554824,
+    "ability": 251,
+    "item": 362,
+    "count": 2,
+    "hp": 100,
+    "tile": [
+      5,
+      10
+    ],
+    "raw_sha256": "68dc0fd276bc54b285f565a015f8bbee261e7bdf2bb7d06027ef6f406bce76cc"
+  },
+  "rejected": [
+    "wrong ability",
+    "wrong callback",
+    "unaccepted overlay",
+    "wrong driver",
+    "wrong preview flags",
+    "wrong target",
+    "accepted final target",
+    "HP changed",
+    "committed tile changed"
+  ],
+  "checks": [
+    "exactly one prompt-inspection input",
+    "retry forbidden",
+    "STOP gives zero input"
+  ],
+  "source_sha256": {
+    "tools/consumable_description.py": "e9a3471045947203a82ceb94347df1eee40b37240e62bfb86d043324b948c3ad",
+    "tools/validate_consumable_description.py": "abfd07c0556f36775ed76fc882edebd9115a6902503cdc4122bc6d6aa407df15"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-Potion-final-prompt-01\\inventory.json": "0d372c9e913a9d2d7ab78a767a8fcfaf2737b177f1eb1337660dac5d5a4bd8e6",
+    "outputs\\autobattle\\a66-Potion-final-prompt-01\\Item-list-ewram.bin": "1e6632ef7062c8b93b6d24bf7d3e51097215c5f132d74ef62c3d057c3c328b4f",
+    "outputs\\autobattle\\a66-Potion-final-prompt-01\\Potion-preview-ewram.bin": "b5a9d95d688dd13d9cd316b42667a28dacc737da3770352082a6ce85c743d566"
+  },
+  "limitations": [
+    "Description ownership only; no coherent effect queue, law compliance or final item input."
+  ]
+}

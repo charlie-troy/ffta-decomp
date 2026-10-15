@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-15 - Potion law matcher controls and final prompt inspection
+
+Actual law matcher081343C8 returns clear for active1/82/42 and match for Items20 on captured self-Potion251;12 amount/control executions return normally with no EWRAM writes. Typed one-attempt preview/description gates reach native Do it/Cancel without final use (40 raw writes,46-module closure, unchanged Potion2/HP100). Six host gate cases and nine description mutations plus STOP/retry controls pass. Lower preview still shows Blizzard/26dmg despite Potion/Heal HP selection: effect-queue correlation remains UNKNOWN. Next verify matcher dependencies and final token, then resolve that mismatch before A6.6.2. All emulator sessions closed.
+
 ## 2026-10-14 - Native law display reached; Potion compliance remains UNKNOWN
 
 Guarded command B, field START, System Law Cards row3 reaches the actual forbidden/recommended panel. PID40048 source-stable,25 attributed raw writes, unchanged inventory, no card application. Active law IDs02003C34=[1,82,42,0], capacity4; actual0802D764 counts3, isolated0/1/3 controls pass. Inferred MAIN_STRINGS[625+ID] joins inspected forbidden Skills/Dmg2Animal/Broadswords. Next classify self-Potion251/item362 against these native law predicates and final prompt; no consumable use is authorized by the reader yet. All owned emulator sessions are closed.

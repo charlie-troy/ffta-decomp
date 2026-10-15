@@ -123,3 +123,30 @@ Next executable step: trace the native law violation/classification predicates
 for active Skills1, Animal82 and Broadswords42 against source Montblanc5,
 self-target and Potion ability251/item362. Enabled Item rows and a legal cursor
 do not settle that question. Final-prompt legality and A6.6.2 remain gated.
+
+## 2026-10-15: isolated law matcher and final prompt reached
+
+Native law records are16 bytes at08528F34.081343C8 is the matcher called by
+08134B88 with source,target,ability,action flag in r0..r3 and phase,amount,
+effect-bit pointer,law-record pointer on the stack (see0813504E..08135072).
+Native08133D78 resolves ability251 to action set1 (Item). On pinned Montblanc
+self-Potion, actual matcher runs return0 for active Skills1/Animal82/
+Broadswords42 and1 for the separate Items20 control. Amounts-30/0/30 all agree:
+12 executions, normal returns, zero EWRAM writes. These are isolated native
+predicate results, not observed live calls or a proved action-result queue.
+
+New typed preview/description gates permit only target acceptance and final
+prompt inspection. Six host preview controls and nine native-description
+mutations plus STOP/retry controls pass. `a66-Potion-final-prompt-01` reaches
+Do it/Cancel with callback080293DD/state0102/mode11, selected251, cursor0,
+processor state2/flags20.40 raw writes match eight guarded navigation/inspection
+presses. HP100 and Potion2 remain unchanged; Do it is never selected. Source
+closure46 resolves. Earlier preview-only capture closure45 also resolves via
+the exact archived probe source.
+
+Unresolved observation: the description header says Heal HP and selected
+ability251 is Potion, while the lower panel displays Blizzard/26dmg. Keep that
+visual/effect-queue mismatch UNKNOWN. Do not use it to claim healing or law
+compliance of the live queue. Next bind a final-prompt token and verify the
+matcher's RAM dependencies, then identify the actual preview/effect queue.
+A6.6.2 and public item execution stay gated.

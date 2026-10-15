@@ -1,0 +1,135 @@
+{
+  "status": "pass-isolated-Potion-law-matcher",
+  "scope": "Execute the retail law matcher on pinned self-Potion facts, with a violating control.\n\n081343C8(source,target,ability,action_flag,phase,amount,effect_bits,law_entry)\nis called by 08134B88 (e.g.0813504E..08135072). Stack arguments are ABI words.\nThis isolates the matcher; it does not claim an observed live invocation,\nvalidated action-result queue, final-prompt legality or item execution.\n",
+  "active_laws": [
+    1,
+    82,
+    42
+  ],
+  "cases": [
+    {
+      "law": 1,
+      "amount_probe": -30,
+      "match": 0,
+      "branch_sha256": "0c019954c7a2d7b854b3411fada657444f43664b15d4a1ca5412c945825c9657",
+      "instruction_count": 345,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 1,
+      "amount_probe": 0,
+      "match": 0,
+      "branch_sha256": "0c019954c7a2d7b854b3411fada657444f43664b15d4a1ca5412c945825c9657",
+      "instruction_count": 345,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 1,
+      "amount_probe": 30,
+      "match": 0,
+      "branch_sha256": "0c019954c7a2d7b854b3411fada657444f43664b15d4a1ca5412c945825c9657",
+      "instruction_count": 345,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 82,
+      "amount_probe": -30,
+      "match": 0,
+      "branch_sha256": "422735db21b96ba161fa6ff7063ccabb3689e0668a1d83c66ee967bc296fdf1f",
+      "instruction_count": 56,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 82,
+      "amount_probe": 0,
+      "match": 0,
+      "branch_sha256": "422735db21b96ba161fa6ff7063ccabb3689e0668a1d83c66ee967bc296fdf1f",
+      "instruction_count": 56,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 82,
+      "amount_probe": 30,
+      "match": 0,
+      "branch_sha256": "422735db21b96ba161fa6ff7063ccabb3689e0668a1d83c66ee967bc296fdf1f",
+      "instruction_count": 56,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 42,
+      "amount_probe": -30,
+      "match": 0,
+      "branch_sha256": "9925fc2c16325b6c685a05616eb72dc436362ef42a4f8e26a028bf54763c05be",
+      "instruction_count": 253,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 42,
+      "amount_probe": 0,
+      "match": 0,
+      "branch_sha256": "9925fc2c16325b6c685a05616eb72dc436362ef42a4f8e26a028bf54763c05be",
+      "instruction_count": 253,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 42,
+      "amount_probe": 30,
+      "match": 0,
+      "branch_sha256": "9925fc2c16325b6c685a05616eb72dc436362ef42a4f8e26a028bf54763c05be",
+      "instruction_count": 253,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 20,
+      "amount_probe": -30,
+      "match": 1,
+      "branch_sha256": "95e79369debbc27f7a9146ab60e20897d392de33dfc7fde819ee8e4bd305b7a1",
+      "instruction_count": 84,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 20,
+      "amount_probe": 0,
+      "match": 1,
+      "branch_sha256": "95e79369debbc27f7a9146ab60e20897d392de33dfc7fde819ee8e4bd305b7a1",
+      "instruction_count": 84,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    },
+    {
+      "law": 20,
+      "amount_probe": 30,
+      "match": 1,
+      "branch_sha256": "95e79369debbc27f7a9146ab60e20897d392de33dfc7fde819ee8e4bd305b7a1",
+      "instruction_count": 84,
+      "native_action_set": 1,
+      "EWRAM_writes": []
+    }
+  ],
+  "native_law_table": "08528F34/stride10",
+  "matcher": "081343C8",
+  "action_set_lookup": "08133D78",
+  "source_sha256": {
+    "tools/validate_consumable_law_predicate.py": "744d2e11f00f83cd6a27ac2de4224124a54e5a757887f2d3582d14bbf2173303",
+    "tools/emulate.py": "78f0e3261564d57beb219bae9f04f9a1372cf6d08c1e84307050a0d3a649d899",
+    "baserom.gba": "43fc8204c6dceee58828aebc7af0c72eb807e99f35ad641c8bb0a4fa8b6edc19"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-Potion-preview-01\\inventory.json": "fa59d2396eab2b90173f09fa2e9c609343ce9fa0a13a5a4ba183d2cde1eeac35",
+    "outputs\\autobattle\\a66-Potion-preview-01\\Potion-preview-ewram.bin": "30d56da3fcd8d1232ca0f7112e500b4249fd43b95d324a9ebc64cb84c6f28fff"
+  },
+  "limitations": [
+    "Isolated native matcher, not an observed live call or law-compliant action queue.",
+    "Preview screenshot has Blizzard/damage fields despite Potion selection; unresolved."
+  ]
+}
