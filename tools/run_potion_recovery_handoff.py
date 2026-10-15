@@ -11,6 +11,7 @@ def main():
     ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--run-id',required=True)
     ap.add_argument('--state',default='outputs/autobattle/a662-use-fixture-01/consumable-recovery.ss0')
     ap.add_argument('--resume-paused',action='store_true')
+    ap.add_argument('--phase',choices=('Wait','navigation'),default='Wait')
     ap.add_argument('--observe-player-boundaries',action='store_true')
     ap.add_argument('--wall-timeout',type=int,default=300);args=ap.parse_args()
     require(Path(args.run_id).name==args.run_id and not any(c in args.run_id for c in ':\\/'),
@@ -24,13 +25,13 @@ def main():
         require(process.returncode==code,f'Potion handoff {label} failed; inspect {path}')
     if not args.resume_paused:
         child('watch',['tools/run_potion_cli_stop.py','--state',args.state,'--run-id',args.run_id,
-                       '--phase','Potion-Wait-final'])
-    child('manual',['tools/manual_potion_wait_handoff.py','--run',str(root)])
+                       '--phase','navigation' if args.phase=='navigation' else 'Potion-Wait-final'])
+    child('manual',['tools/manual_potion_navigation_handoff.py' if args.phase=='navigation' else 'tools/manual_potion_wait_handoff.py','--run',str(root)])
     child('resume',['tools/run_autobattle.py','--resume',args.run_id,
         '--scenario','configs/battle-scenarios/a4-two-player.json','--max-turns','1',
         '--wall-timeout',str(args.wall_timeout),'--on-stop','kill','--yes']+
         (['--observe-player-boundaries'] if args.observe_player_boundaries else []),1)
-    child('handoff-checks',['tools/validate_potion_recovery_handoff.py','--run',str(root),
+    child('handoff-checks',['tools/validate_potion_navigation_handoff.py' if args.phase=='navigation' else 'tools/validate_potion_recovery_handoff.py','--run',str(root),
                           '--out',str(root/'handoff-checks.json')])
     print('PASS public Potion manual/same-PID resume:',root)
 

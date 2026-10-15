@@ -1,0 +1,10 @@
+{
+  "status": "pass",
+  "scope": "Research process-end transport must stay halted with hooks removed.",
+  "checks": [
+    "halted",
+    "running",
+    "STOP",
+    "partial"
+  ]
+}

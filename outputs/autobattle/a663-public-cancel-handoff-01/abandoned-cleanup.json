@@ -1,0 +1,5 @@
+{
+  "pid": 121348,
+  "owned_process_closed": true,
+  "reason": "Native Item scratch remained count0 after command cancel/field reopen; same-PID adoption guard correctly refused. Preserved failed evidence; no runtime guard changed."
+}

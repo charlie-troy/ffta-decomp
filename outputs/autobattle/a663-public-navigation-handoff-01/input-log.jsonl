@@ -1,0 +1,27 @@
+{"event": "key_write", "t": 13.696, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 13.749, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 13.802, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 13.855, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 13.908, "val": 128, "hits": 5, "manual": false}
+{"event": "stop_requested", "t": 15.116, "detection_latency_s": 0.001, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "manual_key_write", "val": 2, "t": 19.99}
+{"event": "manual_key_write", "val": 1, "t": 22.37}
+{"event": "resume", "t": 23.37}
+{"event": "key_write", "t": 37.024, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 37.076, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 37.129, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 37.181, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 37.234, "val": 128, "hits": 5, "manual": false}
+{"event": "press", "mask": 128, "tag": "c3:echo-down", "t": 36.971, "duration": 1.463, "hits": 5, "aborted": false}
+{"event": "key_write", "t": 39.657, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 39.708, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 39.761, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 39.814, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 39.866, "val": 1, "hits": 5, "manual": false}
+{"event": "press", "mask": 1, "tag": "c3:select-wait", "t": 39.656, "duration": 1.411, "hits": 5, "aborted": false}
+{"event": "key_write", "t": 42.304, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 42.355, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 42.408, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 42.46, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 42.513, "val": 1, "hits": 5, "manual": false}
+{"event": "press", "mask": 1, "tag": "c3:confirm-wait", "t": 42.28, "duration": 1.434, "hits": 5, "aborted": false}

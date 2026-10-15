@@ -1,0 +1,19 @@
+{
+  "status": "pass",
+  "scope": "Retained final prompt ownership/resource corruptions must block manual B.",
+  "rejected": [
+    "owner",
+    "ability",
+    "wrapper",
+    "unit HP",
+    "count",
+    "handler",
+    "callback state",
+    "driver state",
+    "driver flags",
+    "mode"
+  ],
+  "limitations": [
+    "Read-only retained final prompt controls; actual window cancellation tested separately."
+  ]
+}

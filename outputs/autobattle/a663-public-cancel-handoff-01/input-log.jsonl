@@ -1,0 +1,48 @@
+{"event": "key_write", "t": 13.718, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 13.771, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 13.823, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 13.876, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 13.929, "val": 128, "hits": 5, "manual": false}
+{"event": "key_write", "t": 15.202, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 15.254, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 15.306, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 15.358, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 15.411, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 16.678, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 16.73, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 16.783, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 16.836, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 16.888, "val": 128, "hits": 5, "manual": false}
+{"event": "key_write", "t": 18.151, "val": 128, "hits": 1, "manual": false}
+{"event": "key_write", "t": 18.203, "val": 128, "hits": 2, "manual": false}
+{"event": "key_write", "t": 18.257, "val": 128, "hits": 3, "manual": false}
+{"event": "key_write", "t": 18.309, "val": 128, "hits": 4, "manual": false}
+{"event": "key_write", "t": 18.362, "val": 128, "hits": 5, "manual": false}
+{"event": "key_write", "t": 19.62, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 19.672, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 19.724, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 19.777, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 19.829, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 21.935, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 21.988, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 22.04, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 22.093, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 22.146, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 24.197, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 24.25, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 24.302, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 24.353, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 24.404, "val": 1, "hits": 5, "manual": false}
+{"event": "key_write", "t": 28.216, "val": 1, "hits": 1, "manual": false}
+{"event": "key_write", "t": 28.268, "val": 1, "hits": 2, "manual": false}
+{"event": "key_write", "t": 28.32, "val": 1, "hits": 3, "manual": false}
+{"event": "key_write", "t": 28.372, "val": 1, "hits": 4, "manual": false}
+{"event": "key_write", "t": 28.426, "val": 1, "hits": 5, "manual": false}
+{"event": "stop_requested", "t": 32.24, "detection_latency_s": 0.02, "note": "STOP file observed; no further gameplay key injections permitted"}
+{"event": "manual_key_write", "val": 2, "t": 37.286}
+{"event": "manual_key_write", "val": 2, "t": 38.621}
+{"event": "manual_key_write", "val": 2, "t": 37.187}
+{"event": "manual_key_write", "val": 2, "t": 38.773}
+{"event": "manual_key_write", "val": 2, "t": 39.849}
+{"event": "manual_key_write", "val": 2, "t": 40.849}
+{"event": "manual_key_write", "val": 1, "t": 41.849}

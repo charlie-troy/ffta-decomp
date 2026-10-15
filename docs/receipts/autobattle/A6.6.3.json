@@ -21,13 +21,13 @@
     },
     {
       "id": "public-STOP-window-manual-same-PID-resumed-player-result",
-      "status": "unknown",
-      "scope": "STOP-final01/PID117368 real CLI pause/kill passes validator. Handoff01 manual owned-window A/next enemy passed; same-PID resumed player result still running. Per-injection STOP host regression newly exposes existing five-frame polling gap; fix and rerun required before acceptance."
+      "status": "pass",
+      "scope": "Current-source navigation-handoff02/PID118372: actual public STOP, owned-window B/A native menu toggle retaining roster8, same-PID verified adoption and one attributed ordinary player command.7 corruptions reject. Five per-injection STOP controls pass after real Probe fix; default/terminal transport13/4 regressions pass. Manual/resume acceptance is navigation boundary only; post-use and post-Item cancel boundaries remain excluded."
     },
     {
       "id": "Cure-Life-default-and-receipt-regressions",
       "status": "unknown",
-      "scope": "Life interface10 and pure policy119 pass; final-source native regression matrix not yet run."
+      "scope": "Final-source matrix02 running; Life and ally-Cure passed so far. Self-Cure/default/refusal/STOP pending. Current-source public-turn04 and21-mutation native audit queued after matrix."
     }
   ],
   "source_sha256": {
@@ -44,9 +44,18 @@
     "tools/validate_potion_policy.py": "a3b491766999dc260ad76e5a561bd5b1da120e4afc184fdf074405a3a290fb8d",
     "tools/run_potion_cli_stop.py": "a75590a2a9add869c8e62649fa108e87962ea8d5107dddf25393217c0279a21f",
     "tools/manual_potion_wait_handoff.py": "770683710abcdcd02d9d4f1c69dbd2f0e1c7da0f2210d265d70888e1690c3fa1",
-    "tools/run_potion_recovery_handoff.py": "65a2be93cf8103b3c24ff14767310490477dbfa82a366fd98d75447f7f2f8c1b",
+    "tools/run_potion_recovery_handoff.py": "96125bab5f82086d5e7d6694a7993300bc5678b74c8b4013526fa877e02235ce",
     "tools/validate_potion_recovery_handoff.py": "4d1ecc440baf8b7140638f208e1273c9033643d01326052e9e6b944fc95b86c2",
-    "configs/tactics/potion-self.json": "6031f081c9dd0de8fae68a6ca37ac40351435ef6074b3d99e8887bc84d3f4650"
+    "configs/tactics/potion-self.json": "6031f081c9dd0de8fae68a6ca37ac40351435ef6074b3d99e8887bc84d3f4650",
+    "tools/probe_control_handoff.py": "8b2d5fff52d0b04fc83280324264280a6a90dbfe977b881a148c46ca7b1c6269",
+    "tools/validate_probe_stop_poll.py": "79cccc41e38bdf68c0e3750b6168efc9e2b9190f4e74bbb66d7af9a35a8ab636",
+    "tools/manual_potion_navigation_handoff.py": "6b76dcde12694785652b95517c2875ca5839b198f6e956a396e70cb982c9ff72",
+    "tools/validate_potion_navigation_handoff.py": "a8bd4822e74cb30831d09c55b8c4123373354871a22e128be1dc87b2139b61b5",
+    "tools/manual_potion_cancel_handoff.py": "ea6cf167d863735f4b040eacd468bbf98ec60ac9f3ac624904564b4840f967ca",
+    "tools/potion_manual_cancel.py": "f0b29c4e4d288989ae89acbcc27891713df800466b535d8bfa353251a460e7b7",
+    "tools/validate_potion_manual_cancel.py": "3f4481d8e6ed8dfa26fb0242538512cce4755ce4d597ecaab5c135b3aa8653b7",
+    "tools/validate_potion_cancel_handoff.py": "546114dbf7deac774375528cddbab19c94d835bc84675d7a9d7f697d5bedb532",
+    "tools/run_potion_public_turn.py": "649120ef8671c0c47f92f9fd584869ac51af45c2a6cf19db8fdf69b4698f6364"
   },
   "evidence_sha256": {
     "docs/receipts/autobattle/A6.6.2.json": "5b38d1ae973b405516e184c17f4a42476f2d847c9738360a63eed970dd2bbe9b",
@@ -61,7 +70,36 @@
     "outputs/autobattle/a663-public-turn-03/input-log.jsonl": "6a7219a021d17b24e0f8cd03cc2a9167ef1ca307a3163ef84e6526c9e3954539",
     "outputs/autobattle/a663-public-STOP-final-01/run.json": "10d6d3d3ea5bab149f06616f772ac5207ac4274a376923c404756b65191a91e3",
     "outputs/autobattle/a663-public-STOP-final-01/events.jsonl": "a8c3eb9eb4c548ce407807731846e88ac9d1b1ae419f2cb1802e72b61dc9778f",
-    "outputs/autobattle/a663-public-STOP-final-01/input-log.jsonl": "e74bc22b3109db357455acc71d2112d92d6a5fc440207232bc0ba25ad1850932"
+    "outputs/autobattle/a663-public-STOP-final-01/input-log.jsonl": "e74bc22b3109db357455acc71d2112d92d6a5fc440207232bc0ba25ad1850932",
+    "outputs/autobattle/a663-keypoll-STOP-controls-02.json": "b846115aa7dddeb0c539f44d9ef340db6f9349993ea540d4f4bfe303fdbcfec2",
+    "outputs/autobattle/a663-transport-regressions-02.json": "6eb88d3f5b2479f11c488d547c37042a38f66ffa632e93c1a54ae92d967142a1",
+    "outputs/autobattle/a663-terminal-transport-regressions-02.json": "a1fee9200845647d3ef3860cf7b6c4d47a72bfa910749828b1748a26adfabdb0",
+    "outputs/autobattle/a663-use-gate-regressions-02.json": "b08bdccf4239c699ad8fcb5c5b864a5263ae61fb69f434c5563eb1ea77b877b9",
+    "outputs/autobattle/a663-public-navigation-handoff-02/handoff-checks.json": "643542e3168c20781e2207e51ee425c8534b4c07918da2ef2c3d480abf314578",
+    "outputs/autobattle/a663-public-navigation-handoff-02/manual-Potion-navigation.json": "9b46bdd5fdb15dc31d5c9f757faf05afdf9410bf7aef8f0fde4c7fc29504b3b8",
+    "outputs/autobattle/a663-public-navigation-handoff-02/paused-run.json": "6cb76e49d2c15a614e2dcd4c6e23419b041572d24d458343cdb9d54b60fcafb8",
+    "outputs/autobattle/a663-public-navigation-handoff-02/run.json": "7c84f72529a18efed3b6fec63ec04646aea3b4ea12d53dbf661e779654936544",
+    "outputs/autobattle/a663-public-navigation-handoff-02/STOP-trigger.json": "655c5e80dc4a4620a17b87d5c7d00194cbe4c0587c59430406880e5286b00075",
+    "outputs/autobattle/a663-public-navigation-handoff-02/events.jsonl": "3ba68c008e8353573f18d779c947dd997adec84c4aed083f2ae6a909ee0c5e9a",
+    "outputs/autobattle/a663-public-navigation-handoff-02/input-log.jsonl": "08aefb518e1766663891c13f8f567768d5936d7494fa48d51769d97350b4dc52",
+    "outputs/autobattle/a663-public-handoff-01/manual-Potion-Wait.json": "073c2d173c4b3d6e23158cf6e363c39298a0b2b513b03c6512a026e2d3126cbf",
+    "outputs/autobattle/a663-public-handoff-01/paused-run.json": "1e0557f9b38897227ad9299113fff8675cd78fb5f5da91d54ba88dec26b8c238",
+    "outputs/autobattle/a663-public-handoff-01/run.json": "d51c36139c48ced04ab41b9d53499f6b7cecadff15f76e1909da4565ef90b956",
+    "outputs/autobattle/a663-public-handoff-01/STOP-trigger.json": "b6301182bbb57bf1d7d486983ae68252f5c86abec58f312f0a471a1012d8c4ab",
+    "outputs/autobattle/a663-public-handoff-01/events.jsonl": "10bd9586ce5df0cf6f7d34a091eeec365296352b1c75cff7d435ba60f13311b6",
+    "outputs/autobattle/a663-public-handoff-01/input-log.jsonl": "96ef6743a0c4343ff6ef1af684311f236d773c58baf0dd78e0f9a5857d1c6967",
+    "outputs/autobattle/a663-public-cancel-handoff-01/abandoned-cleanup.json": "765616d41755ce106a01ac3b70cca72e40ab7af4e74e8db91c03fc9fdad6180e",
+    "outputs/autobattle/a663-public-cancel-handoff-01/manual-cancel-first-B-ewram-root.json": "5464bb1ebe521b443e0cc605cd5701df8142aa1d31b9f6b06517b4655eeb98ec",
+    "outputs/autobattle/a663-public-cancel-handoff-01/manual-field-refresh-01.json": "42511b5c5b7a4a4fc8b3a0ad2e8b1c8dde1ad8cfd39a306a52a79315a3f135c4",
+    "outputs/autobattle/a663-public-cancel-handoff-01/manual-field-refresh-02.json": "90e2a72a614b27a50d550ab099531180cceaa7ed0f04ab91a4e277ea709aadd8",
+    "outputs/autobattle/a663-public-cancel-handoff-01/manual-Potion-cancel-resumed.json": "a43bb77de16c16c3176bf97130b742729d8f342b742b0cde069de9d5dcc48ef3",
+    "outputs/autobattle/a663-public-cancel-handoff-01/manual-Potion-cancel-retry3.json": "ac9099cde884fb36c589a4de7d54e8fb54c6d0151987285a1fffdd39c31214ba",
+    "outputs/autobattle/a663-public-cancel-handoff-01/manual-Potion-cancel.json": "3b2d26da2d5190b2cbfd55f6476cba1a2052708c0d5e2012d90ff2d39c595834",
+    "outputs/autobattle/a663-public-cancel-handoff-01/paused-run.json": "80a834961663b9a85a38e3a8861941e84ec4c947c1768dfc57d207c3bc631d91",
+    "outputs/autobattle/a663-public-cancel-handoff-01/run.json": "83220ae90ea22cc8535d768ac5c09cf1a3f96ad06090efb19acf0b1c8130ed71",
+    "outputs/autobattle/a663-public-cancel-handoff-01/STOP-trigger.json": "0892e082775613073b7ca1baa498fb135545f3386a9010627833d615a5e1aeb6",
+    "outputs/autobattle/a663-public-cancel-handoff-01/events.jsonl": "0b0a7f57afcd1d62df3a57bf0539a68f91bd061011b85f00e3f8eafc0a47b5bc",
+    "outputs/autobattle/a663-public-cancel-handoff-01/input-log.jsonl": "6636b52de6e9209c29ba55b3c69d796bbaccded30cd65e80e922bfc7a7c1427a"
   },
   "excluded_runs": [
     {
@@ -71,12 +109,24 @@
     {
       "run": "a663-public-turn-01",
       "reason": "Fresh Probe has no key_write_log attribute before first input. Fixed with getattr; no gameplay inputs before failure."
+    },
+    {
+      "run": "a663-public-handoff-01",
+      "reason": "Owned manual post-use Wait and same-PID adoption succeeded, but party defeat occurred before any resumed player turn. Remains FAIL for resumed-player gate."
+    },
+    {
+      "run": "a663-public-cancel-handoff-01",
+      "reason": "Manual five-B cancellation restored command, but Item scratch count0 persisted; even field B/A did not restore roster8. Native adoption correctly refused; no guard was weakened. Only owned PID121348 closed after preserving evidence."
+    },
+    {
+      "run": "a663-public-navigation-handoff-01",
+      "reason": "Window toggle retained roster8 and ordinary resume did execute one player turn, but manual helper sampled opening command too early and failed. Added passive settle; complete02 passes."
     }
   ],
   "limitations": [
-    "Research PASS is exact fixture only; whole-battle/A9 and arbitrary consumables remain UNKNOWN.",
-    "Window Wait plus next enemy alone does not prove resumed player result.",
-    "Existing key-poll stop gap is reproduced by host test limit1 yielding5 writes; no complete C1 acceptance yet."
+    "Exact self-Potion use/Wait and navigation manual/resume boundary only; post-use Wait and post-Item cancellation resume remain unaccepted.",
+    "Global per-frame STOP polling changes require all current-source regression cases; matrix still running.",
+    "One-turn budget is not whole-battle/A9 acceptance."
   ],
-  "next_task": "Finish in-flight handoff01; fix real Probe per-injection STOP polling after owned run closes, then fresh public STOP/handoff and final-source Cure/Life/default regression matrix."
+  "next_task": "Collect final-source matrix02 and queued public-turn04; fix failures if any, audit hashes and statuses, close A6.6.3 only when required current-source gates pass. Do not rerun accepted metadata."
 }

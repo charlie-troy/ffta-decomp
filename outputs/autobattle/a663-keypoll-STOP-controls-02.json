@@ -1,0 +1,29 @@
+{
+  "status": "pass",
+  "scope": "Real Probe.press must poll STOP before every gameplay register injection.",
+  "checks": [
+    {
+      "stop_after_writes": 0,
+      "actual_writes": 0
+    },
+    {
+      "stop_after_writes": 1,
+      "actual_writes": 1
+    },
+    {
+      "stop_after_writes": 2,
+      "actual_writes": 2
+    },
+    {
+      "stop_after_writes": 3,
+      "actual_writes": 3
+    },
+    {
+      "stop_after_writes": 4,
+      "actual_writes": 4
+    }
+  ],
+  "limitations": [
+    "Host RSP protocol discrimination; real CLI STOP/manual/resume remains a separate gate."
+  ]
+}

@@ -534,6 +534,10 @@ class Probe:
                 if not regs:
                     break
                 if regs[15] == BP_KEY:
+                    # One press spans several distinct register injections.
+                    # A STOP latched between polls must suppress the next one.
+                    if stop_check is not None and stop_check():
+                        break
                     val = (regs[1] | mask) & 0x3FF
                     g.send("P1=" + val.to_bytes(4, "little").hex())
                     self.note_key_write(val, hits + 1)
