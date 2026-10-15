@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-15 - Public Potion opt-in and first CLI turn; lifecycle still UNKNOWN
+
+A6.6.2 PASS checkpoint7adcd54. New explicit --bounded-self-potion requires schema2/global consumables true; shared native transaction and twice-revalidated policy keep defaults disabled and preserve reserve1. Real public-turn03/PID77732 records count2 to1/HP100 to125/MP221,65 keys, Wait and next enemy; one-turn budget is stalled, not whole battle.21 public receipt corruptions reject;11 interface,4 native/policy and119 pure policy checks pass. Public STOP-final01/PID117368 pause/kill validates. Handoff01 owned window Wait/next enemy passed; same-PID resumed player result is running. Separate host test exposes existing per-frame STOP gap (limit1 sends5); defer Probe edit until active owned lifecycle closes, then fix and rerun current-source STOP/handoff plus native Cure/Life/default regressions. A6.6.3 remains UNKNOWN.
+
 ## 2026-10-15 - A6.6.2 bounded Potion use PASS; public integration next
 
 Live refusal matrix passes STOP-final-use/post-effect/Wait-final (40/45/60 writes, zero after observed latch, under2s), last-item1 refusal at40 and native zero omission/refusal at25. Each passes3 corruption controls, source/raw hashes and terminal owned-process close. Together with two clean native use/Wait/Carson reloads, A6.6.2 is bounded PASS for reaction-free EXP0 Montblanc self-Potion. A6.6 overall/public lifecycle remain UNKNOWN. Next A6.6.3 shared transaction, schema2 policy/default-disabled gates and actual public CLI STOP/manual/same-PID result with Cure/Life/default regressions. All owned research processes closed.

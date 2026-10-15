@@ -1,0 +1,202 @@
+{
+  "status": "pass",
+  "scope": "Audit a real public Potion turn and corruptions through the public validator.",
+  "closure": [
+    "ability_resources",
+    "ability_table",
+    "autobattle_identity",
+    "autobattle_runtime",
+    "build_recovery_fixture",
+    "consumable_description",
+    "consumable_effect_trace",
+    "consumable_final",
+    "consumable_inventory",
+    "consumable_menu",
+    "consumable_overlay",
+    "consumable_policy",
+    "consumable_preview_gate",
+    "consumable_transaction",
+    "consumable_transport",
+    "consumable_use_gate",
+    "emulate",
+    "ffta_names",
+    "ffta_text",
+    "fixture_guard",
+    "life_recovery_runtime",
+    "life_recovery_transaction",
+    "party_recovery_runtime",
+    "player_boundary_observer",
+    "potion_recovery_runtime",
+    "probe_control_handoff",
+    "probe_recovery_ko_lifecycle",
+    "probe_recovery_party",
+    "recovery_ally_confirmation",
+    "recovery_ally_executor",
+    "recovery_ally_preview",
+    "recovery_ally_target",
+    "recovery_boundary_diagnostic",
+    "recovery_continuation",
+    "recovery_executor",
+    "recovery_ko_trace",
+    "recovery_life_effect",
+    "recovery_life_final",
+    "recovery_life_target",
+    "recovery_life_trace",
+    "recovery_life_wait",
+    "recovery_menu",
+    "recovery_menu_list",
+    "recovery_party",
+    "recovery_party_continuation",
+    "recovery_runtime",
+    "recovery_transport",
+    "status_flags",
+    "tactics_adapter",
+    "tactics_policy",
+    "trace_mgba",
+    "wait_ally_continuation"
+  ],
+  "rejected": [
+    {
+      "case": "missing journal",
+      "errors": [
+        "turn event 3: bounded recovery journal missing",
+        "turn event 3: invalid actor-linked result ('NoneType' object is not subscriptable)"
+      ]
+    },
+    {
+      "case": "foreign policy target",
+      "errors": [
+        "turn event 3: invalid actor-linked result (Potion policy candidate is foreign)"
+      ]
+    },
+    {
+      "case": "foreign policy actor",
+      "errors": [
+        "turn event 3: invalid actor-linked result (Potion policy actor is not native source)"
+      ]
+    },
+    {
+      "case": "default items disabled",
+      "errors": [
+        "turn event 3: invalid actor-linked result (Potion lacks explicit consumables policy)"
+      ]
+    },
+    {
+      "case": "missing policy revalidation",
+      "errors": [
+        "turn event 3: invalid actor-linked result (Potion final policy was not revalidated)"
+      ]
+    },
+    {
+      "case": "law forbids",
+      "errors": [
+        "turn event 3: invalid actor-linked result (Potion laws not discriminated)"
+      ]
+    },
+    {
+      "case": "native wrong item",
+      "errors": [
+        "turn event 3: invalid actor-linked result (not a native single-Potion decrement)"
+      ]
+    },
+    {
+      "case": "native foreign HP",
+      "errors": [
+        "turn event 3: invalid actor-linked result (foreign or nonhealing HP store)"
+      ]
+    },
+    {
+      "case": "count not consumed",
+      "errors": [
+        "turn event 3: invalid actor-linked result (foreign item/effect resources)"
+      ]
+    },
+    {
+      "case": "native trace missing",
+      "errors": [
+        "turn event 3: invalid actor-linked result (public native trace differs)"
+      ]
+    },
+    {
+      "case": "duplicate use",
+      "errors": [
+        "turn event 3: invalid actor-linked result (final use was not single delivered input)"
+      ]
+    },
+    {
+      "case": "duplicate Wait",
+      "errors": [
+        "turn event 3: invalid actor-linked result (Potion Wait confirmation missing/duplicated)"
+      ]
+    },
+    {
+      "case": "ledger truncated",
+      "errors": [
+        "event 3: invalid recovery journal (public Potion raw ledger missing/changed)"
+      ]
+    },
+    {
+      "case": "journal ledger empty",
+      "errors": [
+        "turn event 3: invalid actor-linked result (public Potion raw ledger differs)",
+        "event 3: invalid recovery journal (public Potion raw ledger missing/changed)"
+      ]
+    },
+    {
+      "case": "trace restore missing",
+      "errors": [
+        "event 3: invalid recovery journal (public Potion trace restore differs)"
+      ]
+    },
+    {
+      "case": "next actor stale",
+      "errors": [
+        "turn event 3: invalid actor-linked result (no independent next actor)"
+      ]
+    },
+    {
+      "case": "raw capability forged",
+      "errors": [
+        "ordinary raw-input capability disagrees with recovery mode"
+      ]
+    },
+    {
+      "case": "source changed",
+      "errors": [
+        "bounded recovery inputs changed during execution",
+        "Potion input source closure missing or changed"
+      ]
+    },
+    {
+      "case": "source proof missing",
+      "errors": [
+        "Potion input source closure missing or changed"
+      ]
+    },
+    {
+      "case": "closure empty",
+      "errors": [
+        "Potion input source closure missing or changed"
+      ]
+    },
+    {
+      "case": "closure changed after",
+      "errors": [
+        "Potion input source closure missing or changed"
+      ]
+    }
+  ],
+  "source_sha256": {
+    "tools/audit_potion_public_run.py": "2ac3121c92a41b435ce0b16ef91be59793b9813c1dfff8258d972997c47e233d",
+    "tools/potion_recovery_receipt.py": "5a2df876859704e5c9266a7aab87f90e5317d8f6aee358c9213f1d545d948b5e",
+    "tools/validate_autobattle_runtime.py": "aa48a576b17374f7b69d5c8b264de980cca271123cbf80e95f0a8bf13fcca1d5"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a663-public-turn-03\\run.json": "6fe9ab6953c0bd489bcf09f005fe15b4dd23c4159bcee018f50cd8913a6286e1",
+    "outputs\\autobattle\\a663-public-turn-03\\events.jsonl": "fd1d107ebd8ed56eff2f94917e3a96b7bd88ec680c3bb9f398ceb5ca0bd4228f",
+    "outputs\\autobattle\\a663-public-turn-03\\input-log.jsonl": "6a7219a021d17b24e0f8cd03cc2a9167ef1ca307a3163ef84e6526c9e3954539"
+  },
+  "limitations": [
+    "Bounded one-turn public CLI witness; turn budget is not whole-battle acceptance. STOP/manual/resume separate."
+  ]
+}

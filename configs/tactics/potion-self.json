@@ -1,0 +1,26 @@
+{
+  "schema": "ffta-tactics-policy/2",
+  "consumables": true,
+  "fallback": "wait",
+  "observation": { "max_age_seconds": 3.0 },
+  "assignments": {
+    "party": {
+      "player": {
+        "rules": [
+          {
+            "id": "bounded-self-potion",
+            "when": {
+              "kind": "item",
+              "item_name": "Potion",
+              "relation": "self",
+              "actor_hp_pct": { "lte": 50 },
+              "item_count": { "gt": 1 }
+            },
+            "select": "first"
+          }
+        ]
+      }
+    }
+  },
+  "note": "Explicit bounded self-Potion research opt-in. Preserve the final Potion. Native ownership, target and law checks still gate each use."
+}

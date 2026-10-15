@@ -1,0 +1,20 @@
+{
+  "status": "pass",
+  "scope": "Public Potion opt-in must reject invalid policy/family before emulator use.",
+  "checks": [
+    "missing-policy",
+    "schema1",
+    "default-disabled",
+    "mutual",
+    "recognized-valid-cli",
+    "id",
+    "job",
+    "race",
+    "tile-x",
+    "tile-y",
+    "party"
+  ],
+  "limitations": [
+    "Host pre-transport checks only."
+  ]
+}

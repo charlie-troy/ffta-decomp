@@ -1,0 +1,82 @@
+{
+  "milestone": "A6.6.3",
+  "date": "2026-10-15",
+  "status": "unknown",
+  "scope": "Explicit public bounded self-Potion; manual/resume and final-source regressions still open",
+  "prerequisite": {
+    "milestone": "A6.6.2",
+    "status": "pass",
+    "commit": "7adcd54"
+  },
+  "criteria": [
+    {
+      "id": "shared-transaction-public-schema2-opt-in",
+      "status": "pass",
+      "scope": "Explicit --bounded-self-potion and global consumables true required before emulator. Native-final schema2 snapshot and policy revalidated twice; fixed reserve1. Four native/policy replay controls,11 interface controls,119 pure policy regressions; defaults unchanged."
+    },
+    {
+      "id": "real-public-CLI-native-use-Wait-next-actor",
+      "status": "pass",
+      "scope": "public-turn03/PID77732: actual native Potion362 count2 to1, Montblanc HP100 to125/MP221,65 raw keys, guarded Wait/next enemy, source-stable. One-turn budget terminates stalled; no whole-battle result claim. Public validator21 corruption controls and exact-source/raw final replay pass."
+    },
+    {
+      "id": "public-STOP-window-manual-same-PID-resumed-player-result",
+      "status": "unknown",
+      "scope": "STOP-final01/PID117368 real CLI pause/kill passes validator. Handoff01 manual owned-window A/next enemy passed; same-PID resumed player result still running. Per-injection STOP host regression newly exposes existing five-frame polling gap; fix and rerun required before acceptance."
+    },
+    {
+      "id": "Cure-Life-default-and-receipt-regressions",
+      "status": "unknown",
+      "scope": "Life interface10 and pure policy119 pass; final-source native regression matrix not yet run."
+    }
+  ],
+  "source_sha256": {
+    "tools/run_autobattle.py": "8e5e3e410ec063725fb5e9c217743a8cab0064e6daa1b1ec798673e207bc2039",
+    "tools/autobattle_runtime.py": "230f4c4f951a3857beb5793f7e61adb4fb5358b568c9e0588ec31615cd616c9b",
+    "tools/validate_autobattle_runtime.py": "aa48a576b17374f7b69d5c8b264de980cca271123cbf80e95f0a8bf13fcca1d5",
+    "tools/probe_consumable_inventory.py": "cdb48ee8f969a9d1db04e6315767436b27d343edb318c3a4bfb97cda6fa2eecd",
+    "tools/consumable_transaction.py": "99b64fd9de94dec131027e4ac80513e12a6bb33e95bfc5b434be289c8a4c652d",
+    "tools/consumable_policy.py": "a1a14220ed2bc3d6cb71cdb9b795611503aadae21f97e0a68c6dc0ddb1c3d250",
+    "tools/potion_recovery_runtime.py": "b5fad2f37fc7372e15e1796b4fbe4bb9ca57c1086f2b725b88624fd6e9312d60",
+    "tools/potion_recovery_receipt.py": "5a2df876859704e5c9266a7aab87f90e5317d8f6aee358c9213f1d545d948b5e",
+    "tools/audit_potion_public_run.py": "2ac3121c92a41b435ce0b16ef91be59793b9813c1dfff8258d972997c47e233d",
+    "tools/validate_potion_recovery_interface.py": "3ec6c4b580e16dd9951004d493ad0042827e26347c0c6b5de68fb1e227114e20",
+    "tools/validate_potion_policy.py": "a3b491766999dc260ad76e5a561bd5b1da120e4afc184fdf074405a3a290fb8d",
+    "tools/run_potion_cli_stop.py": "a75590a2a9add869c8e62649fa108e87962ea8d5107dddf25393217c0279a21f",
+    "tools/manual_potion_wait_handoff.py": "770683710abcdcd02d9d4f1c69dbd2f0e1c7da0f2210d265d70888e1690c3fa1",
+    "tools/run_potion_recovery_handoff.py": "65a2be93cf8103b3c24ff14767310490477dbfa82a366fd98d75447f7f2f8c1b",
+    "tools/validate_potion_recovery_handoff.py": "4d1ecc440baf8b7140638f208e1273c9033643d01326052e9e6b944fc95b86c2",
+    "configs/tactics/potion-self.json": "6031f081c9dd0de8fae68a6ca37ac40351435ef6074b3d99e8887bc84d3f4650"
+  },
+  "evidence_sha256": {
+    "docs/receipts/autobattle/A6.6.2.json": "5b38d1ae973b405516e184c17f4a42476f2d847c9738360a63eed970dd2bbe9b",
+    "outputs/autobattle/a663-interface-controls-03.json": "15949967157bb9f558332b22926b977da31df754bbf4e3203b3853ae5ba4f1b6",
+    "outputs/autobattle/a663-policy-controls-01.json": "062d08e07a26be1506445e460f299a362df15d8fb044b978db270e97ba74f726",
+    "outputs/autobattle/a663-policy-regression-01/checks.json": "361a103121b5925b9b5cfafe95a599f9399a125546f91380d0f2f2cb40d46723",
+    "outputs/autobattle/a663-Life-interface-regression-01.json": "eecedd4ef0c498a1c7a41a8c55fbdead9221bc3dcb07dc07c6176bd949067ac7",
+    "outputs/autobattle/a663-shared-transaction-checks-02.json": "4251b71e28f33271c6dacfea6e3e6c82b3816385ff62b0920dfeec9ac51e0abb",
+    "outputs/autobattle/a663-public-turn-checks-03.json": "a92e3d026aa50493d9dc7026942b5f419223f76e60762fba9ec3a69981dafb7b",
+    "outputs/autobattle/a663-public-turn-03/run.json": "6fe9ab6953c0bd489bcf09f005fe15b4dd23c4159bcee018f50cd8913a6286e1",
+    "outputs/autobattle/a663-public-turn-03/events.jsonl": "fd1d107ebd8ed56eff2f94917e3a96b7bd88ec680c3bb9f398ceb5ca0bd4228f",
+    "outputs/autobattle/a663-public-turn-03/input-log.jsonl": "6a7219a021d17b24e0f8cd03cc2a9167ef1ca307a3163ef84e6526c9e3954539",
+    "outputs/autobattle/a663-public-STOP-final-01/run.json": "10d6d3d3ea5bab149f06616f772ac5207ac4274a376923c404756b65191a91e3",
+    "outputs/autobattle/a663-public-STOP-final-01/events.jsonl": "a8c3eb9eb4c548ce407807731846e88ac9d1b1ae419f2cb1802e72b61dc9778f",
+    "outputs/autobattle/a663-public-STOP-final-01/input-log.jsonl": "e74bc22b3109db357455acc71d2112d92d6a5fc440207232bc0ba25ad1850932"
+  },
+  "excluded_runs": [
+    {
+      "run": "a663-shared-transaction-01",
+      "reason": "Post-effect roster row has no x/y keys. Fixed by canonical/mirror tile join; replay02 passes."
+    },
+    {
+      "run": "a663-public-turn-01",
+      "reason": "Fresh Probe has no key_write_log attribute before first input. Fixed with getattr; no gameplay inputs before failure."
+    }
+  ],
+  "limitations": [
+    "Research PASS is exact fixture only; whole-battle/A9 and arbitrary consumables remain UNKNOWN.",
+    "Window Wait plus next enemy alone does not prove resumed player result.",
+    "Existing key-poll stop gap is reproduced by host test limit1 yielding5 writes; no complete C1 acceptance yet."
+  ],
+  "next_task": "Finish in-flight handoff01; fix real Probe per-injection STOP polling after owned run closes, then fresh public STOP/handoff and final-source Cure/Life/default regression matrix."
+}

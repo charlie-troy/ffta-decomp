@@ -93,20 +93,29 @@ def validate(out_dir):
     resumed = bool(run.get("resumed"))
     previous_leg = run.get("previous_leg") or {}
     if 'ordinary_raw_input' in run:
-        expected_raw=not any(run.get(k) for k in ('bounded_self_cure','bounded_ally_cure','bounded_ally_life'))
+        expected_raw=not any(run.get(k) for k in ('bounded_self_cure','bounded_ally_cure','bounded_ally_life','bounded_self_potion'))
         if type(run['ordinary_raw_input'])!=bool or run['ordinary_raw_input']!=expected_raw:
             fail('ordinary raw-input capability disagrees with recovery mode',errors)
     if previous_leg and (previous_leg.get("final_state") != "paused"
                          or previous_leg.get("manual_handoff", {}).get("pid") != run.get("emulator_pid")):
         fail("resume previous-leg receipt is not the same paused PID", errors)
-    if resumed and previous_leg.get('bounded_ally_life'):
+    if resumed and (previous_leg.get('bounded_ally_life') or previous_leg.get('bounded_self_potion')):
         adopt = run.get('adopt') or {}
         if (adopt.get('pid') != run.get('emulator_pid')
                 or adopt.get('match_receipt_handoff_pid') is not True
                 or adopt.get('roster_guard_ok') is not True):
             fail('Life resume lacks verified same-PID adoption', errors)
-    if (run.get("bounded_self_cure") or run.get('bounded_ally_cure') or run.get('bounded_ally_life')) and run.get("inputs_unchanged") is False:
+    if (run.get("bounded_self_cure") or run.get('bounded_ally_cure') or run.get('bounded_ally_life') or run.get('bounded_self_potion')) and run.get("inputs_unchanged") is False:
         fail("bounded recovery inputs changed during execution", errors)
+    for potion_leg in (run,run.get('previous_leg') or {}):
+        if not potion_leg.get('bounded_self_potion'):continue
+        required={'tools/run_autobattle.py','tools/autobattle_runtime.py','tools/potion_recovery_runtime.py',
+            'tools/consumable_transaction.py','tools/consumable_final.py','tools/consumable_use_gate.py',
+            'tools/consumable_effect_trace.py','tools/consumable_policy.py','tools/potion_recovery_receipt.py'}
+        pins=potion_leg.get('input_sha256') or {}
+        if (potion_leg.get('inputs_unchanged') is not True or not required<=set(pins)
+                or pins!=potion_leg.get('input_sha256_after')):
+            fail('Potion input source closure missing or changed',errors)
     for life_leg in (run,run.get('previous_leg') or {}):
         if not life_leg.get('bounded_ally_life'):continue
         pins=life_leg.get('input_sha256') or {}
@@ -190,7 +199,7 @@ def validate(out_dir):
             continue
         current_leg = not resumed or i > max(j for j, event in enumerate(events) if event.get("kind") == "start")
         leg = run if current_leg else previous_leg
-        bounded_leg = leg.get("bounded_self_cure") or leg.get('bounded_ally_cure') or leg.get('bounded_ally_life')
+        bounded_leg = leg.get("bounded_self_cure") or leg.get('bounded_ally_cure') or leg.get('bounded_ally_life') or leg.get('bounded_self_potion')
         if bounded_leg and rec.get("recovery") is None:
             fail(f"turn event {i}: bounded recovery journal missing", errors)
         for field in ("actor", "control_mode"):
@@ -277,6 +286,13 @@ def validate(out_dir):
                             or post[targets[0]]['hp']<=pre[targets[0]]['hp']
                             or post[targets[0]]['mp']!=pre[targets[0]]['mp']):
                         raise ValueError('ally-Cure actor/effect/target differs')
+                elif action.get('kind')=='identified-self-potion':
+                    if (moved or len(pre)!=2 or identity['id']!=5 or action.get('ability_id')!=251
+                            or action.get('item_id')!=362 or rec.get('selected_target')!={'kind':'unit','id':5}
+                            or post[actor]['hp']<=row['hp'] or post[actor]['mp']!=row['mp']):
+                        raise ValueError('self-Potion actor/effect/target differs')
+                    from potion_recovery_receipt import validate_potion_turn
+                    validate_potion_turn(rec)
                 elif action.get('kind')=='identified-ally-life':
                     targets=[k for k in pre if k[1]==7]
                     if len(targets)!=1:raise ValueError('Life target missing/ambiguous')
@@ -295,7 +311,10 @@ def validate(out_dir):
                     if (owner["name_text"], owner["id"], owner["job"], owner["side_bit"]) != (
                             identity["name_text"], identity["id"], identity["job"], identity["side_bit"]):
                         raise ValueError("recovery owner disagrees with boundary")
-                    if journal.get('schema')=='ffta-life-recovery-turn/1':
+                    if journal.get('schema')=='ffta-potion-recovery-turn/1':
+                        if action.get('kind')!='identified-self-potion':
+                            raise ValueError('Potion journal has foreign action')
+                    elif journal.get('schema')=='ffta-life-recovery-turn/1':
                         later={r['id']:r for r in journal['Life_effect']['continuation']['party_after']}
                         if (len(later)!=len(post) or any(post[k]['hp']!=later[k[1]]['hp']
                                 or post[k]['mp']!=later[k[1]]['mp'] for k in post)
@@ -366,10 +385,12 @@ def validate(out_dir):
     from recovery_receipt import validate_recovery
     from party_recovery_receipt import validate_party_recovery
     from life_recovery_receipt import validate_life_recovery
+    from potion_recovery_receipt import validate_potion_journal
     for index, rec in enumerate(events):
         if rec.get("recovery") is not None:
             try:
-                validator=(validate_life_recovery if rec['recovery'].get('schema')=='ffta-life-recovery-turn/1'
+                validator=(validate_potion_journal if rec['recovery'].get('schema')=='ffta-potion-recovery-turn/1'
+                           else validate_life_recovery if rec['recovery'].get('schema')=='ffta-life-recovery-turn/1'
                            else validate_party_recovery if rec['recovery'].get('schema')=='ffta-party-recovery-turn/1'
                            else validate_recovery)
                 validator(rec["recovery"], ilog, confirmed=rec.get("kind") == "turn")

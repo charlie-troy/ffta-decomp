@@ -1,0 +1,30 @@
+{
+  "status": "pass",
+  "scope": "Join retained native final Potion context to actual schema2 policy decisions.",
+  "checks": [
+    {
+      "case": "enabled",
+      "selected": true
+    },
+    {
+      "case": "default disabled",
+      "selected": false
+    },
+    {
+      "case": "last item policy",
+      "selected": false
+    },
+    {
+      "case": "above threshold",
+      "selected": false
+    }
+  ],
+  "source_sha256": {
+    "tools/consumable_policy.py": "a1a14220ed2bc3d6cb71cdb9b795611503aadae21f97e0a68c6dc0ddb1c3d250",
+    "tools/validate_potion_policy.py": "a3b491766999dc260ad76e5a561bd5b1da120e4afc184fdf074405a3a290fb8d",
+    "configs/tactics/potion-self.json": "6031f081c9dd0de8fae68a6ca37ac40351435ef6074b3d99e8887bc84d3f4650"
+  },
+  "limitations": [
+    "Native final reader replay plus policy evaluation; modified count/HP cases are host memory controls."
+  ]
+}

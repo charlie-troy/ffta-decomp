@@ -50,6 +50,10 @@ def _input_hashes(args):
                        'tools/fixture_guard.py','tools/trace_mgba.py'])
     if args.tactics_policy:
         inputs.append(args.tactics_policy)
+    if args.bounded_self_potion:
+        inputs.extend(source_dependencies('potion_recovery_runtime'))
+        inputs.extend(source_dependencies('potion_recovery_receipt'))
+        inputs.append('tools/validate_autobattle_runtime.py')
     if args.bounded_ally_life:
         from probe_recovery_ko_lifecycle import source_dependencies
         inputs.extend(source_dependencies('life_recovery_runtime'))
@@ -121,6 +125,8 @@ def main(argv=None):
                     help='A6.3 opt-in eight-unit living ally-Cure fixture; requires schema-2 tactics')
     recovery_flags.add_argument('--bounded-ally-life',action='store_true',
                     help='A6.5 opt-in exact eight-unit Life research fixture; requires schema-2 tactics')
+    recovery_flags.add_argument('--bounded-self-potion',action='store_true',
+                    help='A6.6.3 explicit bounded self-Potion opt-in; schema2 consumables required')
     ap.add_argument("--resume", metavar="RUN_ID", default=None,
                     help="continue the battle of a previously paused run: "
                          "adopt the ALREADY-RUNNING emulator (no reboot — "
@@ -131,7 +137,7 @@ def main(argv=None):
     ap.add_argument('--observe-player-boundaries',action='store_true',
                     help='read-only A6.5.2 native pick/adapter history on an ordinary eight-unit Move/Wait leg')
     args = ap.parse_args(argv)
-    if args.observe_player_boundaries and (args.bounded_self_cure or args.bounded_ally_cure or args.bounded_ally_life):
+    if args.observe_player_boundaries and (args.bounded_self_cure or args.bounded_ally_cure or args.bounded_ally_life or args.bounded_self_potion):
         ap.error('--observe-player-boundaries requires an ordinary Move/Wait leg')
 
     with open(args.scenario, encoding="utf-8") as fh:
@@ -149,8 +155,11 @@ def main(argv=None):
         print(f"tactics policy {args.tactics_policy} "
               f"({tactics_policy['schema']}) validated")
 
-    if (args.bounded_self_cure or args.bounded_ally_cure or args.bounded_ally_life) and (tactics_policy or {}).get("schema") != "ffta-tactics-policy/2":
+    if (args.bounded_self_cure or args.bounded_ally_cure or args.bounded_ally_life or args.bounded_self_potion) and (tactics_policy or {}).get("schema") != "ffta-tactics-policy/2":
         print("FAIL: bounded recovery requires a schema-2 --tactics-policy")
+        return 2
+    if args.bounded_self_potion and not (tactics_policy or {}).get('consumables'):
+        print('FAIL: bounded Potion requires explicit consumables enabled in schema2 policy')
         return 2
     resumed_run = None
     if args.resume:
@@ -238,6 +247,7 @@ def main(argv=None):
                                 bounded_self_cure=args.bounded_self_cure,
                                 bounded_ally_cure=args.bounded_ally_cure,
                                 bounded_ally_life=args.bounded_ally_life,
+                                bounded_self_potion=args.bounded_self_potion,
                                 observe_player_boundaries=args.observe_player_boundaries)
         if not args.yes:
             ans = input("guards will run now; continue? [y/N] ").strip().lower()
@@ -315,6 +325,7 @@ def main(argv=None):
             "bounded_self_cure": args.bounded_self_cure,
             "bounded_ally_cure": args.bounded_ally_cure,
             "bounded_ally_life": args.bounded_ally_life,
+            "bounded_self_potion": args.bounded_self_potion,
             "observe_player_boundaries": args.observe_player_boundaries,
             "ordinary_raw_input": runtime.ordinary_raw_input,
             "player_identities": [list((r["name_text"], r["id"]))

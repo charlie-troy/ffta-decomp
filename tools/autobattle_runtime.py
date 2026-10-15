@@ -73,11 +73,11 @@ class BattleRuntime:
                  wall_timeout=600.0, max_turns=None, verbose=True,
                  resume=False, pause_at_boundary=False,
                  tactics_policy=None, tactics_policy_source=None, bounded_self_cure=False,
-                 bounded_ally_cure=False,bounded_ally_life=False,observe_player_boundaries=False):
+                 bounded_ally_cure=False,bounded_ally_life=False,observe_player_boundaries=False,bounded_self_potion=False):
         self.s = session
         self.observe_player_boundaries=bool(observe_player_boundaries)
         if self.observe_player_boundaries:
-            if bounded_self_cure or bounded_ally_cure or bounded_ally_life:
+            if bounded_self_cure or bounded_ally_cure or bounded_ally_life or bounded_self_potion:
                 raise ValueError('player-boundary observer requires an ordinary Move/Wait leg')
             from player_boundary_observer import PlayerBoundaryProbe
             self.p=PlayerBoundaryProbe(session,verbose=verbose)
@@ -87,6 +87,9 @@ class BattleRuntime:
                             for r in self.adapter.expected] if self.adapter else [],
                 'adapter_prior':self.adapter.prior if self.adapter else None,
                 'last_rejection':self.adapter.last_rejection if self.adapter else None}
+        elif bounded_self_potion:
+            from consumable_effect_trace import PotionExecutionProbe
+            self.p=PotionExecutionProbe(session,verbose=verbose)
         elif bounded_ally_life:
             from recovery_life_trace import LifeExecutionProbe
             self.p = LifeExecutionProbe(session,verbose=verbose)
@@ -101,7 +104,8 @@ class BattleRuntime:
         self.bounded_self_cure = bool(bounded_self_cure)
         self.bounded_ally_cure = bool(bounded_ally_cure)
         self.bounded_ally_life = bool(bounded_ally_life)
-        if sum((self.bounded_self_cure,self.bounded_ally_cure,self.bounded_ally_life))>1:
+        self.bounded_self_potion=bool(bounded_self_potion)
+        if sum((self.bounded_self_cure,self.bounded_ally_cure,self.bounded_ally_life,self.bounded_self_potion))>1:
             raise ValueError('recovery fixture opt-ins are mutually exclusive')
         self._owner_observed_at = None
         self.scenario = scenario
@@ -155,7 +159,7 @@ class BattleRuntime:
         # shared wall clock with the probe's write log (validator rule: a
         # write is "after stop_requested" relative to the SAME t0)
         self.p.t0 = self.t0
-        self.ordinary_raw_input=not (self.bounded_self_cure or self.bounded_ally_cure or self.bounded_ally_life)
+        self.ordinary_raw_input=not (self.bounded_self_cure or self.bounded_ally_cure or self.bounded_ally_life or self.bounded_self_potion)
         if self.ordinary_raw_input:
             note_write=self.p.note_key_write
             def log_write(value,hits):
@@ -568,6 +572,10 @@ class BattleRuntime:
         # re-opens the command menu, so the turn only closes after Wait).
         self.adapter.prior = None
         self._tactics_meta = None
+        if self.bounded_self_potion:
+            from potion_recovery_runtime import drive_public_potion_boundary
+            drive_public_potion_boundary(self,before)
+            return
         if self.bounded_self_cure or self.bounded_ally_cure or self.bounded_ally_life:
             self._drive_recovery_boundary(before)
             return

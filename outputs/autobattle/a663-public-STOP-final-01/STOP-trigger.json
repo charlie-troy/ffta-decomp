@@ -1,0 +1,9 @@
+{
+  "phase": "Potion-final",
+  "trigger": {
+    "screenshot": "recovery-Potion-final-turn1.png"
+  },
+  "pid": 117368,
+  "cli_exit": 0,
+  "source_stable": true
+}
