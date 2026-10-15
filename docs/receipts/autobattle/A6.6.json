@@ -1,6 +1,6 @@
 {
   "milestone": "A6.6",
-  "date": "2026-10-14",
+  "date": "2026-10-15",
   "status": "unknown",
   "scope": "Inventory and consumable legality research; Item execution remains disabled",
   "prerequisite": {
@@ -21,8 +21,8 @@
     },
     {
       "id": "actor-owned-Item-list-and-native-legality",
-      "status": "unknown",
-      "scope": "Owned Item list/count join passes; target/law legality remains UNKNOWN. See A6.6.1."
+      "status": "pass",
+      "scope": "A6.6.1 bounded reaction-free Montblanc5 self-Potion final reader passes; isolated source-only native law matchers and22 mutations. No use or public acceptance."
     },
     {
       "id": "actual-single-consumption-effect-completion",
@@ -41,12 +41,12 @@
     "tools/validate_tactics_policy.py": "8cc503bcccdc122fe979a8d5d3d2316bb51c43c6af7216203438dfd840b1d5e3",
     "tools/consumable_inventory.py": "890ab19ad7bd1b1af42fad51c4ee0ff2827f1edba49b24a18387f21679bae104",
     "tools/consumable_menu.py": "9cf4de620318b1dc92e285583d94ae0f7ab57c74f46bc9f5911e10723e748bc8",
-    "tools/probe_consumable_inventory.py": "6418bde086eb99d0b1516921747c71ed095f871943ffb9c6b106e3e45e483331",
+    "tools/probe_consumable_inventory.py": "1960b9b20c2b289a4cf733170039cf402480e3ec8f24082b98aa514e49fd3b92",
     "tools/validate_consumable_inventory.py": "aa62451cf753df6f161268e0f446565b4f63f8cec75f6729a149ca9bc41d4f5f",
     "tools/validate_consumable_menu.py": "d55ee24bbbc735105c6cbf15490cf58bc54d936def6c18303878938637753970",
     "tools/validate_consumable_builder.py": "0ca0e0866db69a9fbb33bb7042151f15d9bc6276b6b2f8191e4e6229d7ebc6a2",
     "tools/audit_consumable_capture.py": "f200372d7c083f88ac22db83c141db2e198889fd41686816461bc9ce23d2be85",
-    "tools/build_consumable_fixture.py": "ef339058fef56fb8f0d3aacd9d005f083e9c70dca2034210fada564441ff7418",
+    "tools/build_consumable_fixture.py": "6b377d44532196275db7f5224c0bef0bc23d5f956574b8dc0509564e677666a3",
     "tools/consumable_overlay.py": "205b9e49325c145154e2860cb2ee20fbc11b42b3f92ec596f58750229ddfba03",
     "tools/probe_consumable_law_menu.py": "9636502171d4a819764addc3e92a3a0fff5881fd4479904d2eab7fe0805559fa",
     "tools/run_consumable_reader_matrix.py": "9502b0ae475cac766b0775686d8ae169f1f3cbcb1fc5dc749e3e3c8decfc918c",
@@ -57,17 +57,26 @@
     "tools/consumable_description.py": "e9a3471045947203a82ceb94347df1eee40b37240e62bfb86d043324b948c3ad",
     "tools/validate_consumable_preview_gate.py": "5ebe8137402486c51147558f848856f61536ecb4a46379779e4b4a92bb241c39",
     "tools/validate_consumable_description.py": "abfd07c0556f36775ed76fc882edebd9115a6902503cdc4122bc6d6aa407df15",
-    "tools/validate_consumable_law_predicate.py": "744d2e11f00f83cd6a27ac2de4224124a54e5a757887f2d3582d14bbf2173303"
+    "tools/validate_consumable_law_predicate.py": "744d2e11f00f83cd6a27ac2de4224124a54e5a757887f2d3582d14bbf2173303",
+    "tools/consumable_final.py": "e8a30a5cdd7bffb4fbfe74161f2d9da8d07dcbcbcb9ccffa1ee4976073a64792",
+    "tools/validate_consumable_final.py": "cc94549465de6d8c5a90412d8ab4cbf7bd335e7c9a6447e494303c8286f50cb7"
   },
   "evidence_sha256": {
     "outputs/autobattle/a66-bootstrap-checks.json": "ee14f9e9edf64a3173b8cd18f6fc48750ef0dbdd53c2750f0124148a69eae21f",
     "outputs/autobattle/a66-policy-refresh-01/checks.json": "361a103121b5925b9b5cfafe95a599f9399a125546f91380d0f2f2cb40d46723",
     "outputs/autobattle/a66-consumable-metadata-02.json": "991faf42a5b75c497043c8194aa71d6f5813a5d2f876f0a65d9f98eb75d7820b",
     "outputs/autobattle/a66-raw-type29-excluded.json": "79c3539d625452e40ec52142ee80be6d6c569b758a0e48caed2b5037d84a410b",
-    "docs/receipts/autobattle/A6.6.1.json": "84399914d448e7111cb5978859f15754a6fa53e46e13e2ec555d32684a637b13"
+    "docs/receipts/autobattle/A6.6.1.json": "ee8f1c9dac9da0c69644f3ba9306af64d5144efb1ad4e17b1c2952957b096959",
+    "outputs/autobattle/a66-reaction-free-01/fixture.json": "d143c3d99818275578bac2005205b8ff980abf2961a5661f93d0d108e609a55b",
+    "outputs/autobattle/a66-reaction-free-final-01/inventory.json": "81827a652dd156b6489cb6b06b3cc1f68a6b4b5597ca0b22910ee925b0dee075",
+    "outputs/autobattle/a66-reaction-free-source-checks-01.json": "e8f4a3d5ca5a34be57845bff942b5ed5faf110fc1b0c77dea985fd19adb83565",
+    "outputs/autobattle/a66-reaction-free-final-controls-01.json": "7aee894659ef3d2f66c1305d33c6f55eb298c17671568d37b934af60d05b2fb8",
+    "outputs/autobattle/a66-reaction-free-menu-controls-01.json": "52de4d66c71649119705fc0eb3b7271a6f8ac1cb165791a5029a5890a0de4c10",
+    "outputs/autobattle/a6-cure-cast-03/probe.json": "3df5cc875722488607752e0160f95cd7e07cfb3e44492f387da9e363fb272667"
   },
   "limitations": [
     "Inventory and owned Item-list counts proved only for the named fixture; no executable candidate, target/law approval or use.",
     "Public Item execution remains disabled. Draw Weapon row15 is excluded from consumables."
-  ]
+  ],
+  "next_task": "Execute A6.6.2 single-use research witness; preserve public Item default disabled until A6.6.3."
 }

@@ -1,0 +1,171 @@
+{
+  "status": "pass",
+  "scope": "Reject wrong actor/item/law/count or non-final Potion prompt tokens.",
+  "final_prompt": {
+    "source": 33554824,
+    "target": 33554824,
+    "item": 362,
+    "ability": 251,
+    "count": 2,
+    "hp": 100,
+    "tile": [
+      5,
+      10
+    ],
+    "law_matches": [
+      [
+        1,
+        0
+      ],
+      [
+        82,
+        0
+      ],
+      [
+        42,
+        0
+      ]
+    ],
+    "law_control": [
+      20,
+      1
+    ],
+    "native_unit_read_offsets": [
+      [
+        5,
+        1
+      ],
+      [
+        6,
+        1
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        8,
+        1
+      ],
+      [
+        24,
+        2
+      ],
+      [
+        53,
+        1
+      ],
+      [
+        54,
+        1
+      ],
+      [
+        232,
+        1
+      ]
+    ],
+    "raw_sha256": "9bfa4da243d6d9a520a8fcb121f33db594d3510f1e7e08827673bf260f3317bd"
+  },
+  "rejected": [
+    {
+      "case": "wrong ability",
+      "reason": "Potion final source/peer/ability differs"
+    },
+    {
+      "case": "wrong peer",
+      "reason": "Potion final source/peer/ability differs"
+    },
+    {
+      "case": "wrong mode",
+      "reason": "Potion final source/peer/ability differs"
+    },
+    {
+      "case": "wrong source",
+      "reason": "Potion final source/peer/ability differs"
+    },
+    {
+      "case": "wrong callback",
+      "reason": "Potion final prompt is not owned Do it"
+    },
+    {
+      "case": "wrong callback state",
+      "reason": "Potion final prompt is not owned Do it"
+    },
+    {
+      "case": "Cancel selected",
+      "reason": "Potion final prompt is not owned Do it"
+    },
+    {
+      "case": "wrong driver",
+      "reason": "Potion final driver differs"
+    },
+    {
+      "case": "wrong processor ability",
+      "reason": "Potion final processor signature differs"
+    },
+    {
+      "case": "wrong processor state",
+      "reason": "Potion final processor signature differs"
+    },
+    {
+      "case": "wrong final flags",
+      "reason": "Potion final processor signature differs"
+    },
+    {
+      "case": "wrong target wrapper",
+      "reason": "Potion final self-target table/accepted source differs"
+    },
+    {
+      "case": "foreign accepted source",
+      "reason": "Potion final self-target table/accepted source differs"
+    },
+    {
+      "case": "already committed target",
+      "reason": "Potion final self-target table/accepted source differs"
+    },
+    {
+      "case": "changed HP",
+      "reason": "Potion final canonical source changed"
+    },
+    {
+      "case": "changed count",
+      "reason": "Potion final inventory/availability changed"
+    },
+    {
+      "case": "unknown law",
+      "reason": "unknown/aliased current-law set"
+    },
+    {
+      "case": "duplicate law",
+      "reason": "unknown/aliased current-law set"
+    },
+    {
+      "case": "extra law",
+      "reason": "unknown/aliased current-law set"
+    },
+    {
+      "case": "Items law forbids Potion",
+      "reason": "active law forbids self-Potion"
+    },
+    {
+      "case": "target tile changed",
+      "reason": "Potion final target tile differs"
+    },
+    {
+      "case": "aliased source id",
+      "reason": "Potion final source alias"
+    }
+  ],
+  "source_sha256": {
+    "tools/consumable_final.py": "e8a30a5cdd7bffb4fbfe74161f2d9da8d07dcbcbcb9ccffa1ee4976073a64792",
+    "tools/validate_consumable_final.py": "cc94549465de6d8c5a90412d8ab4cbf7bd335e7c9a6447e494303c8286f50cb7"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a66-reaction-free-final-01\\inventory.json": "81827a652dd156b6489cb6b06b3cc1f68a6b4b5597ca0b22910ee925b0dee075",
+    "outputs\\autobattle\\a66-reaction-free-final-01\\Item-list-ewram.bin": "bb1805e03a1cec47da92f6de6f4c2faee10d6b85aa6a786121581bcf89afd9e0",
+    "outputs\\autobattle\\a66-reaction-free-final-01\\Potion-final-prompt-ewram.bin": "9fe692952bb3515ddfefcfcf4ffa58fe41abb8eb4ee8c7ead9f766678fced586"
+  },
+  "limitations": [
+    "Read-only final context and isolated native law predicates; no actual item use or effect queue claim."
+  ]
+}

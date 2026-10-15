@@ -150,3 +150,11 @@ visual/effect-queue mismatch UNKNOWN. Do not use it to claim healing or law
 compliance of the live queue. Next bind a final-prompt token and verify the
 matcher's RAM dependencies, then identify the actual preview/effect queue.
 A6.6.2 and public item execution stay gated.
+
+## 2026-10-15: bounded final reader and preview controls pass
+
+The isolated law matcher now maps only the pinned unit. Read hooks reject any foreign EWRAM or non-stack IWRAM dependency and EWRAM writes. Current laws1/82/42 return0; Items20 returns1. Unknown law IDs, moving data, aliases and Cancel are refused. Twenty-two final-context mutations pass. This is actual ROM execution with captured unit data, not proof of a live matcher call.
+
+Fresh `a66-reaction-free-final-01` PID22428 reaches the final owned Do it prompt with selected251, unchanged HP100/Potion2,47-module source closure and40 attributed raw writes. `a66-reaction-free-01` changes only the two HP records, reaction bytes and Potion count/reserve in a copied session; independent reload confirms native reaction getter080CD4D4 returns0. Original slot75 resolved Blizzard29; removing it removes that displayed reaction. No final use input was sent.
+
+The remaining generic dmg label is also present in retained accepted Cure screenshot `a6-cure-cast-03/07-A.png`; its probe records actual HP100 to163 and MP85 to79. Thus the label alone does not establish damage. This resolves the preview discrepancy at the reader boundary; it does not prove the actual Potion effect queue. A6.6.1 passes only for this bounded reaction-free self-Potion fixture. A6.6.2 must measure real consumption, healing and turn completion. Clear EXP99 explicitly in a new clone before use to avoid an unrelated native level-up prompt. Public item execution remains disabled.

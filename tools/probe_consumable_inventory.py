@@ -16,6 +16,7 @@ from consumable_menu import OwnedItemList
 from consumable_overlay import PotionOverlayReader
 from consumable_preview_gate import PotionPreviewGate
 from consumable_description import PotionDescriptionReader,PotionPromptInspectionGate
+from consumable_final import PotionFinalPromptReader
 from emulate import Gba
 from ffta_names import Names, UI_STRINGS
 from fixture_guard import FixtureSession, STRIDE
@@ -127,6 +128,7 @@ def main():
                         'live pool disagrees with actual ROM count accessor')
                 item_reader=OwnedItemList(transport.g,rom,owner,member)
                 item_token=item_reader.snapshot();item_reader.revalidate(item_token)
+                final_reader=PotionFinalPromptReader(item_reader,item_token,rom_path=args.rom) if args.inspect_potion_final_prompt else None
                 result['joined_item_list']=item_token.receipt()
                 result['status']='pass-live-owned-Item-list-and-inventory-reader'
                 if args.inspect_potion_target:
@@ -165,6 +167,7 @@ def main():
                             'inventory':inventory.snapshot().raw.hex(),
                             'canonical':exact(transport.g,member,STRIDE).hex()}
                         result['status']='captured-Potion-target-acceptance-only'
+                        session.screenshot(str(out/'Potion-preview.png'));stopped()
                         if args.inspect_potion_final_prompt:
                             description=description_reader.snapshot();description_reader.revalidate(description)
                             result['Potion_description']=description.receipt()
@@ -179,6 +182,8 @@ def main():
                                 'driver':exact(transport.g,0x0200F4E8,0xE0).hex(),
                                 'inventory':inventory.snapshot().raw.hex(),
                                 'canonical':exact(transport.g,member,STRIDE).hex()}
+                            final_token=final_reader.snapshot();final_reader.revalidate(final_token)
+                            result['Potion_final_token']=final_token.receipt()
                             result['status']='captured-Potion-final-prompt-only'
                 require(not session.writes,'research probe edited RAM')
             session.screenshot(str(out/'Item-list.png'));probe.disarm(strict=True)

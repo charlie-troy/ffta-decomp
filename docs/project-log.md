@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-15 - Bounded self-Potion final reader passes; use witness next
+
+Fresh reaction-free native capture reaches owned Do it with HP100/Potion2 unchanged, 40 raw writes and47-module closure. Native law matcher depends only on the pinned unit/stack; current1/82/42 clear, Items20 rejects,22 final-context mutations reject. Blizzard was reaction slot75, confirmed by native getter and disappearance after clearing only reaction. The accepted Cure control also displays dmg while actually healing, resolving that label concern without asserting Potion effect semantics. A6.6.1 bounded reader PASS; actual use/queue/turn completion and public lifecycle remain UNKNOWN. Next construct EXP0 reaction-free fixture for single-use witness. All owned sessions closed.
+
 ## 2026-10-15 - Potion law matcher controls and final prompt inspection
 
 Actual law matcher081343C8 returns clear for active1/82/42 and match for Items20 on captured self-Potion251;12 amount/control executions return normally with no EWRAM writes. Typed one-attempt preview/description gates reach native Do it/Cancel without final use (40 raw writes,46-module closure, unchanged Potion2/HP100). Six host gate cases and nine description mutations plus STOP/retry controls pass. Lower preview still shows Blizzard/26dmg despite Potion/Heal HP selection: effect-queue correlation remains UNKNOWN. Next verify matcher dependencies and final token, then resolve that mismatch before A6.6.2. All emulator sessions closed.

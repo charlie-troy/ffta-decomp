@@ -16,6 +16,7 @@ from probe_recovery_ko_lifecycle import export_owned_state, source_dependencies
 from recovery_menu import MEMBERS, MEMBER_COUNT, exact, integer, require
 from recovery_menu_list import ResearchMenuList
 from recovery_transport import RecoveryTransport
+from emulate import Gba
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
     ap.add_argument('--rom',default='baserom.gba')
     ap.add_argument('--hp',type=int,default=100)
     ap.add_argument('--potion-count',type=int,default=2)
+    ap.add_argument('--clear-reaction',action='store_true',help='Explicitly construct a reaction-free actor; no original asset changes')
     ap.add_argument('--out',required=True)
     args=ap.parse_args();out=Path(args.out);out.mkdir(parents=True,exist_ok=False)
     sha=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
@@ -49,6 +51,8 @@ def main():
                 require(record is not None,'fixture Potion record absent')
                 for address in [member,ROSTER+owner['slot']*STRIDE]:
                     session.write_bytes(address+0x18,args.hp.to_bytes(2,'little'),'disposable Item fixture: wounded actor')
+                    if args.clear_reaction:
+                        session.write_u8(address+0x3A,0,'disposable Item fixture: clear reaction slot')
                 session.write_bytes(record+2,bytes([args.potion_count,0]),'disposable Item fixture: Potion owned/reserved')
                 result.update(owner=owner,canonical=member,fixture_writes=session.writes,
                               gameplay_writes=getattr(probe,'key_write_log',[]))
@@ -61,6 +65,10 @@ def main():
                 require(owner['id']==5 and token.state=='command' and token.hp==args.hp
                         and count==args.potion_count,'fresh Item fixture reload differs')
                 require(not session.writes,'reload unexpectedly edited fixture')
+                if args.clear_reaction:
+                    unit=exact(transport.g,member,STRIDE);native=Gba(args.rom);native.uc.mem_write(member,unit)
+                    require(unit[0x3A]==0 and native.call(0x080CD4D4,[member])==0,'native reaction getter differs after reload')
+                    result['native_reaction']={'slot_offset':'3A','getter':'080CD4D4','reloaded_effect':0}
                 result['reload']={'pid':session.pid,'owner':owner,'command':token.receipt(),'Potion_count':count,
                                   'fixture_writes':session.writes,'gameplay_writes':getattr(probe,'key_write_log',[])}
             session.screenshot(str(out/'wounded-reload.png'));probe.disarm(strict=True)
