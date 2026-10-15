@@ -1,0 +1,71 @@
+{
+  "status": "pass",
+  "scope": "Audit live research STOP/reserve/zero refusal and zero writes after latch.",
+  "observation": {
+    "case": "last-item",
+    "writes": 40,
+    "owned_process_closed": true
+  },
+  "closure": [
+    "ability_resources",
+    "ability_table",
+    "autobattle_identity",
+    "autobattle_runtime",
+    "build_recovery_fixture",
+    "consumable_description",
+    "consumable_effect_trace",
+    "consumable_final",
+    "consumable_inventory",
+    "consumable_menu",
+    "consumable_overlay",
+    "consumable_preview_gate",
+    "consumable_transport",
+    "consumable_use_gate",
+    "emulate",
+    "ffta_names",
+    "ffta_text",
+    "fixture_guard",
+    "life_recovery_runtime",
+    "life_recovery_transaction",
+    "party_recovery_runtime",
+    "player_boundary_observer",
+    "probe_consumable_inventory",
+    "probe_control_handoff",
+    "probe_recovery_ko_lifecycle",
+    "probe_recovery_party",
+    "recovery_ally_confirmation",
+    "recovery_ally_executor",
+    "recovery_ally_preview",
+    "recovery_ally_target",
+    "recovery_boundary_diagnostic",
+    "recovery_continuation",
+    "recovery_executor",
+    "recovery_ko_trace",
+    "recovery_life_effect",
+    "recovery_life_final",
+    "recovery_life_target",
+    "recovery_life_trace",
+    "recovery_life_wait",
+    "recovery_menu",
+    "recovery_menu_list",
+    "recovery_party",
+    "recovery_party_continuation",
+    "recovery_runtime",
+    "recovery_transport",
+    "status_flags",
+    "tactics_adapter",
+    "tactics_policy",
+    "trace_mgba",
+    "wait_ally_continuation"
+  ],
+  "mutations_rejected": 3,
+  "source_sha256": {
+    "tools/validate_consumable_refusal.py": "ca147d33ad7d5d9bc6c5bd810aad8132e19c3203ce31b438977afe967422c26e"
+  },
+  "evidence_sha256": {
+    "outputs\\autobattle\\a662-live-refusals-01\\last-item\\inventory.json": "0058a9a40237ecdb230687ef5d287e388dd9a70968fdd4c071a8db841acbd326"
+  },
+  "limitations": [
+    "Research CLI and actual STOP file only; not public leave-running/manual/resume acceptance."
+  ]
+}

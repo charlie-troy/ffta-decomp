@@ -26,7 +26,8 @@
     },
     {
       "id": "actual-single-consumption-effect-completion",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "A6.6.2 bounded reaction-free EXP0 Montblanc self-Potion: two clean use/Wait/next-actor reloads, native decrement/HP stores, live STOP/reserve/zero refusals. Public lifecycle separate."
     },
     {
       "id": "final-public-lifecycle-and-regressions",
@@ -72,11 +73,12 @@
     "outputs/autobattle/a66-reaction-free-source-checks-01.json": "e8f4a3d5ca5a34be57845bff942b5ed5faf110fc1b0c77dea985fd19adb83565",
     "outputs/autobattle/a66-reaction-free-final-controls-01.json": "7aee894659ef3d2f66c1305d33c6f55eb298c17671568d37b934af60d05b2fb8",
     "outputs/autobattle/a66-reaction-free-menu-controls-01.json": "52de4d66c71649119705fc0eb3b7271a6f8ac1cb165791a5029a5890a0de4c10",
-    "outputs/autobattle/a6-cure-cast-03/probe.json": "3df5cc875722488607752e0160f95cd7e07cfb3e44492f387da9e363fb272667"
+    "outputs/autobattle/a6-cure-cast-03/probe.json": "3df5cc875722488607752e0160f95cd7e07cfb3e44492f387da9e363fb272667",
+    "docs/receipts/autobattle/A6.6.2.json": "5b38d1ae973b405516e184c17f4a42476f2d847c9738360a63eed970dd2bbe9b"
   },
   "limitations": [
     "Inventory and owned Item-list counts proved only for the named fixture; no executable candidate, target/law approval or use.",
     "Public Item execution remains disabled. Draw Weapon row15 is excluded from consumables."
   ],
-  "next_task": "Execute A6.6.2 single-use research witness; preserve public Item default disabled until A6.6.3."
+  "next_task": "A6.6.3 public schema2 integration and lifecycle/regressions."
 }

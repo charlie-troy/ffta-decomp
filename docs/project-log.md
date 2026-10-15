@@ -1,5 +1,9 @@
 # Project log
 
+## 2026-10-15 - A6.6.2 bounded Potion use PASS; public integration next
+
+Live refusal matrix passes STOP-final-use/post-effect/Wait-final (40/45/60 writes, zero after observed latch, under2s), last-item1 refusal at40 and native zero omission/refusal at25. Each passes3 corruption controls, source/raw hashes and terminal owned-process close. Together with two clean native use/Wait/Carson reloads, A6.6.2 is bounded PASS for reaction-free EXP0 Montblanc self-Potion. A6.6 overall/public lifecycle remain UNKNOWN. Next A6.6.3 shared transaction, schema2 policy/default-disabled gates and actual public CLI STOP/manual/same-PID result with Cure/Life/default regressions. All owned research processes closed.
+
 ## 2026-10-15 - Two clean Potion/Wait reloads; terminal cleanup corrected
 
 Explicit halt alone still raced S02. Terminal research transport now strictly disarms while halted and does not re-arm before owned process close; default public transport unchanged. Clean-turn07/PID51040 and08/PID87840 each show native count2 to1 / HP100 to125 / MP221,65 inputs, guarded Wait, independently joined Carson, strict disarm and process close.13 audit mutations each,4 terminal host cases and13 default transport regressions pass. Live refusal matrix running; STOP-final-use and post-effect already pass. A6.6.2 remains UNKNOWN until remaining STOP/last-item/zero cases; no public Item acceptance.

@@ -1,0 +1,50 @@
+{
+  "status": "pass-live-Potion-research-refusals",
+  "scope": "Sequential actual-emulator STOP, last-item and zero-quantity research cases.",
+  "cases": [
+    {
+      "case": "STOP-final-use",
+      "capture": "outputs\\autobattle\\a662-live-refusals-01\\STOP-final-use",
+      "checks": "outputs\\autobattle\\a662-live-refusals-01\\STOP-final-use-checks.json",
+      "status": "pass"
+    },
+    {
+      "case": "STOP-post-effect",
+      "capture": "outputs\\autobattle\\a662-live-refusals-01\\STOP-post-effect",
+      "checks": "outputs\\autobattle\\a662-live-refusals-01\\STOP-post-effect-checks.json",
+      "status": "pass"
+    },
+    {
+      "case": "STOP-Wait-final",
+      "capture": "outputs\\autobattle\\a662-live-refusals-01\\STOP-Wait-final",
+      "checks": "outputs\\autobattle\\a662-live-refusals-01\\STOP-Wait-final-checks.json",
+      "status": "pass"
+    },
+    {
+      "case": "last-item",
+      "capture": "outputs\\autobattle\\a662-live-refusals-01\\last-item",
+      "checks": "outputs\\autobattle\\a662-live-refusals-01\\last-item-checks.json",
+      "status": "pass"
+    },
+    {
+      "case": "zero",
+      "capture": "outputs\\autobattle\\a662-live-refusals-01\\zero",
+      "checks": "outputs\\autobattle\\a662-live-refusals-01\\zero-checks.json",
+      "status": "pass"
+    }
+  ],
+  "evidence_sha256": {
+    "outputs\\autobattle\\a662-live-refusals-01\\last-item-checks.json": "d87db73df2b30d8b249b2b3b354407fe49b57591b7bc70ce1868f60fd820c8ee",
+    "outputs\\autobattle\\a662-live-refusals-01\\STOP-final-use-checks.json": "3fedf9dce5df5850d7d11b26dce4939bcc430fb9f550c4281b6b16ca4537f5ec",
+    "outputs\\autobattle\\a662-live-refusals-01\\STOP-post-effect-checks.json": "4dbbb7f2d5cbf41579036ebeb91044f2d85b1289b4ca38a47cbe7b5200ff0f88",
+    "outputs\\autobattle\\a662-live-refusals-01\\STOP-Wait-final-checks.json": "e4e590bd50a658579fbc2cf09b3a34f6b3cabaf5430d0ebe172c239d1026ac01",
+    "outputs\\autobattle\\a662-live-refusals-01\\zero-checks.json": "f02a278f6cb0f2e540315650b9c540b1e52e28a7d77e3a761c951f6f0b47e705",
+    "outputs\\autobattle\\a662-live-refusals-01\\last-item\\inventory.json": "0058a9a40237ecdb230687ef5d287e388dd9a70968fdd4c071a8db841acbd326",
+    "outputs\\autobattle\\a662-live-refusals-01\\last-item-fixture\\fixture.json": "7a0bcff1f0b3f6f6a2bf88629eba858df998c38122d7aa9da8426fa5d74fd180",
+    "outputs\\autobattle\\a662-live-refusals-01\\STOP-final-use\\inventory.json": "b9f47db92a56223610a6fa4faf06be2d8c7ac037440cdd14e36448446e8e1172",
+    "outputs\\autobattle\\a662-live-refusals-01\\STOP-post-effect\\inventory.json": "d4a776fb3f8a8e5bfa215e758d36df948dc19c9a0e7a7e4b131cb4a6cf2d22d9",
+    "outputs\\autobattle\\a662-live-refusals-01\\STOP-Wait-final\\inventory.json": "40e57e1bf95d1d8f0a347e7117a8fd4b334013b712719fd707a152abca260f55",
+    "outputs\\autobattle\\a662-live-refusals-01\\zero\\inventory.json": "148e794c90e405a41e94d2f9f7464eea8447b60a64e0ae3b997f3254dcfa3437",
+    "outputs\\autobattle\\a662-live-refusals-01\\zero-fixture\\fixture.json": "666a2d85767f8b83933be2c8cdacc798d108d8f77a8a6da6f4015b3d43455291"
+  }
+}

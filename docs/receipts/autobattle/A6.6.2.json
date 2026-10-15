@@ -1,7 +1,7 @@
 {
   "milestone": "A6.6.2",
   "date": "2026-10-15",
-  "status": "unknown",
+  "status": "pass",
   "scope": "Bounded reaction-free EXP0 Montblanc self-Potion research; public execution disabled",
   "criteria": [
     {
@@ -26,7 +26,8 @@
     },
     {
       "id": "live-STOP-and-reserve-refusal",
-      "status": "unknown"
+      "status": "pass",
+      "scope": "Actual research CLI STOP file at final-use/post-effect/Wait-final:40/45/60 raw writes, zero after observed latch, under2s observation, terminal disarm/owned process closed. Last-item1 refuses final input at40 writes; native count0 omits Potion and refuses before selection at25. Each has3 audit mutations and source closure."
     },
     {
       "id": "first-complete-use-Wait-next-actor",
@@ -70,7 +71,20 @@
     "outputs/autobattle/a662-clean-turn-08/inventory.json": "d156a6207305e17d285426df77665b40cbc9fa2b99383ec1bfd6eb9cfb8179dc",
     "outputs/autobattle/a662-clean-turn-08/native-Potion-hits.jsonl": "6ca3bb142b564271252ea0454f1fe294481b5bb4e959af850e43365eb225a9a7",
     "outputs/autobattle/a662-clean-turn-checks-07b.json": "78a97ec349e10bcecc04bb13c412001232564a6d67ce3cc23a9a3053179d40cb",
-    "outputs/autobattle/a662-clean-turn-checks-08b.json": "473efd2aff200224fec9fb2624c0cd27dae2d3be7d08b2b4e81675ab03cb37d4"
+    "outputs/autobattle/a662-clean-turn-checks-08b.json": "473efd2aff200224fec9fb2624c0cd27dae2d3be7d08b2b4e81675ab03cb37d4",
+    "outputs/autobattle/a662-live-refusals-01/last-item-checks.json": "d87db73df2b30d8b249b2b3b354407fe49b57591b7bc70ce1868f60fd820c8ee",
+    "outputs/autobattle/a662-live-refusals-01/matrix.json": "bf6655cc8134c3eeef888ee260120705f226b588a828dcaaca6cdb9a31333098",
+    "outputs/autobattle/a662-live-refusals-01/STOP-final-use-checks.json": "3fedf9dce5df5850d7d11b26dce4939bcc430fb9f550c4281b6b16ca4537f5ec",
+    "outputs/autobattle/a662-live-refusals-01/STOP-post-effect-checks.json": "4dbbb7f2d5cbf41579036ebeb91044f2d85b1289b4ca38a47cbe7b5200ff0f88",
+    "outputs/autobattle/a662-live-refusals-01/STOP-Wait-final-checks.json": "e4e590bd50a658579fbc2cf09b3a34f6b3cabaf5430d0ebe172c239d1026ac01",
+    "outputs/autobattle/a662-live-refusals-01/zero-checks.json": "f02a278f6cb0f2e540315650b9c540b1e52e28a7d77e3a761c951f6f0b47e705",
+    "outputs/autobattle/a662-live-refusals-01/last-item/inventory.json": "0058a9a40237ecdb230687ef5d287e388dd9a70968fdd4c071a8db841acbd326",
+    "outputs/autobattle/a662-live-refusals-01/last-item-fixture/fixture.json": "7a0bcff1f0b3f6f6a2bf88629eba858df998c38122d7aa9da8426fa5d74fd180",
+    "outputs/autobattle/a662-live-refusals-01/STOP-final-use/inventory.json": "b9f47db92a56223610a6fa4faf06be2d8c7ac037440cdd14e36448446e8e1172",
+    "outputs/autobattle/a662-live-refusals-01/STOP-post-effect/inventory.json": "d4a776fb3f8a8e5bfa215e758d36df948dc19c9a0e7a7e4b131cb4a6cf2d22d9",
+    "outputs/autobattle/a662-live-refusals-01/STOP-Wait-final/inventory.json": "40e57e1bf95d1d8f0a347e7117a8fd4b334013b712719fd707a152abca260f55",
+    "outputs/autobattle/a662-live-refusals-01/zero/inventory.json": "148e794c90e405a41e94d2f9f7464eea8447b60a64e0ae3b997f3254dcfa3437",
+    "outputs/autobattle/a662-live-refusals-01/zero-fixture/fixture.json": "666a2d85767f8b83933be2c8cdacc798d108d8f77a8a6da6f4015b3d43455291"
   },
   "excluded_runs": [
     {
@@ -99,5 +113,5 @@
     "Effect-time processor ability is cleared; never infer ability from that zero field.",
     "No public Item lifecycle acceptance."
   ],
-  "next_task": "Finish live refusal matrix STOP-final-use/post-effect/Wait-final, last-item and zero. Then A6.6.3 public schema2 integration and real CLI lifecycle; no public acceptance yet."
+  "next_task": "A6.6.3: share accepted transaction with explicit public schema2 opt-in, default-disabled consumables and policy revalidation; real CLI STOP/window manual/same-PID resumed player result, Cure/Life/default regressions and receipt mutations. Do not transfer research PASS to public acceptance."
 }
